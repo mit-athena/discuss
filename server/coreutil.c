@@ -7,7 +7,7 @@
  */
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.22 1990-02-24 20:05:09 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.23 1993-04-29 17:06:50 miki Exp $
  *
  *
  * coreutil.c  -- These contain lower-layer, utility type routines to
@@ -15,6 +15,9 @@
  *		  in-memory superblock, and to open & close meetings.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.22  90/02/24  20:05:09  srz
+ * Hmmm.  Should not exceed array bounds, should we?
+ * 
  * Revision 1.21  90/02/24  18:56:30  srz
  * Changed read_trn to return the signature (if it exists), and changed
  * mtg_znotify to handle the signature if it exists.
@@ -90,7 +93,7 @@
 const
 #endif
 static char rcsid_coreutil_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.22 1990-02-24 20:05:09 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.23 1993-04-29 17:06:50 miki Exp $";
 #endif /* lint */
 
 #include <discuss/types.h>
@@ -109,8 +112,19 @@ static char rcsid_coreutil_c[] =
 #include <netdb.h>
 #include <sys/file.h>
 #include <sys/stat.h>
+#ifndef SOLARIS
 #include <strings.h>
-
+#else
+#include <string.h>
+#include <fcntl.h>
+/*
+ * flock operations.
+ */
+#define LOCK_SH               1       /* shared lock */
+#define LOCK_EX               2       /* exclusive lock */
+#define LOCK_NB               4       /* don't block when locking */
+#define LOCK_UN               8       /* unlock */
+#endif
 #define NULL 0
 
 /* global variables */

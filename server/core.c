@@ -8,13 +8,16 @@
 /*
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.32 1992-11-08 23:00:49 probe Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.33 1993-04-29 17:06:33 miki Exp $
  *
  *
  * core.c --    Routines that are the meat of discuss.  These provide user
  *		callable routines.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.32  92/11/08  23:00:49  probe
+ * Avoid incompatible redeclarations (AIX 3.2)
+ * 
  * Revision 1.31  92/07/14  17:37:03  mar
  * don't allow newline in subject line
  * compile under SVR4
@@ -100,7 +103,7 @@
  */
 #ifndef lint
 static char rcsid_core_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.32 1992-11-08 23:00:49 probe Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.33 1993-04-29 17:06:33 miki Exp $";
 #endif lint
 
 
@@ -119,7 +122,12 @@ static char rcsid_core_c[] =
 #include <sys/file.h>
 #include <sys/stat.h>
 #include <sys/param.h>
+#ifndef SOLARIS
 #include <strings.h>
+#else
+#include <string.h>
+#include <fcntl.h>
+#endif
 #ifdef SVR4
 #include <fcntl.h>
 #endif
