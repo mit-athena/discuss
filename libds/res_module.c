@@ -1,7 +1,7 @@
 /*
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/res_module.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/res_module.c,v 1.4 1987-06-27 01:28:36 spook Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/res_module.c,v 1.5 1988-06-10 05:35:19 raeburn Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
@@ -16,7 +16,7 @@
  *
  */
 #ifndef lint
-static char *rcsid_res_module_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/res_module.c,v 1.4 1987-06-27 01:28:36 spook Exp $";
+static char *rcsid_res_module_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/res_module.c,v 1.5 1988-06-10 05:35:19 raeburn Exp $";
 #endif lint
 
 #ifdef KERBEROS
@@ -37,6 +37,8 @@ static char *rcsid_res_module_c = "$Header: /afs/dev.mit.edu/source/repository/a
 #define NULL 0
 
 char *local_host_name (), *local_realm ();
+
+static int service_port = 0;
 
 resolve_module (modname, port, hostp, servp, result)
 char *modname;					/* name to translate */
@@ -118,13 +120,17 @@ int *result;					/* std error code */
      }
 
      /* otherwise, we have to generate the port number */
-     sp = getservbyname (SERVICE_NAME, 0);
-     if (!sp) {
-	  *result = RPC_SERV_UNKNOWN;
-	  return;
+     if (service_port == 0) {
+	 sp = getservbyname (SERVICE_NAME, 0);
+	 if (!sp) {
+	     *result = RPC_SERV_UNKNOWN;
+	     return;
+	 }
+
+	 service_port = sp -> s_port;
      }
 
-     *port = sp -> s_port;
+     *port = service_port;
 
      /* generate the service name, but concatenating "discuss.instance@realm"
 	desired realm. */
