@@ -12,6 +12,9 @@
  *        $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/dsmail.c.old,v $
  *
  *        $Log: not supported by cvs2svn $
+ * Revision 1.10  89/06/03  00:30:54  srz
+ * Added standard copyright notice.
+ * 
  * Revision 1.9  89/04/17  17:09:21  srz
  * Added error table initialization.
  * 
@@ -44,6 +47,7 @@
 #include <sys/file.h>
 
 #include <discuss/discuss.h>
+#include <rpc.h>
 #include "config.h"
 
 #define DEFAULT_SUBJECT "No subject found in mail header"
@@ -52,7 +56,7 @@
 
 #ifndef	lint
 static char rcsid[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/dsmail.c.old,v 1.10 1989-06-03 00:30:54 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/dsmail.c.old,v 1.11 1990-02-24 18:46:12 srz Exp $";
 #endif
 
 char *malloc();
@@ -77,6 +81,9 @@ char *inreplyto[] = {
 	"in-reply-to",NULL
 };
 
+char *fromlist[] = {
+	"^from$",NULL
+};     
 
 char *progname;
 char *save[LISTLEN],*reject[LISTLEN];
@@ -101,8 +108,8 @@ main(argc,argv)
 	FILE *f;
 	char line[BUFFLEN+1],*keyword,*key;
 	char *subject=NULL;
-	int i,ok_prev=0,iscont = 0;
-	char filename[60];
+	int i,ok_prev=0,iscont = 0, have_signature = 0;
+	char filename[60], signature[35];
 
 	init_dsc_err_tbl();
 	PRS(argc,argv);
@@ -146,6 +153,15 @@ main(argc,argv)
 					if (isdigit(*cp))
 						reply_to = atoi(cp);
 				}
+			} else if (list_compare(key,fromlist)) {
+				char *cp;
+
+				cp = index(line, ':');
+				if (cp != NULL) {
+					cp++;
+					extract_full_name(cp, signature, sizeof(signature));
+					have_signature = TRUE;
+				}
 			}
 		}
 		if ((ok_prev && iscont) || (!iscont && CheckField(key))) {
@@ -171,6 +187,7 @@ main(argc,argv)
 	}
 	
 	PipeToMeeting(f,(subject==NULL) ? DEFAULT_SUBJECT : subject,
+		      (have_signature) ? signature : NULL, 
 		      reply_to);
  bye:
 	if (!debug)
@@ -179,8 +196,9 @@ main(argc,argv)
 	
 }
 
-void PipeToMeeting(f,subject, reply_to)	/* Pipes? I don't see any pipes here.. */
+void PipeToMeeting(f,subject, signature, reply_to)	/* Pipes? I don't see any pipes here.. */
 	char *subject;
+	char *signature;     
 	FILE *f;
 	int reply_to;
 {
@@ -210,7 +228,15 @@ void PipeToMeeting(f,subject, reply_to)	/* Pipes? I don't see any pipes here.. *
 		printf("subject is ``%s''\nreplying to %d in %s\n",
 		       subject, reply_to, usr_mtg);
 	} 
-	add_trn(usr_mtg, transaction, subject, reply_to, &trn_no, &result);
+	if (signature == NULL || *signature == '\0') {
+		add_trn(usr_mtg, transaction, subject, reply_to, &trn_no, &result);
+	} else {
+		if (get_server_version() < SERVER_2)
+			add_trn(usr_mtg, transaction, subject, reply_to, &trn_no, &result);
+		else
+		     	add_trn2(usr_mtg, transaction, subject, signature, reply_to, &trn_no, &result);
+	}
+
 	if (result) {
 		fprintf(stderr, "Can't enter transaction into %s: %s\n",
 			usr_mtg, error_message(result));
@@ -314,3 +340,200 @@ int list_compare(s,list)
 	return(0);
 }
 
+strip_addr(addr, dest, dest_size)
+char *addr,*dest;
+int dest_size;
+{
+     char *dest_end,*dp,*sp,*quote_start;
+     int paren_level,found_angle;
+
+     dest_end = &dest[dest_size-1];
+     dp = dest;
+     sp = addr;
+     paren_level = 0;
+
+eat_white:
+     while (isspace(*sp) && *sp != '\n')
+	  sp++;
+
+     if (*sp == '(')
+	  goto eat_comment;
+
+     if (*sp == '"')
+	  goto eat_string;
+
+     if (*sp == '<') {
+	  dp = dest;
+	  sp++;
+	  found_angle = TRUE;
+	  goto eat_white;
+     }
+
+     if (*sp == '>' && found_angle) {
+	  *sp++;
+	  goto eat_white;
+     }
+
+     if (*sp == '\0' || *sp == '\n') {
+	  *dp++ = '\0';
+	  goto post_proc;
+     }
+
+     *dp++ = *sp++;
+     if (dp == dest_end) {
+	  *dp++ = '\0';
+	  goto post_proc;
+     }
+
+     goto eat_white;
+
+eat_comment:
+     paren_level++;
+     sp++;
+
+cont_comment:
+     while (*sp != ')' && *sp != '(' && *sp) {
+	  sp++;
+     }
+
+     if (*sp == '\0') {
+	  *dp = '\0';
+	  goto post_proc;
+     }
+
+     if (*sp == '(')
+	  goto eat_comment;
+
+     sp++;		/* ) */
+     paren_level--;
+     if (paren_level <= 0)
+	  goto eat_white;
+
+     goto cont_comment;
+
+eat_string:
+     quote_start = sp;
+     sp++;
+
+     while(*sp != '"' && *sp) 
+	  sp++;
+
+     if (!*sp) {
+	  *dp = '\0';
+	  goto post_proc;
+     }
+
+     if (*++sp == '@') {		/* "foo"@bar */
+	  sp = quote_start;
+	  *dp++ = *sp++;
+	  while (dp < dest_end && *sp != '"')
+	       *dp++ = *sp++;
+
+	  if (dp == dest_end) {
+	       *dp = '\0';
+	       goto post_proc;
+	  }
+	  *dp++ = *sp++;
+	  if (dp == dest_end) {
+	       *dp++ = '\0';
+	       goto post_proc;
+	  }
+     }
+     goto eat_white;
+
+     /* No post processing */
+post_proc:
+     return;
+}
+
+/*
+ *
+ *   Routine to extract a full name from an address.  If no full name
+ *   can be found, then we simply return the stripped address.
+ *
+ */
+
+extract_full_name(addr, dest, dest_size)
+char *addr,*dest;
+int dest_size;
+{
+     char *dest_end,*dp,*sp,*bracket,*close_paren;
+     int paren_level,non_white;
+
+     dest_end = &dest[dest_size-1];
+     dp = dest;
+     sp = addr;
+
+     /* Find angle bracket (if possible) */
+     while (*sp && *sp != '<' && *sp != '\n')
+	  sp++;
+
+     bracket = NULL;
+     if (*sp == '<')
+	  bracket = sp;
+
+     non_white = 0;
+     if (bracket != NULL) {
+	  for (sp = addr; sp < bracket; sp++) {
+	       if (!isspace(*sp) && *sp != '"')
+		    non_white++;
+	  }
+     }
+
+     if (non_white > 1) {		/* We have a name */
+	  sp = addr;
+	  while (isspace(*sp) || *sp == '"')	/* Skip leading spaces */
+	       sp++;
+
+	  while (isspace(*(bracket-1)) || *(bracket-1) == '"')  /* Skip trailing spaces */
+	       bracket--;
+
+	  /* Copy it over */
+	  while (sp < bracket && dp < dest_end)
+	       *dp++ = *sp++;
+
+	  *dp++ = '\0';
+	  return;
+     }
+
+     /* Now, let's see if we have name in a comment (look back from the
+	end for a parenthesis. */
+     for (sp = addr; *sp && *sp != '\n'; sp++)
+	  ;
+
+     sp--;
+     while (sp > addr && isspace(*sp))
+	  sp--;
+
+     if (*sp == ')') {			/* Name in comment */
+	  close_paren = sp;
+	  paren_level = 1;
+	  sp--;
+
+	  for (;sp > addr; sp--) {
+	       if (*sp == ')')
+		    paren_level++;
+	       else if (*sp == '(') {
+		    paren_level--;
+		    if (paren_level == 0)
+			 break;
+	       }
+	  }
+
+	  if (*sp == '(') {	      	/* Copy it over */
+	       sp++;
+
+	       while(isspace(*sp))
+		    sp++;
+
+	       while (sp < close_paren && dp < dest_end)
+		    *dp++ = *sp++;
+
+	       *dp = '\0';
+	       return;
+	  }
+     }
+
+     strip_addr(addr, dest, dest_size);
+     return;
+}	  
