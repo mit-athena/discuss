@@ -1,5 +1,5 @@
 ;;;	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss-enter.el,v $
-;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss-enter.el,v 1.4 1988-10-29 01:50:29 balamac Exp $
+;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss-enter.el,v 1.5 1988-11-01 15:57:21 eichin Exp $
 ;;;
 ;;;  Emacs lisp code to enter transaction into discuss.  Part of the
 ;;;  emacs-based interface to the discuss conferencing system.
@@ -38,7 +38,7 @@
   (let ((subject (nth 11 discuss-current-transaction-info)))
     ;; Add the Re: field
     (if (and (> (length subject) 3)
-	     (equal (substring subject 0 4) "Re: "))
+	     (string-match "[Rr]e: " (substring subject 0 4)))
 	nil
       (setq subject (concat "Re: " subject)))
     (discuss-enter discuss-current-meeting discuss-current-transaction
@@ -55,7 +55,7 @@
   (let ((subject (nth 11 discuss-randrp-trn-info))
 	(trn-num (nth 0 discuss-randrp-trn-info)))
     (if (and (> (length subject) 3)
-	     (equal (substring subject 0 4) "Re: "))
+	     (string-match "[Rr]e: " (substring subject 0 4)))
 	nil
       (setq subject (concat "Re: " subject)))
     (discuss-enter discuss-current-meeting trn-num subject t)))
