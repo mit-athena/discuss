@@ -2,13 +2,16 @@
  *
  * List request for DISCUSS
  *
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.9 1986-12-07 00:39:08 rfrench Exp $
+ * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.10 1986-12-07 16:04:34 rfrench Exp $
  * $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v $
  * $Locker:  $
  *
  * Copyright (C) 1986 by the MIT Student Information Processing Board
  *
  * $Log: not supported by cvs2svn $
+ * Revision 1.9  86/12/07  00:39:08  rfrench
+ * Killed ../include
+ * 
  * Revision 1.8  86/11/11  16:33:09  spook
  * Fixed to work with changes in et stuff
  * 
@@ -49,7 +52,6 @@
 
 char *ctime(), *malloc();
 static int	time_now, time_sixmonthsago, time_plusthreemonths;
-static int idl, sci_idx;
 static trn_info t_info;
 static list_it(),delete_it(),retrieve_it();
 static int performed;				/* true if trn was acted upon */
@@ -120,8 +122,7 @@ list_it(i)
 	return(code);
 }
 
-list(sci_arg, argc, argv)
-	int sci_arg;
+list(argc, argv)
 	int argc;
 	char **argv;
 {
@@ -129,7 +130,7 @@ list(sci_arg, argc, argv)
 	time_sixmonthsago = time_now - 6*30*24*60*60; 
 	time_plusthreemonths = time_now + 6*30*24*60*60;
 
-	map_trns(sci_arg, argc, argv, "all", list_it);
+	map_trns(argc, argv, "all", list_it);
 	return;
 }
 
@@ -155,12 +156,11 @@ int i;
 }
 
 
-del_trans(sci_arg, argc, argv)
-	int sci_arg;
+del_trans(argc, argv)
 	int argc;
 	char **argv;
 {
-	map_trns(sci_arg, argc, argv, "current", delete_it);
+	map_trns(argc, argv, "current", delete_it);
 	dsc_public.current = 0;
 	return;
 }
@@ -187,17 +187,15 @@ int i;
 
 
 
-ret_trans(sci_arg, argc, argv)
-	int sci_arg;
+ret_trans(argc, argv)
 	int argc;
 	char **argv;
 {
-	map_trns(sci_arg, argc, argv, "current", retrieve_it);
+	map_trns(argc, argv, "current", retrieve_it);
 	return;
 }
 
-map_trns(sci_arg, argc, argv, defalt, proc)
-	int sci_arg;
+map_trns(argc, argv, defalt, proc)
 	int argc;
 	char **argv;
 	char *defalt;
@@ -207,8 +205,6 @@ map_trns(sci_arg, argc, argv, defalt, proc)
 	int code;
 	int i;
 	selection_list *trn_list;
-
-	sci_idx = sci_arg;
 
 	if (!dsc_public.attending) {
 		ss_perror(sci_idx, 0, "No current meeting.\n");
@@ -263,4 +259,3 @@ map_trns(sci_arg, argc, argv, defalt, proc)
 	     else
 		  (void) fprintf(stderr, "%s: No transactions selected\n", ss_name(sci_idx));
 }
-

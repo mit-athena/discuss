@@ -2,13 +2,16 @@
  *
  * Status request for DISCUSS
  *
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/status.c,v 1.4 1986-12-07 00:39:56 rfrench Exp $
+ * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/status.c,v 1.5 1986-12-07 16:05:19 rfrench Exp $
  * $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/status.c,v $
  * $Locker:  $
  *
  * Copyright (C) 1986 by the MIT Student Information Processing Board
  *
  * $Log: not supported by cvs2svn $
+ * Revision 1.4  86/12/07  00:39:56  rfrench
+ * Killed ../include
+ * 
  * Revision 1.3  86/11/16  06:26:03  wesommer
  * Now prints out info similar to that printed when one goes to a
  * meeting.
@@ -28,8 +31,7 @@
 #include "config.h"
 #include "globals.h"
 
-status(sci_idx, argc, argv)
-	int sci_idx;
+status(argc, argv)
 	int argc;
 	char **argv;
 {

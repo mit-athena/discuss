@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.21 1986-12-07 00:29:25 rfrench Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.22 1986-12-07 16:04:23 rfrench Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
@@ -9,6 +9,9 @@
  *	ss library for the command interpreter.
  *
  *      $Log: not supported by cvs2svn $
+ * Revision 1.21  86/12/07  00:29:25  rfrench
+ * Killed ../include
+ * 
  * Revision 1.20  86/11/20  10:32:10  srz
  * Reply sets current right
  * 
@@ -77,7 +80,7 @@
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.21 1986-12-07 00:29:25 rfrench Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.22 1986-12-07 16:04:23 rfrench Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -111,7 +114,7 @@ char	*temp_file = (char *)NULL;
 char	*pgm = (char *)NULL;
 char	buf[BUFSIZ];
 char	*buffer = &buf[0];
-int	dsc_sci_idx;
+int	sci_idx;
 
 /* EXTERNAL ROUTINES */
 
@@ -122,7 +125,6 @@ main(argc, argv)
 	int argc;
 	char **argv;
 {
-	int sci_idx;
 	int code;
 	char *initial_meeting = (char *)NULL;
 	char *subsystem_name = "discuss";
@@ -165,7 +167,6 @@ main(argc, argv)
 		ss_perror(sci_idx, code, "creating invocation");
 		exit(1);
 	}
-	dsc_sci_idx = sci_idx;
 	ss_add_info_dir(sci_idx, INFO_DIR, &code);
 	if (code) {
 		ss_perror(sci_idx, code, INFO_DIR);
@@ -197,8 +198,7 @@ main(argc, argv)
 
 
 
-repl(sci_idx, argc, argv)
-	int sci_idx;
+repl(argc, argv)
 	int argc;
 	char **argv;
 {
@@ -298,8 +298,7 @@ abort:
 	free(t_info.author);
 }
 
-goto_mtg(sci_idx, argc, argv)
-	int sci_idx;
+goto_mtg(argc, argv)
 	int argc;
 	char **argv;
 {

@@ -3,12 +3,15 @@
  *	Print-related requests for DISCUSS.
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.10 1986-12-07 00:39:33 rfrench Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.11 1986-12-07 16:05:09 rfrench Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
  *
  *      $Log: not supported by cvs2svn $
+ * Revision 1.10  86/12/07  00:39:33  rfrench
+ * Killed ../include
+ * 
  * Revision 1.9  86/11/20  10:27:54  srz
  * Fixed bug dealing with current
  * 
@@ -42,7 +45,7 @@
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.10 1986-12-07 00:39:33 rfrench Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.11 1986-12-07 16:05:09 rfrench Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -96,12 +99,10 @@ display_trans(trn_no)
 	return(0);
 }
 
-prt_trans(sci_idx, argc, argv)
-	int sci_idx;
+prt_trans(argc, argv)
 	int argc;
 	char **argv;
 {
-	int txn_no;
 	int fd;
 	int (*old_sig)();
 	int code;
@@ -181,12 +182,10 @@ prt_trans(sci_idx, argc, argv)
 		(void) fprintf(stderr, "print: No transactions selected\n");
 }
 
-write_trans(sci_idx, argc, argv)
-	int sci_idx;
+write_trans(argc, argv)
 	int argc;
 	char **argv;
 {
-	int txn_no;
 	selection_list *trn_list;
 	int fd;
 	int (*old_sig)();
@@ -215,7 +214,6 @@ write_trans(sci_idx, argc, argv)
 		return;
 	}
 	performed = FALSE;
-	dsc_public.current = txn_no;
 
 	fd = open(argv[2], O_CREAT|O_APPEND|O_WRONLY, 0666);
 	if (fd < 0) {

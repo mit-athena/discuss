@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v 1.6 1986-12-07 00:39:27 rfrench Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v 1.7 1986-12-07 16:04:59 rfrench Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
@@ -8,6 +8,9 @@
  *	New-transaction routine for DISCUSS.  (Request 'talk'.)
  *
  *      $Log: not supported by cvs2svn $
+ * Revision 1.6  86/12/07  00:39:27  rfrench
+ * Killed ../include
+ * 
  * Revision 1.5  86/11/11  01:53:04  wesommer
  * Added access control sanity check on entry of new transactions.
  * 
@@ -28,7 +31,7 @@
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v 1.6 1986-12-07 00:39:27 rfrench Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v 1.7 1986-12-07 16:04:59 rfrench Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -51,8 +54,7 @@ static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athe
 extern tfile	unix_tfile();
 extern char *gets();
 
-new_trans(sci_idx, argc, argv)
-	int sci_idx;
+new_trans(argc, argv)
 	int argc;
 	char **argv;
 {

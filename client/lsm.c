@@ -62,8 +62,8 @@ do_mtg(mtg_name)
 	   }
    }
 
-list_meetings (sci_idx, argc, argv)
-	int sci_idx, argc;
+list_meetings (argc, argv)
+	int argc;
 	char **argv;
 {
 	int have_names = 0;

@@ -1,9 +1,12 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.4 1986-12-07 00:38:50 rfrench Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.5 1986-12-07 16:04:09 rfrench Exp $
  *	$Locker:  $
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.4  86/12/07  00:38:50  rfrench
+ * Killed ../include
+ * 
  * Revision 1.3  86/12/07  00:20:45  rfrench
  * Made adding a meeting louder and more accurate
  * 
@@ -17,7 +20,7 @@
  */
 
 #ifndef lint
-static char *rcsid_addmtg_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.4 1986-12-07 00:38:50 rfrench Exp $";
+static char *rcsid_addmtg_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.5 1986-12-07 16:04:09 rfrench Exp $";
 #endif lint
 
 #include <strings.h>
@@ -34,10 +37,9 @@ int parse_add_trn();
 
 name_blk *set;
 int num;
-int sci_kludge; /* Temporary sci_idx - begging to be fixed */
 
-add_mtg(sci_idx, argc, argv)
-     int sci_idx, argc;
+add_mtg(argc, argv)
+     int argc;
      char **argv;
 {
 	int i, *used;
@@ -47,7 +49,6 @@ add_mtg(sci_idx, argc, argv)
 	trn_info t_info;
 	selection_list *trn_list,*trn_temp;
 
-	sci_kludge = sci_idx;
 	used = (int *)malloc(sizeof(int)*argc);
 	bzero(used, sizeof(int)*argc); /* bletch */
 	user = "";
@@ -186,7 +187,7 @@ int trn_no;
 	tdestroy(tf);
 
 	if (code)
-		return;
+		return (0); /* Ignore transaction non-existant */
 	
 	fp = fopen(temp_file,"r");
 	if (!fp)
@@ -216,7 +217,7 @@ int trn_no;
 
 	sprintf(cerror,"Transaction [%04d] is not a meeting announcement",
 		trn_no);
-	ss_perror(sci_kludge,0,cerror);
+	ss_perror(sci_idx,0,cerror);
 	return (0);
 }
 
@@ -238,7 +239,7 @@ add_the_mtg(host,nb,long_name,tran,code)
 		else
 			*cerror = '\0';
 		sprintf(cerror+strlen(cerror),"Meeting name (%s)",nb->mtg_name);
-		ss_perror(sci_kludge,*code,cerror);
+		ss_perror(sci_idx,*code,cerror);
 		return (*code);
 	}
 	strcpy(long_name,dsc_temp.m_info.long_name);
@@ -256,19 +257,20 @@ add_the_mtg(host,nb,long_name,tran,code)
 					*cerror = '\0';
 				sprintf(cerror+strlen(cerror),"Meeting %s (%s) is duplicated",
 					long_name,nb->mtg_name);
-				ss_perror(sci_kludge,0,cerror);
-				return;
+				ss_perror(sci_idx,0,cerror);
+				return (0);
 			}
 		}
 	}
 	update_mtg_set(realm, "", nb, 1, code);
 	if (*code) {
 		sprintf(cerror,"Setting meeting name (%s)",nb->mtg_name);
-		ss_perror(sci_kludge, *code, cerror);
+		ss_perror(sci_idx, *code, cerror);
 	}
 	else {
 		if (tran)
 			printf("Transaction [%04d] ",tran);
 		printf("Meeting %s (%s) added\n",long_name,nb->mtg_name);
 	}
+	return (0);
 }
