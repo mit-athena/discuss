@@ -1,13 +1,13 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v 1.9 1987-04-26 16:57:32 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v 1.10 1987-06-27 01:13:42 spook Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
  */
 
 #ifndef lint
-static char *rcsid_dsname_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v 1.9 1987-04-26 16:57:32 srz Exp $";
+static char *rcsid_dsname_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v 1.10 1987-06-27 01:13:42 spook Exp $";
 #endif lint
 
 /*
@@ -307,6 +307,7 @@ char **
 expand(list)
 	char *list;
 {
+        char *calloc();
 	register int num = 1;
 	register char *cp;
 	register char **rv, **rv1;

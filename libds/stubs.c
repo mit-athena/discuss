@@ -11,17 +11,20 @@
 /*
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/stubs.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/stubs.c,v 1.5 1987-04-11 00:06:13 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/stubs.c,v 1.6 1987-06-27 01:10:55 spook Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
  * stubs.c -- These are stubs that handle the calling of routines.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.5  87/04/11  00:06:13  srz
+ * Added RCS junk
+ * 
  *
  */
 #ifndef lint
-static char *rcsid__c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/stubs.c,v 1.5 1987-04-11 00:06:13 srz Exp $";
+static char *rcsid_stubs_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/stubs.c,v 1.6 1987-06-27 01:10:55 spook Exp $";
 #endif lint
 
 /* Derived from CORE.PAS 06/21/86 by SRZ */
@@ -34,6 +37,8 @@ static char *rcsid__c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/
 extern bool recvbool();
 extern char *recvstr();
 Acl *recv_acl();
+
+static char discuss[] = "discuss";
 
 /*
  *
@@ -57,7 +62,7 @@ int *result;
      sendfile(source_file);
      sendstr(subject);
      sendint(reply_trn);
-     sendit("discuss");
+     sendit(discuss);
      senddata(source_file);
      if (rpc_err) { *result = rpc_err; return; }
      recvreply ();
@@ -85,7 +90,7 @@ int *result;
      if (rpc_err) { *result = rpc_err; return; }
      sendstr(mtg_name);
      sendint(trn);
-     sendit("discuss");
+     sendit(discuss);
      if (rpc_err) { *result = rpc_err; return; }
      recvreply();
      if (rpc_err) { *result = rpc_err; return; }
@@ -112,7 +117,7 @@ int *result;
      if (rpc_err) { *result = rpc_err; return; }
      sendstr(mtg_name);
      sendint(trn);
-     sendit("discuss");
+     sendit(discuss);
      if (rpc_err) { *result = rpc_err; return; }
      recvreply();
      if (rpc_err) { *result = rpc_err; return; }
@@ -138,7 +143,7 @@ int *result;
      if (rpc_err) { *result = rpc_err; return; }
      sendstr (mtg_name);
      sendint (trn);
-     sendit("discuss");
+     sendit(discuss);
      if (rpc_err) { *result = rpc_err; return; }
      recvreply();
      if (rpc_err) { *result = rpc_err; return; }
@@ -167,7 +172,7 @@ int *result;
      sendstr(location);
      sendstr(long_mtg_name);
      sendbool(public);
-     sendit("discuss");
+     sendit(discuss);
      if (rpc_err) { *result = rpc_err; return; }
      recvreply();
      if (rpc_err) { *result = rpc_err; return; }
@@ -192,7 +197,7 @@ int *result;
      startsend(OLD_GET_MTG_INFO);
      if (rpc_err) { *result = rpc_err; return; }
      sendstr(mtg_name);
-     sendit("discuss");
+     sendit(discuss);
      if (rpc_err) { *result = rpc_err; return; }
      recvreply();
      if (rpc_err) { *result = rpc_err; return; }
@@ -216,7 +221,7 @@ int *result;
      startsend(GET_MTG_INFO);
      if (rpc_err) { *result = rpc_err; return; }
      sendstr(mtg_name);
-     sendit("discuss");
+     sendit(discuss);
      if (rpc_err) { *result = rpc_err; return; }
      recvreply();
      if (rpc_err) { *result = rpc_err; return; }
@@ -244,7 +249,7 @@ int *result;
      sendstr(mtg_name);
      sendint(trn);
      sendfile(dest_file);
-     sendit("discuss");
+     sendit(discuss);
      if (rpc_err) { *result = rpc_err; return; }
      recvdata(dest_file);
      recvreply();
@@ -269,7 +274,7 @@ int *result;
      startsend(REMOVE_MTG);
      if (rpc_err) { *result = rpc_err; return; }
      sendstr(mtg_name);
-     sendit("discuss");
+     sendit(discuss);
      if (rpc_err) { *result = rpc_err; return; }
      recvreply();
      if (rpc_err) { *result = rpc_err; return; }
@@ -294,7 +299,7 @@ int *result;
      sendstr(mtg_name);
      sendint(date_attended);
      sendint(last);
-     sendit("discuss");
+     sendit(discuss);
      if (rpc_err) { *result = rpc_err; return; }
      recvreply();
      if (rpc_err) { *result = rpc_err; return; }
@@ -316,7 +321,7 @@ get_acl(mtg_name, result, list)
 	startsend(GET_ACL);
 	rpccheck;
 	sendstr(mtg_name);
-	sendit("discuss");
+	sendit(discuss);
 	rpccheck;
 	recvreply();
 	if (rpc_err) { *result = rpc_err; return; }
@@ -336,7 +341,7 @@ get_access(mtg_name, princ_name, modes, result)
 	rpccheck;
 	sendstr(mtg_name);
 	sendstr(princ_name);
-	sendit("discuss");
+	sendit(discuss);
 	rpccheck;
 	recvreply();
 	if (rpc_err) { *result = rpc_err; return; }
@@ -356,7 +361,7 @@ set_access(mtg_name, princ_name, modes, result)
 	sendstr(mtg_name);
 	sendstr(princ_name);
 	sendstr(modes);
-	sendit("discuss");
+	sendit(discuss);
 	rpccheck;
 	recvreply();
 	if (rpc_err) { *result = rpc_err; return; }
@@ -374,7 +379,7 @@ delete_access(mtg_name, princ_name, result)
 	rpccheck;
 	sendstr(mtg_name);
 	sendstr(princ_name);
-	sendit("discuss");
+	sendit(discuss);
 	rpccheck;
 	recvreply();
 	if (rpc_err) { *result = rpc_err; return; }
@@ -390,7 +395,7 @@ whoami(ident)
 	int *result=0;
 	startsend(WHO_AM_I);
 	rpccheck;
-	sendit("discuss");
+	sendit(discuss);
 	rpccheck;
 	*ident = recvstr();
 	rpccheck;
@@ -469,6 +474,7 @@ mtg_info *minfo;
 Acl *
 recv_acl()
 {
+        char *malloc();
 	/* The following code would lose points in 6.170... */
 	register Acl *result = (Acl *) malloc(sizeof(Acl));
 	register acl_entry *ae;

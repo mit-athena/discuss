@@ -1,10 +1,13 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.8 1987-03-22 04:21:46 spook Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.9 1987-06-27 01:16:46 spook Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.8  87/03/22  04:21:46  spook
+ * *** empty log message ***
+ * 
  * Revision 1.7  87/01/12  04:15:47  wesommer
  * Replaced an fprintf(stderr, ...) with a call to log_warning.
  * 
@@ -23,10 +26,11 @@
  */
 
 #ifndef lint
-static char *rcsid_interface_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.8 1987-03-22 04:21:46 spook Exp $";
+static char *rcsid_interface_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.9 1987-06-27 01:16:46 spook Exp $";
 #endif lint
 
 #include <stdio.h>
+#include <strings.h>
 #include "tfile.h"
 #include "interface.h"
 #include "acl.h"
@@ -163,6 +167,7 @@ dsc_create_mtg(host, location, name, public, hidden, code_ptr)
 	/* mumble */
 	/* hand back mtg_uid */
 	*code_ptr = EACCES;
+	return((char *)NULL);
 }
 
 dsc_get_mtg_info(nbp, info, code_ptr)
