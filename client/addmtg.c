@@ -9,13 +9,13 @@
  *	command line, in which case they are used as meeting announcements.
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.19 1988-02-15 01:00:21 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.20 1988-03-12 11:04:01 raeburn Exp $
  *	$Locker:  $
  *
  */
 
 #ifndef lint
-static char *rcsid_addmtg_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.19 1988-02-15 01:00:21 wesommer Exp $";
+static char *rcsid_addmtg_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.20 1988-03-12 11:04:01 raeburn Exp $";
 #endif lint
 
 #include <strings.h>
@@ -478,7 +478,7 @@ char *question;
 
      printf ("%s", question);
      fflush (stdout);
-     if (fgets (answer, 10, stdin) < 0)
+     if (fgets (answer, 10, stdin) == NULL)
 	  return(FALSE);
 
 
