@@ -7,12 +7,15 @@
  */
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v 1.15 1996-05-23 22:05:04 ghudson Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v 1.16 1996-05-23 22:17:12 ghudson Exp $
  *
  *	Routines for use in a server to edit access control lists remotely.
  *	Originally written for the discuss system by Bill Sommerfeld
  *
  *	$Log: not supported by cvs2svn $
+ *	Revision 1.15  1996/05/23 22:05:04  ghudson
+ *	You can't open a directory read-write.
+ *
  *	Revision 1.14  1994/08/24 03:46:36  cfields
  *	open for RDRW instead of RDONLY when want to lock
  *	Changes by vrt.
@@ -76,7 +79,7 @@
 #endif
 #ifndef lint
 static const char rcsid_acl_core_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v 1.15 1996-05-23 22:05:04 ghudson Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v 1.16 1996-05-23 22:17:12 ghudson Exp $";
 #endif lint
 
 extern dsc_acl *mtg_acl;
@@ -295,17 +298,18 @@ locked_open_mtg(mtg_name, lockfd, acl_name, acl)
     struct flock lock;
 #endif
 
-	
 	*lockfd = -1;
-	u_acl_f = -1;
 	/* XXX historical magic number should be MAXPATHLEN */
 	if (mtg_name[0] != '/' || mtg_name_len == 0 || 
 	    mtg_name_len > MAXPATHLEN || mtg_name [mtg_name_len-1] == '/') {
 		result = BAD_PATH;
 		goto punt;
 	}
-	if((*lockfd = open(mtg_name, O_RDONLY, 0700)) < 0) {
-		result = errno;
+	(void) strcpy (acl_name, mtg_name);
+	(void) strcat (acl_name, "/acl");
+	if((*lockfd = open(acl_name, O_RDWR, 0700)) < 0) {
+		result = (errno == ENOENT) ? NO_SUCH_MTG :
+		    (errno == EACCES) ? NO_ACCESS : BAD_PATH;
 		goto punt;
 	}
 #ifdef SOLARIS
@@ -320,31 +324,16 @@ locked_open_mtg(mtg_name, lockfd, acl_name, acl)
 		result = errno;
 		goto punt;
 	}
-	(void) strcpy (acl_name, mtg_name);
-	(void) strcat (acl_name, "/acl");
 
-	if ((u_acl_f = open(acl_name, O_RDONLY, 0700)) < 0) {
-		if (errno == ENOENT)
-			result = NO_SUCH_MTG;
-		else if (errno == EACCES)
-			result = NO_ACCESS;
-		else
-			result = BAD_PATH;
-		goto punt;
-	}
-	if (!fis_owner (u_acl_f, (int)geteuid())) {
+	if (!fis_owner (*lockfd, (int)geteuid())) {
 		result = NO_ACCESS;
 		goto punt;
 	}
 
-	*acl = acl_read (u_acl_f);
-	(void) close(u_acl_f);
-	u_acl_f = 0;
+	*acl = acl_read (*lockfd);
 	return 0;
 punt:
 	if (*lockfd >= 0) (void) close(*lockfd);
-	if (u_acl_f >= 0) (void) close(u_acl_f);
-	if (*acl) acl_destroy(*acl);
 
 	return result;
 }
