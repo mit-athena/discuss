@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v 1.9 1988-08-16 23:14:38 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v 1.10 1988-08-17 00:34:23 srz Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
@@ -11,7 +11,7 @@
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v 1.9 1988-08-16 23:14:38 srz Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v 1.10 1988-08-17 00:34:23 srz Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -30,6 +30,7 @@ static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athe
 
 char	*malloc(), *getenv(), *gets(), *ctime(), *error_message();
 tfile	unix_tfile();
+extern void flag_interrupts(),dont_flag_interrupts();
 
 #define DEFAULT_EDITOR "/bin/ed"
 
@@ -92,9 +93,10 @@ repl(argc, argv)
 		}
 	}
 
+	flag_interrupts();
 	if (!dsc_public.attending) {
 		ss_perror(sci_idx, 0, "No current meeting.\n");
-		return;
+		goto abort2;
 	}
 
 	dsc_get_trn_info(&dsc_public.nb, dsc_public.current, &t_info, &code);
@@ -112,13 +114,13 @@ repl(argc, argv)
 	if (code) {
 	     ss_perror(sci_idx, code, "");
 	     free((char *) trn_list);
-	     return;
+	     goto abort2;
 	}
 
 	if (trn_list -> low != trn_list -> high) {
 	     ss_perror(sci_idx, 0, "Cannot reply to range");
 	     free((char *)trn_list);
-	     return;
+	     goto abort2;
 	}
 
 	orig_trn = trn_list -> low;
@@ -128,7 +130,7 @@ repl(argc, argv)
 
 	if (code != 0) {
 		ss_perror(sci_idx, code, "");
-		return;
+		goto abort2;
 	}
 
 	if(!acl_is_subset("a", dsc_public.m_info.access_modes)) {
@@ -166,6 +168,7 @@ repl(argc, argv)
 		(void) unlink(temp_file);
 		goto abort;
 	}
+	if (interrupt) goto abort;
 	fd = open(temp_file, O_RDONLY, 0);
 	if (fd < 0) {
 		(void) fprintf(stderr, "No file; not entered.\n");
@@ -200,5 +203,7 @@ repl(argc, argv)
 abort:
 	free(t_info.subject);
 	free(t_info.author);
+abort2:
+	dont_flag_interrupts();
 }
 
