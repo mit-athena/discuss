@@ -4,34 +4,34 @@
 			"Kerberos successful"
 
 	ec		KDC_NAME_EXP,
-			"Principal expired"
+			"Kerberos principal expired"
 
 	ec		KDC_SERVICE_EXP,
-			"Service expired"
+			"Kerberos service expired"
 
 	ec		KDC_AUTH_EXP,
-			"Auth expired"
+			"Kerberos auth expired"
 
 	ec		KDC_PKT_VER,
-			"Incorrect master key version"
+			"Incorrect kerberos master key version"
 
 	ec		KDC_P_MKEY_VER,
-			"Incorrect master key version"
+			"Incorrect kerberos master key version"
 
 	ec		KDC_S_MKEY_VER,
-			"Incorrect master key version"
+			"Incorrect kerberos master key version"
 
 	ec		KDC_BYTE_ORDER,
-			"Byte order unknown"
+			"Kerberos error: byte order unknown"
 
 	ec		KDC_PR_UNKNOWN,
-			"Principal unknown"
+			"Kerberos principal unknown"
 
 	ec		KDC_PR_N_UNIQUE,
-			"Principal not unique"
+			"Kerberos principal not unique"
 
 	ec		KDC_NULL_KEY,
-			"Principal has null key"
+			"Kerberos principal has null key"
 
 	ec		KRB_RES11,
 		        "Reserved 11"
@@ -61,13 +61,13 @@
 		        "Reserved 19"
 
 	ec		KDC_GEN_ERR,
-			"Generic error from KDC"
+			"Generic error from Kerberos KDC"
 
 	ec		GC_TKFIL,
-			"Can't read ticket file"
+			"Can't read Kerberos ticket file"
 
 	ec		GC_NOTKT,
-			"Can't find ticket or TGT"
+			"Can't find Kerberos ticket or TGT"
 
 	ec		KRB_RES23,
 			"Reserved 23"
@@ -79,7 +79,7 @@
 			"Reserved 25"
 
 	ec		MK_AP_TGTEXP,
-			"TGT Expired"
+			"Kerberos TGT Expired"
 
 	ec		KRB_RES27,
 			"Reserved 27"
@@ -94,43 +94,43 @@
 			"Reserved 30"
 
 	ec		RD_AP_UNDEC,
-			"Can't decode authenticator"
+			"Kerberos error: Can't decode authenticator"
 
 	ec		RD_AP_EXP,
-			"Ticket expired"
+			"Kerberos ticket expired"
 
 	ec		RD_AP_NYV,
-			"Ticket not yet valid"
+			"Kerberos ticket not yet valid"
 
 	ec		RD_AP_REPEAT,
-			"Repeated request"
+			"Kerberos error: Repeated request"
 
 	ec		RD_AP_NOT_US,
-			"The ticket isn't for us"
+			"The kerberos ticket isn't for us"
 
 	ec		RD_AP_INCON,
-			"Request is inconsistent"
+			"Kerberos request inconsistent"
 
 	ec		RD_AP_TIME,
-			"delta_t too big"
+			"Kerberos error: delta_t too big"
 
 	ec		RD_AP_BADD,
-			"Incorrect net address"
+			"Kerberos error: incorrect net address"
 
 	ec		RD_AP_VERSION,
-			"protocol version mismatch"
+			"Kerberos protocol version mismatch"
 
 	ec		RD_AP_MSG_TYPE,
-			"invalid msg type"
+			"Kerberos error: invalid msg type"
 
 	ec		RD_AP_MODIFIED,
-			"message stream modified"
+			"Kerberos error: message stream modified"
 
 	ec		RD_AP_ORDER,
-			"message out of order"
+			"Kerberos error: message out of order"
 
 	ec		RD_AP_UNAUTHOR,
-			"unauthorized request"
+			"Kerberos error: unauthorized request"
 
 	ec		KRB_RES44,
 			"Reserved 44"
@@ -154,25 +154,25 @@
 			"Reserved 50"
 
 	ec		GT_PW_NULL,
-			"Current PW is null"
+			"Kerberos error: current PW is null"
 
 	ec		GT_PW_BADPW,
-			"Incorrect current password"
+			"Kerberos error: Incorrect current password"
 
 	ec		GT_PW_PROT,
-			"Protocol Error"
+			"Kerberos protocol error"
 
 	ec		GT_PW_KDCERR,
-			"Error returned by KDC"
+			"Error returned by Kerberos KDC"
 
 	ec		GT_PW_NULLTKT,
-			"Null ticket returned by KDC"
+			"Null Kerberos ticket returned by KDC"
 
 	ec		SKDC_RETRY,
-			"Retry count exceeded"
+			"Kerberos error: Retry count exceeded"
 
 	ec		SKDC_CANT,
-			"Can't send request"
+			"Kerberos error: Can't send request"
 
 	ec		KRB_RES58,
 			"Reserved 58"
@@ -184,13 +184,13 @@
 			"Reserved 60"
 
 	ec		INTK_W_NOTALL,
-			"Not ALL tickets returned"
+			"Kerberos error: not all tickets returned"
 
 	ec		INTK_BADPW,
-			"Incorrect password"
+			"Kerberos error: incorrect password"
 
 	ec		INTK_PROT,
-			"Protocol Error"
+			"Kerberos error: Protocol Error"
 
 	ec		KRB_RES64,
 			"Reserved 64"
@@ -214,7 +214,7 @@
 			"Other error"
 
 	ec		AD_NOTGT,
-			"Don't have tkt granting tkt"
+			"Don't have Kerberos ticket-granting ticket"
 
 	end
 
