@@ -1,11 +1,14 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/rn.c,v $
  *	$Author: srz $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/rn.c,v 1.4 1988-04-20 16:34:04 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/rn.c,v 1.5 1988-04-21 16:04:46 srz Exp $
  *
  *	Copyright (C) 1987 by the Massachusetts Institute of Technology
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.4  88/04/20  16:34:04  srz
+ * Added catchup, loop for '?' on first prompt.
+ * 
  * Revision 1.3  88/01/15  23:11:33  srz
  * Fixed bug where new meetings caused problems for "next"
  * 
@@ -20,7 +23,7 @@
  */
 
 #ifndef lint
-static char *rcsid_update_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/rn.c,v 1.4 1988-04-20 16:34:04 srz Exp $";
+static char *rcsid_update_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/rn.c,v 1.5 1988-04-21 16:04:46 srz Exp $";
 #endif lint
 
 #include "types.h"
@@ -100,7 +103,7 @@ first_meeting:
 		        if (interrupt)
 			     break;
 
-			cmd = more_break("Hit space for next transaction: ", " qcnptr?");
+			cmd = more_break("Hit space for next transaction: ", " qcnp\022tr?");
 			if (interrupt)
 			     break;
 		        printf("\n");
@@ -122,6 +125,10 @@ first_meeting:
 				ss_execute_line(ss_idx, "prev", &code);
 				if (code != 0) goto punt;
 				break;
+			case '\022':
+				ss_execute_line(ss_idx, "pr", &code);
+				if (code != 0) goto punt;
+				break;
 			case 'r':
 				ss_execute_line(ss_idx, "reply", &code);
 				if (code != 0) goto punt;
@@ -135,6 +142,7 @@ first_meeting:
 				printf("<space>,n\tNext transaction\n");
 				printf("c\t\tCatch up on transactions in meeting\n");
 				printf("p\t\tPrevious transaction\n");
+				printf("^R\t\tReview current transaction\n");
 				printf("q\t\tQuit from read_new\n");
 				printf("r\t\tReply to current transaction\n");
 				printf("t\t\tEnter a new transaction\n");
@@ -146,7 +154,7 @@ first_meeting:
 		if (!changed_meetings())
 		     break;
 
-		cmd = more_break("Hit space to go to next meeting: ", " qn?ptr");
+		cmd = more_break("Hit space to go to next meeting: ", " qn?ptr\022");
 		if (interrupt)
 		     break;
 		printf("\n");
@@ -162,6 +170,10 @@ first_meeting:
 		     ss_execute_line(ss_idx, "prev", &code);
 		     if (code != 0) goto punt;
 		     break;
+                case '\022':
+		     ss_execute_line(ss_idx, "pr", &code);
+		     if (code != 0) goto punt;
+		     break;
 		case 'r':
 		     ss_execute_line(ss_idx, "reply", &code);
 		     if (code != 0) goto punt;
@@ -174,6 +186,7 @@ first_meeting:
 		     printf("List of possible responses:\n\n");
 		     printf("<space>,n\tNext meeting\n");
 		     printf("p\t\tPrevious transaction\n");
+		     printf("^R\t\tReview the current transaction\n");
 		     printf("q\t\tQuit from read_new\n");
 		     printf("r\t\tReply to current transaction\n");
 		     printf("t\t\tEnter a new transaction\n");
