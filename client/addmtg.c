@@ -1,9 +1,12 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.5 1986-12-07 16:04:09 rfrench Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.6 1987-02-04 16:10:26 srz Exp $
  *	$Locker:  $
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.5  86/12/07  16:04:09  rfrench
+ * Globalized sci_idx
+ * 
  * Revision 1.4  86/12/07  00:38:50  rfrench
  * Killed ../include
  * 
@@ -20,12 +23,12 @@
  */
 
 #ifndef lint
-static char *rcsid_addmtg_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.5 1986-12-07 16:04:09 rfrench Exp $";
+static char *rcsid_addmtg_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.6 1987-02-04 16:10:26 srz Exp $";
 #endif lint
 
 #include <strings.h>
 #include <stdio.h>
-#include <fcntl.h>
+#include <sys/file.h>
 #include "tfile.h"
 #include "types.h"
 #include "interface.h"
