@@ -8,7 +8,7 @@
 
 #ifndef lint
 #ifndef SABER
-static char *RCSid = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/dsgrep/dsgrep.c,v 1.9 1997-12-03 21:52:26 ghudson Exp $";
+static char *RCSid = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/dsgrep/dsgrep.c,v 1.10 1998-01-20 23:15:40 ghudson Exp $";
 #endif
 #endif
 
@@ -46,7 +46,7 @@ main(argc,argv)
 
   char *meetings_file,*homedir,*getenv(),*var;
   name_blk *meetings,*tmp_mtg;
-  mtg_info meeting_info[MAX_MEETINGS];
+  mtg_info meeting_info;
   char tmp_meeting_file[MAXPATHLEN];
   int n_meetings,result,i,cur_meeting,n_to_look,j,c;
   int print_trans,use_re,search_trans,search_deleted,s_trans();
@@ -181,7 +181,7 @@ main(argc,argv)
   tf = unix_tfile(1); /*stdout */
 
   for(i=0;i<cur_meeting;i++) {
-    dsc_get_mtg_info(&meetings[i],&meeting_info[i],&result);
+    dsc_get_mtg_info(&meetings[i],&meeting_info,&result);
      if (result != 0) {
        fprintf(stderr,"dsgrep: error getting meeting info for meeting '%s:%s': %s\n",
 	       meetings[i].hostname, meetings[i].pathname,
@@ -192,9 +192,9 @@ main(argc,argv)
       low = trans_num;
       high = trans_num;
     } else {
-      low = meeting_info[i].highest-n_to_look+1; 
+      low = meeting_info.highest-n_to_look+1; 
       low = MAX(low,1);
-      high = meeting_info[i].highest;
+      high = meeting_info.highest;
     }
     for(j=low;j<=high;j++)
       {
