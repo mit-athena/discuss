@@ -6,7 +6,7 @@
  *
  */
 /*
- *	$Id: acl_core.c,v 1.21 1999-02-08 14:47:17 danw Exp $
+ *	$Id: acl_core.c,v 1.22 2001-02-28 20:44:23 ghudson Exp $
  *
  *	Routines for use in a server to edit access control lists remotely.
  *	Originally written for the discuss system by Bill Sommerfeld
@@ -28,7 +28,7 @@
 #endif
 #ifndef lint
 static const char rcsid_acl_core_c[] =
-    "$Id: acl_core.c,v 1.21 1999-02-08 14:47:17 danw Exp $";
+    "$Id: acl_core.c,v 1.22 2001-02-28 20:44:23 ghudson Exp $";
 #endif /* lint */
 
 extern dsc_acl *mtg_acl;
@@ -81,7 +81,7 @@ static dsc_acl *read_acl(mtg_name, code_ptr, check)
 	char acl_name[MAXPATHLEN];
 	
 	if (mtg_name[0] != '/' || mtg_name_len == 0 || 
-	    mtg_name_len > MAXPATHLEN || mtg_name [mtg_name_len-1] == '/') {
+	    mtg_name_len+5 >= MAXPATHLEN || mtg_name [mtg_name_len-1] == '/') {
 		result = BAD_PATH;
 		goto punt;
 	}
@@ -250,7 +250,7 @@ locked_open_mtg(mtg_name, lockfd, acl_name, acl)
 	u_acl_f = -1;
 	/* XXX historical magic number should be MAXPATHLEN */
 	if (mtg_name[0] != '/' || mtg_name_len == 0 || 
-	    mtg_name_len > MAXPATHLEN || mtg_name [mtg_name_len-1] == '/') {
+	    mtg_name_len+9 >= MAXPATHLEN || mtg_name [mtg_name_len-1] == '/') {
 		result = BAD_PATH;
 		goto punt;
 	}

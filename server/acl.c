@@ -6,7 +6,7 @@
  *
  */
 /*
- *	$Id: acl.c,v 1.16 1999-02-08 14:47:17 danw Exp $
+ *	$Id: acl.c,v 1.17 2001-02-28 20:44:23 ghudson Exp $
  *
  * 	Routines for the manipulation of access control lists in core,
  *	along with routines to move them to and from files.
@@ -19,7 +19,7 @@
 
 #ifndef lint
 static const char rcsid_acl_c[] =
-    "$Id: acl.c,v 1.16 1999-02-08 14:47:17 danw Exp $";
+    "$Id: acl.c,v 1.17 2001-02-28 20:44:23 ghudson Exp $";
 #endif /* lint */
 
 #include <stdio.h>
@@ -120,7 +120,7 @@ bool acl_write(fd, list)
 	if (fwrite(buf, 1, len, f) != len) goto punt;
 	
 	for (ae=list->acl_entries, n=list->acl_length; n; --n, ++ae) {
-		(void) sprintf(buf, "%s:%s\n", ae->modes, ae->principal);
+		(void) sprintf(buf, "%s:%.100s\n", ae->modes, ae->principal);
 		len = strlen(buf);
 		if (fwrite(buf, 1, len, f) != len) goto punt;
 	}

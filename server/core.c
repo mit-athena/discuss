@@ -7,7 +7,7 @@
  */
 /*
  *
- *	$Id: core.c,v 1.39 1999-02-08 14:47:18 danw Exp $
+ *	$Id: core.c,v 1.40 2001-02-28 20:44:23 ghudson Exp $
  *
  *
  * core.c --    Routines that are the meat of discuss.  These provide user
@@ -16,7 +16,7 @@
  */
 #ifndef lint
 static char rcsid_core_c[] =
-    "$Id: core.c,v 1.39 1999-02-08 14:47:18 danw Exp $";
+    "$Id: core.c,v 1.40 2001-02-28 20:44:23 ghudson Exp $";
 #endif /* lint */
 
 
@@ -1128,7 +1128,7 @@ int *result;
 	    long_mtg_name, location, public);*/
 
      loclen = strlen (location);
-     if (location[0] != '/' || loclen == 0 || loclen >= MAXPATHLEN || location [loclen-1] == '/') {
+     if (location[0] != '/' || loclen == 0 || loclen >= MAXPATHLEN || location [loclen-1] == '/' || loclen+14 >= sizeof(str)) {
 	  *result = BAD_PATH;
 	  return;
      }
@@ -1305,8 +1305,7 @@ int *result;
 	       int mf;
 	       char *cp;
 
-	       strcpy(buf, mtg_name);
-	       strcat(buf, "/forward");
+	       snprintf(buf, sizeof(buf), "%s/forward", mtg_name);
 	       if ((mf = open(buf, O_RDONLY, 0700)) < 0) {
 		    *result = INCONSISTENT;
 		    return;
@@ -1540,7 +1539,7 @@ int *result;
      *result = 0;				/* optimist */
 
      mtg_name_len = strlen (mtg_name);
-     if (mtg_name[0] != '/' || mtg_name_len == 0 || mtg_name_len >= MAXPATHLEN || mtg_name [mtg_name_len-1] == '/') {
+     if (mtg_name[0] != '/' || mtg_name_len == 0 || mtg_name_len >= MAXPATHLEN || mtg_name [mtg_name_len-1] == '/' || mtg_name_len + 9 >= sizeof(str)) {
 	  *result = BAD_PATH;
 	  return;
      }

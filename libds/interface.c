@@ -6,13 +6,13 @@
  *
  */
 /*
- *	$Id: interface.c,v 1.29 1999-02-08 14:47:10 danw Exp $
+ *	$Id: interface.c,v 1.30 2001-02-28 20:44:21 ghudson Exp $
  *
  */
 
 #ifndef lint
 static char rcsid_interface_c[] =
-    "$Id: interface.c,v 1.29 1999-02-08 14:47:10 danw Exp $";
+    "$Id: interface.c,v 1.30 2001-02-28 20:44:21 ghudson Exp $";
 static char copyright[] =
     "Copyright (C) 1989 by the Massachusetts Institute of Technology";
 #endif /* lint */
@@ -414,11 +414,9 @@ log_warning(code, buf)
 int code;
 char *buf;
 {
-     if (warning_hook == 0) {
-	  char buf2[200];
-	  sprintf(buf2, "Warning: %s %s\n", error_message(code), buf);
-	  printf(buf2);
-     } else
+     if (warning_hook == 0)
+	  printf("Warning: %s %s\n", error_message(code), buf);
+     else
 	  (*warning_hook)(code, buf);
 }
 
