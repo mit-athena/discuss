@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl.c,v 1.7 1987-07-20 21:23:25 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl.c,v 1.8 1987-10-24 00:53:39 wesommer Exp $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
  *
@@ -8,6 +8,10 @@
  *	along with routines to move them to and from files.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.7  87/07/20  21:23:25  wesommer
+ * Removed fdclose (kludge), added checking to acl_write() to detect
+ * disk full conditions.
+ * 
  * Revision 1.6  87/03/17  02:25:19  srz
  * Added expunging.  added acl_copy, and fixed acl_canon to deal with
  * spaces without barfing.
@@ -31,13 +35,14 @@
  */
 
 #ifndef lint
-static char *rcsid_acl_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl.c,v 1.7 1987-07-20 21:23:25 wesommer Exp $";
+static char *rcsid_acl_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl.c,v 1.8 1987-10-24 00:53:39 wesommer Exp $";
 #endif lint
 
 #include "../include/acl.h"
 #include "../include/dsc_et.h"
 #include <stdio.h>
 #include <strings.h>
+#include <ctype.h>
 
 char *malloc(), *realloc();
 char *acl_union(), *acl_intersection(), *acl_subtract();
@@ -67,28 +72,45 @@ Acl *acl_read(fd)
 	register char *cp;
 	register int n;
 	register acl_entry *ae;
-	register Acl *list = (Acl *) malloc(sizeof(Acl));
-	fgets(buf, 128, f);
-	n=list->acl_length=atoi(buf);
-	list->acl_entries = (acl_entry *)malloc((unsigned)(n * sizeof(acl_entry)));
+	register Acl *list;
 
-	for (ae=list->acl_entries; n; --n, ++ae)  {
+	if (!f) return NULL;	/* oops. */
+	
+	list = (Acl *) malloc(sizeof(Acl));
+	list->acl_entries = (acl_entry *)NULL;
+
+	if (fgets(buf, 128, f) == NULL) goto punt;
+	if (!isdigit(buf[0])) goto punt;
+	
+	n=atoi(buf);
+	list->acl_entries = (acl_entry *)malloc((unsigned)(n * sizeof(acl_entry)));
+	if (!list->acl_entries) goto punt;
+	
+	list->acl_length = 0;
+	for (ae=list->acl_entries; n; --n)  {
 		buf[0]=0;
-		fgets(buf, 128, f);
+		if (fgets(buf, 128, f) == NULL) goto punt;
 		if(cp=index(buf, '\n')) *cp='\0';
 		if(cp=index(buf, ':')) {
 			*cp='\0';
+			list->acl_length++;
+			ae->principal = NULL;
 			ae->modes = malloc((unsigned)(strlen(buf)+1));
+			if (!ae->modes) goto punt;
 			(void) strcpy(ae->modes, buf);
 			ae->principal = malloc((unsigned)(strlen(cp+1)+1));
+			if (!ae->principal) goto punt;
 			(void) strcpy(ae->principal, cp+1);
+			ae++;
 		} else { /* skip line */
-			list->acl_length--;
-			--ae;
 		}
 	}
 	(void) fclose(f);
 	return(list);
+punt:
+	fclose(f);
+	if (list) acl_destroy(list);
+	return NULL;
 }
 /*
  * Attempt to write an access control list to fd.
@@ -298,12 +320,12 @@ acl_destroy(list)
 	register int n;
 	if(!list) return;
 	for (ae=list->acl_entries, n=list->acl_length;
-	     n;
+	     ae && n;
 	     --n, ++ae) {
-		     (void) free(ae->principal);
-		     (void) free(ae->modes);
+		     if (ae->principal) (void) free(ae->principal);
+		     if (ae->modes) (void) free(ae->modes);
 	}
-	(void) free((char *)(list->acl_entries));
+	if (ae) (void) free((char *)(list->acl_entries));
 	(void) free((char *)list);
 }
 
