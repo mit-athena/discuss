@@ -82,7 +82,7 @@
 */
 
 /*
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/usp/main.c,v 1.5 1997-12-06 20:42:36 ghudson Exp $
+ * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/usp/main.c,v 1.6 1998-07-25 21:06:27 ghudson Exp $
  * $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/usp/main.c,v $
  * $Locker:  $
  */
@@ -98,7 +98,7 @@
 #include "usp.h"
 
 static char rcsid[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/usp/main.c,v 1.5 1997-12-06 20:42:36 ghudson Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/usp/main.c,v 1.6 1998-07-25 21:06:27 ghudson Exp $";
 
 /* connection operations */
 
@@ -130,7 +130,7 @@ char	*service;
      if((s = socket(host_info->h_addrtype, SOCK_STREAM, 0)) == ERROR) {
 	 return(NULL);
      }
-     if(connect(s, (char *) &address, sizeof(address)) == ERROR) {
+     if(connect(s, (struct sockaddr *) &address, sizeof(address)) == ERROR) {
 	 return(NULL);
      }
      if((us = USP_associate(s))) {

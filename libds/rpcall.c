@@ -12,9 +12,12 @@
  *		This file handles the caller's side of the connection.
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/rpcall.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/rpcall.c,v 1.18 1996-09-19 22:30:52 ghudson Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/rpcall.c,v 1.19 1998-07-25 21:06:12 ghudson Exp $
  *	$Locker:  $
  *	$Log: not supported by cvs2svn $
+ *	Revision 1.18  1996/09/19 22:30:52  ghudson
+ *	BSD -> ANSI string and memory functions
+ *
  *	Revision 1.17  1994/03/25 16:45:22  miki
  *	replace bcopy with memmove for POSIX platforms; replaced bzero with memset and
  *	ndex with strchr
@@ -59,7 +62,7 @@
  */
 #ifndef lint
 static char rcsid_rpcall_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/rpcall.c,v 1.18 1996-09-19 22:30:52 ghudson Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/rpcall.c,v 1.19 1998-07-25 21:06:12 ghudson Exp $";
 #endif lint
 
 /* INCLUDES */
@@ -349,7 +352,7 @@ rpc_conversation open_rpc (host, port_num, service_id, code)
     if((s = socket(hp->h_addrtype, SOCK_STREAM, 0)) < 0)
 	goto punt;
 
-    if(connect(s, (char *) &address, sizeof(address)) < 0)
+    if(connect(s, (struct sockaddr *) &address, sizeof(address)) < 0)
 	goto punt;
 
     (void) fcntl (s, F_SETFD, 1);
