@@ -36,6 +36,7 @@ static char *temp_dir = "/tmp";
 
 tfile unix_tfile ();
 char *malloc();
+static fsize(),read_trn_hdr(),read_last_trn(),save_trn();
 
 extern char rpc_caller[];
 extern int has_privs, use_zephyr;
