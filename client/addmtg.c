@@ -1,9 +1,12 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.9 1987-04-08 03:53:25 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.10 1987-04-09 00:11:39 rfrench Exp $
  *	$Locker:  $
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.9  87/04/08  03:53:25  wesommer
+ * Added del_mtg
+ * 
  * Revision 1.8  87/04/06  16:00:56  spook
  * More error-message printing.
  * 
@@ -32,7 +35,7 @@
  */
 
 #ifndef lint
-static char *rcsid_addmtg_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.9 1987-04-08 03:53:25 wesommer Exp $";
+static char *rcsid_addmtg_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.10 1987-04-09 00:11:39 rfrench Exp $";
 #endif lint
 
 #include <strings.h>
@@ -180,7 +183,7 @@ add_mtg(argc, argv)
 				ss_perror(sci_idx, code, cerror);
 			}
 			else
-				add_the_mtg("",&nb,long_name,0,&code);
+				add_the_mtg("",&nb,0,&code);
 		}
 	}
 
@@ -195,7 +198,7 @@ parse_add_trn(trn_no)
 int trn_no;
 {
 	int code,fd,dummy;
-	char tempbfr[256],host[50],long_name[80],*short_name;
+	char tempbfr[256],host[100],*short_name;
 	char cerror[80];
 	tfile tf;
 	FILE *fp;
@@ -226,6 +229,8 @@ int trn_no;
 		goto not_ann;
 	if (strncmp(tempbfr,"  Host:          ",17))
 		goto not_ann;
+	tempbfr[strlen(tempbfr)-1] = '\0';
+	strcpy(host,tempbfr+17);
 	if (!fgets(tempbfr,256,fp))
 		goto not_ann;
 	if (strncmp(tempbfr,"  Pathname:      ",17))
@@ -233,9 +238,8 @@ int trn_no;
 	fclose(fp);
 	tempbfr[strlen(tempbfr)-1] = '\0';
 	nb.date_attended = nb.last = 0;
-	strncpy(host,tempbfr+17,index(tempbfr+17,':')-tempbfr-17);
-	nb.hostname = malloc((unsigned)strlen(tempbfr)-16);
-	strcpy(nb.hostname,tempbfr+17);
+	nb.hostname = malloc((unsigned)strlen(host)+1);
+	strcpy(nb.hostname,host);
 	nb.pathname = malloc((unsigned)strlen(tempbfr)-16);
 	strcpy(nb.pathname, tempbfr+17);
 	nb.user_id = malloc((unsigned)strlen(user_id)+1);
@@ -258,7 +262,7 @@ int trn_no;
 	nb.aliases[1] = malloc(strlen(short_name));
 	strcpy(nb.aliases[1],short_name+1);
 	nb.aliases[2] = (char *)NULL;
-	(void) add_the_mtg(host,&nb,long_name,trn_no,&code);
+	(void) add_the_mtg(host,&nb,trn_no,&code);
 	return(0);		/* add_the_mtg prints error messages */
 
  not_ann:
@@ -271,10 +275,9 @@ int trn_no;
 	return (0);
 }
 
-add_the_mtg(host,nb,long_name,tran,code)
+add_the_mtg(host,nb,tran,code)
 	char *host;
 	name_blk *nb;
-	char *long_name;
 	int tran,*code;
 {
 	struct _dsc_pub dsc_temp;
@@ -293,7 +296,6 @@ add_the_mtg(host,nb,long_name,tran,code)
 		ss_perror(sci_idx,*code,cerror);
 		return (*code);
 	}
-	strcpy(long_name,dsc_temp.m_info.long_name);
 	nb->date_attended = 0;
 	nb->last = 0;
 	/* see if we're already attending... */
@@ -309,7 +311,7 @@ add_the_mtg(host,nb,long_name,tran,code)
 					*cerror = '\0';
 				sprintf(cerror+strlen(cerror),
 					"Meeting %s (%s) is duplicated",
-					long_name,nb->aliases[0]);
+					nb->aliases[0],nb->aliases[1]);
 				ss_perror(sci_idx,0,cerror);
 				return (0);
 			}
@@ -323,7 +325,7 @@ add_the_mtg(host,nb,long_name,tran,code)
 	else {
 		if (tran)
 			printf("Transaction [%04d] ",tran);
-		printf("Meeting %s (%s) added\n",long_name,nb->aliases[0]);
+		printf("Meeting %s (%s) added\n",nb->aliases[0],nb->aliases[1]);
 	}
 	return (0);
 }
