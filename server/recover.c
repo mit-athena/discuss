@@ -100,6 +100,8 @@ char **argv;
      has_privs = TRUE;
      use_zephyr = 0;
 
+     init_dsc_err_tbl();
+
      for (i = 1; i < argc; i++) {
 	  if (*argv[i] == '-') switch (argv[i][1]) {
 	  case 'c':
