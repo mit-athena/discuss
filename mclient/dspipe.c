@@ -28,7 +28,7 @@ tfile unix_tfile();
 char *mktemp();
 
 #ifndef	lint
-static char rcsid[] = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/dspipe.c,v 1.6 1993-04-28 15:36:28 miki Exp $";
+static char rcsid[] = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/dspipe.c,v 1.7 1994-03-25 16:54:16 miki Exp $";
 #endif
 
 main (argc,argv)
@@ -157,7 +157,7 @@ char *usr_string,*host,*mtg_name;
 	char *colon;
 	int host_len;
 
-	colon = index (usr_string, ':');
+	colon = strchr (usr_string, ':');
 
 	if (colon == 0) {
 		(void) strcpy (mtg_name, usr_string);
@@ -166,7 +166,11 @@ char *usr_string,*host,*mtg_name;
 	}
 
 	host_len = colon - usr_string;
+#ifdef POSIX
+      memmove (host, usr_string, host_len);
+#else
 	bcopy (usr_string, host, host_len);
+#endif
 	host [host_len] = '\0';
 	(void) strcpy (mtg_name, colon+1);
 	return;
