@@ -5,6 +5,9 @@
  *        $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/dsmail.c.old,v $
  *
  *        $Log: not supported by cvs2svn $
+ * Revision 1.6  88/01/05  03:09:30  srz
+ * Put location of DSPIPE into config.h
+ * 
  * Revision 1.5  87/10/24  04:26:44  wesommer
  * Rewritten for speed and efficiency.  "popen" is a crock.
  * 
@@ -31,7 +34,7 @@
 #define LISTLEN 40
 
 #ifndef	lint
-static char rcsid[] = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/dsmail.c.old,v 1.6 1988-01-05 03:09:30 srz Exp $";
+static char rcsid[] = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/dsmail.c.old,v 1.7 1988-01-15 22:42:39 srz Exp $";
 #endif
 
 char *malloc();
@@ -163,14 +166,14 @@ void PipeToMeeting(f,subject, reply_to)	/* Pipes? I don't see any pipes here.. *
 {
 	int len;
 	char module[100];
-	int result;
+	int fatal_err,result;
 	tfile transaction;
 	int trn_no;
 	
 	strcpy(module, "discuss@");
 	gethostname(&module[8], sizeof(module)-8);
 	init_rpc();
-	set_module(module, &result);
+	set_module(module, &fatal_err, &result);
 	if (result) {
 		fprintf(stderr, "Can't connect to discuss server: %s\n",
 			error_message(result));
