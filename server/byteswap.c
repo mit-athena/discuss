@@ -18,8 +18,24 @@
 #include <discuss/interface.h>
 #include "mtg.h"
 
-extern int add_trn_priv(char *, tfile, char *, char *, trn_nums, trn_nums,
-              char *, date_times, int, trn_nums *, int *);
+#if defined(__STDC__) 
+#define PROTOTYPE(x) x
+#ifdef NARROW_PROTOTYPES
+#define DECLARG(type, val) type val
+#define OLDDECLARG(type, val)
+#else
+#define DECLARG(type, val) val
+#define OLDDECLARG(type, val) type val;
+#endif /* Narrow prototypes */
+#else
+#define PROTOTYPE(x) ()
+#define DECLARG(type, val) val
+#define OLDDECLARG(type, val) type val;
+#endif /* STDC or PROTOTYPES */
+
+extern int add_trn_priv PROTOTYPE((char *, tfile, char *, char *, trn_nums,
+				  trn_nums, char *, date_times, int,
+				  trn_nums *, int *));
 #define NULL 0
 #define MAX_TRNS 20000
 #define min(a, b) (a < b ? a : b)
@@ -47,7 +63,9 @@ extern int has_privs, use_zephyr;
 #define inline
 #endif
 
-static inline short Sshort (short P_s) {
+static inline short Sshort (DECLARG(short, P_s))
+	OLDDECLARG(short, P_s)
+{
     union {
 	short s;
 	char c[2];
@@ -58,7 +76,9 @@ static inline short Sshort (short P_s) {
     return x2.s;
 }
 
-static inline long Slong (long P_l) {
+static inline long Slong (DECLARG(long, P_l))
+OLDDECLARG(long, P_l)
+{
     union {
 	long l;
 	char c[4];
