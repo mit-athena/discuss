@@ -7,7 +7,7 @@
  */
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.25 1994-06-04 15:04:22 cfields Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.26 1994-06-04 15:14:46 cfields Exp $
  *
  *
  * coreutil.c  -- These contain lower-layer, utility type routines to
@@ -15,6 +15,10 @@
  *		  in-memory superblock, and to open & close meetings.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.25  94/06/04  15:04:22  cfields
+ * Zephyr headers now include stdlib.h, so we don't need to declare
+ * malloc. (char * conflicts with void *)
+ * 
  * Revision 1.24  94/03/25  17:22:07  miki
  * changed the calls to flock with calls to fcntl for SOLARIS
  * chnaged bzero into memset
@@ -100,7 +104,7 @@
 const
 #endif
 static char rcsid_coreutil_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.25 1994-06-04 15:04:22 cfields Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.26 1994-06-04 15:14:46 cfields Exp $";
 #endif /* lint */
 
 #include <discuss/types.h>
@@ -151,8 +155,8 @@ int use_zephyr = 0;
 
 
 /* EXTERNAL */
-#ifdef NOTDEF
-extern char *malloc();
+#ifndef ZEPHYR
+extern char *malloc(); /* zephyr.h includes stdlib.h */
 #endif
 extern off_t lseek();
 extern int errno;
