@@ -35,6 +35,9 @@ a client program accesses meetings on the same machine, discuss bypasses the
 network and creates a subprocess server.  Set this to the location of
 the server program, where disserve will be installed.
 
+SERVER_LOCAL: This is the location of a copy of the subprocess server which
+is not a protected subsystem, but relies on filesystem protections instead.
+
 SERVER_NAME:  The name of the server program (argv[0] of the subprocess).
 
 DSPIPE:  This was used by dsmail.c to enter transactions into
@@ -47,6 +50,7 @@ create an initial .meetings file. */
 
 /* Server to exec (assumed to be in SERVERDIR) */
 #define SERVER "/usr/local/disserve"
+#define SERVER_LOCAL "/usr/local/disserve-fs"
 #define SERVER_NAME "disserve"
 
 /* Info directory */
