@@ -4,7 +4,7 @@
 ;;;    	For copying information, see the file mit-copyright.h in this release.
 ;;;
 ;;;	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v $
-;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.19 1990-12-05 16:23:50 raeburn Exp $
+;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.20 1991-01-03 22:23:31 bjaspan Exp $
 ;;;
 ;;;  Emacs lisp code to remote control a "discuss" shell process to
 ;;;  provide an emacs-based interface to the discuss conferencing system.
@@ -13,6 +13,12 @@
 ;;;  Written by Stan Zanarotti, Bill Sommerfeld and Theodore Ts'o.
 ;;;
 ;;;  $Log: not supported by cvs2svn $
+; Revision 1.19  90/12/05  16:23:50  raeburn
+; Removed one-second delay at startup.  Argument to `discuss' is now
+; optional, and no longer causes reversion to previous buffer.  Error
+; messages now show up associated with meeting names, rather than
+; showing up in the minibuffer and then disappearing.
+; 
 ; Revision 1.18  90/11/05  14:46:02  eichin
 ; moved autoload path dependencies into discuss-source-dir variable.
 ; 
@@ -200,6 +206,7 @@ l	list meetings.
 g	go to meeting listed on line.
 a	add meeting
 d	delete meeting
+c	mark a meeting as read (catch up)
 q	Quit Discuss mode."
   (interactive)
   (kill-all-local-variables)
@@ -250,6 +257,7 @@ q       Quit meeting.
 r	Reply to this transaction.
 f	Forward this transaction via mail.
 t	Talk.  Enter a new transaction.
+c	Catch up.  Mark the rest of the transactions in this meeting as read.
 a	Add meeting."
   (interactive)
   (kill-all-local-variables)
@@ -672,6 +680,16 @@ a	Add meeting."
   (discuss-show-trn discuss-current-transaction)
   (message ""))
 
+(defun discuss-set-seen-and-leave-mtg (arg)
+  "Sets the highest transaction number seen in the current meeting to
+the argument or the current transaction and leaves the meeting."
+  (interactive "p")
+  (if (not discuss-cur-mtg-buf)
+      (error "Not looking at a meeting.")
+    (if current-prefix-arg
+	(setq discuss-highest-seen arg)
+      (setq discuss-highest-seen discuss-current-transaction))
+    (discuss-leave-mtg)))
 
 (defun discuss-leave-mtg ()
   "Leave the current discuss meeting"
@@ -688,6 +706,39 @@ a	Add meeting."
 	(setq discuss-cur-mtg-buf nil)
 	(setq discuss-current-meeting nil)
 	(switch-to-buffer discuss-main-buffer))))
+
+(defun discuss-catchup (&optional meeting)
+  "Mark all messages in the current meeting as read."
+  (interactive
+   (list (or discuss-cur-mtg-buf
+	     (if (or current-prefix-arg
+		     (= (point) 1))
+		 (completing-read "Meeting name:  "
+				  discuss-meeting-completion-list
+				  nil t "")))))
+
+  ;; If meeting is nil, we are in the *meetings* buffer.  Use the
+  ;; meeting on the current line.
+  (if (not meeting)
+      (let ((curline (- (count-lines 1 (min (1+ (point)) (point-max))) 3)))
+	(if (< curline 0)
+	    (error "Not looking at a meeting."))
+	(setq meeting (cadr (aref discuss-meeting-list curline)))
+	(discuss-send-cmd (format "(gmi %s)\n" meeting)
+			  'discuss-end-of-catchup 'discuss-read-form
+			  'discuss-goto-error))
+    ;; Otherwise just set discuss-highest-seen.
+    (setq discuss-highest-seen (nth 6 discuss-current-meeting-info))
+    (discuss-leave-mtg)
+    ))
+
+(defun discuss-end-of-catchup ()
+  (let ((meeting (nth 1 discuss-current-meeting-info))
+	(highest (nth 6 discuss-current-meeting-info)))
+    (message "(ss %d %s)\n" highest meeting)
+    (discuss-send-cmd (format "(ss %d %s)\n" highest meeting))
+    (discuss-mark-read-meeting meeting)
+    ))
 
 (defun discuss-delete-trn-backwards (trn-num)
   (interactive
@@ -1120,7 +1171,7 @@ discuss server while we spin-block."
 ; run this at each load
 (defun discuss-initialize nil
   (setq discuss-version
-	"$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.19 1990-12-05 16:23:50 raeburn Exp $")
+	"$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.20 1991-01-03 22:23:31 bjaspan Exp $")
 
 ;;;
 ;;; Lots of autoload stuff....
@@ -1169,6 +1220,7 @@ discuss server while we spin-block."
   (define-key discuss-mtgs-mode-map "g" 'discuss-goto)
   (define-key discuss-mtgs-mode-map "q" 'discuss-quit)
   (define-key discuss-mtgs-mode-map "s" 'discuss-stat)
+  (define-key discuss-mtgs-mode-map "c" 'discuss-catchup)
   (define-key discuss-mtgs-mode-map "?" 'describe-mode))
 
 (if discuss-trn-mode-map
@@ -1206,6 +1258,8 @@ discuss server while we spin-block."
   (define-key discuss-trn-mode-map "\ef" 'discuss-fref)
   (define-key discuss-trn-mode-map "\el" 'discuss-lref)
   (define-key discuss-trn-mode-map "=" 'discuss-ls)
+  (define-key discuss-trn-mode-map "c" 'discuss-catchup)
+  (define-key discuss-trn-mode-map "l" 'discuss-set-seen-and-leave-mtg)
 )
 
 
