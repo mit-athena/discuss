@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/output.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/output.c,v 1.8 1989-01-05 00:21:13 raeburn Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/output.c,v 1.9 1989-01-29 17:08:58 srz Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986, 1988 by the Student Information Processing Board.
@@ -11,7 +11,7 @@
 
 #ifndef lint
 static char rcsid_discuss_utils_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/output.c,v 1.8 1989-01-05 00:21:13 raeburn Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/output.c,v 1.9 1989-01-29 17:08:58 srz Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -36,10 +36,10 @@ output_trans(txn_no, tf, code)
 	char *plural;
 	char newtime[26];
 	char line[255];
-	trn_info tinfo;
+	trn_info2 tinfo;
 
 	*code = 0;
-	dsc_get_trn_info(&dsc_public.nb, txn_no,
+	dsc_get_trn_info2(&dsc_public.nb, txn_no,
 			 &tinfo, code);
 	if (*code != 0) return;
 
@@ -51,10 +51,11 @@ output_trans(txn_no, tf, code)
 	else
 		plural = "";
      
-	(void) sprintf (line, "[%04d] %s  %s  %s (%d line%s)\n",
+	(void) sprintf (line, "[%04d] %s  %s  %s (%d line%s)%s\n",
 			tinfo.current, tinfo.author,
 			dsc_public.m_info.long_name,
-			newtime, tinfo.num_lines, plural);
+			newtime, tinfo.num_lines, plural,
+			((tinfo.flags & TRN_FLAG1) != 0) ? " (flagged)" : "");
 	twrite (tf, line, strlen (line), code);
 	if (tinfo.subject [0] != '\0') {
 		twrite (tf, "Subject: ", 9, code);
