@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v 1.3 1987-06-27 01:55:05 spook Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v 1.4 1987-07-08 01:57:56 wesommer Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
@@ -11,7 +11,7 @@
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v 1.3 1987-06-27 01:55:05 spook Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v 1.4 1987-07-08 01:57:56 wesommer Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -46,7 +46,7 @@ repl(argc, argv)
 	char *editor = NULL;
 	char *trans = NULL;
 	char *mtg = NULL;
-
+	char *myname = NULL;
 	while (++argv, --argc) {
 		if (!strcmp (*argv, "-meeting") || !strcmp (*argv, "-mtg")) {
 			if (argc==1) {
@@ -124,13 +124,30 @@ repl(argc, argv)
 
 	dsc_get_trn_info(&dsc_public.nb, orig_trn, &t_info, &code);
 	if (code != 0) {
-	     ss_perror(sci_idx, code, "");
-	     return;
+		ss_perror(sci_idx, code, "");
+		return;
 	}
 
-	if(!acl_is_subset("a", dsc_public.m_info.access_modes))
-		(void) fprintf(stderr, "Warning: You do not have permission to create replies.\n");
+	if(!acl_is_subset("a", dsc_public.m_info.access_modes)) {
+		(void) ss_perror(sci_idx, 0,
+			"You do not have permission to create replies in this meeting.");
+		goto abort;
+	}
 
+	printf("Replying to [%04d]: %s\n", orig_trn, t_info.subject);
+
+	dsc_whoami(&dsc_public.nb, &myname, &code);
+
+	if (code != 0) {
+		ss_perror(sci_idx, code, "while checking for anonymity");
+	} else {
+		if (strncmp(myname, "???", 3) == 0) {
+			printf("Reply will be anonymous.\n");
+		}
+		free(myname);
+		myname = NULL;
+	}
+	
 	if (strncmp(t_info.subject, "Re: ", 4)) {
 		char *new_subject = malloc((unsigned)strlen(t_info.subject)+5);
 		(void) strcpy(new_subject, "Re: ");
@@ -156,8 +173,7 @@ repl(argc, argv)
 	dsc_add_trn(&dsc_public.nb, tf, t_info.subject,
 		    orig_trn, &txn_no, &code);
 	if (code != 0) {
-		fprintf(stderr, "Error adding transaction: %s\n",
-			error_message(code));
+		ss_perror(sci_idx, code, "while adding transaction\n");
 		goto abort;
 	}
 	(void) printf("Transaction [%04d] entered in the %s meeting.\n",
@@ -175,3 +191,4 @@ abort:
 	free(t_info.subject);
 	free(t_info.author);
 }
+
