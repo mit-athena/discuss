@@ -16,9 +16,12 @@
 /*
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/rpproc.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/rpproc.c,v 1.14 1998-03-24 22:26:24 ghudson Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/rpproc.c,v 1.15 1998-04-14 19:46:06 ghudson Exp $
  *
  *	$Log: not supported by cvs2svn $
+ *	Revision 1.14  1998/03/24 22:26:24  ghudson
+ *	/usr/spool -> /var/spool
+ *
  *	Revision 1.13  1997/06/02 17:23:05  ghudson
  *	From mhpower: fix a buffer overrun.
  *
@@ -278,6 +281,7 @@ long haddr;
     char hostname[50];
     char filename[50];
     char instance[INST_SZ];
+    char *envvar;
     AUTH_DAT kdata;
     KTEXT_ST ticket;
 
@@ -294,6 +298,12 @@ long haddr;
 	ticket.dat[i] = recvshort();
     }
     
+    envvar = malloc(strlen(service) + 50);
+    if (envvar) {
+	sprintf(envvar, "KRB5_KTNAME=/var/spool/%s/krb5.keytab", service);
+	putenv(envvar);
+    }
+
     /* make filename from service */
     strcpy (filename, "/var/spool/");
     strcat (filename, service);
