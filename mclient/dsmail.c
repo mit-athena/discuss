@@ -12,6 +12,10 @@
  *        $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/dsmail.c,v $
  *
  *        $Log: not supported by cvs2svn $
+ * Revision 1.3  1995/07/31  21:43:53  cfields
+ * Get sysexits.h from ucbinclude if SOLARIS, not SYSV.
+ * Don't need the EX_CONFIG def in that ifdef; it happens later if necessary.
+ *
  * Revision 1.2  1994/08/14  22:21:28  cfields
  * include /usr/ucbinclude/sysexits.h if SYSV
  * index to strchr
@@ -103,11 +107,8 @@
 #include <ctype.h>
 #include <sys/types.h>
 #include <sys/file.h>
-#ifdef SOLARIS
-#include "/usr/ucbinclude/sysexits.h"
-#else
 #include <sysexits.h>
-#endif
+
 
 #include <discuss/discuss.h>
 #include <rpc.h>
@@ -124,7 +125,7 @@
 
 #ifndef	lint
 static char rcsid[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/dsmail.c,v 1.3 1995-07-31 21:43:53 cfields Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/dsmail.c,v 1.4 1995-11-30 19:37:40 miki Exp $";
 #endif
 
 char *malloc(), *realloc ();
