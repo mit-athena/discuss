@@ -1,7 +1,7 @@
-LIBS=	libds.a libusp.a
+LIBS=	../lib/libds.a ../lib/libusp.a
 CFLAGS=	-g
 
-all:	testrpc pmtg dspipe mkds discuss rmds tags
+all:	pmtg dspipe mkds discuss rmds tags
 
 discuss: discuss.o cmds.o discuss_utils.o pager.o trn_expr.o libss.a $(LIBS)
 	cc $(CFLAGS) -o discuss discuss.o cmds.o discuss_utils.o pager.o libss.a $(LIBS)
@@ -11,16 +11,13 @@ tags:	TAGS
 TAGS:	discuss.c discuss_utils.c pager.c
 	-etags discuss.c discuss_utils.c pager.c
 
-testrpc:  testrpc.o libds.a
-	cc $(CFLAGS) -o testrpc testrpc.o $(LIBS)
-
-pmtg:	pmtg.o libds.a
+pmtg:	pmtg.o $(LIBS)
 	cc $(CFLAGS) -o pmtg pmtg.o $(LIBS)
 
-dspipe:	dspipe.o libds.a
+dspipe:	dspipe.o $(LIBS)
 	cc $(CFLAGS) -o dspipe dspipe.o $(LIBS)
 
-mkds:	mkds.o libds.a
+mkds:	mkds.o $(LIBS)
 	cc $(CFLAGS) -o mkds mkds.o $(LIBS)
 
 rmds:	mkds
