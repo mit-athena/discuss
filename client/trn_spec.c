@@ -1,24 +1,43 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/trn_spec.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/trn_spec.c,v 1.2 1987-07-08 19:06:42 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/trn_spec.c,v 1.3 1991-09-04 11:29:35 lwvanels Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
- *	A new routine to parse transaction specifiers.  This one 
- *	has a slightly different interface from the previous one, and
- *	was inspired by forum_trans_specs_.pl1 in the Multics forum 
- * 	system, with slight variations.
- * 	
- *	This is not working code yet.
+ *	Parse a command line containing transaction specifiers and 
+ * 	"standard" message selection control arguments.
+ *
+ *	parse_trans_spec "compiles" the command line arguments into 
+ *	a "generator" data structure.  
+ *
+ *	The generator strucuture contains things like a trn_info for each
+ *	generated transaction.
+ *
+ * 	It is indended that the application will call "tg_next_trn" repeatedly
+ *	until it returns a non-zero error code.  "tg_next_trn" returns 
+ *	DSC_NO_MORE when there are no more transactions in a series, and
+ *	silently swallows things like deleted transactions (unless the 
+ *	-deleted option was given...)
+ *
+ *	It is intended that this will be the place to do things like 
+ *	matching subjects based on a regexp, implementing "-by_chain", etc,
+ *	although some significant rearrangement of the FSMs will be needed
+ * 	to do that.
+ *
+ *	If this were LISP, I would wind up turning tg_next_trn into something
+ *	which called eval..  but it isn't.  Sorry.
  *
  * 	$Log: not supported by cvs2svn $
+ * Revision 1.2  87/07/08  19:06:42  wesommer
+ * Another intermediate version.
+ * 
  * Revision 1.1  87/04/10  23:42:37  srz
  * Initial revision
- * 
+ *
  */
 
 #ifndef lint
-static char *rcsid_trn_spec_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/trn_spec.c,v 1.2 1987-07-08 19:06:42 wesommer Exp $";
+static char *rcsid_trn_spec_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/trn_spec.c,v 1.3 1991-09-04 11:29:35 lwvanels Exp $";
 #endif lint
 
 #include "interface.h"
@@ -56,6 +75,7 @@ static struct trn_ent {
 	{ "first",	TRSPEC_FIRST|TRSPEC_REM, 0 },
 	{ "last",	TRSPEC_LAST|TRSPEC_REM, 0},
 	{ "$",		TRSPEC_LAST|TRSPEC_REM, 0},
+	{ "new",	TRSPEC_FUNS|TRSPEC_REM, TRSPEC_NEXT },
 };
 int n_trn_table = (sizeof(trn_table)/sizeof(struct trn_ent));
 	
@@ -63,13 +83,9 @@ static struct swtch {
 	char *name;
 	int	set;
 } switches[] = {
-	{ "-reverse",   TRSPEC_REVERSE  },
-	{ "-rev",	TRSPEC_REVERSE  },
 	{ "-deleted", 	TRSPEC_DEL },
-	{ "-u",		TRSPEC_UNSEEN },
-	{ "-uns",	TRSPEC_UNSEEN },
-	{ "-unseen",	TRSPEC_UNSEEN }
 };
+
 int n_switches = (sizeof(switches)/sizeof(struct swtch));
 
 /*
@@ -153,6 +169,7 @@ process_an_arg(tg, arg)
 			}
 		}
 		*cp = ',';
+		return 0;
 	}
 
 	{
@@ -193,103 +210,39 @@ tg_next_trn(tg)
 {
 	register trnspec_entry *te;
 	int deleted, remove, until, flags, trn_num, unseen;
-	int code;
+	int code = 0;
 	
 	/* Come up with next xcn number */
 	if(tg->te == (trnspec_entry *)tg) return DSC_NO_MORE;
 	
 	te=tg->te;
 	
-	deleted = tg->flags&TRSPEC_DEL;
-	unseen = tg->flags&TRSPEC_UNSEEN;
-
-	remove = te->flags&TRSPEC_REM;
-	until = te->flags&TRSPEC_UNTIL;
-	flags = te->flags&TRSPEC_KINDS;
-
-again:
-	switch (flags) {
-	case TRSPEC_NEXT:
-		if (deleted) trn_num = tg->current + 1;
-		else trn_num = tg->tinfo.next;
-		if (unseen) trn_num = max(tg->highest_seen+1, trn_num);
-		break;
-		
-	case TRSPEC_PREV:
-		if (deleted) trn_num = tg->tinfo.current - 1;
-		else trn_num = tg->tinfo.prev;
-		break;
-		
-	case TRSPEC_NREF:
-		trn_num = tg->tinfo.nref;
-		break;
-		
-	case TRSPEC_PREF:
-		trn_num = tg->tinfo.pref;
-		break;
-
-	case TRSPEC_FREF:
-		trn_num = tg->tinfo.fref;
-		break;
-		
-	case TRSPEC_LREF:
-		trn_num = tg->tinfo.lref;
-		break;
-
-	case TRSPEC_FIRST:
-		trn_num = tg->minfo->first;
-		break;
-
-	case TRSPEC_LAST:
-		trn_num = tg->minfo->last;
-		break;
-
-	case TRSPEC_CUR:
-		goto gotit;
-
-	case TRSPEC_NUM:
-		trn_num = te->num;
-		break;
-
-	case TRSPEC_FUNS:		/* First unseen - this is broken*/
-		trn_num = tg->highest_seen + 1;
-		break;
-
-	default:
-		abort();
-	}
+	trn_num = tg_next_trn_num(tg, te);
 
 	if (trn_num == 0) return DSC_NO_MORE;
 
-	if (until) {
-		if (tg->current < trn_num) {
-			until = 0;
-			flags = TRSPEC_NEXT;
-			goto again;
-		}
-	}
+	if (trn_num != tg->current)
+		dsc_get_trn_info(tg->nbp, trn_num, &tg->tinfo, &code);
 
-	dsc_get_trn_info(tg->nbp, trn_num, &tg->tinfo, &code);
-
-	if (code == DELETED_TRN) {
-		if (deleted != TRSPEC_DEL) {
+	if (tg->flags&TRSPEC_DEL) {
+		if (code != DELETED_TRN) {
+/* arg! */
 			deleted = -1;
 			flags = TRSPEC_NEXT;
 			goto again;
-		}
-		tg->current = 0;
+/* end arg! */
+		} else code = 0;
 	}
+
 	if (code == 0) {
 		tg->current = trn_num;
 	}
-	if (unseen && trn_num <= tg->highest_seen) 
-		goto again;
 
-gotit:
-	if(remove) {
+	if(te->flags&TRSPEC_REM) {
 		remque(te);
-		free(te);
-	} 
+		te_free(te);
+	}
+
 	if (code) tg->current = 0;
 	return code;
 } 
@@ -304,4 +257,59 @@ add_new_te(tg, flags, num)
 	new_te->num = num;
 	insque(new_te, tg->te_last);
 }
+
+/*
+ * A Lisp programmer would call this function a special case of eval..
+ */
+
+int tg_next_trn_num(tg, te)
+	trans_gen *tg;
+	trnspec_entry *te;
+{
+	int trn_num;
+
+	switch (te->flags&TRSPEC_KINDS) {
+	case TRSPEC_UNTIL:
+		trn_num = tg_next_trn_num(tg, te->down);
+		if (trn_num >= tg->current) return 0;
+		/* fall through into next... */
+
+	case TRSPEC_NEXT:
+		if (tg->flags&TRSPEC_DEL) return tg->current + 1;
+		else return tg->tinfo.next;
+		
+	case TRSPEC_PREV:
+		if (tg->flags&TRSPEC_DEL) return tg->tinfo.current - 1;
+		else return tg->tinfo.prev;
+		
+	case TRSPEC_NREF:
+		return tg->tinfo.nref;
+		
+	case TRSPEC_PREF:
+		return tg->tinfo.pref;
+
+	case TRSPEC_FREF:
+		return tg->tinfo.fref;
+		
+	case TRSPEC_LREF:
+		return tg->tinfo.lref;
+
+	case TRSPEC_FIRST:
+		return tg->minfo->first;
+
+	case TRSPEC_LAST:
+		return tg->minfo->last;
+
+	case TRSPEC_CUR:
+		return te->tinfo.current;
+
+	case TRSPEC_NUM:
+		return te->num;
+
+	case TRSPEC_FUNS:	
+		return tg->highest_seen + 1;
+
+	default:
+		abort();
+	}
 }
