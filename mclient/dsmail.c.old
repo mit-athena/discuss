@@ -5,6 +5,10 @@
  *        $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/dsmail.c.old,v $
  *
  *        $Log: not supported by cvs2svn $
+ * Revision 1.8  89/01/05  07:13:11  raeburn
+ * replaced included header files with <discuss/discuss.h>; also added
+ * newline after message header
+ * 
  * Revision 1.7  88/01/15  22:42:39  srz
  * set_module now returns fatal flag, again.
  * 
@@ -38,7 +42,7 @@
 
 #ifndef	lint
 static char rcsid[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/dsmail.c.old,v 1.8 1989-01-05 07:13:11 raeburn Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/dsmail.c.old,v 1.9 1989-04-17 17:09:21 srz Exp $";
 #endif
 
 char *malloc();
@@ -90,6 +94,7 @@ main(argc,argv)
 	int i,ok_prev=0,iscont = 0;
 	char filename[60];
 
+	init_dsc_err_tbl();
 	PRS(argc,argv);
 	line[BUFFLEN]='\0';
 	if (debug) 
