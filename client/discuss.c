@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.16 1986-10-29 10:25:23 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.17 1986-11-11 01:49:11 wesommer Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
@@ -9,6 +9,12 @@
  *	ss library for the command interpreter.
  *
  *      $Log: not supported by cvs2svn $
+ * Revision 1.16  86/10/29  10:25:23  srz
+ * Clean up global variables.
+ * Moves delete and retrieve over to list.c
+ * Added leave, and have goto/leave record meeting changes
+ * Reply takes transaction number.
+ * 
  * Revision 1.15  86/10/19  09:58:03  spook
  * Changed to use dsc_ routines; eliminate refs to rpc.
  * 
@@ -56,7 +62,7 @@
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.16 1986-10-29 10:25:23 srz Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.17 1986-11-11 01:49:11 wesommer Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -189,6 +195,9 @@ repl(sci_idx, argc, argv)
 	     return;
 	}
 
+	if(!acl_is_subset("a", dsc_public.m_info.access_modes))
+		(void) fprintf(stderr, "Warning: You do not have permission to create replies.\n");
+
 	if (strncmp(t_info.subject, "Re: ", 4)) {
 		char *new_subject = malloc((unsigned)strlen(t_info.subject)+5);
 		(void) strcpy(new_subject, "Re: ");
@@ -219,7 +228,7 @@ repl(sci_idx, argc, argv)
 		goto abort;
 	}
 	(void) printf("Transaction [%04d] entered in the %s meeting.\n",
-		      txn_no, dsc_public.mtg_uid);
+		      txn_no, dsc_public.mtg_name);
 	if (dsc_public.current == 0)
 		dsc_public.current = txn_no;
 
@@ -271,11 +280,19 @@ goto_mtg(sci_idx, argc, argv)
 	}
 	dsc_public.attending = TRUE;
         dsc_public.highest_seen = dsc_public.current = dsc_public.nb.last;
-	printf ("%s meeting;  %d last, %d new.\n\n",
+	printf ("%s meeting;  %d new, %d last",
 		dsc_public.m_info.long_name,
-		dsc_public.m_info.last,
-		max (dsc_public.m_info.last - dsc_public.highest_seen, 0));
-
+		max (dsc_public.m_info.last - dsc_public.highest_seen, 0),
+		dsc_public.m_info.last);
+	if (acl_is_subset("c", dsc_public.m_info.access_modes)) 
+		printf(" (You are a chairman)");
+	if (!acl_is_subset("w", dsc_public.m_info.access_modes)) {
+		if (!acl_is_subset("a", dsc_public.m_info.access_modes)) 
+			printf(" (Read only)");
+		else printf(" (Reply only)");
+	} else if (!acl_is_subset("a", dsc_public.m_info.access_modes))
+		printf(" (No replies)");
+	printf(".\n\n");
 }
 
 /*
