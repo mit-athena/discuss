@@ -1,13 +1,13 @@
 /*
  *
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/trn_select.c,v 1.11 1989-03-27 02:20:26 srz Exp $
+ * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/trn_select.c,v 1.12 1989-03-27 02:33:28 srz Exp $
  * $Locker:  $
  *
  */
 
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/trn_select.c,v 1.11 1989-03-27 02:20:26 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/trn_select.c,v 1.12 1989-03-27 02:33:28 srz Exp $";
 #endif lint
 
 #define	MIN(a,b)	((a)<(b)?(a):(b))
@@ -90,7 +90,7 @@ int include_deleted;
      flag_interrupts();
      for (p = list; p; p = p->next) {
 	  if ((p->flags & flag_AREF)) {			/* Handle aref */
-	       dsc_get_trn_info (&dsc_public.nb, p->low, &t_info, &result);
+	       dsc_get_trn_info2 (&dsc_public.nb, p->low, &t_info, &result);
 	       t_info.current = p->low;
 	       if (result != 0) {
 		    func(&t_info, &result);
@@ -104,7 +104,7 @@ int include_deleted;
 	       if (t_info.fref != t_info.current) {	/* Get fref */
 		    dsc_destroy_trn_info(&t_info);
 		    trn_no = t_info.fref;
-		    dsc_get_trn_info (&dsc_public.nb, trn_no, &t_info, &result);
+		    dsc_get_trn_info2 (&dsc_public.nb, trn_no, &t_info, &result);
 		    t_info.current = trn_no;
 	       }
 
@@ -119,7 +119,7 @@ int include_deleted;
 
 		    trn_no = t_info.nref;
 		    if (trn_no != 0) {
-			 dsc_get_trn_info (&dsc_public.nb, trn_no, &t_info, &result);
+			 dsc_get_trn_info2 (&dsc_public.nb, trn_no, &t_info, &result);
 			 t_info.current = trn_no;
 		    }
 	       } while (trn_no != 0);
@@ -128,7 +128,7 @@ int include_deleted;
 		    if (i == 0)
 			 continue;
 
-		    dsc_get_trn_info (&dsc_public.nb, i, &t_info, &result);
+		    dsc_get_trn_info2 (&dsc_public.nb, i, &t_info, &result);
 		    t_info.current = i;
 		    func(&t_info, &result);
 		    dsc_destroy_trn_info(&t_info);
@@ -147,7 +147,7 @@ int include_deleted;
 		    if (interrupt)
 			 goto exit;
 
-		    dsc_get_trn_info (&dsc_public.nb, trn_no, &t_info, &result);
+		    dsc_get_trn_info2(&dsc_public.nb, trn_no, &t_info, &result);
 		    t_info.current = trn_no;
 
 		    if (result == DELETED_TRN) {
