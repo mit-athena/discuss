@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/output.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/output.c,v 1.2 1987-01-04 19:30:10 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/output.c,v 1.3 1987-03-22 04:39:50 spook Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board.
@@ -8,6 +8,9 @@
  *	Utility routines.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.2  87/01/04  19:30:10  srz
+ * Changed format of header
+ * 
  * Revision 1.1  86/12/07  01:31:16  rfrench
  * Initial revision
  * 
@@ -40,7 +43,7 @@
  */
 
 #ifndef lint
-static char *rcsid_discuss_utils_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/output.c,v 1.2 1987-01-04 19:30:10 srz Exp $";
+static char *rcsid_discuss_utils_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/output.c,v 1.3 1987-03-22 04:39:50 spook Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -70,10 +73,11 @@ output_trans(txn_no, tf, code)
 	trn_info tinfo;
 
 	*code = 0;
-	dsc_get_trn_info(dsc_public.mtg_uid, txn_no, &tinfo, code);
+	dsc_get_trn_info(&dsc_public.nb, txn_no,
+			 &tinfo, code);
 	if (*code != 0) return;
 
-	(void) strcpy (newtime, ctime (&(tinfo.date_entered)));
+	(void) strcpy (newtime, ctime (&tinfo.date_entered));
 	newtime [24] = '\0';			/* get rid of \n */
 
 	if (tinfo.num_lines != 1)
@@ -91,7 +95,7 @@ output_trans(txn_no, tf, code)
 		twrite (tf, tinfo.subject, strlen (tinfo.subject), code);
 		twrite (tf, "\n", 1, code);
 	}
-	dsc_get_trn(dsc_public.mtg_uid, txn_no, tf, code);
+	dsc_get_trn(&dsc_public.nb, txn_no, tf, code);
 	if (*code != 0) return;
 
 	if (tinfo.pref == 0 && tinfo.nref == 0)

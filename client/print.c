@@ -3,12 +3,15 @@
  *	Print-related requests for DISCUSS.
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.11 1986-12-07 16:05:09 rfrench Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.12 1987-03-22 04:41:25 spook Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
  *
  *      $Log: not supported by cvs2svn $
+ * Revision 1.11  86/12/07  16:05:09  rfrench
+ * Globalized sci_idx
+ * 
  * Revision 1.10  86/12/07  00:39:33  rfrench
  * Killed ../include
  * 
@@ -45,7 +48,7 @@
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.11 1986-12-07 16:05:09 rfrench Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.12 1987-03-22 04:41:25 spook Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -74,6 +77,9 @@ static trn_nums	performed;
 static char *	request_name;
 static trn_info	t_info;
 static tfile	tf;
+
+extern void sl_free();
+extern char *error_message();
 
 static int
 display_trans(trn_no)
@@ -113,13 +119,15 @@ prt_trans(argc, argv)
 		(void) fprintf(stderr, "No current meeting.\n");
 		return;
 	}
-	dsc_get_mtg_info(dsc_public.mtg_uid, &dsc_public.m_info, &code);
+	dsc_get_mtg_info(&dsc_public.nb,
+			 &dsc_public.m_info, &code);
 	if (code != 0) {
 		(void) ss_perror(sci_idx, code, "Can't get meeting info");
 		return;
 	}
 
-	dsc_get_trn_info(dsc_public.mtg_uid, dsc_public.current, &t_info, &code);
+	dsc_get_trn_info(&dsc_public.nb, dsc_public.current,
+			 &t_info, &code);
 	if (code)
 		t_info.current = 0;
 	else {
@@ -134,7 +142,7 @@ prt_trans(argc, argv)
 				      (selection_list *)NULL, &code);
 		if (code) {
 			ss_perror(sci_idx, code, "");
-			free(trn_list);
+			free((char *)trn_list);
 			return;
 		}
 	}
@@ -191,11 +199,12 @@ write_trans(argc, argv)
 	int (*old_sig)();
 	int code;
 
-	if (dsc_public.mtg_uid == (char *)NULL) {
+	if (dsc_public.host == (char *)NULL) {
 		(void) fprintf(stderr, "No current meeting.\n");
 		return;
 	}
-	dsc_get_mtg_info(dsc_public.mtg_uid, &dsc_public.m_info, &code);
+	dsc_get_mtg_info(&dsc_public.nb,
+			 &dsc_public.m_info, &code);
 	if (code != 0) {
 		(void) ss_perror(sci_idx, code, "Can't get meeting info");
 		return;

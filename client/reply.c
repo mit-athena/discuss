@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v 1.1 1987-03-22 04:41:46 spook Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v 1.2 1987-03-22 04:42:06 spook Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
@@ -13,7 +13,7 @@
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v 1.1 1987-03-22 04:41:46 spook Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v 1.2 1987-03-22 04:42:06 spook Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -97,7 +97,7 @@ repl(argc, argv)
 	}
 
 
-	dsc_get_trn_info(dsc_public.mtg_uid, dsc_public.current, &t_info, &code);
+	dsc_get_trn_info(&dsc_public.nb, dsc_public.current, &t_info, &code);
 	if (code != 0)
 		t_info.current = 0;
 	else {
@@ -124,7 +124,7 @@ repl(argc, argv)
 	orig_trn = trn_list -> low;
 	free((char *)trn_list);
 
-	dsc_get_trn_info(dsc_public.mtg_uid, orig_trn, &t_info, &code);
+	dsc_get_trn_info(&dsc_public.nb, orig_trn, &t_info, &code);
 	if (code != 0) {
 	     ss_perror(sci_idx, code, "");
 	     return;
@@ -155,8 +155,8 @@ repl(argc, argv)
 	}
 	tf = unix_tfile(fd);
 	
-	dsc_add_trn(dsc_public.mtg_uid, tf, t_info.subject,
-		orig_trn, &txn_no, &code);
+	dsc_add_trn(&dsc_public.nb, tf, t_info.subject,
+		    orig_trn, &txn_no, &code);
 	if (code != 0) {
 		fprintf(stderr, "Error adding transaction: %s\n",
 			error_message(code));
@@ -170,7 +170,7 @@ repl(argc, argv)
 	/* and now a pragmatic definition of 'seen':  If you are up-to-date
 	   in a meeting, then you see transactions you enter. */
 	if (dsc_public.highest_seen == txn_no -1) {
-	     dsc_public.highest_seen = txn_no;
+		dsc_public.highest_seen = txn_no;
 	}
 
 abort:
