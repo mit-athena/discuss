@@ -17,7 +17,7 @@
 		"Meeting does not exist"
 
 	ec	NEW_VERSION,
-		"Cannot handle new version"
+		"Invalid version number in meeting"
 
 	ec	INCONSISTENT,
 		"There is an inconsistency in the meeting"
