@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/edit.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/edit.c,v 1.9 1989-01-24 19:34:14 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/edit.c,v 1.10 1989-03-26 23:20:08 raeburn Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board.
@@ -8,6 +8,10 @@
  *	Utility routines.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.9  89/01/24  19:34:14  srz
+ * Protect the temporary file used in editing.
+ * Mode 0700.
+ * 
  * Revision 1.8  89/01/05  00:17:56  raeburn
  * replaced included header files with <discuss/discuss.h>
  * 
@@ -63,8 +67,8 @@
 
 #ifndef lint
 static char rcsid_discuss_utils_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/edit.c,v 1.9 1989-01-24 19:34:14 srz Exp $";
-#endif lint
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/edit.c,v 1.10 1989-03-26 23:20:08 raeburn Exp $";
+#endif /* lint */
 
 #include <stdio.h>
 #include <sys/file.h>
