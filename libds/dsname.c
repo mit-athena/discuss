@@ -1,13 +1,13 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v 1.8 1987-04-09 05:41:04 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v 1.9 1987-04-26 16:57:32 srz Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
  */
 
 #ifndef lint
-static char *rcsid_dsname_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v 1.8 1987-04-09 05:41:04 wesommer Exp $";
+static char *rcsid_dsname_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v 1.9 1987-04-26 16:57:32 srz Exp $";
 #endif lint
 
 /*
@@ -492,26 +492,41 @@ dsc_update_mtg_set(user_id, set, num, result)
 		}
 		if (current.status & DSC_ST_DELETED) continue;
 
-		fprintf(new_file, format,
+		if (fprintf(new_file, format,
 			current.status, current.date_attended, current.last,
 			current.hostname, current.pathname,
-			current.alias_list, current.spare);
+			current.alias_list, current.spare) == EOF)
+		     goto punt;
 	}
 	
 	/* clean up ones we haven't touched in memory yet */
 	for (i = 0, nbp = set; i < num; i++, nbp++) {
 		if (!touched[i]) {
-			fprintf(new_file, format,
+			if(fprintf(new_file, format,
 				nbp->status, nbp->date_attended, nbp->last,
 				nbp->hostname, nbp->pathname,
-				compress(nbp->aliases), current.spare);
+				compress(nbp->aliases), current.spare) == EOF)
+			     goto punt;
 		}
 	}
 	enddbent();
-	fclose(new_file);
+	if (fclose(new_file)==EOF)
+	     goto punt2;
 	*result = (rename(new_name, old_name) < 0) ? errno : 0;
 	free(new_name);
 	free(old_name);
 	free(touched);
 	return;
+
+punt:
+	fclose(new_file);
+punt2:
+	enddbent();
+	unlink(new_name);
+	free(new_name);
+	free(old_name);
+	free(touched);
+	*result = CANT_WRITE_TEMP;
+	return;
+	
 }
