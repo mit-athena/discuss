@@ -7,13 +7,13 @@
  */
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v 1.23 1989-06-02 23:37:45 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v 1.24 1996-09-08 20:31:20 ghudson Exp $
  *
  */
 
 #ifndef lint
 static char rcsid_lsm_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v 1.23 1989-06-02 23:37:45 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v 1.24 1996-09-08 20:31:20 ghudson Exp $";
 #endif lint
 
 #include <string.h>
@@ -21,7 +21,7 @@ static char rcsid_lsm_c[] =
 #include <discuss/discuss.h>
 #include "globals.h"
 #include <errno.h>
-#include "ss.h"
+#include <ss/ss.h>
 
 extern char *malloc(), *calloc(), *ctime(), *error_message();
 extern void flag_interrupts(), dont_flag_interrupts();

@@ -7,12 +7,15 @@
  */
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/edit.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/edit.c,v 1.13 1994-03-25 16:27:35 miki Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/edit.c,v 1.14 1996-09-08 20:31:16 ghudson Exp $
  *	$Locker:  $
  *
  *	Utility routines.
  *
  *	$Log: not supported by cvs2svn $
+ *	Revision 1.13  1994/03/25 16:27:35  miki
+ *	replaced calls to signal with calls to sigaction, for POSIX
+ *
  * Revision 1.12  93/04/28  11:17:05  miki
  * ported to Solaris2.1
  * 
@@ -81,14 +84,14 @@
 
 #ifndef lint
 static char rcsid_discuss_utils_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/edit.c,v 1.13 1994-03-25 16:27:35 miki Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/edit.c,v 1.14 1996-09-08 20:31:16 ghudson Exp $";
 #endif /* lint */
 
 #include <stdio.h>
 #include <sys/file.h>
 #include <string.h>
 #include <signal.h>
-#include "ss.h"
+#include <ss/ss.h>
 #include <discuss/discuss.h>
 #include "globals.h"
 #include <sys/wait.h>

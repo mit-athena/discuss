@@ -9,19 +9,19 @@
  *
  * Status request for DISCUSS
  *
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/status.c,v 1.13 1992-12-23 11:47:32 probe Exp $
+ * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/status.c,v 1.14 1996-09-08 20:31:33 ghudson Exp $
  * $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/status.c,v $
  * $Locker:  $
  *
  */
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/status.c,v 1.13 1992-12-23 11:47:32 probe Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/status.c,v 1.14 1996-09-08 20:31:33 ghudson Exp $";
 #endif lint
 
 #include <stdio.h>
 #include <ctype.h>
-#include "ss.h"
+#include <ss/ss.h>
 #include <discuss/discuss.h>
 #include "config.h"
 #include "globals.h"

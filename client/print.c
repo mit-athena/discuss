@@ -9,7 +9,7 @@
  *	Print-related requests for DISCUSS.
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.23 1996-04-05 22:24:47 ghudson Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.24 1996-09-08 20:31:29 ghudson Exp $
  *	$Locker:  $
  *
  */
@@ -17,7 +17,7 @@
 
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.23 1996-04-05 22:24:47 ghudson Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.24 1996-09-08 20:31:29 ghudson Exp $";
 #endif /* lint */
 
 #include <stdio.h>
@@ -30,7 +30,7 @@ static char rcsid_discuss_c[] =
 #include <fcntl.h>
 #endif
 #include <discuss/discuss.h>
-#include "ss.h"
+#include <ss/ss.h>
 #include "config.h"
 #include "globals.h"
 

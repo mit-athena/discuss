@@ -7,7 +7,7 @@
  */
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v 1.18 1993-04-28 11:22:07 miki Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v 1.19 1996-09-08 20:31:31 ghudson Exp $
  *	$Locker:  $
  *
  *	Code for "reply" request in discuss.
@@ -17,7 +17,7 @@
 
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v 1.18 1993-04-28 11:22:07 miki Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v 1.19 1996-09-08 20:31:31 ghudson Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -29,7 +29,7 @@ static char rcsid_discuss_c[] =
 #include <fcntl.h>
 #endif
 #include <sys/wait.h>
-#include "ss.h"
+#include <ss/ss.h>
 #include <discuss/discuss.h>
 #include "config.h"
 #include "globals.h"

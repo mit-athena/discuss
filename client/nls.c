@@ -2,7 +2,7 @@
  *
  * List request for DISCUSS
  *
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/nls.c,v 1.2 1991-09-04 11:30:37 lwvanels Exp $
+ * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/nls.c,v 1.3 1996-09-08 20:31:26 ghudson Exp $
  * $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/nls.c,v $
  * $Locker:  $
  *
@@ -10,13 +10,13 @@
  *
  */
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/nls.c,v 1.2 1991-09-04 11:30:37 lwvanels Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/nls.c,v 1.3 1996-09-08 20:31:26 ghudson Exp $";
 #endif lint
 
 #include <stdio.h>
 #include <strings.h>
 #include "discuss_err.h"
-#include "ss.h"
+#include <ss/ss.h>
 #include "tfile.h"
 #include "interface.h"
 #include "config.h"

@@ -16,14 +16,14 @@
  *	command line, in which case they are used as meeting announcements.
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.29 1994-03-25 16:32:25 miki Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.30 1996-09-08 20:31:01 ghudson Exp $
  *	$Locker:  $
  *
  */
 
 #ifndef lint
 static char rcsid_addmtg_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.29 1994-03-25 16:32:25 miki Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.30 1996-09-08 20:31:01 ghudson Exp $";
 #endif lint
 
 #include <string.h>
@@ -35,7 +35,7 @@ static char rcsid_addmtg_c[] =
 #endif
 #include <discuss/discuss.h>
 #include "globals.h"
-#include "ss.h"
+#include <ss/ss.h>
 
 extern char *malloc(), *calloc();
 extern tfile unix_tfile();

@@ -7,7 +7,7 @@
  */
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/goto.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/goto.c,v 1.16 1992-12-23 11:47:30 probe Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/goto.c,v 1.17 1996-09-08 20:31:18 ghudson Exp $
  *	$Locker:  $
  *
  *	Code for "goto" request in discuss.
@@ -16,7 +16,7 @@
 
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/goto.c,v 1.16 1992-12-23 11:47:30 probe Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/goto.c,v 1.17 1996-09-08 20:31:18 ghudson Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -25,7 +25,7 @@ static char rcsid_discuss_c[] =
 #include <strings.h>
 #include <sys/wait.h>
 #include <ctype.h>
-#include "ss.h"
+#include <ss/ss.h>
 #include <discuss/discuss.h>
 #include "globals.h"
 

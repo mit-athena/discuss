@@ -7,7 +7,7 @@
  */
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/output.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/output.c,v 1.13 1990-02-24 18:51:30 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/output.c,v 1.14 1996-09-08 20:31:27 ghudson Exp $
  *	$Locker:  $
  *
  *	Utility routines.
@@ -16,14 +16,14 @@
 
 #ifndef lint
 static char rcsid_discuss_utils_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/output.c,v 1.13 1990-02-24 18:51:30 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/output.c,v 1.14 1996-09-08 20:31:27 ghudson Exp $";
 #endif lint
 
 #include <stdio.h>
 #include <sys/file.h>
 #include <string.h>
 #include <signal.h>
-#include "ss.h"
+#include <ss/ss.h>
 #include <discuss/discuss.h>
 #include "config.h"
 #include "globals.h"

@@ -7,7 +7,7 @@
  */
 #include <stdio.h>
 #include <discuss/discuss.h>
-#include "ss.h"
+#include <ss/ss.h>
 #include "globals.h"
 
 struct _dsc_pub dsc_public = { 0, 0, 0, (char *)NULL, (char *)NULL };
