@@ -1,13 +1,13 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v 1.12 1987-08-08 02:27:59 spook Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v 1.13 1988-01-24 09:24:42 wesommer Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
  */
 
 #ifndef lint
-static char *rcsid_dsname_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v 1.12 1987-08-08 02:27:59 spook Exp $";
+static char *rcsid_dsname_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v 1.13 1988-01-24 09:24:42 wesommer Exp $";
 #endif lint
 
 /*
@@ -263,11 +263,13 @@ setdbent(user_id)
 
 	enddbent();
 
+	if (!user_id)
+	    user_id = "";
 	auid = malloc(strlen(user_id)+2);
 	strcpy(auid, user_id);
 	if (!db_file)
 		db_file = malloc(MAXPATHLEN);
-	if(code = set_rc_filename(user_id, db_file, MAXPATHLEN))
+	if (code = set_rc_filename(user_id, db_file, MAXPATHLEN))
 		return code;
 
 	db = fopen(db_file, "r");
