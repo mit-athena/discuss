@@ -11,13 +11,16 @@
 /*
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/stubs.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/stubs.c,v 1.10 1988-10-16 14:04:50 raeburn Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/stubs.c,v 1.11 1989-01-04 20:52:00 raeburn Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
  * stubs.c -- These are stubs that handle the calling of routines.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.10  88/10/16  14:04:50  raeburn
+ * Changed includes and type names.
+ * 
  * Revision 1.9  87/10/06  02:36:45  spook
  * Fixed error detected by High C compiler.
  * 
@@ -36,13 +39,14 @@
  *
  */
 #ifndef lint
-static char *rcsid_stubs_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/stubs.c,v 1.10 1988-10-16 14:04:50 raeburn Exp $";
+static char rcsid_stubs_c[] =
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/stubs.c,v 1.11 1989-01-04 20:52:00 raeburn Exp $";
 #endif lint
 
 /* Derived from CORE.PAS 06/21/86 by SRZ */
 
 #include <discuss/interface.h>
-#include <discuss/rpc.h>
+#include "rpc.h"
 #include <discuss/tfile.h>
 #include <discuss/acl.h>
 
