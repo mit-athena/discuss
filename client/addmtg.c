@@ -1,9 +1,12 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.8 1987-04-06 16:00:56 spook Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.9 1987-04-08 03:53:25 wesommer Exp $
  *	$Locker:  $
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.8  87/04/06  16:00:56  spook
+ * More error-message printing.
+ * 
  * Revision 1.7  87/03/22  05:21:50  spook
  * Rewritten for new interfaces and new format.
  * 
@@ -29,7 +32,7 @@
  */
 
 #ifndef lint
-static char *rcsid_addmtg_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.8 1987-04-06 16:00:56 spook Exp $";
+static char *rcsid_addmtg_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.9 1987-04-08 03:53:25 wesommer Exp $";
 #endif lint
 
 #include <strings.h>
@@ -179,7 +182,6 @@ add_mtg(argc, argv)
 			else
 				add_the_mtg("",&nb,long_name,0,&code);
 		}
-punt_this_one: ;
 	}
 
 	free((char *)set);
@@ -193,7 +195,7 @@ parse_add_trn(trn_no)
 int trn_no;
 {
 	int code,fd,dummy;
-	char tempbfr[256],host[50],long_name[80],*realm,*user,*short_name;
+	char tempbfr[256],host[50],long_name[80],*short_name;
 	char cerror[80];
 	tfile tf;
 	FILE *fp;
@@ -276,7 +278,7 @@ add_the_mtg(host,nb,long_name,tran,code)
 	int tran,*code;
 {
 	struct _dsc_pub dsc_temp;
-	char realm[100],cerror[100];
+	char cerror[100];
 	name_blk *nbp;
 	int j;
 
@@ -325,3 +327,77 @@ add_the_mtg(host,nb,long_name,tran,code)
 	}
 	return (0);
 }
+
+del_mtg(argc, argv)
+     int argc;
+     char **argv;
+{
+	int i, *used;
+	name_blk nb;
+	int code,have_names;
+	char *user,*realm,cerror[80];
+	char auser_id[BUFSIZ];
+
+	used = (int *)calloc(argc, sizeof(int));
+	user = "";
+	realm = user;
+
+	have_names = 0;
+	     
+	for (i=1; i<argc; i++) {
+		if (*argv[i] == '-') {
+			fprintf(stderr,
+				"Unknown control argument %s\n",
+				argv[i]);
+			free((char *)used);
+			return;
+		}
+		else {
+			have_names = 1;
+		}
+	}
+
+	strcpy(auser_id, user_id);
+	if (user[0] != '\0')
+		strcpy(auser_id, user);
+	{
+		register char *at = index(auser_id, '@');
+		if (at) *at = '\0';
+	}
+	strcat(auser_id, "@");
+	if (realm[0] != '\0')
+		strcat(auser_id, realm);
+	else
+		strcat(auser_id, index(user_id, '@')+1);
+
+	if (!have_names) {
+		(void) fprintf(stderr,
+			       "Usage:  %s [mtg_names]\n",
+			       argv[0]);
+		goto punt;
+	}
+
+	for (i = 1; i < argc; i++) {
+		if (!used[i]) {
+			dsc_get_mtg (auser_id, argv[i], &nb, &code);
+			if (code) {
+				sprintf(cerror, 
+					"while getting meeting name (%s)",
+					argv[i]);
+				ss_perror(sci_idx, code, cerror);
+			}
+			nb.status |= DSC_ST_DELETED;
+			dsc_update_mtg_set(auser_id, &nb, 1, &code);
+			if (code) {
+				sprintf(cerror, "while deleting meeting %s\n",
+					argv[i]);
+				ss_perror(sci_idx, code, cerror);
+			}
+		}
+	}
+
+ punt:
+	free((char *)used);
+	return;
+}
+
