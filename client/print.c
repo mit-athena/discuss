@@ -3,12 +3,15 @@
  *	Print-related requests for DISCUSS.
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.4 1986-10-15 00:18:26 spook Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.5 1986-10-15 00:50:23 spook Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
  *
  *      $Log: not supported by cvs2svn $
+ * Revision 1.4  86/10/15  00:18:26  spook
+ * Added trn list parsing to print and write requests.
+ * 
  * Revision 1.3  86/09/10  18:57:35  wesommer
  * Made to work with kerberos; meeting names are now longer.
  * ./
@@ -24,7 +27,7 @@
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.4 1986-10-15 00:18:26 spook Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.5 1986-10-15 00:50:23 spook Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -122,7 +125,7 @@ prt_trans(sci_idx, argc, argv)
 	 * Ignore SIGPIPE from the pager
 	 */
 	old_sig = signal(SIGPIPE, SIG_IGN);
-	fd = pager_create();
+	fd = ss_pager_create();
 	if (fd < 0) {
 		fprintf(stderr, "%s: Can't start pager: %s\n",
 			request_name, error_message(ERRNO));
