@@ -5,9 +5,13 @@
  *		This file handles the caller's side of the connection.
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/rpcall.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/rpcall.c,v 1.13 1989-01-04 20:36:24 raeburn Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/rpcall.c,v 1.14 1989-06-03 00:12:42 srz Exp $
  *	$Locker:  $
  *	$Log: not supported by cvs2svn $
+ * Revision 1.13  89/01/04  20:36:24  raeburn
+ * Fixed return type of open_rpc and case statement syntax; fixed
+ * include paths.
+ * 
  * Revision 1.12  88/10/16  14:53:22  raeburn
  * Added function type definitions; handled different errors from
  * gethostbyname; moved static "panic" to top (to avoid implicit
@@ -35,7 +39,7 @@
  */
 #ifndef lint
 static char rcsid_rpcall_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/rpcall.c,v 1.13 1989-01-04 20:36:24 raeburn Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/rpcall.c,v 1.14 1989-06-03 00:12:42 srz Exp $";
 #endif lint
 
 /* INCLUDES */
@@ -47,6 +51,7 @@ static char rcsid_rpcall_c[] =
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
+#include <fcntl.h>
 #include <discuss/tfile.h>
 #include "rpc.h"
 #include "config.h"
@@ -281,6 +286,7 @@ rpc_conversation open_rpc (host, port_num, service_id, code)
 	    }
 	} else {
 	    (void) close (sv[1]);
+	    (void) fcntl (sv[0], F_SETFD, 1);
 	    us = USP_associate (sv[0]);
 	    return(us);
 	}
@@ -326,6 +332,7 @@ rpc_conversation open_rpc (host, port_num, service_id, code)
     if(connect(s, (char *) &address, sizeof(address)) < 0)
 	goto punt;
 
+    (void) fcntl (s, F_SETFD, 1);
     conv = USP_associate (s);
     us = conv;
     if (!us)

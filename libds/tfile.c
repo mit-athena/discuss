@@ -1,25 +1,29 @@
 /*
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tfile.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tfile.c,v 1.3 1987-07-18 00:01:19 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tfile.c,v 1.4 1989-06-03 00:12:58 srz Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
  * tfile.c -- a new implementation of tfile's.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.3  87/07/18  00:01:19  srz
+ * Added control operation to tfile's.
+ * 
  * Revision 1.2  87/04/11  00:06:21  srz
  * Added RCS junk
  * 
  *
  */
 #ifndef lint
-static char *rcsid_tfile_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tfile.c,v 1.3 1987-07-18 00:01:19 srz Exp $";
+static char rcsid_tfile_c[] =
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tfile.c,v 1.4 1989-06-03 00:12:58 srz Exp $";
 #endif lint
 
 #include <stdio.h>
 #include <errno.h>
-#include "../include/tfile.h"
+#include <discuss/tfile.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 
@@ -38,7 +42,7 @@ int (*proc)();
 {
      tfile tf;
 
-     tf = (tfile) malloc (sizeof (struct trecord));
+     tf = (tfile) malloc (sizeof (struct _tfile));
      if (tf ==  NIL)
 	  return (NIL);
 

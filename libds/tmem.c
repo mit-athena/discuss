@@ -1,23 +1,27 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tmem.c,v $
- *	$Author: wesommer $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tmem.c,v 1.1 1988-03-11 00:05:45 wesommer Exp $
+ *	$Author: srz $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tmem.c,v 1.2 1989-06-03 00:13:07 srz Exp $
  *
  *	Copyright (C) 1988 by the Massachusetts Institute of Technology
  *
  *	tfile module for ``memory'' tfiles. 
  * 
  *	$Log: not supported by cvs2svn $
+ * Revision 1.1  88/03/11  00:05:45  wesommer
+ * Initial revision
+ * 
  */
 
 #ifndef lint
-static char rcsid_tmem_c[] = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tmem.c,v 1.1 1988-03-11 00:05:45 wesommer Exp $";
+static char rcsid_tmem_c[] =
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tmem.c,v 1.2 1989-06-03 00:13:07 srz Exp $";
 #endif lint
 
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/uio.h>
-#include "tfile.h" 
+#include <discuss/tfile.h>
 
 #define min(x,y) ((x)<(y)?(x):(y))
 
