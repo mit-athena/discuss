@@ -1,11 +1,11 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v 1.9 1987-06-27 01:57:21 spook Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v 1.10 1987-07-08 01:57:17 wesommer Exp $
  *
  */
      
 #ifndef lint
-static char *rcsid_ckm_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v 1.9 1987-06-27 01:57:21 spook Exp $";
+static char *rcsid_ckm_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v 1.10 1987-07-08 01:57:17 wesommer Exp $";
 #endif lint
 
 #include <strings.h>
@@ -16,7 +16,9 @@ static char *rcsid_ckm_c = "$Header: /afs/dev.mit.edu/source/repository/athena/b
 
 extern char *malloc(),*ctime(), *error_message(), *calloc();
 
-static int print_header, display;
+extern int print_header;
+static int display;
+static int checked_meetings;
 
 static
 do_mtg(mtg_name)
@@ -35,46 +37,33 @@ do_mtg(mtg_name)
      last_host[0] = '\0';
      last_path[0] = '\0';
      for (i = 0; i < n_matches; i++) {
+	  code = 0;
 	  if (interrupt)
 	       break;
 	  nbp = &set[i];
 	  /* Test to see if we are attending this meeting */
-	  if (dsc_public.attending && !strcmp(dsc_public.host, nbp ->hostname) && !strcmp(dsc_public.path, nbp->pathname)) {
+	  if (dsc_public.attending 
+	  && !strcmp(dsc_public.host, nbp ->hostname)
+  	  && !strcmp(dsc_public.path, nbp->pathname)) {
 	       updated = (dsc_public.highest_seen < dsc_public.m_info.last);
 	  } else {
 	       dsc_updated_mtg(nbp, &updated, &code);
 	       if (interrupt)
 		    break;
-	       if (code) {
-		    fprintf(stderr,
-			    "Error checking meeting %s: %s\n",
-			    nbp -> aliases[0],
-			    error_message(code));
-		    continue;
-	       }
 	  }
-	  if (strcmp(last_host,nbp->hostname) || strcmp(last_path, nbp->pathname)) {
+	  if (strcmp(last_host,nbp->hostname) || 
+	      strcmp(last_path, nbp->pathname)) {
 	       strcpy(last_host,nbp->hostname);
 	       strcpy(last_path,nbp->pathname);
-	       if (updated) {
+	       if (updated) 
 		    nbp->status |= DSC_ST_CHANGED;
-		    if (display) {
-			 if (print_header) {
-			      printf("   %-30s   %-30s\n",
-				     "Meeting",
-				     "Short name");
-			      print_header = 0;
-			 }
-			 printf("   %-30s   %s\n",
-				nbp->aliases[0],
-				(nbp->aliases[1] ?
-				 nbp->aliases[1] :
-				 ""));
-		    }
-	       }
 	       else {
 		    nbp->status &= ~DSC_ST_CHANGED;
 	       }
+	       if (display && (updated || code))
+	    	    do_line(nbp, code, updated);
+	       if (updated)
+		    print_header = 0;
 	  }
      }
      if (interrupt)
@@ -96,7 +85,9 @@ check_meetings (argc, argv)
      display = 1;
      
      for (i = 1; i < argc; i++) {
-	  if (*argv[i] == '-') {
+	  if (!strcmp(argv[i], "-quiet") || !strcmp(argv[i], "-q")) {
+		display=0; used[i]=1;
+	  } else if (*argv[i] == '-') {
 	       ss_perror(sci_idx, 0,
 			 sprintf(errbuf, "Unknown control argument %s\n",
 				 argv[i]));
@@ -111,13 +102,14 @@ check_meetings (argc, argv)
      flag_interrupts();
      if (!have_names) {
 	  do_mtg("*");
-     }
-     else for (i = 1; i < argc; i++) {
+     } else for (i = 1; i < argc; i++) {
 	  if (!used[i])
 	       do_mtg(argv[i]);
 	  if (interrupt)
 	       break;
      }
+     checked_meetings = 1;
+
      if (print_header && !interrupt)
 	  ss_perror(sci_idx, 0, "No changed meetings");
      
@@ -134,6 +126,8 @@ next_meeting(argc, argv)
      int n_matches, code, i;
      
      dsc_expand_mtg_set(user_id, "*", &set, &n_matches, &code);
+
+
      if (code) {
 	  ss_perror(sci_idx, code, "Can't get meeting names.");
 	  return;
@@ -154,7 +148,9 @@ next_meeting(argc, argv)
 	       goto done;
 	  }
      }
-     ss_perror(sci_idx, 0, "No more changed meetings.");
+     if (!checked_meetings) {
+	  ss_perror(sci_idx, 0, "Use check_meetings first.");
+     } else ss_perror(sci_idx, 0, "No more changed meetings.");
  done:
      free(set);
 }

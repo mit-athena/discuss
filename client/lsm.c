@@ -1,8 +1,11 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v 1.13 1987-07-07 23:06:17 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v 1.14 1987-07-08 01:57:43 wesommer Exp $
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.13  87/07/07  23:06:17  wesommer
+ * [spook] changed format.
+ * 
  * Revision 1.12  87/06/20  13:35:55  srz
  * Cleaned up Control-C code.
  * 
@@ -32,7 +35,7 @@
  */
 
 #ifndef lint
-static char *rcsid_lsm_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v 1.13 1987-07-07 23:06:17 wesommer Exp $";
+static char *rcsid_lsm_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v 1.14 1987-07-08 01:57:43 wesommer Exp $";
 #endif lint
 
 
@@ -41,11 +44,65 @@ static char *rcsid_lsm_c = "$Header: /afs/dev.mit.edu/source/repository/athena/b
 #include "types.h"
 #include "interface.h"
 #include "globals.h"
+#include "dsc_et.h"
+#include "rpc_et.h"
+#include <errno.h>
 
 extern char *malloc(), *calloc(), *ctime(), *error_message();
 
-static int print_header, long_output;
+int print_header, long_output;
+static char last_host[140], last_path[140];
 static char *auser_id;
+static int fast;
+
+int do_line(nbp, code, updated)
+	register name_blk *nbp;
+	int code, updated;
+{
+	if (print_header) {
+	        char *fmt = "%-7s %-22s   %-22s\n";
+		last_host[0] = '\0';
+		last_path[0] = '\0';
+		printf(fmt, " Flags", "Meeting ID", "Short name");
+		printf(fmt, " -----", "----------", "----------");
+		print_header = 0;
+	}
+	if (code) {
+		printf("        %-22s   %s", nbp->aliases[0],
+		       nbp->aliases[1] ? nbp->aliases[1] : "");
+		printf(" (%s", 
+		       error_message(code));
+		switch (code) {
+		case ECONNREFUSED:
+			printf(" by");
+			goto hostn;
+		case ETIMEDOUT:
+			printf(" with");
+			goto hostn;
+		case RPC_HOST_UNKNOWN:
+		hostn:
+			printf(" %s", nbp->hostname);
+			break;
+				
+		default:
+			;
+		}
+		printf(")\n");
+		return 0;
+	}
+	if (!strcmp(last_host,nbp->hostname) && 
+		!strcmp(last_path, nbp->pathname))
+		printf("        %-22s   %s\n","",nbp->aliases[0]);
+	else {
+		printf(" %c      %-22s   %*s",updated?'c':' ',
+		       nbp->aliases[0],
+		       updated?-22:0,
+		       (nbp->aliases[1] ? nbp->aliases[1] : ""));
+		printf("\n");
+		strcpy(last_host,nbp->hostname);
+		strcpy(last_path,nbp->pathname);
+	}
+}
 
 static
 do_mtg(mtg_name)
@@ -55,7 +112,6 @@ do_mtg(mtg_name)
 	register name_blk *nbp;
 	int n_matches, i, code;
 	bool updated;
-	char last_host[140], last_path[140];
 
 	dsc_expand_mtg_set(auser_id, mtg_name, &set, &n_matches, &code);
 
@@ -67,42 +123,28 @@ do_mtg(mtg_name)
 	if (!n_matches)
 		return (0);
 
-	last_host[0] = '\0';
-	last_path[0] = '\0';
 	for (i = 0; i < n_matches; i++) {
 	        if (interrupt)
 		        break;
-		if (print_header) {
-		        char *fmt = "%-7s %-30s   %-30s\n";
-			printf(fmt, " Flags", "Meeting ID", "Short name");
-			printf(fmt, " -----", "----------", "----------");
-			print_header = 0;
-		}
+
 		nbp = &set[i];
-		/* Test to see if we are attending this meeting */
-		if (dsc_public.attending && !strcmp(dsc_public.host, nbp ->hostname) && !strcmp(dsc_public.path, nbp->pathname)) {
-		     updated = (dsc_public.highest_seen < dsc_public.m_info.last);
+
+		if (fast) {
+		     updated = 0;
 		} else {
-		     dsc_updated_mtg(nbp, &updated, &code);	
-		     if (interrupt)
-			  break;
-		     if (code) {
-			  fprintf(stderr, "Error checking meeting %s: %s\n",
-				  nbp -> aliases[0], error_message(code));
-			  continue;
+		     /* Test to see if we are attending this meeting */
+		     if (dsc_public.attending 
+		     && !strcmp(dsc_public.host, nbp->hostname) 
+		     && !strcmp(dsc_public.path, nbp->pathname)) {
+			  updated = (dsc_public.highest_seen 
+				     < dsc_public.m_info.last);
+		     } else {
+			  dsc_updated_mtg(nbp, &updated, &code);	
+			  if (interrupt)
+			       break;
 		     }
 		}
-		if (!strcmp(last_host,nbp->hostname) && !strcmp(last_path, nbp->pathname))
-			printf("        %-30s   %s\n","",nbp->aliases[0]);
-		else {
-			printf(" %c      %-30s   %*s",updated?'c':' ',
-			       nbp->aliases[0],
-			       updated?-30:0,
-			       (nbp->aliases[1] ? nbp->aliases[1] : ""));
-			printf("\n");
-			strcpy(last_host,nbp->hostname);
-			strcpy(last_path,nbp->pathname);
-		}
+		do_line(nbp, code, updated);
 	}
 	return(0);
 }
@@ -119,7 +161,7 @@ list_meetings (argc, argv)
 	long_output = 0;	/* make dependent on arguments later */
 	auser = "";
 	print_header = 1;
-
+	fast = 0;
 	for (i = 1; i < argc; i++) {
 		if (!strcmp("-user", argv[i])) {
 			if (i == argc - 1) {
@@ -146,6 +188,8 @@ list_meetings (argc, argv)
 		     auser = "discuss";
 		     used[i] = 1;
 		}
+		else if (!strcmp(argv[i],"-f") || !strcmp(argv[i], "-fast"))
+		     fast = 1;
 		else if (*argv[i] == '-') {
 			fprintf(stderr,
 				"Unknown control argument %s\n",
