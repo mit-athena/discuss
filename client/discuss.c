@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.9 1986-08-23 21:42:48 spook Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.10 1986-09-10 17:20:11 wesommer Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
@@ -9,6 +9,9 @@
  *	ss library for the command interpreter.
  *
  *      $Log: not supported by cvs2svn $
+ * Revision 1.9  86/08/23  21:42:48  spook
+ * moved timecheck for list into list module
+ * 
  * Revision 1.8  86/08/22  00:19:19  spook
  * using new error-table stuff; moved some code out to other
  * modules
@@ -34,7 +37,7 @@
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.9 1986-08-23 21:42:48 spook Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.10 1986-09-10 17:20:11 wesommer Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -49,9 +52,9 @@ static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athe
 #include "globals.h"
 
 #ifdef	lint
-#define	USE(var)	var=var;
+#define	DONT_USE(var)	var=var;
 #else	lint
-#define	USE(var)	;
+#define	DONT_USE(var)	;
 #endif	lint
 
 extern ss_request_table discuss_cmds;
@@ -113,7 +116,7 @@ repl(sci_idx, argc, argv)
 	trn_info t_info;
 	int code;
 
-	USE(sci_idx);
+	DONT_USE(sci_idx);
 	if (cur_mtg == (char *)NULL) {
 		(void) fprintf(stderr, "Not currently attending a meeting.\n");
 		return;
@@ -172,7 +175,7 @@ del_trans(sci_idx, argc, argv)
 {
 	int txn_no;
 	int code;
-	USE(sci_idx);
+	DONT_USE(sci_idx);
 	if (cur_mtg == (char *)NULL) {
 		(void) fprintf(stderr, "No current meeting.\n");
 		return;
@@ -197,7 +200,7 @@ ret_trans(sci_idx, argc, argv)
 {
 	int txn_no;
 	int code;
-	USE(sci_idx);
+	DONT_USE(sci_idx);
 	if (cur_mtg == (char *)NULL) {
 		(void) fprintf(stderr, "No current meeting.\n");
 		return;
@@ -222,7 +225,7 @@ goto_mtg(sci_idx, argc, argv)
 {
 	char *path;
 	int code;
-	USE(sci_idx);
+	DONT_USE(sci_idx);
 	if (argc != 2) {
 		(void) fprintf(stderr, "Usage:  %s mtg_name\n", argv[0]);
 		return;
