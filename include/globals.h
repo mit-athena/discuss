@@ -1,8 +1,13 @@
 /*
- *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/include/globals.h,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/include/globals.h,v 1.18 1989-05-02 21:10:11 srz Exp $
  *
- *	Copyright (C) 1986 by the Massachusetts Institute of Technology
+ *	Copyright (C) 1988, 1989 by the Massachusetts Institute of Technology
+ *    	Developed by the MIT Student Information Processing Board (SIPB).
+ *    	For copying information, see the file mit-copyright.h in this release.
+ *
+ */
+/*
+ *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/include/globals.h,v $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/include/globals.h,v 1.19 1989-06-03 00:07:04 srz Exp $
  *
  *	Declarations of global variables for discuss.
  */

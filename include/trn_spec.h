@@ -1,8 +1,13 @@
 /*
- *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/include/trn_spec.h,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/include/trn_spec.h,v 1.1 1989-06-03 00:03:05 srz Exp $
  *
- *	Copyright (C) 1986 by the Massachusetts Institute of Technology
+ *	Copyright (C) 1988, 1989 by the Massachusetts Institute of Technology
+ *    	Developed by the MIT Student Information Processing Board (SIPB).
+ *    	For copying information, see the file mit-copyright.h in this release.
+ *
+ */
+/*
+ *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/include/trn_spec.h,v $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/include/trn_spec.h,v 1.2 1989-06-03 00:07:26 srz Exp $
  *
  *	Transaction specifiers, and things which use them.
  */
