@@ -1,9 +1,10 @@
-%token INTEGER NREF PREF FIRST LAST NEXT PREV FREF LREF CUR
+%token INTEGER NREF PREF FIRST LAST NEXT PREV FREF LREF CUR NEW ALL
 %left '+' '-'
 %{
 #include <ctype.h>
 #include "../include/interface.h"
 #include "../include/discuss_err.h"
+#include "globals.h"
 
 static trn_info *trnexpr_curtrn;
 static mtg_info *trnexpr_curmtg;
@@ -21,7 +22,15 @@ range	: trn_no
 		{ trnexpr_low = $1;
 		  trnexpr_high = $3;
 		}
-	;
+	| NEW
+		{ trnexpr_low = dsc_public.highest_seen+1;
+		  trnexpr_high = trnexpr_curmtg->last;
+	        }
+	| ALL
+	        { trnexpr_low = trnexpr_curmtg->first;
+		  trnexpr_high = trnexpr_curmtg->last;
+		}
+	;	  
 
 trn_no	: INTEGER
 	| NREF
@@ -86,6 +95,16 @@ static yylex()
 		return(CUR);
 	} else if (*cp==':' || *cp=='+' || *cp=='-') {
 		return(*cp++);
+	} else if (match(cp, "current")) {
+	        cp += 7;
+	        yylval=trnexpr_curtrn->current;
+		return(CUR);
+	} else if (match(cp, "new")) {
+	        cp += 3;
+		return(NEW);
+	} else if (match(cp, "all")) {
+	        cp += 3;
+		return(ALL);
 	} else if (match(cp, "next")) {
 		cp += 4;
 		yylval=trnexpr_curtrn->next;
