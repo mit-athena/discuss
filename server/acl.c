@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl.c,v 1.10 1988-09-23 17:03:09 raeburn Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl.c,v 1.11 1989-01-04 22:20:45 raeburn Exp $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
  *
@@ -8,6 +8,11 @@
  *	along with routines to move them to and from files.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.10  88/09/23  17:03:09  raeburn
+ * Changed type names in accordance with acl.h; used "const" where
+ * appropriate.  Also changed include files to use <discuss/discuss.h>
+ * and <discuss/internal.h>.
+ * 
  * Revision 1.9  87/10/24  07:02:44  wesommer
  * A bit more robustness.
  * 
@@ -46,14 +51,14 @@
 
 #ifndef lint
 static const char rcsid_acl_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl.c,v 1.10 1988-09-23 17:03:09 raeburn Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl.c,v 1.11 1989-01-04 22:20:45 raeburn Exp $";
 #endif lint
 
 #include <stdio.h>
 #include <strings.h>
 #include <ctype.h>
 #include <discuss/discuss.h>
-#include <discuss/internal.h>
+#include "internal.h"
 
 char *malloc(), *realloc();
 char *acl_union(), *acl_intersection(), *acl_subtract();
@@ -486,4 +491,3 @@ static void panic(s)
 	fflush(stdout);
 	abort();
 }
-
