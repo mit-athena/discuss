@@ -7,7 +7,7 @@
  */
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/randrp.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/randrp.c,v 1.11 1995-07-31 21:33:55 cfields Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/randrp.c,v 1.12 1996-11-26 21:53:45 ghudson Exp $
  *	$Locker:  $
  *
  *	Code for "randrp" request in discuss.
@@ -16,7 +16,7 @@
 
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/randrp.c,v 1.11 1995-07-31 21:33:55 cfields Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/randrp.c,v 1.12 1996-11-26 21:53:45 ghudson Exp $";
 #endif lint
 
 #include <discuss/discuss.h>
@@ -37,10 +37,6 @@ randrp(argc, argv, sci_idx)
 	char *meeting = NULL;
 	char *editor = NULL;
 	char *trans = NULL;
-#ifndef sgi
-	void srandom(), gettimeofday();
-#endif
-	int getpid();
 	struct timeval tv;
 	int randrp_retry = 15;
 	int i, code;
