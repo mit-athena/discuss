@@ -1,5 +1,5 @@
 ;;;	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v $
-;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.5 1988-10-29 01:47:34 balamac Exp $
+;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.6 1988-11-08 06:24:10 raeburn Exp $
 ;;;
 ;;;  Emacs lisp code to remote control a "discuss" shell process to
 ;;;  provide an emacs-based interface to the discuss conferencing system.
@@ -8,6 +8,10 @@
 ;;;  Written by Stan Zanarotti and Bill Sommerfeld.
 ;;;
 ;;;  $Log: not supported by cvs2svn $
+; Revision 1.5  88/10/29  01:47:34  balamac
+; Added randrp support.
+; 
+; 
 ; Revision 1.4  88/10/26  23:25:47  srz
 ; Now goes to next transaction when going to a meeting.
 ; 
@@ -20,16 +24,6 @@
 ; Revision 1.1  88/10/24  22:32:58  srz
 ; Initial revision
 ; 
-;;;	Revision 1.3  86/12/10  16:12:30  srz
-;;;	Some different keybindings
-;;;
-;;;	Revision 1.2  86/12/10  15:41:44  wesommer
-;;;	Added autoload and keybinding for reply-by-mail.
-;;;
-;;;	Revision 1.1  86/12/09  16:09:20  wesommer
-;;;	Initial revision
-;;;
-;;;
 
 (provide 'discuss)
 
@@ -44,7 +38,7 @@
 	  "Reply to an existing discuss transaction." t)
 
 (autoload 'discuss-randrp "discuss-enter"
-	  "Randrp in a meeting." t)
+	  "Random reply in a meeting." t)
 
 (defvar discuss-mtgs-mode-map nil
   "Keymap used by the meetings-list mode of the discuss subsystem")
@@ -59,41 +53,42 @@
   "Name of main buffer for discuss, which holds a list of the current
 meetings")
 
+(defvar discuss-version nil "Version of discuss code loaded.")
+(defun discuss-version nil (interactive) (message discuss-version))
+
+(defvar discuss-shell-buffer nil
+  "Buffer used to communicate with slave discuss subprocess.")
+
+(defvar discuss-cont nil
+  "Internal hook to call when discuss subprocess is done.")
+
+(defvar discuss-in-process nil
+  "t if a request to the slave subprocess is outstanding")
+
+(defvar discuss-form nil
+  "Lisp form returned by the subprocess.")
+
+(defvar discuss-meeting-list nil
+  "Meeting list.")
+
+(defvar discuss-show-num 0
+  "Current discuss transaction number")
+
 (defvar discuss-cur-mtg-buf nil
   "Name of buffer for current Discuss meeting")
 
+(defvar discuss-async t
+  "*Run discuss commands asynchronously.
+
+Currently ignored (always async).")
+
 ;;
 ;;  Determine pathname for subprocess.  Pretty gross, if you ask me.
-;(defvar discuss-pathname (format "/mit/discuss/exl/edsc.%s"
-;				 (if (equal emacs-build-system "paris")
-;				     "vax"
-;				   "rt"))
-;  "*Name of program to run as slave process for discuss.")
 (defvar discuss-pathname (format "/mit/discuss/%s/edsc/edsc"
 				 (if (equal emacs-build-system "paris")
 				     "vax"
 				   "rt"))
   "*Name of program to run as slave process for discuss.")
-
-;;; Random state variables:
-
-;;; The buffer used to communicate with the slave process.
-(setq discuss-shell-buffer nil)
-
-;;; Hook to call when the current request to discuss has finished.
-(setq discuss-cont nil)
-
-;;; Is there currently a request to the slave outstanding?
-(setq discuss-in-progress nil)
-
-;;; Form returned from subprocess.
-(setq discuss-form nil)
-
-;;; Meeting list
-(setq discuss-meeting-list nil)
-
-;;; Global variable for show
-(setq discuss-show-num 0)
 
 
 ;;; Major modes defined by this package.
@@ -102,7 +97,7 @@ meetings")
 
 (defun discuss-mtgs-mode ()
   "Major mode for providing an emacs discuss subsystem.
-This looks a lot like RMAIL.  This works by using edsc as a subjob.
+This looks a lot like RMAIL.  This works by using ``edsc'' as a subjob.
 
 The following commands are available:
 n	go to next line.
@@ -114,8 +109,6 @@ q	Quit Discuss mode."
   (kill-all-local-variables)
   (setq major-mode 'discuss-mtgs-mode)
   (setq mode-name "Discuss (meetings)")
-;  (setq mode-line-format
-;	"--%1*%1*-Emacs: %17b   %M   %[(%m)%]----%3p--%-")
   (use-local-map discuss-mtgs-mode-map)
   (setq buffer-read-only t)
   (run-hooks 'discuss-mode-hooks))
@@ -177,19 +170,22 @@ a	Add meeting.  Not implemented yet."
   "Enter discuss mode for emacs and list meetings."
   (interactive)
 
+  (discuss-start-slave)
+  (switch-to-buffer (get-buffer-create discuss-main-buffer))
+  (discuss-mtgs-mode)
+  (if current-prefix-arg		;not quite right...
+      nil
+    (discuss-lsm)))
+
+(defun discuss-start-slave nil
   (if discuss-shell-buffer
       nil
     (setq discuss-shell-buffer (make-shell "discuss-shell" discuss-pathname)))
-    ;;; These values are innocuous for the sentinel and filter.
-    ;    (discuss-send-cmd "" 'discuss-end-of-lsm 'into-discuss)
-
-    (switch-to-buffer (get-buffer-create discuss-main-buffer))
-    (discuss-mtgs-mode)
-    (discuss-lsm))
+  )
 
 ;;; Entry points typically entered through key sequences.
 
-(defun discuss-lsm ()
+(defun discuss-list-meetings ()
   "List discuss meetings"
   (interactive)
   (message "Listing meetings..."
@@ -197,6 +193,8 @@ a	Add meeting.  Not implemented yet."
   (let ((buffer-read-only nil))
     (erase-buffer))
   (discuss-send-cmd "(gml)\n" 'discuss-end-of-lsm 'discuss-read-form)))
+
+(fset 'discuss-lsm (symbol-function 'discuss-list-meetings))
 
 (defmacro cadr (x)
   (list 'car (list 'cdr x)))
@@ -221,13 +219,13 @@ a	Add meeting.  Not implemented yet."
   (insert ", " name))
 
 (defun discuss-end-of-lsm ()
-  (message "done")
+  (message "Listing meetings...done.")
   (set-buffer discuss-main-buffer)
   (setq discuss-meeting-list (apply 'vector discuss-form))
   (let ((buffer-read-only nil))
     (goto-char (point-min))
-    (insert " Flags  Meeting name\n"
-	    " -----  ------------\n")
+    (insert " Flags   Meeting name\n"
+	    " -----   ------------\n")
     (mapcar 'discuss-lsm-1 discuss-form)
     (goto-char (point-max))
     (backward-delete-char 1))
@@ -239,9 +237,15 @@ a	Add meeting.  Not implemented yet."
   (interactive)
   (if discuss-cur-mtg-buf
       (discuss-leave-mtg))
-  (kill-buffer discuss-main-buffer)
-  (kill-buffer (buffer-name discuss-shell-buffer))
-  (setq discuss-shell-buffer nil))
+  (save-excursion
+    ; go bash discuss-shell-buffer
+    (set-buffer discuss-shell-buffer)
+    (let ((proc (get-buffer-process (buffer-name))))
+      (send-string proc "(quit)")
+      (set-process-buffer proc nil)	; Fly, be free!
+      (kill-buffer discuss-shell-buffer)
+      (setq discuss-shell-buffer nil)))
+  (kill-buffer discuss-main-buffer))
 
 (defun goto-column (num)
   (insert-char 32 (max 0 (- num (current-column)))))
@@ -249,7 +253,8 @@ a	Add meeting.  Not implemented yet."
 (defun discuss-goto (&optional meeting)
   "Go to a meeting"
   (interactive (list (if (or current-prefix-arg
-			     (not (equal (buffer-name) discuss-main-buffer)))
+			     (not (equal (buffer-name) discuss-main-buffer))
+			     (= (point) 1))
 			 (read-string "Meeting name:  "))))
   (if (not meeting)
       (let ((curline (- (count-lines 1 (1+ (point))) 3)))
@@ -509,6 +514,10 @@ a	Add meeting.  Not implemented yet."
   (setq discuss-in-progress nil))
 
 
+; run this at each load
+(defun discuss-initialize nil
+  (setq discuss-version "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.6 1988-11-08 06:24:10 raeburn Exp $")
+
 ;;; Keymaps, here at the end, where the trash belongs..
 
 (if discuss-mtgs-mode-map
@@ -550,6 +559,10 @@ a	Add meeting.  Not implemented yet."
 ;  (define-key discuss-trn-mode-map "\C-d" 'discuss-trn-delete-backward)
 )
 
+  (fmakunbound 'discuss-initialize)
+  )					;end of discuss-initialize
+(discuss-initialize)
+
 ;;; discuss-trn-output mostly stolen from rmail-output...
 ;;; converted by [eichin:19881026.1505EST]
 (defvar discuss-output-last-file "discuss.out"
@@ -578,4 +591,3 @@ a	Add meeting.  Not implemented yet."
       (insert "\n")			;other modifying here as well
       (append-to-file (point-min) (point-max) file-name))
     (kill-buffer tembuf)))
-
