@@ -1,5 +1,6 @@
 #!/bin/sh
-path=/bin:/site/sipb/bin
+PATH=/bin:/site/sipb/bin
+export PATH
 cat >/tmp/dsmail$$
 subject=`sed '/^$/q' </tmp/dsmail$$ | grep '^Subject: ' | sed 's/^Subject: //'`
 awk 'BEGIN { foo=0 }
@@ -10,6 +11,6 @@ rm /tmp/dsmail$$
 
 #
 #	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/dsmail,v $
-#	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/dsmail,v 1.2 1986-07-21 13:59:20 wesommer Exp $
+#	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/dsmail,v 1.3 1986-07-24 16:01:17 wesommer Exp $
 #
 # 	Handle mail into dspipe..
