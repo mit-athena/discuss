@@ -2,13 +2,16 @@
  *
  * List request for DISCUSS
  *
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.1 1986-08-22 00:23:56 spook Exp $
+ * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.2 1986-08-23 21:43:09 spook Exp $
  * $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v $
  * $Locker:  $
  *
  * Copyright (C) 1986 by the MIT Student Information Processing Board
  *
  * $Log: not supported by cvs2svn $
+ * Revision 1.1  86/08/22  00:23:56  spook
+ * Initial revision
+ * 
  *
  */
 
@@ -21,6 +24,7 @@
 #include "globals.h"
 
 char *ctime(), *malloc();
+int	time_now, time_sixmonthsago, time_plusthreemonths;
 
 list(sci_idx, argc, argv)
 	int sci_idx;
@@ -35,6 +39,10 @@ list(sci_idx, argc, argv)
 	int idl;
 	int i;
 	int new_trn_no = -1;
+
+	(void) time(&time_now); 
+	time_sixmonthsago = time_now - 6*30*24*60*60; 
+	time_plusthreemonths = time_now + 6*30*24*60*60;
 
 	if (cur_mtg == (char *)NULL) {
 		ss_perror(sci_idx, 0, "No current meeting.\n");
@@ -87,7 +95,7 @@ list(sci_idx, argc, argv)
 			}
 			cp=ctime(&t_info.date_entered);
 			if((t_info.date_entered < time_sixmonthsago) ||
-			   (t_info.date_entered > time_now))
+			   (t_info.date_entered > time_plusthreemonths))
 				(void) sprintf(newtime, "%-7.7s %-4.4s",
 					       cp+4, cp+20);
 			else

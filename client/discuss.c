@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.8 1986-08-22 00:19:19 spook Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.9 1986-08-23 21:42:48 spook Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
@@ -9,6 +9,10 @@
  *	ss library for the command interpreter.
  *
  *      $Log: not supported by cvs2svn $
+ * Revision 1.8  86/08/22  00:19:19  spook
+ * using new error-table stuff; moved some code out to other
+ * modules
+ * 
  * Revision 1.7  86/08/07  13:40:44  spook
  * replaced "/projects/discuss/client/info" with #define from config.h
  * 
@@ -30,7 +34,7 @@
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.8 1986-08-22 00:19:19 spook Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.9 1986-08-23 21:42:48 spook Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -59,7 +63,6 @@ char	*malloc(), *getenv(), *gets(), *ctime();
 mtg_info m_info;
 char	buf[BUFSIZ];
 char	*buffer = &buf[0];
-int	time_now, time_sixmonthsago;
 tfile	unix_tfile();
 int	dsc_sci_idx;
 
@@ -85,9 +88,6 @@ main(argc, argv)
 
 	init_disc_err_tbl();
 	init_rpc();
-
-	(void) time(&time_now); 
-	time_sixmonthsago = time_now - 6*30*24*60*60; 
 
 	temp_file = malloc(64);
 	pgm = malloc(64);
