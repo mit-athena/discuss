@@ -55,6 +55,7 @@ dist: $(SRCS) Makefile
 	-mkdir ../dist/mclient
 	cp -p $(SRCS) ../dist/mclient/
 	cp -p Makefile ../dist/mclient/
+	chmod 644 ../dist/mclient/Makefile
 
 # 'make depend' code
 CFILES=	pmtg.c dspipe.c mkds.c dlsm.c crmtgs.c
