@@ -7,12 +7,16 @@
  */
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v 1.14 1994-08-24 03:46:36 cfields Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v 1.15 1996-05-23 22:05:04 ghudson Exp $
  *
  *	Routines for use in a server to edit access control lists remotely.
  *	Originally written for the discuss system by Bill Sommerfeld
  *
  *	$Log: not supported by cvs2svn $
+ *	Revision 1.14  1994/08/24 03:46:36  cfields
+ *	open for RDRW instead of RDONLY when want to lock
+ *	Changes by vrt.
+ *
  * Revision 1.13  94/03/25  17:21:23  miki
  * changed the calls to flock with calls to fcntl for SOLARIS
  * 
@@ -72,7 +76,7 @@
 #endif
 #ifndef lint
 static const char rcsid_acl_core_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v 1.14 1994-08-24 03:46:36 cfields Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v 1.15 1996-05-23 22:05:04 ghudson Exp $";
 #endif lint
 
 extern dsc_acl *mtg_acl;
@@ -300,7 +304,7 @@ locked_open_mtg(mtg_name, lockfd, acl_name, acl)
 		result = BAD_PATH;
 		goto punt;
 	}
-	if((*lockfd = open(mtg_name, O_RDWR, 0700)) < 0) {
+	if((*lockfd = open(mtg_name, O_RDONLY, 0700)) < 0) {
 		result = errno;
 		goto punt;
 	}
