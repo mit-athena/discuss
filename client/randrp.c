@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/randrp.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/randrp.c,v 1.3 1988-01-18 14:36:13 balamac Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/randrp.c,v 1.4 1988-04-23 16:03:17 balamac Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1988 by the Student Information Processing Board
@@ -10,13 +10,14 @@
  */
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/randrp.c,v 1.3 1988-01-18 14:36:13 balamac Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/randrp.c,v 1.4 1988-04-23 16:03:17 balamac Exp $";
 #endif lint
 
 #include "types.h"
 #include "interface.h"
 #include "globals.h"
 #include <stdio.h>
+#include <sys/time.h>
 
 randrp(argc, argv, sci_idx)
 	int argc;
@@ -26,10 +27,14 @@ randrp(argc, argv, sci_idx)
 	char *meeting = NULL;
 	char *editor = NULL;
 	char *trans = NULL;
+	void srandom(), gettimeofday();
+	int getpid();
+	struct timeval tv;
 	int code;
 	int active_transactions;
 	long rnd_num;
 	int rnd_trn;
+	int pid = getpid();
 	int noeditor = FALSE;
 	trn_info t_info;
 	trn_nums current_transaction;
@@ -78,6 +83,9 @@ randrp(argc, argv, sci_idx)
 	/* Need to preserve current transaction across the call to reply */
 
 	current_transaction = dsc_public.current;
+
+	gettimeofday(&tv, (struct timezone *) NULL);
+	srandom(tv.tv_sec ^ tv.tv_usec ^ pid);
 
 	do {
 		rnd_num = random();
