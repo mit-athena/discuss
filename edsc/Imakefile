@@ -20,3 +20,10 @@ edsc:: newvers.sh
 
 build_program(edsc,$(OBJS),$(LFLAGS),$(LIBS))
 install_program(edsc,,$(ATHETCDIR))
+
+create_dir($(ATHLIBDIR)/elisp)
+install_file(discuss-acl.el,$(ATHLIBDIR)/elisp)
+install_file(discuss-enter.el,$(ATHLIBDIR)/elisp)
+install_file(discuss-ls.el,$(ATHLIBDIR)/elisp)
+install_file(discuss-misc.el,$(ATHLIBDIR)/elisp)
+install_file(discuss.el,$(ATHLIBDIR)/elisp)
