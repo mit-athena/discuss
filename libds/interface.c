@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.15 1988-01-15 22:39:20 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.16 1988-02-15 01:02:15 wesommer Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
@@ -8,7 +8,7 @@
 
 #ifndef lint
 static char rcsid_interface_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.15 1988-01-15 22:39:20 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.16 1988-02-15 01:02:15 wesommer Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -278,4 +278,30 @@ dsc_whoami(nbp, ident, result)
 	select_meeting(nbp, result);
 	if (*result) return;
 	dwhoami(ident, result);
+}
+
+void dsc_destroy_mtg_info (info)
+	register mtg_info *info;
+{
+	if (info->chairman) {
+		free(info->chairman);
+		info->chairman = NULL;
+	}
+	if (info->access_modes) {
+		free (info->access_modes);
+		info->access_modes = NULL;
+	}
+}
+
+void dsc_destroy_trn_info (info)
+	register trn_info *info;
+{
+	if (info->author) {
+		free (info->author);
+		info->author = NULL;
+	}
+	if (info->subject) {
+		free (info->subject);
+		info->subject = NULL;
+	}
 }
