@@ -15,10 +15,8 @@
  */
 
 #include <stdio.h>
-#ifndef SOLARIS
-#include <strings.h>
-#else
 #include <string.h>
+#ifdef POSIX_FLOCK
 #include <fcntl.h>
 #endif
 #include <ctype.h>
@@ -70,7 +68,7 @@ char **argv;
      tfile tf;
      char control_name[256];
      int control_fd;
-#ifdef SOLARIS
+#ifdef POSIX_FLOCK
      static struct flock lock;
 #endif
 
@@ -256,7 +254,7 @@ expunge_range:
      if ((control_fd = open (control_name, O_RDWR, 0700)) < 0) {
 	  error_occurred = TRUE;
      } else {
-#ifdef SOLARIS
+#ifdef POSIX_FLOCK
           lock.l_type = F_WRLCK;
           lock.l_start = 0;
           lock.l_whence = 0;
@@ -274,7 +272,7 @@ expunge_range:
 	  if (result != 0) {	       
 	       fprintf(stderr, "%s: %s while getting mtg info\n", location, error_message(result));
 	       error_occurred = TRUE;
-#ifdef SOLARIS
+#ifdef POSIX_FLOCK
              lock.l_type = F_UNLCK;
              lock.l_start = 0;
              lock.l_whence = 0;
