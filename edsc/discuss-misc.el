@@ -4,7 +4,7 @@
 ;;;    	For copying information, see the file mit-copyright.h in this release.
 ;;;
 ;;;	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss-misc.el,v $
-;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss-misc.el,v 1.7 1996-04-12 22:16:18 ghudson Exp $
+;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss-misc.el,v 1.8 1998-03-24 22:26:19 ghudson Exp $
 ;;;
 ;;;  Emacs lisp code with random parts of the emacs discuss user interface
 ;;;  We may want to split out the mail functions into a separate file if
@@ -44,7 +44,7 @@
    (if (or current-prefix-arg
 	   (not (eq (current-buffer) discuss-cur-mtg-buf)))
        (list (read-input "Host Name: ")
-	     (read-input "Pathname: " "/usr/spool/discuss/"))
+	     (read-input "Pathname: " "/var/spool/discuss/"))
      (discuss-parse-meeting-announcement)))
   (message "Trying to add meeting....")
   (discuss-send-cmd (format "(am %s %s)\n"

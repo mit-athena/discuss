@@ -7,10 +7,10 @@ struct passwd *pwd;
 char pathname[MAXPATHLEN];
 int fd;
 
-char *text = "0:0:0:charon.mit.edu:/usr/spool/discuss/new_meetings:New_Meetings,new_meetings:\n0:541394699:24:charon.mit.edu:/usr/spool/discuss/eve:Everybody,eve:\n";
+char *text = "0:0:0:charon.mit.edu:/var/spool/discuss/new_meetings:New_Meetings,new_meetings:\n0:541394699:24:charon.mit.edu:/var/spool/discuss/eve:Everybody,eve:\n";
 
 #ifndef	lint
-static char rcsid_dsc_setup_c[] = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/dsc_setup.c,v 1.1 1987-04-11 00:05:36 spook Exp $";
+static char rcsid_dsc_setup_c[] = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/dsc_setup.c,v 1.2 1998-03-24 22:26:22 ghudson Exp $";
 #endif
 
 main()

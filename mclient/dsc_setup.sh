@@ -18,8 +18,8 @@ if ( -f ~/.disrc ) then
 else
 	if ($#argv == 0) echo "  Creating .meetings file:"
 	cat >~/.meetings << _EOF_
-0:0:0:charon.mit.edu:/usr/spool/discuss/new_meetings:New_meetings,new_meetings:
-0:0:0:charon.mit.edu:/usr/spool/discuss/eve:Everybody,eve:
+0:0:0:charon.mit.edu:/var/spool/discuss/new_meetings:New_meetings,new_meetings:
+0:0:0:charon.mit.edu:/var/spool/discuss/eve:Everybody,eve:
 _EOF_
 	if ($#argv == 0) echo "  done."
 endif

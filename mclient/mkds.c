@@ -7,10 +7,13 @@
  */
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v 1.18 1994-03-25 16:55:49 miki Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v 1.19 1998-03-24 22:26:23 ghudson Exp $
  *	$Locker:  $
  *
  *	$Log: not supported by cvs2svn $
+ *	Revision 1.18  1994/03/25 16:55:49  miki
+ *	replaced rindex with strrchr
+ *
  * Revision 1.17  93/05/20  12:54:08  miki
  * ported to Solaris2.1
  * 
@@ -62,7 +65,7 @@
 
 #ifndef lint
 static char rcsid_mkds_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v 1.18 1994-03-25 16:55:49 miki Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v 1.19 1998-03-24 22:26:23 ghudson Exp $";
 #endif lint
 
 #include <discuss/discuss.h>
@@ -88,7 +91,7 @@ static char rcsid_mkds_c[] =
 #define cupper(x) (islower(x)?toupper(x):(x))
 #define clower(x) (isupper(x)?tolower(x):(x))
 
-char default_dir[] = "/usr/spool/discuss";
+char default_dir[] = "/var/spool/discuss";
 char *whoami;
 int  interrupt = 0;
 

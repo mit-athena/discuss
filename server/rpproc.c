@@ -16,9 +16,12 @@
 /*
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/rpproc.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/rpproc.c,v 1.13 1997-06-02 17:23:05 ghudson Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/rpproc.c,v 1.14 1998-03-24 22:26:24 ghudson Exp $
  *
  *	$Log: not supported by cvs2svn $
+ *	Revision 1.13  1997/06/02 17:23:05  ghudson
+ *	From mhpower: fix a buffer overrun.
+ *
  *	Revision 1.12  1996/09/19 22:32:25  ghudson
  *	BSD -> ANSI string and memory functions
  *
@@ -292,7 +295,7 @@ long haddr;
     }
     
     /* make filename from service */
-    strcpy (filename, "/usr/spool/");
+    strcpy (filename, "/var/spool/");
     strcat (filename, service);
     strcat (filename, "/srvtab");
     
