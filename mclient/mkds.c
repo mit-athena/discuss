@@ -7,10 +7,13 @@
  */
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v 1.16 1990-12-01 22:41:38 eichin Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v 1.17 1993-05-20 12:54:08 miki Exp $
  *	$Locker:  $
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.16  90/12/01  22:41:38  eichin
+ * initialized nbsrc.spare, added "%" as a local meeting name
+ * 
  * Revision 1.15  89/06/03  00:31:10  srz
  * Added standard copyright notice.
  * 
@@ -56,7 +59,7 @@
 
 #ifndef lint
 static char rcsid_mkds_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v 1.16 1990-12-01 22:41:38 eichin Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v 1.17 1993-05-20 12:54:08 miki Exp $";
 #endif lint
 
 #include <discuss/discuss.h>
@@ -75,6 +78,9 @@ static char rcsid_mkds_c[] =
 #include <netdb.h>
 #include <pwd.h>
 #include <errno.h>
+#ifdef SOLARIS
+#include <fcntl.h>
+#endif
 
 #define cupper(x) (islower(x)?toupper(x):(x))
 #define clower(x) (isupper(x)?tolower(x):(x))
