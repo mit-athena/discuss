@@ -8,9 +8,12 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/rn.c,v $
  *	$Author: probe $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/rn.c,v 1.12 1993-03-07 06:24:04 probe Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/rn.c,v 1.13 1993-03-07 06:25:39 probe Exp $
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.12  93/03/07  06:24:04  probe
+ * Fixed a couple syntax errors introduced in the last patch.
+ * 
  * Revision 1.11  93/03/07  06:21:45  probe
  * ss_execute_line should not be called with read-only strings.
  * 
@@ -50,7 +53,7 @@
 
 #ifndef lint
 static char rcsid_update_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/rn.c,v 1.12 1993-03-07 06:24:04 probe Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/rn.c,v 1.13 1993-03-07 06:25:39 probe Exp $";
 #endif /* lint */
 
 #include <discuss/discuss.h>
@@ -222,7 +225,7 @@ first_meeting:
 		     if (code != 0) goto punt;
 		     break;
 		case 't':
-		     strcpy(ss_buf, "talk")
+		     strcpy(ss_buf, "talk");
 		     ss_execute_line(ss_idx, ss_buf, &code);
 		     if (code != 0) goto punt;
 		     break;
