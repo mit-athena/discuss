@@ -35,12 +35,21 @@ struct proc_table {
 #define SET_ACCESS 15
 #define DELETE_ACCESS 16
 #define WHO_AM_I 17
+#define GET_TRN_INFO2 18
+#define GET_SERVER_VERSION 19
+#define SET_TRN_FLAGS 20
 
 #define REPLY_TYPE 440
 #define PROC_BASE 400
 #define TFILE_BLK 500
 #define KRB_TICKET 501
 #define UNKNOWN_CALL 502
+#define KRB_TICKET2 503
+#define TICKET_REPLY 504
+
+/* Server version numbers */
+#define SERVER_0 0
+#define SERVER_1 1
 
 extern int rpc_err;
 
