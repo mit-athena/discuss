@@ -1,0 +1,85 @@
+#
+# $Id: Imakefile,v 1.1 1991-07-09 11:40:49 lwvanels Exp $
+#
+
+INFODIR=/usr/athena/lib/discuss/info
+
+#LINKS=	 ss/mit-sipb-copyright.h com_err.h
+LINKS=	usp/usp.h usp/usp_et.h rpc_et.h discuss/dsc_et.h usp.h usp_et.h \
+	discuss_err.h ss/ss.h ss/ss_err.h ss.h
+FILES=	ansi.h atom.h globals.h internal.h mit-copyright.h \
+	rpc.h trn_spec.h \
+	discuss/acl.h discuss/discuss.h discuss/dsname.h discuss/interface.h \
+	discuss/mit-sipb-copyright.h discuss/tfile.h discuss/types.h
+
+all depend:: $(LINKS) config.h
+
+ss:
+	-mkdir ss
+
+ss/ss.h: ss ../ss/ss.h
+	$(RM) ss/ss.h
+	ln -s ../../ss/ss.h ss/
+
+ss/ss_err.h: ss 
+	$(RM) ss/ss_err.h
+	ln -s ../../ss/ss_err.h ss/
+
+ss/mit-sipb-copyright.h: ss ../ss/mit-sipb-copyright.h
+	$(RM) ss/mit-sipb-copyright.h
+	ln -s ../../ss/mit-sipb-copyright.h ss/
+
+ss.h:
+	$(RM) ss.h
+	ln -s ss/ss.h .
+
+config.h: config.h.sed
+	$(RM) config.h
+	sed     -e s:SERVERDIR:$(ATHETCDIR): \
+		-e s:INFODIR:$(INFODIR): \
+		-e s:BINDIR:$(ATHBINDIR): < config.h.sed > config.h
+
+#com_err.h: ../et/com_err.h
+#	$(RM) com_err.h
+#	ln -s ../et/com_err.h .
+
+usp:
+	-mkdir usp
+
+usp/usp.h: usp ../usp/usp.h
+	$(RM) usp/usp.h
+	ln -s ../../usp/usp.h usp/
+
+usp.h:	usp/usp.h
+	$(RM) usp.h
+	ln -s usp/usp.h .
+
+usp/usp_et.h: usp ../ets/usp_et.h
+	$(RM) usp/usp_et.h
+	ln -s ../../ets/usp_et.h usp/
+
+usp_et.h: usp/usp_et.h
+	$(RM) usp_et.h
+	ln -s usp/usp_et.h .
+
+rpc_et.h: ../ets/rpc_et.h
+	$(RM) rpc_et.h
+	ln -s ../ets/rpc_et.h .
+
+discuss/dsc_et.h: ../ets/dsc_et.h
+	$(RM) discuss/dsc_et.h
+	ln -s ../../ets/dsc_et.h discuss/
+
+discuss_err.h:	../ets/discuss_err.h
+	$(RM) discuss_err.h
+	ln -s ../ets/discuss_err.h .
+
+clean::
+	$(RM) -r ss usp $(LINKS) *~ discuss/?*~ config.h
+
+# tar option `h' means follow links
+install::
+	$(RM) -r ${DESTDIR}$(ATHINCDIR)/usp
+	$(RM) -r ${DESTDIR}$(ATHINCDIR)/discuss
+	tar chf - usp discuss | (cd ${DESTDIR}$(ATHINCDIR) ; tar xf -)
+
