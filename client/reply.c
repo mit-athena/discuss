@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v 1.4 1987-07-08 01:57:56 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v 1.5 1987-07-17 00:23:45 spook Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
@@ -11,7 +11,7 @@
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v 1.4 1987-07-08 01:57:56 wesommer Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v 1.5 1987-07-17 00:23:45 spook Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -25,6 +25,9 @@ static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athe
 #include "rpc.h"
 #include "globals.h"
 #include "acl.h"
+#ifdef	ZEPHYR
+#include "zephyr.h"
+#endif	/* ZEPHYR */
 
 /* EXTERNAL ROUTINES */
 
@@ -47,6 +50,12 @@ repl(argc, argv)
 	char *trans = NULL;
 	char *mtg = NULL;
 	char *myname = NULL;
+#ifdef	ZEPHYR
+	ZNotice_t notice;
+	char buf[1024];
+#endif	/* ZEPHYR */
+	char announcement[1024];
+	
 	while (++argv, --argc) {
 		if (!strcmp (*argv, "-meeting") || !strcmp (*argv, "-mtg")) {
 			if (argc==1) {
@@ -71,16 +80,18 @@ repl(argc, argv)
 		} else {
 			if (!trans) trans = *argv; 
 			else {
-				ss_perror(sci_idx, 0, "Cannot reply to multiple transactions");
-				return; 
+			    ss_perror(sci_idx, 0,
+				      "Cannot reply to multiple transactions");
+			    return; 
 			}
 		}
 	}
 	if (mtg && !trans) { 
-		fprintf(stderr, "Must have transaction specifier if using -mtg.\n");
+		fprintf(stderr,
+			"Must have transaction specifier if using -mtg.\n");
 		return;
 	}
-	if(mtg) {
+	if (mtg) {
 		(void) sprintf(buffer, "goto %s", mtg);
 		ss_execute_line(sci_idx, buffer, &code);
 		if (code != 0) {
@@ -93,7 +104,6 @@ repl(argc, argv)
 		ss_perror(sci_idx, 0, "No current meeting.\n");
 		return;
 	}
-
 
 	dsc_get_trn_info(&dsc_public.nb, dsc_public.current, &t_info, &code);
 	if (code != 0)
@@ -129,12 +139,10 @@ repl(argc, argv)
 	}
 
 	if(!acl_is_subset("a", dsc_public.m_info.access_modes)) {
-		(void) ss_perror(sci_idx, 0,
-			"You do not have permission to create replies in this meeting.");
-		goto abort;
+	    (void) ss_perror(sci_idx, 0,
+			     "You do not have permission to create replies in this meeting.");
+	    goto abort;
 	}
-
-	printf("Replying to [%04d]: %s\n", orig_trn, t_info.subject);
 
 	dsc_whoami(&dsc_public.nb, &myname, &code);
 
@@ -156,6 +164,8 @@ repl(argc, argv)
 		t_info.subject = new_subject;
 	}
 
+	printf("Subject: %s\n", t_info.subject);
+
 	(void) unlink(temp_file);
 	if (edit(temp_file, editor) != 0) {
 		(void) fprintf(stderr,
@@ -176,8 +186,29 @@ repl(argc, argv)
 		ss_perror(sci_idx, code, "while adding transaction\n");
 		goto abort;
 	}
-	(void) printf("Transaction [%04d] entered in the %s meeting.\n",
-		      txn_no, dsc_public.mtg_name);
+ 
+	(void) sprintf(announcement,
+		       "Transaction [%04d] entered in the %s meeting.",
+		       txn_no, dsc_public.mtg_name);
+#ifdef	ZEPHYR
+	notice.z_kind = UNSAFE;
+	notice.z_port = 0;
+	notice.z_class = "discuss";
+	notice.z_class_inst = buf;
+	(void) sprintf(buf, "%s:%s", dsc_public.nb.hostname,
+		       dsc_public.nb.pathname);
+
+	notice.z_opcode = "reply";
+	notice.z_sender = 0;
+	notice.z_recipient = "";
+	notice.z_message = announcement;
+	notice.z_message_len = strlen(announcement)+1;
+	
+	ZInitialize();
+	ZSendNotice(&notice, ZNOAUTH);
+#endif	/* ZEPHYR */
+
+	(void) printf("%s\n", announcement);
 
 	dsc_public.current = orig_trn;
 
