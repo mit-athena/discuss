@@ -11,12 +11,12 @@
  *	  	protocol over a TCP connection.
  *		This file handles the caller's side of the connection.
  *
- *	$Id: rpcall.c,v 1.22 1999-02-08 14:47:11 danw Exp $
+ *	$Id: rpcall.c,v 1.23 2000-08-01 18:51:40 ghudson Exp $
  *
  */
 #ifndef lint
 static char rcsid_rpcall_c[] =
-    "$Id: rpcall.c,v 1.22 1999-02-08 14:47:11 danw Exp $";
+    "$Id: rpcall.c,v 1.23 2000-08-01 18:51:40 ghudson Exp $";
 #endif /* lint */
 
 /* INCLUDES */
@@ -25,6 +25,9 @@ static char rcsid_rpcall_c[] =
 #include <stdio.h>
 #include <ctype.h>
 #include <string.h>
+#include <fcntl.h>
+#include <errno.h>
+#include <sys/time.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
@@ -235,7 +238,8 @@ rpc_conversation open_rpc (host, port_num, service_id, code)
     register int i, s = -1;
 
     char *server_name,*authp;
-    struct sockaddr_in address;
+    struct sockaddr_in address, peeraddr;
+    int retval, flags, arglen;
 
     *code = 0;
 
@@ -308,7 +312,57 @@ rpc_conversation open_rpc (host, port_num, service_id, code)
     if((s = socket(hp->h_addrtype, SOCK_STREAM, 0)) < 0)
 	goto punt;
 
-    if(connect(s, (struct sockaddr *) &address, sizeof(address)) < 0)
+    /* attempt to connect to the remote host, timing out after a
+       pre-configured period of time.. */
+    flags = fcntl(s, F_GETFL);
+    if (flags < 0)
+	goto punt;
+
+    /* put socket in non-blocking mode */
+    if (fcntl(s, F_SETFL, flags | O_NONBLOCK) < 0)
+	goto punt;
+
+    retval = connect(s, (struct sockaddr *) &address, sizeof(address));
+    /* if connect returns an error immediately, punt */
+    if (retval < 0 && errno != EINPROGRESS)
+	goto punt;
+
+    /* if not connected immediately, wait until connected or timed out */
+    if (retval < 0) {
+	struct timeval conn_timeout;
+	fd_set fds;
+	char c;
+
+	conn_timeout.tv_sec = CONN_TIMEOUT;
+	conn_timeout.tv_usec = 0;
+
+	FD_ZERO(&fds);
+	FD_SET(s, &fds);
+
+	retval = select(s + 1, NULL, &fds, NULL, &conn_timeout);
+
+	/* if select returned an error, punt */
+	if (retval < 0)
+	    goto punt;
+
+	/* if no response, set errno and punt */
+	if (retval == 0) {
+	    errno = ETIMEDOUT;
+	    goto punt;
+	}
+
+	/* presumably got a response; check if the connection is open */
+	arglen = sizeof(peeraddr);
+	if (getpeername(s, (struct sockaddr *)&peeraddr, &arglen) < 0) {
+	    /* not connected; find out why and punt */
+	    arglen = sizeof(errno);
+	    (void) getsockopt(s, SOL_SOCKET, SO_ERROR, (void *)&errno, &arglen);
+	    goto punt;
+	}
+    }
+
+    /* put socket back in blocking mode */
+    if (fcntl(s, F_SETFL, flags) < 0)
 	goto punt;
 
     (void) fcntl (s, F_SETFD, 1);

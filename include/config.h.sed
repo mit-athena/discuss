@@ -45,7 +45,10 @@ meetings;  it is obsolete.
 
 DSC_SETUP:  This name of the DSC_SETUP program.  This program is
 invoked by the various clients when a user first runs Discuss, to
-create an initial .meetings file. */
+create an initial .meetings file.
+
+CONN_TIMEOUT: This is the timeout for connecting to a remote discuss
+server, in seconds. */
 
 
 /* Server to exec (assumed to be in SERVERDIR) */
@@ -83,4 +86,9 @@ create an initial .meetings file. */
 /* dsc_setup command */
 #ifndef DSC_SETUP
 #define DSC_SETUP "dsc_setup"
+#endif
+
+/* Timeout for connecting to discuss server, in seconds */
+#ifndef CONN_TIMEOUT
+#define CONN_TIMEOUT 20
 #endif
