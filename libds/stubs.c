@@ -164,6 +164,29 @@ int *result;
 
 /*
  *
+ * old_get_mtg_info () --
+ * returns information about the given meeting.  Return argument is an
+ * error code
+ *
+ */
+old_get_mtg_info (mtg_name, info, result)
+char *mtg_name;
+mtg_info *info;
+int *result;
+{
+     startsend(OLD_GET_MTG_INFO);
+     if (rpc_err) { *result = rpc_err; return; }
+     sendstr(mtg_name);
+     sendit("discuss");
+     if (rpc_err) { *result = rpc_err; return; }
+     recvreply();
+     old_recv_mtg_info(info);
+     *result = recvint();
+     if (rpc_err) { *result = rpc_err; return; }
+     return;
+}
+/*
+ *
  * get_mtg_info () --
  * returns information about the given meeting.  Return argument is an
  * error code
@@ -286,6 +309,27 @@ trn_info *tinfo;
     
 /*
  *
+ * old_recv_mtg_info -- Recv a mtg info struct.
+ *
+ */
+old_recv_mtg_info(minfo)
+mtg_info *minfo;
+{
+     minfo -> version = recvint ();
+     minfo -> location = recvstr ();
+     minfo -> long_name = recvstr ();
+     minfo -> chairman = recvstr ();
+     minfo -> first = recvint ();
+     minfo -> last = recvint ();
+     minfo -> lowest = recvint ();
+     minfo -> highest = recvint ();
+     minfo -> date_created = recvint ();
+     minfo -> date_modified = recvint ();
+     minfo -> public_flag = recvbool ();
+}
+
+/*
+ *
  * recv_mtg_info -- Recv a mtg info struct.
  *
  */
@@ -303,5 +347,6 @@ mtg_info *minfo;
      minfo -> date_created = recvint ();
      minfo -> date_modified = recvint ();
      minfo -> public_flag = recvbool ();
+     minfo -> access_modes = recvstr ();
 }
 
