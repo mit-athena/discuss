@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.5 1987-03-11 18:00:27 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.6 1987-03-17 02:24:10 srz Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
@@ -11,6 +11,9 @@
  *		  in-memory superblock, and to open & close meetings.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.5  87/03/11  18:00:27  srz
+ * Made sure that write's were error checked.
+ * 
  * Revision 1.4  87/02/04  15:48:18  srz
  * When there is a choice between making lint happy or cc happy, I tend
  * to prefer 'cc'.  uid_t is not in 4.2 BSD.
@@ -26,7 +29,7 @@
  */
 
 #ifndef lint
-static char *rcsid_coreutil_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.5 1987-03-11 18:00:27 srz Exp $";
+static char *rcsid_coreutil_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.6 1987-03-17 02:24:10 srz Exp $";
 #endif lint
 
 #include "../include/types.h"
@@ -55,6 +58,7 @@ int 	last_acl_mod;				/* last mod to ACL */
 mtg_super super;
 char *super_chairman;
 char *super_long_name;
+int has_privs = 0;
 
 
 /* EXTERNAL */
@@ -108,33 +112,9 @@ char *mtg_name;
 	  /*
 	   * is acl stale? 
 	   */
-	  (void) stat(str, &sb);
-	  if (sb.st_mtime <= last_acl_mod)
-		  return (0);				/* that was easy */
-	  /*
-	   * Ok, just revert the ACL.
-	   */
-	  acl_destroy(mtg_acl);
-	  if ((u_acl_f = open(str, O_RDONLY, 0700)) < 0) {
-		  if (errno == ENOENT)
-			  result = NO_SUCH_MTG;
-		  else if (errno == EACCES)
-			  result = NO_ACCESS;
-		  else
-			  result = BAD_PATH;
-		  goto punt;
-	  }
-	  if (!fis_owner (u_acl_f, uid)) {
-		  result = NO_ACCESS;
-		  goto punt;
-	  }
-
-	  mtg_acl = acl_read (u_acl_f);
-	  (void) close(u_acl_f);
-	  u_acl_f = 0;
-	  fstat(u_acl_f, &sb);
-	  last_acl_mod = sb.st_mtime;
-	  return(0);
+	  if (stat(str, &sb) >= 0)
+	       if (sb.st_mtime <= last_acl_mod)
+		    return (0);				/* that was easy */
      }
 
      if (current_mtg [0] != '\0') {		/* close previous meeting */
@@ -496,6 +476,9 @@ char mode;
 {
      char *test_modes;
 
+     if (has_privs)
+	  return(TRUE);				/* linked in */
+
      switch (mode) {
      case 'd':
 	  if (!strcmp(author,rpc_caller)) {
@@ -523,6 +506,9 @@ bool has_mtg_access(mode)
 char mode;
 {
      char *test_modes;
+
+     if (has_privs)				/* linked in stuff */
+	  return (TRUE);		
 
      switch (mode) {
      case 'w':
