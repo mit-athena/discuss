@@ -5,19 +5,27 @@
  *        $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/dsmail.c.old,v $
  *
  *        $Log: not supported by cvs2svn $
+ * Revision 1.3  87/05/02  02:12:58  tytso
+ * Replaced the regexp and options parsing code with the UNIX
+ * library routines.  Cleaned up code.  Added -A (all headers)
+ * option.
+ * 
  */
 
 #include <stdio.h>
 #include <strings.h>
 #include <ctype.h>
 
-#define DSPIPE		"/site/sipb/bin/dspipe"
+#define DSPIPE		"/usr/sipb/bin/dspipe"
 #define DEFAULT_SUBJECT "No subject found in mail header"
+#define BUFFLEN 400
+#define LISTLEN 40
 
 #ifndef	lint
-static char rcsid[] = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/dsmail.c.old,v 1.3 1987-05-02 02:12:58 tytso Exp $";
+static char rcsid[] = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/dsmail.c.old,v 1.4 1987-07-17 03:34:57 tytso Exp $";
 #endif
 
+char *malloc();
 char *mktemp();
 FILE *popen();
 FILE *fopen();
@@ -27,12 +35,8 @@ int getopt();
 extern char *optarg;                /* External variables for getopt */
 extern int optind;
 
-char *zippy[] = {
-	"yow!","snarl","zippy",NULL 
-};
-	
 char *deflist[] = {
-	"^to$","^from$","^cc$",".*-to$",".*-from$",NULL
+	"^to$","^from$","^cc$",".*-to$",".*-from$","^date$",NULL
 };
 		
 char *subjlist[] = {
@@ -40,93 +44,115 @@ char *subjlist[] = {
 };
 
 char *progname;
-char *save[20],*reject[20];
+char *save[LISTLEN],*reject[LISTLEN];
 char *usr_mtg = "";
-int zipgun=0,
-	dodefs=0,
+int 	dodefs=0,
 	allfields=0,
 	debug=0;
 char *optarg;
 int optind;
+char *dspipeloc;
 
 void PRS();
 void MakeLowerCase();
 void PipeToMeeting();
-void perror();
 
 main(argc,argv)
 	int argc;
 	char *argv[];
 {
 	FILE *f;
-	char subject[80],line[255],keyword[40],key[40];
-	int i;
+	char line[BUFFLEN+1],*keyword,*key;
+	char *subject=NULL;
+	int i,ok_prev=0,iscont = 0;
 	char filename[60];
 
 	PRS(argc,argv);
+	line[BUFFLEN]='\0';
 	if (debug) 
 		f=stdout;
 	else {
 		(void) mktemp(strcpy(filename, "/tmp/DSXXXXXX"));
-		if ((f = fopen(filename,"w")) == NULL)
-			perror("Can't open temp file");
+		if ((f = fopen(filename,"w+")) == NULL)
+			perror(filename);
+		if (fchmod(fileno(f),0600))
+			perror("chmod temp file");
 	}
 	
-	if (gets(line)==NULL)
+	if (fgets(line,BUFFLEN,stdin)==NULL)
 		exit(0);
-	while (*line != '\0') {
-		for (i=0;line[i] && line[i]!=':';i++)
-			keyword[i]=line[i];
-		keyword[i]='\0';
-		MakeLowerCase(strcpy(key,keyword));
-		if (list_compare(key,subjlist)) {
-			for (i++;line[i]==' ';i++) ;
-			(void) strcpy(subject,line+i);
+	if (isspace(line[0]))
+		iscont = 1;
+	while (*line != '\n') {
+		if (!iscont) {
+			for (i=0;line[i] && line[i]!=':';i++) ;
+			keyword=malloc(i+1);
+			(void) strncpy(keyword,line,i);
+			keyword[i]='\0';
+			key=malloc(i+1);
+			MakeLowerCase(strcpy(key,keyword));
+			if (list_compare(key,subjlist)) {
+				for (i++;line[i]==' ';i++) ;
+				/* if luser tries two subject lines, we */
+				/* ignore the second subject line */
+				if (subject==NULL) {
+					subject=malloc(strlen(line)-i+1);
+					(void) strcpy(subject,line+i);
+				}	
+			}
 		}
-		if (CheckField(key))
-			fprintf(f,"%s\n",line);
-		if (zipgun && list_compare(key,zippy))
-			fprintf(f,"%s: <CENSORED by the Net-Police>\n",keyword);
-		if (gets(line)==NULL)
+		if ((ok_prev && iscont) || (!iscont && CheckField(key))) {
+			ok_prev=1;
+			fprintf(f,"%s",line);
+		} else
+			ok_prev=0;
+		if (!iscont) {
+			free(key);
+			free(keyword);
+		}
+		iscont = line[strlen(line)-1] != '\n';
+		if (fgets(line,BUFFLEN,stdin)==NULL)
 			goto bye;
 	}
-	fprintf(f,"\n");
-	while (gets(line)!=NULL)
-		fprintf(f,"%s\n",line);
-	if (!debug)
-		if (fclose(f) == EOF)
-			perror("Can't close temp file.");
-	PipeToMeeting(filename,*subject ? subject : DEFAULT_SUBJECT);
+	while (fgets(line,BUFFLEN,stdin)!=NULL) {
+		fprintf(f,"%s",line);
+	}
+	PipeToMeeting(f,(subject==NULL) ? DEFAULT_SUBJECT : subject);
  bye:
-	(void) unlink(filename); 
+	if (!debug)
+		(void) unlink(filename); 
 	exit(0);
 	
 }
 
-void PipeToMeeting(filename,subject)
-	char *filename, *subject;
+void PipeToMeeting(f,subject)
+	char *subject;
+	FILE *f;
 {
-	char command[100], line[100];
-	FILE *f,*dspipe;
+	char command[384], line[255];
+	int len;
+	FILE *dspipe;
 
-	(void) sprintf(command,"%s %s -t \"%s\"",DSPIPE,usr_mtg,subject);
+	len=strlen(subject);
+	if (len && (subject[--len] == '\n'))
+		subject[len]='\0';
+	(void) sprintf(command,"%s %s -t \"%s\"",dspipeloc,usr_mtg,subject);
 	if (debug) {
 		printf("<----------------- End of Text\n");
 		printf("pipe to: %s\n",command);
 		return;
 	}
-	if ((f = fopen(filename,"r")) == NULL)
-		perror("Can't reopen temp file.");
+	if (rewind(f) == -1)
+		perror("rewind");
 	if ((dspipe = popen(command,"w")) == NULL)
 		{
 			fprintf(stderr,"Can't fork to %s",DSPIPE);
 			exit(1);
 		}
-	(void) fgets(line,255,f);
-	while (!feof(f)) {
+
+	while (fgets(line,BUFFLEN,f))
 		(void) fputs(line,dspipe);
-		(void) fgets(line,255,f);
-	}
+
 	(void) pclose(dspipe);
 	(void) fclose(f);
 }
@@ -145,11 +171,11 @@ int CheckField(key)
 	int keepfield;
 
 	keepfield=allfields;
-	if (dodefs && list_compare(key,deflist))
+	if (!keepfield && dodefs && list_compare(key,deflist))
 		keepfield=1;
-	if (list_compare(key,save))
+	if (!keepfield && list_compare(key,save))
 		keepfield=1;
-	if (list_compare(key,reject))
+	if (keepfield && list_compare(key,reject))
 		keepfield=0;
 	return(keepfield);
 }
@@ -162,13 +188,11 @@ void PRS(argc,argv)
 	int c,rp,sp;
 	
 	progname=argv[0];
+	dspipeloc = DSPIPE;
 	sp=rp=0;
 	optind=1;		/* Initialize for getopt */
-	while ((c = getopt(argc,argv,"AZDda:r:")) != EOF)
+	while ((c = getopt(argc,argv,"AZDda:r:p:")) != EOF)
 		switch(c) {
-		case 'Z':  
-			zipgun=!zipgun;
-			break;
 		case 'd':
 			dodefs=!dodefs;
 			break;
@@ -181,12 +205,22 @@ void PRS(argc,argv)
 		case 'a':
 			MakeLowerCase(optarg);
 			save[sp++]=optarg;
+			if (sp>=LISTLEN) {
+				fprintf(stderr,"Too many accept fields\n");
+				exit(1);
+			}
 			break;
 		case 'r':
 			MakeLowerCase(optarg);
 			reject[rp++]=optarg;
+			if (sp>=LISTLEN) {
+				fprintf(stderr,"Too many reject fields\n");
+				exit(1);
+			}
+		case 'p':
+			dspipeloc = optarg;
 			break;
-			}    
+		}    
 	if (optind>=argc) 
 		goto lusage;
 	usr_mtg=argv[optind];
@@ -208,7 +242,7 @@ int list_compare(s,list)
 
 	while (*list!=NULL) {
 		err=re_comp(*list++);
-		if (*err) {
+		if (err) {
 			fprintf(stderr,"%s: %s - %s\n",progname,err,*(--list));
 			exit(1);
 			}
@@ -216,12 +250,5 @@ int list_compare(s,list)
 			return(1);
 	}
 	return(0);
-}
-
-void perror(s)
-	char *s;
-{
-	fprintf(stderr,"%s: %s\n",progname,s);
-	exit(1);
 }
 
