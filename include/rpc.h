@@ -45,6 +45,8 @@ struct proc_table {
 #define GET_TRN_INFO2 18
 #define GET_SERVER_VERSION 19
 #define SET_TRN_FLAGS 20
+#define ADD_TRN2 21
+#define GET_TRN_INFO3 22
 
 #define REPLY_TYPE 440
 #define PROC_BASE 400
@@ -57,6 +59,7 @@ struct proc_table {
 /* Server version numbers */
 #define SERVER_0 0
 #define SERVER_1 1
+#define SERVER_2 2
 
 extern int rpc_err;
 
