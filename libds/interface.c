@@ -1,10 +1,13 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.9 1987-06-27 01:16:46 spook Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.10 1987-07-08 01:59:44 wesommer Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.9  87/06/27  01:16:46  spook
+ * *** empty log message ***
+ * 
  * Revision 1.8  87/03/22  04:21:46  spook
  * *** empty log message ***
  * 
@@ -26,7 +29,7 @@
  */
 
 #ifndef lint
-static char *rcsid_interface_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.9 1987-06-27 01:16:46 spook Exp $";
+static char *rcsid_interface_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.10 1987-07-08 01:59:44 wesommer Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -251,4 +254,14 @@ dsc_delete_access (nbp, princ, result)
 	select_meeting(nbp, result);
 	if (*result) return;
 	delete_access(mtg_name, princ, result);
+}
+
+dsc_whoami(nbp, ident, result)
+	name_blk *nbp;
+	char **ident;
+	int *result;
+{
+	select_meeting(nbp, result);
+	if (*result) return;
+	whoami(ident, result);
 }

@@ -11,20 +11,23 @@
 /*
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/stubs.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/stubs.c,v 1.6 1987-06-27 01:10:55 spook Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/stubs.c,v 1.7 1987-07-08 02:00:16 wesommer Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
  * stubs.c -- These are stubs that handle the calling of routines.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.6  87/06/27  01:10:55  spook
+ * *** empty log message ***
+ * 
  * Revision 1.5  87/04/11  00:06:13  srz
  * Added RCS junk
  * 
  *
  */
 #ifndef lint
-static char *rcsid_stubs_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/stubs.c,v 1.6 1987-06-27 01:10:55 spook Exp $";
+static char *rcsid_stubs_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/stubs.c,v 1.7 1987-07-08 02:00:16 wesommer Exp $";
 #endif lint
 
 /* Derived from CORE.PAS 06/21/86 by SRZ */
@@ -388,20 +391,21 @@ delete_access(mtg_name, princ_name, result)
 	return;
 }
 
-/*
-whoami(ident)
+whoami(ident, result)
 	char **ident;
+	int *result;
 {
 	int *result=0;
 	startsend(WHO_AM_I);
 	rpccheck;
 	sendit(discuss);
 	rpccheck;
+	recvreply();
+	if (rpc_err) { *result = rpc_err; return; }
 	*ident = recvstr();
 	rpccheck;
 	return;
 }
-*/
 
 
 /*
