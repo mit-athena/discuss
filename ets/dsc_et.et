@@ -49,4 +49,10 @@
 	ec	NO_PRINC,
 		"Principal not on access control list"
 
+	ec	NO_MTGS_FILE,
+		"No '.meetings' file"
+
+	ec	BAD_MTGS_FILE,
+		"Invalid format in meetings file"
+
 	end
