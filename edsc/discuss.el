@@ -4,7 +4,7 @@
 ;;;    	For copying information, see the file mit-copyright.h in this release.
 ;;;
 ;;;	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v $
-;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.24 1991-02-24 14:46:58 bjaspan Exp $
+;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.25 1991-03-08 21:05:33 tytso Exp $
 ;;;
 ;;;  Emacs lisp code to remote control a "discuss" shell process to
 ;;;  provide an emacs-based interface to the discuss conferencing system.
@@ -13,6 +13,9 @@
 ;;;  Written by Stan Zanarotti, Bill Sommerfeld and Theodore Ts'o.
 ;;;
 ;;;  $Log: not supported by cvs2svn $
+; Revision 1.24  91/02/24  14:46:58  bjaspan
+; fixed my brain-dead discuss-catchup implementation
+; 
 ; Revision 1.23  91/02/19  16:13:50  bjaspan
 ; removed useless check for machine-type in (edsc-machine-type).
 ; 
@@ -441,7 +444,9 @@ a	Add meeting."
       (set-buffer discuss-cur-mtg-buf)
       (discuss-send-cmd (format "(ss %d %s)\n"
 				discuss-highest-seen
-				discuss-meeting))))
+				discuss-meeting)
+			nil
+			'discuss-read-form)))
   (switch-to-buffer discuss-cur-mtg-buf)
   (setq discuss-meeting meeting)
   (setq discuss-current-meeting meeting)   ;;; denigrated
@@ -720,7 +725,9 @@ the argument or the current transaction and leaves the meeting."
 	(if (not (= discuss-highest-seen 0))
 	    (discuss-send-cmd (format "(ss %d %s)\n"
 				      discuss-highest-seen
-				      discuss-meeting)))
+				      discuss-meeting)
+			      nil
+			      'discuss-read-form))
 	(kill-buffer (buffer-name discuss-cur-mtg-buf))
 	(setq discuss-cur-mtg-buf nil)
 	(setq discuss-current-meeting nil)
@@ -758,7 +765,8 @@ the argument or the current transaction and leaves the meeting."
 (defun discuss-end-of-catchup ()
   (let ((meeting (nth 1 discuss-form))
 	(highest (nth 6 discuss-form)))
-    (discuss-send-cmd (format "(ss %d %s)\n" highest meeting))
+    (discuss-send-cmd (format "(ss %d %s)\n" highest meeting)
+		      nil 'discuss-read-form)
     (discuss-mark-read-meeting meeting)
     (discuss-next-meeting t)
     (message "Done.")
@@ -1195,7 +1203,7 @@ discuss server while we spin-block."
 ; run this at each load
 (defun discuss-initialize nil
   (setq discuss-version
-	"$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.24 1991-02-24 14:46:58 bjaspan Exp $")
+	"$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.25 1991-03-08 21:05:33 tytso Exp $")
 
 ;;;
 ;;; Lots of autoload stuff....
