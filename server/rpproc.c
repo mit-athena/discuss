@@ -9,11 +9,14 @@
 /*
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/rpproc.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/rpproc.c,v 1.4 1987-04-24 21:01:05 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/rpproc.c,v 1.5 1988-07-04 08:06:10 raeburn Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.4  87/04/24  21:01:05  srz
+ * Have subprocess close the tty, so that random signals can't get sent.
+ * 
  *
  *
  */
@@ -226,7 +229,7 @@ int *code;
      strcat (filename, "/srvtab");
 
      strcpy(instance,"*");
-     i = rd_ap_req(&ticket, service, instance, hostaddr, &kdata,filename);
+     i = krb_rd_req (&ticket, service, instance, hostaddr, &kdata,filename);
      if (i == 0) {
 	  strcpy(rpc_caller, kdata.pname);
 	  if (kdata.pinst[0] != '\0') {
