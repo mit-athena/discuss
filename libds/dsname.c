@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v 1.15 1988-02-07 00:52:49 raeburn Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v 1.16 1988-02-15 01:02:45 wesommer Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
@@ -8,7 +8,7 @@
 
 #ifndef lint
 static char rcsid_dsname_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v 1.15 1988-02-07 00:52:49 raeburn Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v 1.16 1988-02-15 01:02:45 wesommer Exp $";
 #endif lint
 
 /*
@@ -408,6 +408,7 @@ dsc_expand_mtg_set(user_id, name, set, num, result)
 	while ((r=getdbent()) > 0)
 		if (is_a_name(name)) {
 			register name_blk *nb = *set + (*num)++;
+			bzero((char *)nb, sizeof(*nb));
 			nb->date_attended = current.date_attended;
 			nb->last = current.last;
 			nb->status = current.status;
