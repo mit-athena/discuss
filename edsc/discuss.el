@@ -1,5 +1,5 @@
 ;;;	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v $
-;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.2 1988-10-26 15:17:01 eichin Exp $
+;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.3 1988-10-26 15:23:15 eichin Exp $
 ;;;
 ;;;  Emacs lisp code to remote control a "discuss" shell process to
 ;;;  provide an emacs-based interface to the discuss conferencing system.
@@ -8,6 +8,9 @@
 ;;;  Written by Stan Zanarotti and Bill Sommerfeld.
 ;;;
 ;;;  $Log: not supported by cvs2svn $
+; Revision 1.2  88/10/26  15:17:01  eichin
+; Added discuss-trn-output
+; 
 ; Revision 1.1  88/10/24  22:32:58  srz
 ; Initial revision
 ; 
@@ -57,7 +60,7 @@ meetings")
 ;				     "vax"
 ;				   "rt"))
 ;  "*Name of program to run as slave process for discuss.")
-(defvar discuss-pathname (format "/mit/discuss/%s/edsc"
+(defvar discuss-pathname (format "/mit/discuss/%s/edsc/edsc"
 				 (if (equal emacs-build-system "paris")
 				     "vax"
 				   "rt"))
