@@ -1,364 +1,477 @@
 /*
- *
- * dsname.c -- Routines to implement the discuss name routines, on the
- *	       client end.
+ * db: Implements user's meetings database.
  *
  */
 
-#ifndef lint
-static char *rcsid_dsname_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v 1.5 1986-11-22 19:29:27 wesommer Exp $";
-#endif lint
-
+#include <stdio.h>
 #include <strings.h>
-#include <ctype.h>
-#include <errno.h>
 #include <pwd.h>
 #include <sys/file.h>
 #include <sys/param.h>
-#include <stdio.h>
-#include "../include/dsname.h"
+#include "config.h"
+#include "dsname.h"
+#include "dsc_et.h"
 
-#define NULL 0
+/*
+ * Format of data file:
+ *    status:last_time:last_seen:uid:name1:name2:name3:....:nameN:
+ */
 
-struct nment {
-     char *nm_name;
-     int  last;
-     int  date_attended;
-     char *unique_id;
+static FILE *db = (FILE *)NULL;
+static char *db_file = (char *)NULL;
+static char *db_user_id = (char *)NULL;
+
+static server_name_blk current = {
+	(char *)NULL, (char *)NULL, (char *)NULL, 0, 0, 0
 };
 
-struct nment *getnment();
-char *malloc();
-
+extern char *malloc();
 extern int errno;
 
-FILE *nm_file;
-
-
-/*
- *
- * get_mtg_location --  Maps unique_id -> {host, pathname}.  Cheats by
- *			relying on the form of unique_id's.
- *
- */
-get_mtg_location (unique_id, host, pathname, result)
-char *unique_id;		/* input */
-char **host;			/* output, malloc'd */
-char **pathname;		/* output, malloc'd */
-int *result;			/* standard code */
-{
-     char *cp;
-     int n;
-
-     *result = 0;		/* optimist */
-
-     cp = index (unique_id, ':');
-     if (cp == 0) {		/* something's wrong here */
-	  *host = NULL;
-	  *pathname = NULL;
-	  *result = EINVAL;
-	  return;
-     }
-
-     n = cp - unique_id;
-     *host = malloc (n+1);
-     bcopy (unique_id, *host, n);
-     (*host) [n] = '\0';
-
-     cp++;
-     while (isdigit(*cp))
-	  cp++;
-     n = strlen (cp);
-     *pathname = malloc (n+1);
-     bcopy (cp, *pathname, n);
-     (*pathname) [n] = '\0';
-
-     return;
-}
-
-expand_mtg_set (realm, user, mtgname, set, num)
-char *realm, *user, *mtgname;	/* input */
-name_blk **set;			/* array of name_blk's */
-int *num;
-{
-     int star_realm, star_user, star_mtgname;
-     int realm_len, user_len, mtgname_len;
-     int count = 0;
-     name_blk *nbp;
-     struct nment *nm;
-
-     *set = 0;
-     *num = 0;
-     
-     realm_len = strlen (realm);
-     user_len = strlen (user);
-     mtgname_len = strlen (mtgname);
-     if (realm_len   >= NB_REALM_SZ ||
-	 user_len    >= NB_USER_SZ ||
-	 mtgname_len >= NB_MTG_NAME_SZ)
-	  return;				/* he loses */
-
-     star_realm = !strcmp (realm, "*");
-     star_user = !strcmp (user, "*");
-     star_mtgname = !strcmp (mtgname, "*");
-
-     setnment(user);
-     while ((nm = getnment()) != NULL) {
-	  if (star_mtgname || !strcmp (mtgname, nm -> nm_name))
-	       count++;
-     }
-
-     if (count == 0)
-	  return;
-
-     *set = (name_blk *) malloc (count * sizeof (name_blk));
-     if (*set == 0)
-	  return;
-
-     *num = count;
-     nbp = *set;
-     setnment(user);
-     while ((nm = getnment ()) != NULL) {
-	  if (star_mtgname || !strcmp (mtgname, nm -> nm_name)) {
-	       strcpy (nbp->realm, realm);
-	       strcpy (nbp->mtg_name, nm -> nm_name);
-	       strcpy (nbp->user, user);
-	       strcpy (nbp->unique_id, nm -> unique_id);
-	       nbp -> date_attended = nm -> date_attended;
-	       nbp -> last = nm -> last;
-	       nbp++;
-	  }
-     }
-     return;
-}
-
-get_mtg_unique_id (realm, user, mtgname, nb, result)
-char *realm, *user, *mtgname;   /* input */
-name_blk *nb;			/* output */
-int *result;			/* standard code */
-{
-     int realm_len, user_len, mtgname_len;
-     int count = 0;
-     struct nment *nm;
-
-     realm_len = strlen (realm);
-     user_len = strlen (user);
-     mtgname_len = strlen (mtgname);
-     if (realm_len   >= NB_REALM_SZ ||
-	 user_len    >= NB_USER_SZ ||
-	 mtgname_len >= NB_MTG_NAME_SZ) {
-	  *result = ENOMEM;
-	  return;				/* he loses */
-     }
-
-     setnment(user);
-     while ((nm = getnment ()) != NULL) {
-	  if (!strcmp (mtgname, nm -> nm_name)) {
-	       strcpy (nb->mtg_name,mtgname);
-	       strcpy (nb->realm, realm);
-	       strcpy (nb->user, user);
-	       strcpy (nb->unique_id, nm -> unique_id);
-	       nb -> date_attended = nm -> date_attended;
-	       nb -> last = nm -> last;
-	       *result = 0;
-	       return;
-	  }
-     }
-     *result = ENOENT;
-     return;
-}
 /*
  * Find name of .disrc file; search path is:
- *	$DISRC environment variable
- *	$HOME/.disrc
- *	<pw->pw_dir>/.disrc
+ *	$MEETINGS environment variable
+ *	$HOME/.meetings
+ *	<pw->pw_dir>/.meetings
  * This function is "sticky"; it only evaluates the filename once.
  */
 
-static set_rc_filename(user, buf, len)
-     char *user, *buf;
-     int len;
+static char disrcbuf[MAXPATHLEN]; /* user's MEETINGS file */
+static char *disrcfile = NULL;	/* pointer to above */
+static char *me = NULL;		/* user's own user_id field */
+
+static set_rc_filename(auser_id, buf, len)
+	char *auser_id, *buf;
+	int len;
 {
-     static char disrcbuf[MAXPATHLEN], *disrcfile = NULL;
-     struct passwd *pw;
-     register char *cp = NULL;
-     extern char *getenv();
+	struct passwd *pw = NULL;
+	register char *cp = NULL;
+	extern char *getenv();
 
-     if (*user != '\0') {
-          pw = getpwnam(user);
-	  if (!pw) {
-	       fprintf(stderr, "Unknown user %s\n", user); /* XXX - should return error code */
-	       strncpy(buf, "/dev/null", len);
-	  } else {
-	       strncpy (buf, pw -> pw_dir, len);
-	       strncat (buf, "/.disrc", len);
-	  }
-	  return;
-     } 
-     if (!disrcfile) {
-	  if ((cp = getenv("DISRC")) && !access(cp, R_OK|W_OK)) {
-	       strncpy(disrcbuf, cp, MAXPATHLEN-1);
-	  } else if ((cp = getenv("HOME")) 
-		 &&  (strncpy(disrcbuf,cp, MAXPATHLEN-1))
-		 &&  (strncat(disrcbuf,"/.disrc", MAXPATHLEN-1))
-		 &&  (!access(disrcbuf, R_OK|W_OK))) {
-	       /* got it */
-	  } else {
-	       pw = getpwuid(getuid());
-	       if (!pw) {
-		    printf("Who are you?\n"); /* XXX - use warning */
-		    strcpy(disrcbuf, "/tmp/.disrc");
-	       } else {
-		    strncpy (disrcbuf, pw -> pw_dir, MAXPATHLEN-1);
-		    strncat (disrcbuf, "/.disrc", MAXPATHLEN-1);
-	       }
-	  }
-	  disrcfile = disrcbuf;
-     }
-     strncpy(buf, disrcfile, len);	  
-}
-
-
-update_mtg_set(realm, user, set, num, result)
-char *realm, *user;		/* input */
-name_blk *set;			/* array of name_blk's */
-int num;			/* number in set */
-int *result;			/* error code */
-{
-     name_blk *nbp;
-     int i;
-     char *touched;		/* array of booleans */
-     char old_name[MAXPATHLEN], new_name[MAXPATHLEN];
-     FILE *new_file;
-     struct passwd *pw;
-     struct nment *nm;
-
-     *result = 0;
-
-     set_rc_filename(user, old_name, sizeof(old_name));
-
-     strcpy (new_name, old_name);
-     strcat (new_name, "~");		/* emacsish, but who cares? */
-
-     new_file = fopen (new_name, "w+");
-     if (new_file == NULL) {
-	  *result = errno;
-	  return;
-     }
-
-     touched = malloc (num);
-     for (i = 0; i < num; i++)
-	  touched[i] = 0;
-
-
-     setnment(user);
-     while ((nm = getnment()) != NULL) {
-	  /* walk through user structures, seeing if we find matching entries */
-	  for (i = 0, nbp = set;  i < num; i++, nbp++) {
-	       if (!strcmp (nm -> unique_id, nbp -> unique_id)) {	/* match, update */
-		    nm -> last = nbp -> last;
-		    nm -> date_attended = nbp -> date_attended;
-		    if (!strcmp (nm -> nm_name, nbp -> mtg_name))
-			 touched[i] = 1;
-	       }
-	  }
-	  fprintf(new_file, "%s:%d:%d:%s\n", nm -> nm_name, nm -> last,
-		  nm -> date_attended, nm -> unique_id);
-     }
-
-     /* clean up ones we haven't touched in memory yet */
-     for (i = 0, nbp = set; i < num; i++, nbp++) {
-	  if (!touched[i]) {
-	       fprintf(new_file, "%s:%d:%d:%s\n", nbp -> mtg_name, nbp -> last,
-		  nbp -> date_attended, nbp -> unique_id);
-	  }
-     }
-     endnment();
-     fclose(new_file);
-
-     if (rename(new_name, old_name) < 0)
-	  *result = errno;
-     
-     free(touched);
-     return;
-}
-
-
-
-/*
- *
- * getnment () -- Read the name entry
- *
- */
-static struct nment *getnment()
-{
-     static char buffer[512];
-     static struct nment nm;
-     char *cp;
-     int len;
-
-     if (nm_file == NULL) {
-	  return (NULL);
-     }
-
-     while (fgets (buffer, sizeof(buffer), nm_file) != NULL) {
-	  len = strlen(buffer);
-	  buffer[len-1] = '\0';
-	  nm.nm_name = buffer;
-	  cp = index (nm.nm_name, ':');
-	  if (cp == 0)
-	       continue;
-	  *cp++ = '\0';
-	  if (!isdigit(*cp))
-	       continue;
-	  nm.last = 0;
-	  while (isdigit(*cp))
-	       nm.last = nm.last * 10 + *cp++ - '0';
-	  if (*cp++ != ':')
-	       continue;
-	  if (!isdigit(*cp))
-	       continue;
-	  nm.date_attended = 0;
-	  while (isdigit(*cp))
-	       nm.date_attended = nm.date_attended * 10 + *cp++ - '0';
-	  if (*cp++ != ':')
-	       continue;
-	  nm.unique_id = cp;
-	  return(&nm);
-     }
-     return(NULL);
+	if (!disrcfile) {
+		if ((cp = getenv("MEETINGS")) && !access(cp, R_OK|W_OK)) {
+			strncpy(disrcbuf, cp, MAXPATHLEN-1);
+		} else if ((cp = getenv("HOME")) 
+			   &&  (strncpy(disrcbuf, cp, MAXPATHLEN-1))
+			   &&  (strncat(disrcbuf, "/.meetings", MAXPATHLEN-1))
+			   &&  (!access(disrcbuf, R_OK|W_OK))) {
+				   /* got it */
+		} else {
+			pw = getpwuid(getuid());
+			if (!pw) {
+				/* XXX - use warning */
+/*				printf("Who are you?\n");*/
+				strcpy(disrcbuf, "/tmp/.meetings");
+			} else {
+				strncpy (disrcbuf, pw -> pw_dir, MAXPATHLEN-1);
+				strncat (disrcbuf, "/.meetings", MAXPATHLEN-1);
+			}
+		}
+		if (!pw)
+			pw = getpwuid(getuid());
+		if (pw) {
+			me = malloc(strlen(pw->pw_name)+2+
+				    strlen(local_realm()));
+			strcpy(me, pw->pw_name);
+			strcat(me, "@");
+			strcat(me, local_realm());
+		}
+		else me = "";
+		disrcfile = disrcbuf;
+	}
+	if (!strcmp(me, auser_id)) {
+		strncpy(buf, disrcfile, len);
+		return;
+	}
+	cp = index(auser_id, '@');
+	if (cp)
+		*cp = '\0';
+	pw = getpwnam(auser_id);
+	if (cp)
+		*cp = '@';
+	if (!pw) {
+		strncpy(buf, "/tmp/.meetings", len);
+		return;
+	}
+	strncpy(buf, pw->pw_dir, len);
+	strncat(buf, "/.meetings", len - strlen(buf));
 }
 
 /*
- *
- * setnment(user) -- Start reading a file.
- *
+ * ds() -- duplicate a string
  */
-static setnment(user)
-char *user;
-{
-     static char last_user[NB_USER_SZ] = "";
-     char buffer[MAXPATHLEN];
-     struct passwd *pw;
 
-     if (nm_file == NULL || strcmp(user, last_user) != 0) {
-	  if (nm_file) endnment();
-	  set_rc_filename(user, buffer, sizeof(buffer));
-	  nm_file = fopen (buffer, "r");
-	  if (nm_file != NULL) {
-	       strcpy (last_user, user);
-	  }
-     }
-     if (nm_file != NULL)
-	  rewind(nm_file);
-     return;
+static char *
+ds(s)
+	register char *s;
+{
+	register int len = strlen(s) + 1;
+	register char *ns = malloc(len);
+	bcopy(s, ns, len);
+	return(ns);
 }
 
-static endnment()
+static void
+enddbent()
 {
-     if (nm_file != NULL) {
-	  fclose (nm_file);
-	  nm_file = NULL;
-     }
+	if (db) {
+		fclose(db);
+		db = (FILE *)NULL;
+		free(db_file);
+		db_file = (char *)NULL;
+		free(db_user_id);
+		db_user_id = (char *)NULL;
+	}
+}
+
+/*
+ * getdbent() -- get the next entry out of the file.  returns
+ * zero on end of file, one on success, minus one on error
+ */
+
+static int
+getdbent()
+{
+	char buffer[BUFSIZ];
+	char *bufp, *cp;
+
+	if (!db) {
+		errno = -1;
+		return(-1);
+	}
+	if (!fgets(buffer, BUFSIZ, db)) {
+		return(ferror(db) ? -1 : 0);
+	}
+
+	bufp = index(buffer, '\n');
+	if (bufp)
+		*bufp = '\0';
+	bufp = buffer;
+
+	/* meeting status flags (per-user) */
+	current.status = atoi(bufp);
+	bufp = index(bufp, ':');
+	if (!bufp) {
+	bad_fmt:
+		errno = BAD_MTGS_FILE;
+		return(-1);
+	}
+	else
+		bufp++;
+
+	/* date user last attended meeting */
+	current.date_attended = atoi(bufp);
+	bufp = index(bufp, ':');
+	if (!bufp)
+		goto bad_fmt;
+	else
+		bufp++;
+
+	/* last transaction seen */
+	current.last = atoi(bufp);
+	bufp = index(bufp, ':');
+	if (!bufp)
+		goto bad_fmt;
+	else
+		bufp++;
+
+	/* hostname of meeting */
+	if (current.hostname)
+		free(current.hostname);
+	current.hostname = ds(bufp);
+	cp = index(current.hostname, ':');
+	if (cp)
+		*cp = '\0';
+	bufp = index(bufp, ':');
+	if (!bufp)
+		goto bad_fmt;
+	else
+		bufp++;
+
+	/* pathname of meeting on remote host */
+	if (current.pathname)
+		free(current.pathname);
+	current.pathname = ds(bufp);
+	cp = index(current.pathname, ':');
+	if (cp)
+		*cp = '\0';
+	bufp = index(bufp, ':');
+	if (!bufp)
+		goto bad_fmt;
+	else
+		bufp++;
+
+	/* list of aliases for meeting */
+	if (current.alias_list)
+		free(current.alias_list);
+	current.alias_list = ds(bufp);
+	cp = index(current.alias_list, ':');
+	if (cp)
+		*cp = '\0';
+	bufp = index(bufp, ':');
+	if (!bufp)
+		goto bad_fmt;
+	else
+		bufp++;
+
+	current.spare = ds(bufp);
+
+	return(1);
+}
+
+static int
+setdbent(user_id)
+	char *user_id;
+{
+	char *auid;
+
+	enddbent();
+
+	auid = malloc(strlen(user_id)+2);
+	strcpy(auid, user_id);
+	if (!db_file)
+		db_file = malloc(MAXPATHLEN);
+	set_rc_filename(user_id, db_file, MAXPATHLEN);
+
+	db = fopen(db_file, "r");
+	if (!db)
+		return(errno);
+	if (db_user_id)
+		free(db_user_id);
+	db_user_id = ds(user_id);
+	if (current.user_id)
+		free(current.user_id);
+	current.user_id = ds(user_id);
+	return(0);
+}
+
+static int
+is_a_name(name)
+	register char *name;
+{
+	register int len;
+	register char *ns = current.alias_list;
+
+	if (*name == '*')
+		return(1);
+	len = strlen(name);
+
+	while (1) {
+		if (!strncmp(name, ns, len) && (!ns[len] || ns[len] == ',')) {
+			return(1);
+		}
+		ns = index(ns+1, ',');
+		if (!ns || !ns[1]) {
+			return(0);
+		}
+		ns++;
+	}
+}
+
+static
+char **
+expand(list)
+	char *list;
+{
+	register int num = 1;
+	register char *cp;
+	register char **rv, **rv1;
+	for (cp = list; cp;) {
+		num++;
+		cp = index(cp, ',');
+		if (cp)
+			cp++;
+	}
+	rv = (char **) calloc (num, sizeof(char *));
+	rv1 = rv;
+	while (list && *list) {
+		while (*list == ',')
+			list++;
+		cp = index(list, ',');
+		if (cp)
+			*cp = '\0';
+		*rv1 = ds(list);
+		rv1++;
+		if (cp) {
+			*cp = ',';
+			cp++;
+			list = cp;
+		}
+		else list = (char *) NULL;
+	}
+	*rv1 = (char *) NULL;
+	return(rv);
+}
+
+static
+char *
+compress(list)
+	char **list;
+{
+	int len;
+	char **cp;
+	char *rv;
+	len = 1;
+	for (cp = list; *cp; cp++)
+		len += 1 + strlen(*cp);
+	rv = malloc (len);
+	strcpy(rv, *list);
+	for (cp = list+1; *cp; cp++) {
+		strcat(rv, ",");
+		strcat(rv, *cp);
+	}
+	return (rv);
+}
+
+dsc_expand_mtg_set(user_id, name, set, num, result)
+	char *user_id;		/* userid to do lookup for */
+	char *name;		/* user's name for meeting */
+	name_blk **set;		/* returned values */
+	int *num;		/* number of returned meetings */
+	int *result;		/* return code */
+{
+	int count;
+	register int r;
+
+	*set = 0;
+	*num = 0;
+	*result = 0;
+	r = setdbent(user_id);
+	if (r) {		/* setdbent returns errno */
+		*result = errno;
+		return;
+	}
+	count = 0;
+	while ((r=getdbent()) > 0) {
+		if (is_a_name(name))
+			count++;
+	}
+	if (r) {		/* getdbent returns -1 */
+		*result = errno;
+		return;
+	}
+	r = setdbent(user_id);
+	if (r) {
+		*result = r;
+		return;
+	}
+	*set = (name_blk *) malloc(count * sizeof(name_blk));
+	if (*set == (name_blk *)NULL) {
+		*result = errno;
+		return;
+	}
+	while ((r=getdbent()) > 0)
+		if (is_a_name(name)) {
+			register name_blk *nb = *set + (*num)++;
+			nb->date_attended = current.date_attended;
+			nb->last = current.last;
+			nb->status = current.status;
+			nb->hostname = ds(current.hostname);
+			nb->pathname = ds(current.pathname);
+			nb->aliases = expand(current.alias_list);
+			nb->spare = ds(current.spare);
+			nb->user_id = ds(user_id);
+		}
+	if (r)
+		*result = r;
+}
+
+dsc_get_mtg (user_id, name, nbp, result)
+	char *user_id;
+	char *name;
+	name_blk *nbp;
+	int *result;
+{
+	name_blk *set;
+	int num;
+	dsc_expand_mtg_set(user_id, name, &set, &num, result);
+	if (num == 0) {
+		if (!*result)
+			*result = NO_SUCH_MTG;
+		return;
+	}
+	bcopy(&set[0], nbp, sizeof(name_blk));
+}
+
+dsc_update_mtg_set(user_id, set, num, result)
+	char *user_id;		/* input */
+	name_blk *set;		/* array of name_blk's */
+	int num;		/* number in set */
+	int *result;		/* error code */
+{
+	name_blk *nbp;
+	int i;
+	register int r;
+	char *touched;		/* array of booleans */
+	char *new_name;
+	FILE *new_file;
+	char *old_name;
+
+	static char *format = "%d:%d:%d:%s:%s:%s:%s\n";
+
+	if (setdbent(user_id)) {
+		*result = errno;
+		return;
+	}
+	
+	new_name = malloc(strlen(db_file) + 2);
+	strcpy (new_name, db_file);
+	strcat (new_name, "~");		/* emacsish, but who cares? */
+	old_name = malloc(strlen(db_file) + 1);
+	strcpy (old_name, db_file);
+
+	new_file = fopen (new_name, "w+");
+	if (new_file == NULL) {
+		*result = errno;
+		free(new_name);
+		return;
+	}
+	
+	touched = malloc (num);
+	for (i = 0; i < num; i++)
+		touched[i] = 0;
+	
+	if (setdbent(user_id)) {
+		*result = errno;
+		return;
+	}
+	while ((r=getdbent()) != 0) {
+		if (r == -1)	/* if bad format, punt it */
+			continue;
+		/* walk through user structures, look for matching entries */
+		for (i = 0, nbp = set;  i < num; i++, nbp++) {
+			if (!strcmp (current.hostname, nbp -> hostname) && !strcmp(current.pathname, nbp->pathname)) {
+				/* match, update */
+				current.last = nbp -> last;
+				current.date_attended =
+					nbp -> date_attended;
+				current.status = nbp -> status;
+				current.alias_list = compress(nbp -> aliases);
+				current.spare = nbp->spare;
+				touched[i] = 1;
+			}
+		}
+		fprintf(new_file, format,
+			current.status, current.date_attended, current.last,
+			current.hostname, current.pathname,
+			current.alias_list, current.spare);
+	}
+	
+	/* clean up ones we haven't touched in memory yet */
+	for (i = 0, nbp = set; i < num; i++, nbp++) {
+		if (!touched[i]) {
+			fprintf(new_file, format,
+				nbp->status, nbp->date_attended, nbp->last,
+				nbp->hostname, nbp->pathname,
+				compress(nbp->aliases), current.spare);
+		}
+	}
+	enddbent();
+	fclose(new_file);
+	*result = (rename(new_name, old_name) < 0) ? errno : 0;
+	free(new_name);
+	free(old_name);
+	free(touched);
+	return;
 }
 
