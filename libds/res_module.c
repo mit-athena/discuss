@@ -8,7 +8,7 @@
 /*
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/res_module.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/res_module.c,v 1.11 1991-09-04 11:35:11 lwvanels Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/res_module.c,v 1.12 1996-06-26 07:21:10 ghudson Exp $
  *
  * resolve_module () --
  *	Can you say "Put all the configuration into one file?"  Can you
@@ -20,6 +20,9 @@
  *	the remote function is executed as a subprocess.
  *
  *	$Log: not supported by cvs2svn $
+ *	Revision 1.11  1991/09/04 11:35:11  lwvanels
+ *	stuff not checked in when picked up for the release; local server stuff.
+ *
  * Revision 1.10  90/12/01  22:40:09  eichin
  * added SERVER_LOCAL usage if hostname is ""
  * 
@@ -39,12 +42,13 @@
 
 #ifndef lint
 static char rcsid_res_module_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/res_module.c,v 1.11 1991-09-04 11:35:11 lwvanels Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/res_module.c,v 1.12 1996-06-26 07:21:10 ghudson Exp $";
 #endif lint
 
 #include "rpc_et.h"
 #include "config.h"
 #include "ansi.h"
+#include <stdio.h>
 #include <netdb.h>
 #include <string.h>
 #include <ctype.h>
@@ -61,7 +65,6 @@ static void ExpandHost ();
 #ifndef SNAME_SZ
 #define SNAME_SZ 30
 #define REALM_SZ 30
-#define MAX_HSTNM 60
 #endif SNAME_SZ
 
 #define NULL 0
@@ -111,7 +114,7 @@ void resolve_module (modname, port, hostp, servp, result)
     int *result;		/* std error code */
 {
     static char service_id [SNAME_SZ+REALM_SZ];
-    static char hostname [MAX_HSTNM];
+    static char hostname [BUFSIZ];
     char realm [REALM_SZ];
 
     char *myhnamep = NULL;
