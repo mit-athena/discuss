@@ -11,7 +11,7 @@
 /*
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.20 1988-06-17 23:12:43 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.21 1988-09-23 17:05:04 raeburn Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
@@ -21,6 +21,10 @@
  *		callable routines.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.20  88/06/17  23:12:43  srz
+ * Change update_mtg to return an error if the meeting appears to have
+ * lost transactions.
+ * 
  * Revision 1.19  88/01/05  01:08:44  rfrench
  * #ifdef'd ZEPHYR stuff
  * 
@@ -52,7 +56,7 @@
  *
  */
 #ifndef lint
-static char *rcsid_core_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.20 1988-06-17 23:12:43 srz Exp $";
+static char *rcsid_core_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.21 1988-09-23 17:05:04 raeburn Exp $";
 #endif lint
 
 
@@ -90,7 +94,7 @@ extern char rpc_caller [];
 extern int errno;
 extern int has_privs;
 extern tfile abort_file;
-extern Acl *mtg_acl;
+extern dsc_acl *mtg_acl;
 
 
 /*
@@ -109,7 +113,9 @@ trn_nums reply_trn;		/* trn replying to;  0 if original */
 trn_nums *result_trn;		/* trn number given to added trn */
 int *result;
 {
-     add_trn_priv (mtg_name, source_file, subject, reply_trn, 0, rpc_caller, (date_times) time ((long *)0), result_trn, result);
+     add_trn_priv (mtg_name, source_file, subject, reply_trn, 0,
+		   rpc_caller, (date_times) time ((long *)0),
+		   result_trn, result);
 }
 
 
@@ -795,7 +801,7 @@ create_mtg_priv (location, long_mtg_name, public, date_created, chairman, new_ac
 char *location,*long_mtg_name,*chairman;
 bool public;
 date_times date_created;
-Acl *new_acl;
+dsc_acl *new_acl;
 int *result;
 {
      char str[256];
@@ -842,7 +848,7 @@ int *result;
 	  if ((aclfd = open(str, O_RDONLY, 0700)) < 0) {
 	       *result = NO_ACCESS;
 	  } else {
-	       Acl *tmp_acl = acl_read(aclfd);
+	       dsc_acl *tmp_acl = acl_read(aclfd);
 	       (void) close(aclfd);
 
 	       if (tmp_acl == NULL ||
