@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.32 1987-07-14 16:30:51 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.33 1987-07-14 16:36:50 wesommer Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
@@ -12,7 +12,7 @@
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.32 1987-07-14 16:30:51 wesommer Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.33 1987-07-14 16:36:50 wesommer Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -20,6 +20,7 @@ static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athe
 #include <signal.h>
 #include <strings.h>
 #include <sys/wait.h>
+#include <sys/signal.h>
 #include <pwd.h>
 #include <ctype.h>
 #include "ss.h"
@@ -68,6 +69,7 @@ main(argc, argv)
 	bool quit = FALSE;	/* quit after processing request */
 	bool flame = FALSE;	/* Have we flamed them for multiple  */
 
+	signal(SIGPIPE, SIG_IGN);
 	buffer = &buf[0];
 	editor_path = getenv ("EDITOR");
 	if (!editor_path)
