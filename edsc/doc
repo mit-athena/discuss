@@ -1,0 +1,88 @@
+edsc expects a set of lines, in the form of S-expressions (no quoted
+strings).  It returns S-expressions with quoted strings.  This might
+change if this is too burdensome.  If the first character of the line
+is a ";", then this indicates an error message.  If the first
+character of the line is a "-", this is a warning.  The next line will
+be the response to the operation.
+
+Request: (gmi mtg-name)
+
+Returns information about the given meeting.  This is an
+s-expression of the form:
+
+  (location long-name chairman first last lowest highest date-created
+   date-modified public access_modes highest-seen)
+
+Request: (quit)
+
+Quits out of edsc.
+
+Request: (gti trn-num mtg-name)
+
+Get transaction info:
+Gets information about transaction trn-num in meeting mtg-name.  The
+information is returned in the form:
+
+  (current prev next pref nref fref lref chain-index date-entered
+   num-lines num-chars subject author)
+
+Request: (gt trn-num mtg-name)
+
+get_transaction:  Gets a pretty version of the transaction.  This returns
+the number of lines in the transaction:
+  (num-lines)
+
+followed by the actual transaction itself.
+
+Request: (grt trn-num mtg-name)
+
+Get raw transaction:  This returns the transaction in raw form, without
+any formatting.  It returns the number of characters in the transaction:
+  (num-chars)
+
+followed by the transaction itself.
+
+Request: (gml)
+
+Get meeting list:  Returns a list of meetings that the user attends,
+along with an indication whether it has changed or not.  It returns
+this as a list.  Each item in this list is a list itself, with the first
+element being a flag if the meeting has changed (0 or 1).  The rest of the
+list are the various aliases of the meeting.  Here is a sample return list:
+
+  ((1 "Cheery_thoughts" "ping") (0 "Central_america" "ca"))
+
+Request: (gcm)
+
+Get changed meetings: Performs the same thing as gml, except that it filters
+only for changed meetings.
+
+Request: (ss trn-num mtg-name)
+
+Set seen:  Sets the highest seen transaction in mtg-name to be trn-num.
+
+Request: (at reply-trn file-name mtg-name)
+
+Add transaction:  Adds a transaction to the discuss meeting mtg-name.  If
+reply-trn is non-zero, the new transaction is chained to that transaction.
+file-name is the filename with the contents of the meeting.  The subject
+is taken from the next line.  This request returns the resulting transaction
+number, in an S-expression:
+
+(new-trn-num)
+
+Request: (nut trn-num mtg-name)
+
+Next undeleted transaction:  Returns the number of the next undeleted
+transaction following trn-num in the meeting, even if trn-num happens
+to be deleted.  Returns it in an S-expression:
+
+(next-trn-num)
+
+Request: (grtn mtg-name)
+
+Returns transaction info (as in gti above) corresponding to a random
+transaction in the meeting.  Returns it in an S-expression:
+
+  (current prev next pref nref fref lref chain-index date-entered
+   num-lines num-chars subject author)
