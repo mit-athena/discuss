@@ -15,11 +15,16 @@
 #include <stdio.h>
 #include <sys/file.h>
 #include <signal.h>
-#include <strings.h>
 #include <sys/wait.h>
 #include <ctype.h>
 #include <sys/time.h>
 #include <netdb.h>
+#ifdef SVR4
+#include <string.h>
+#include <fcntl.h>
+#else
+#include <strings.h>
+#endif
 #include "edsc.h"
 
 do_gti(args)
@@ -227,6 +232,7 @@ char *args;
      cache_pc = 0;
      cache_working = 1;
      tinfo = cache_current->t_info;
+     (void) unlink(output_fn);
      if (link(cache_current->filename, output_fn)) {
 	     int	fd, rfd, cc;
 	     char	buf[8192];
@@ -244,7 +250,7 @@ char *args;
 		     dsc_destroy_name_blk(&nb);
 		     return;
 	     }
-	     while ((cc = read(rfd, buf, sizeof(buf))) >= 0) {
+	     while ((cc = read(rfd, buf, sizeof(buf))) > 0) {
 		     if (cc != write(fd, buf, cc)) {
 			     printf("; Failed write!\n");
 			     dsc_destroy_name_blk(&nb);
