@@ -6,7 +6,7 @@
 ;;; Written by Stan Zanarotti, Bill Sommerfeld and Theodore Ts'o.
 ;;; For copying information, see the file mit-copyright.h in this release.
 ;;;
-;;; $Id: discuss.el,v 1.38 1999-01-26 17:25:10 danw Exp $
+;;; $Id: discuss.el,v 1.39 1999-02-09 20:00:07 danw Exp $
 ;;;
 
 ;;
@@ -79,6 +79,10 @@ fed by mailing lists.")
 (defvar discuss-keep-discuss-ls nil
   "If nil, windows containing *discuss-ls* buffers will be deleted when
 leaving transaction mode.")
+
+(defvar discuss-use-short-meeting-name nil
+  "If nil, transaction mode buffers will use the full name of the discuss
+meeting. If non-nil, they will use the short name.")
 
 (defvar discuss-mtgs-mode-map nil
   "Keymap used by the meetings-list mode of the discuss subsystem.")
@@ -345,17 +349,16 @@ Instead, these commands are available:
     (set-buffer orig-buffer))
   (message "Listing meetings...done."))
 
-; Not working yet...
 (defun discuss-find-meeting (meeting)
   (let ((i 0)
 	(eol (length discuss-meeting-list)))
     (while (and (< i eol)
-		(not (memq meeting (aref discuss-meeting-list i))))
+		(not (member meeting (aref discuss-meeting-list i))))
 	(setq i (1+ i)))
     (if (< i eol)
-	i
+	(aref discuss-meeting-list i)
       nil)))
-	
+
 
 (defun discuss-quit ()
   "Exits Discuss mode."
@@ -387,7 +390,9 @@ Instead, these commands are available:
 	(if discuss-cur-mtg-buf
 	    (discuss-leave-mtg))
 	(setq discuss-cur-mtg-buf
-	      (get-buffer-create (concat "*" meeting " meeting*")))
+	      (get-buffer-create (if discuss-use-short-meeting-name
+				     (caddr (discuss-find-meeting meeting))
+				   (concat "*" meeting " meeting*"))))
 	(switch-to-buffer discuss-cur-mtg-buf)
 	(discuss-trn-mode))
     (progn
@@ -1035,7 +1040,7 @@ discuss server while we spin-block."
 ; run this at each load
 (defun discuss-initialize nil
   (setq discuss-version
-	"$Id: discuss.el,v 1.38 1999-01-26 17:25:10 danw Exp $")
+	"$Id: discuss.el,v 1.39 1999-02-09 20:00:07 danw Exp $")
 
 ;;;
 ;;; Lots of autoload stuff....
