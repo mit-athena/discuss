@@ -1,6 +1,6 @@
 /*
  *
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/trn_select.c,v 1.4 1986-10-14 23:00:04 spook Exp $
+ * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/trn_select.c,v 1.5 1986-10-29 10:31:18 srz Exp $
  * $Locker:  $
  *
  */
@@ -33,28 +33,18 @@ sl_insert_range(low, high, old_list, code_ptr)
 	new->next = (selection_list *)NULL;
 
 	if (!p)
-		return(new);
+		return(new);	/* first one, so just return it */
 
-	while (p) {
-		if (high-1 < p->low)
-			p = p->next;
-		if (high > p->low)
-			break;
+	/* we just add it on to the end, and let the user lose if he
+	   wants...(he might want them printed/listed out of order.
+	   Ken, try to document... */
+
+	while (p->next != NULL) {
+	     p = p->next;
 	}
 
-	while (1) {
-		if (p->next = (selection_list *)NULL)
-			break;
-		else if (p->high < p->next->low - 1)
-			break;
-		else {
-			register selection_list *q;
-			p->high = MAX(p->high, p->next->high);
-			q = p->next;
-			p->next = p->next->next;
-			free((char *)q);
-		}
-	}
+	p->next = new;
+	return(old_list);
 }
 
 selection_list *
@@ -108,7 +98,7 @@ trn_select(t_info, string, old_sl_ptr, code_ptr)
 {
 	int low, high;
 
-	*code_ptr = trnexpr_parse(&m_info, t_info, string, &low, &high);
+	*code_ptr = trnexpr_parse(&dsc_public.m_info, t_info, string, &low, &high);
 	if (*code_ptr != 0)
 		return((selection_list *)NULL);
 	old_sl_ptr = sl_insert_range(low, high, old_sl_ptr, code_ptr);
