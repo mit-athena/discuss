@@ -191,6 +191,7 @@ int procno;
 	  sendint(result);
 	  send_acl(list);
 	  sendreply();
+	  acl_destroy(list);
 	  break;
 
      /* get_access(mtg_name, princ_name) */
