@@ -4,7 +4,7 @@
 ;;;    	For copying information, see the file mit-copyright.h in this release.
 ;;;
 ;;;	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v $
-;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.15 1990-09-19 16:29:02 bjaspan Exp $
+;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.16 1990-10-29 22:55:04 bjaspan Exp $
 ;;;
 ;;;  Emacs lisp code to remote control a "discuss" shell process to
 ;;;  provide an emacs-based interface to the discuss conferencing system.
@@ -13,6 +13,9 @@
 ;;;  Written by Stan Zanarotti, Bill Sommerfeld and Theodore Ts'o.
 ;;;
 ;;;  $Log: not supported by cvs2svn $
+; Revision 1.15  90/09/19  16:29:02  bjaspan
+; merged my changes: meeting name completion, discuss-safe-delete
+; 
 ; Revision 1.1  89/02/25  00:12:20  tytso
 ; Initial revision
 ;
@@ -706,8 +709,8 @@ a	Add meeting."
 	 ))
   ;; Probably we should make sure the transaction can be deleted before
   ;; asking this question, but the cache code is too confusing...
-  (if (not (and discuss-safe-delete 
-		(yes-or-no-p (format "Delete transaction %d? " trn-num))))
+  (if (and discuss-safe-delete
+	   (not (yes-or-no-p (format "Delete transaction %d? " trn-num))))
       nil
     (let (info
 	  other
@@ -1107,7 +1110,7 @@ discuss server while we spin-block."
 ; run this at each load
 (defun discuss-initialize nil
   (setq discuss-version
-	"$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.15 1990-09-19 16:29:02 bjaspan Exp $")
+	"$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.16 1990-10-29 22:55:04 bjaspan Exp $")
 
 ;;;
 ;;; Lots of autoload stuff....
