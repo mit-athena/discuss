@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.29 1987-04-08 03:54:00 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.30 1987-04-12 08:13:38 wesommer Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
@@ -9,6 +9,9 @@
  *	ss library for the command interpreter.
  *
  *      $Log: not supported by cvs2svn $
+ * Revision 1.29  87/04/08  03:54:00  wesommer
+ * Added new-user setup hooks.
+ * 
  * Revision 1.28  87/03/22  04:33:23  spook
  * *** empty log message ***
  * 
@@ -99,7 +102,7 @@
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.29 1987-04-08 03:54:00 wesommer Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.30 1987-04-12 08:13:38 wesommer Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -154,6 +157,7 @@ main(argc, argv)
 	int code;
 	char *initial_meeting = (char *)NULL;
 	char *subsystem_name = "discuss";
+	char *argv0 = argv[0];
 	char *initial_request = (char *)NULL;
 	bool quit = FALSE;	/* quit after processing request */
 	bool flame = FALSE;	/* Have we flamed them for multiple  */
@@ -203,7 +207,7 @@ main(argc, argv)
 			fprintf(stderr, "Unknown control argument %s\n",
 				*argv);
 			fprintf(stderr, "Usage: %s [ -prompt name ] [ -request name ] [ -quit ]\n\t\t[ -editor editor_path ] [ -no_editor ]\n",
-				*argv);
+				argv0);
 			exit(1);
 		}
 		else {
