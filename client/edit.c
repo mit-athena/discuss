@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/edit.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/edit.c,v 1.6 1988-02-07 23:09:48 balamac Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/edit.c,v 1.7 1988-04-03 21:55:11 srz Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board.
@@ -8,6 +8,9 @@
  *	Utility routines.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.6  88/02/07  23:09:48  balamac
+ * Added Fend options to the type-in prompter
+ * 
  * Revision 1.5  86/12/14  12:02:53  spook
  * Fixed -editor/-no_editor so that it doesn't break other things..
  * 
@@ -52,7 +55,7 @@
  */
 
 #ifndef lint
-static char *rcsid_discuss_utils_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/edit.c,v 1.6 1988-02-07 23:09:48 balamac Exp $";
+static char *rcsid_discuss_utils_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/edit.c,v 1.7 1988-04-03 21:55:11 srz Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -125,7 +128,7 @@ edit(fn, edit_path)
 		ftruncate(fileno(the_file), 0);
 		printf("Enter transaction; end with ^D or '.' on a line by itself.\n");
 		for (;;) {
-			if ((gets(buffer) == NULL) || !strcmp(buffer, ".")) break;
+			if ((gets(buffer) == NULL) || interrupt || !strcmp(buffer, ".")) break;
 			else if (!strcmp(buffer,"\\f")) {
 				editor_path_2 = editor_path_e;
 				break;
