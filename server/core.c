@@ -11,7 +11,7 @@
 /*
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.23 1988-10-08 01:27:54 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.24 1989-01-04 23:32:51 raeburn Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
@@ -21,6 +21,9 @@
  *		callable routines.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.23  88/10/08  01:27:54  srz
+ * Changes for new expunge.
+ * 
  * Revision 1.22  88/09/23  17:15:21  raeburn
  * Needs internal.h too.
  * 
@@ -62,26 +65,27 @@
  *
  */
 #ifndef lint
-static char *rcsid_core_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.23 1988-10-08 01:27:54 srz Exp $";
+static char rcsid_core_c[] =
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.24 1989-01-04 23:32:51 raeburn Exp $";
 #endif lint
 
 
 /* Derived from CORE.PAS 06/21/86 by SRZ */
 
-#include "../include/types.h"
-#include "../include/dsc_et.h"
-#include "../include/interface.h"
+#include <discuss/types.h>
+#include <discuss/dsc_et.h>
+#include <discuss/interface.h>
 #include "mtg.h"
-#include "../include/tfile.h"
-#include "../include/atom.h"
-#include "../include/acl.h"
-#include "../include/internal.h"
+#include <discuss/tfile.h>
+#include "atom.h"
+#include <discuss/acl.h>
+#include "internal.h"
 #include <errno.h>
 #include <sys/file.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/param.h>
-#include <strings.h>
+#include <string.h>
 
 #define min(a, b) (a < b ? a : b)
 #define NULL 0
