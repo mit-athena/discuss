@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.14 1988-10-08 03:28:49 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.15 1988-10-13 01:26:29 discuss Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
@@ -11,6 +11,9 @@
  *		  in-memory superblock, and to open & close meetings.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.14  88/10/08  03:28:49  srz
+ * Attempt at fixing Zephyr (doesn't work).
+ * 
  * Revision 1.13  88/10/08  01:28:26  srz
  * Changes for new expunge.  Fix to Zephyr stuff.
  * 
@@ -61,7 +64,7 @@
 const
 #endif
 static char rcsid_coreutil_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.14 1988-10-08 03:28:49 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.15 1988-10-13 01:26:29 discuss Exp $";
 #endif /* lint */
 
 #include "../include/types.h"
@@ -646,7 +649,7 @@ mtg_znotify(mtg_name, subject, author)
 			break;
 	}
 	if (n) {
-		notice.z_recipient = "*";
+		notice.z_recipient = "";
 		/* We really don't care if it gets through... */
 		code = ZSendList(&notice,msglst,4,ZNOAUTH);
 		return;
