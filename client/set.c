@@ -2,7 +2,7 @@
  *
  * set request for Discuss
  *
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/set.c,v 1.3 1989-01-29 17:08:26 srz Exp $
+ * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/set.c,v 1.4 1989-02-23 23:29:23 srz Exp $
  * $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/set.c,v $
  * $Locker:  $
  *
@@ -12,20 +12,18 @@
 
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/set.c,v 1.3 1989-01-29 17:08:26 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/set.c,v 1.4 1989-02-23 23:29:23 srz Exp $";
 #endif /* lint */
 
 #include <stdio.h>
 #include <string.h>
 
 int set_seen();
-int set_flag();
 
 static struct set_req {
      char *name;				/* Name of request */
      int (*routine)();				/* Routine to call */
-} sr[] = {"seen", set_seen,
-	  "flag", set_flag};
+} sr[] = {"seen", set_seen};
 
 #define NUM_SET_REQUESTS (sizeof (sr) / sizeof (struct set_req))
 
