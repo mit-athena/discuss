@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.6 1987-03-17 02:24:10 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.7 1987-03-25 15:04:31 srz Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
@@ -11,6 +11,11 @@
  *		  in-memory superblock, and to open & close meetings.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.6  87/03/17  02:24:10  srz
+ * Added expunging.  An ACL change will require meeting to be reopened, in
+ * case an expunge is taking place.  Also added has_privs, which allows
+ * wheel access for programs that are linked in.
+ * 
  * Revision 1.5  87/03/11  18:00:27  srz
  * Made sure that write's were error checked.
  * 
@@ -29,7 +34,7 @@
  */
 
 #ifndef lint
-static char *rcsid_coreutil_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.6 1987-03-17 02:24:10 srz Exp $";
+static char *rcsid_coreutil_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.7 1987-03-25 15:04:31 srz Exp $";
 #endif lint
 
 #include "../include/types.h"
@@ -506,21 +511,20 @@ bool has_mtg_access(mode)
 char mode;
 {
      char *test_modes;
+     char mode_str[3];
 
      if (has_privs)				/* linked in stuff */
 	  return (TRUE);		
 
      switch (mode) {
      case 'w':
-	  test_modes = "w";
-	  break;
-
      case 'a':
-	  test_modes = "a";
-	  break;
-
+     case 'r':
      case 's':
-	  test_modes = "s";
+     case 'o':
+	  mode_str[0] = mode;
+	  mode_str[1] = '\0';
+	  test_modes = mode_str;
 	  break;
 
      case 'c':
