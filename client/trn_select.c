@@ -1,6 +1,6 @@
 /*
  *
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/trn_select.c,v 1.7 1986-12-07 00:40:13 rfrench Exp $
+ * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/trn_select.c,v 1.8 1987-01-18 22:40:37 spook Exp $
  * $Locker:  $
  *
  */
@@ -77,6 +77,7 @@ sl_map(func, list)
 	register selection_list *p;
 	register int i, result;
 
+	flag_interrupts();
 	for (p = list; p; p = p->next) {
 		for (i = p->low; i <= p->high; i++) {
 			if (i == 0)
@@ -84,8 +85,12 @@ sl_map(func, list)
 			if ((result = func(i))) {
 				return(result);
 			}
+			if (interrupt)
+				goto exit;
 		}
 	}
+ exit:
+	dont_flag_interrupts();
 	return(0);
 }
 
