@@ -1,60 +1,16 @@
 /*
- *
  *	Print-related requests for DISCUSS.
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.14 1987-04-12 00:08:47 spook Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.15 1987-07-17 00:39:37 spook Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
- *
- *      $Log: not supported by cvs2svn $
- * Revision 1.13  87/04/08  03:54:20  wesommer
- * added "next","prev","[np]ref" commands.
- * 
- * Revision 1.12  87/03/22  04:41:25  spook
- * Changes for new interfaces.
- * 
- * Revision 1.11  86/12/07  16:05:09  rfrench
- * Globalized sci_idx
- * 
- * Revision 1.10  86/12/07  00:39:33  rfrench
- * Killed ../include
- * 
- * Revision 1.9  86/11/20  10:27:54  srz
- * Fixed bug dealing with current
- * 
- * Revision 1.8  86/11/11  16:33:21  spook
- * Fixed to work with changes in et stuff
- * 
- * Revision 1.7  86/10/29  10:28:59  srz
- * Fixed current handling, etc.
- * 
- * Revision 1.6  86/10/19  10:00:17  spook
- * Changed to use dsc_ routines; eliminate refs to rpc.
- * 
- * Revision 1.5  86/10/15  00:50:23  spook
- * switch to use ss_pager_create
- * 
- * Revision 1.4  86/10/15  00:18:26  spook
- * Added trn list parsing to print and write requests.
- * 
- * Revision 1.3  86/09/10  18:57:35  wesommer
- * Made to work with kerberos; meeting names are now longer.
- * ./
- * 
- * Revision 1.2  86/09/10  17:43:16  wesommer
- * Ken, please clean up after yourself.
- * 
- * Revision 1.1  86/08/22  00:24:01  spook
- * Initial revision
- * 
- * 
  */
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.14 1987-04-12 00:08:47 spook Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.15 1987-07-17 00:39:37 spook Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -68,6 +24,7 @@ static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athe
 #include "interface.h"
 #include "config.h"
 #include "dsc_et.h"
+#include "discuss_err.h"
 #include "globals.h"
 
 #ifdef	lint
@@ -132,14 +89,14 @@ prt_trans(argc, argv)
 	}
 
 	if (!dsc_public.attending) {
-		(void) fprintf(stderr, "No current meeting.\n");
-		return;
+	     ss_perror(sci_idx, DISC_NO_MTG, (char *)NULL);
+	     return;
 	}
 	dsc_get_mtg_info(&dsc_public.nb,
 			 &dsc_public.m_info, &code);
 	if (code != 0) {
-		(void) ss_perror(sci_idx, code, "Can't get meeting info");
-		return;
+	     (void) ss_perror(sci_idx, code, "Can't get meeting info");
+	     return;
 	}
 
 	dsc_get_trn_info(&dsc_public.nb, dsc_public.current,
@@ -198,9 +155,8 @@ prt_trans(argc, argv)
 	old_sig = signal(SIGPIPE, SIG_IGN);
 	fd = ss_pager_create();
 	if (fd < 0) {
-		fprintf(stderr, "%s: Can't start pager: %s\n",
-			request_name, error_message(errno));
-		return;
+	     ss_perror(sci_idx, errno, "Can't start pager");
+	     return;
 	}
 	tf = unix_tfile(fd);
 	(void) sl_map(display_trans, trn_list);
@@ -210,7 +166,7 @@ prt_trans(argc, argv)
 	(void) wait((union wait *)0);
 	(void) signal(SIGPIPE, old_sig);
 	if (!performed)
-		(void) fprintf(stderr, "print: No transactions selected\n");
+	     ss_perror(sci_idx, DISC_NO_TRN, "");
 }
 
 write_trans(argc, argv)
@@ -220,10 +176,11 @@ write_trans(argc, argv)
 	selection_list *trn_list;
 	int fd;
 	int code;
+	char *arg, *filename;
 
 	if (dsc_public.host == (char *)NULL) {
-		(void) fprintf(stderr, "No current meeting.\n");
-		return;
+	     ss_perror(sci_idx, DISC_NO_MTG, "");
+	     return;
 	}
 	dsc_get_mtg_info(&dsc_public.nb,
 			 &dsc_public.m_info, &code);
@@ -231,22 +188,29 @@ write_trans(argc, argv)
 		(void) ss_perror(sci_idx, code, "Can't get meeting info");
 		return;
 	}
-	if (argc != 3) {
-		(void) fprintf(stderr,
-			       "Usage:  %s transaction_list filename\n",
-			       argv[0]);
-		return;
+	if (argc == 3) {
+	     arg = argv[1];
+	     filename = argv[2];
 	}
-	trn_list = trn_select(&t_info, argv[1], (selection_list *)NULL,
-			      &code);
+	else if (argc == 2) {
+	     arg = "current";
+	     filename = argv[1];
+	}
+	else {
+	     (void) fprintf(stderr,
+			    "Usage:  %s transaction_list filename\n",
+			    argv[0]);
+	     return;
+	}
+	trn_list = trn_select(&t_info, arg, (selection_list *)NULL, &code);
 	if (code) {
-		ss_perror(sci_idx, code, argv[1]);
+		ss_perror(sci_idx, code, arg);
 		sl_free(trn_list);
 		return;
 	}
 	performed = FALSE;
 
-	fd = open(argv[2], O_CREAT|O_APPEND|O_WRONLY, 0666);
+	fd = open(filename, O_CREAT|O_APPEND|O_WRONLY, 0666);
 	if (fd < 0) {
 		ss_perror(sci_idx, errno, "Can't open output file");
 		return;
@@ -257,6 +221,6 @@ write_trans(argc, argv)
 	(void) close(fd);
 	(void) tdestroy(tf);
 	if (!performed)
-		(void) fprintf(stderr, "print: No transactions selected\n");
+	     ss_perror(sci_idx, DISC_NO_TRN, "");
 	return;
 }
