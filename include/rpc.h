@@ -40,6 +40,7 @@ struct proc_table {
 #define PROC_BASE 400
 #define TFILE_BLK 500
 #define KRB_TICKET 501
+#define UNKNOWN_CALL 502
 
 extern int rpc_err;
 
