@@ -23,7 +23,8 @@ struct proc_table {
 #define DELETE_TRN 3
 #define RETRIEVE_TRN 4
 #define CREATE_MTG 5
-#define GET_MTG_INFO 6
+#define OLD_GET_MTG_INFO 6
+#define GET_MTG_INFO 12
 #define START_MTG_INFO 7
 #define NEXT_MTG_INFO 8
 #define GET_TRN 9
