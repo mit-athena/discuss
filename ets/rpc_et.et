@@ -27,4 +27,13 @@
 	ec	RPC_UNIMPL_CALL,
 		"Remote procedure call not implemented"
 		
+	ec	RPC_NS_TIMEOUT,
+		"Nameserver timeout"
+
+	ec	RPC_NS_ERROR,
+		"Name service error"
+
+	ec	RPC_NO_ADDR,
+		"Host has no network address"
+
 	end
