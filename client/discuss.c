@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.43 1988-07-24 14:17:48 raeburn Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.44 1988-12-02 23:56:26 srz Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
@@ -12,7 +12,7 @@
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.43 1988-07-24 14:17:48 raeburn Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.44 1988-12-02 23:56:26 srz Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -128,9 +128,16 @@ main(argc, argv)
 	}
 
 	{
-		register char *user = getpwuid(getuid())->pw_name;
+		char *user;
+		struct passwd *user_pw = getpwuid(getuid());
 		register char *realm = local_realm();
+		
 
+		if (user_pw == NULL) {
+		     fprintf(stderr, "You do not appear /etc/passwd.  Cannot continue.\n");
+		     exit(1);
+		}
+		user = user_pw -> pw_name;
 		user_id = malloc((unsigned)(strlen(user)+strlen(realm)+2));
 		strcpy(user_id, user);
 		strcat(user_id, "@");
