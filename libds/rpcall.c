@@ -44,9 +44,11 @@ int rpc_err;
 
 /* argument list info */
 static int procno;				/* procedure number */
+static char *myhostname = NULL;
 
 /* connections & socket info */
 static USPStream *us = NULL;
+static USPStream *childus = NULL;
 
 /*
  *
@@ -162,35 +164,29 @@ char *dest;
  */
 init_rpc ()
 {
-#ifdef SUBPROC
-     int parent,sv[2],i;
-#endif
+     char kern_host[100];
+     struct hostent *hp;
 
      init_rpc_err_tbl();
      init_usp_err_tbl();
-#ifdef SUBPROC
-     if (socketpair(AF_UNIX,SOCK_STREAM,0,sv) < 0)
-          panic ("can't do socket pair");
-
-     parent = fork ();
-     if (parent < 0)
-          panic ("Can't fork");
-     if (!parent) {				/* child's play */
-	  dup2(sv[1],0);		     	/* child takes second one */
-
-	  for (i = 3; i < 20; i++)
-	       (void) close (i);
-	  execl(SERVER, SERVER_NAME, 0);
-	  panic ("Can't exec");
-     } else {
-	  (void) close (sv[1]);
-	  us = USP_associate (sv[0]);
-     }
-#endif
 
 #ifdef KERBEROS
      init_krb_err_tbl();
 #endif
+
+     /* get our canonical name (sigh!) */
+     if (myhostname != NULL)
+	  return;				/* we have it already, bye. */
+
+     gethostname(kern_host, 100);
+     hp = gethostbyname(kern_host);
+     if (hp == NULL) {
+	  perror("Unable to resolve own host name\n");
+	  return;
+     }
+
+     myhostname = malloc (strlen (hp -> h_name));
+     strcpy (myhostname, hp -> h_name);
 }
 
 /*
@@ -200,7 +196,8 @@ init_rpc ()
  */
 term_rpc()
 {
-     USP_close_connection(us);
+     if (us != NULL)
+	  USP_close_connection(us);
      return;
 }
 
@@ -212,7 +209,8 @@ term_rpc()
 close_rpc(rc)
 rpc_conversation rc;
 {
-     USP_close_connection(rc);
+     if (rc != childus)				/* don't close down child */
+	  USP_close_connection(rc);
      us = NULL;
      return;
 }
@@ -238,28 +236,77 @@ rpc_conversation open_rpc (host, serv, code)
 char *host, *serv;
 int *code;
 {
-#ifndef SUBPROC
 #ifdef KERBEROS
      char krb_realm[REALM_SZ];
      KTEXT_ST ticket;
-     int rem,i;
+     int rem;
      char phost[MAX_HSTNM];	/* principal hostname, for Kerberos only */
 #endif
+#ifdef SUBPROC
+     int parent,sv[2];
+#endif
      rpc_conversation conv;
+     struct hostent *hp;
+     int i;
 
      *code = 0;
+     if (myhostname == NULL) {				/* not initialized */
+	  *code = RPC_NOT_INIT;
+	  return(NULL);
+     }
+
+     hp = gethostbyname(host);
+     if (hp == NULL) {
+	  *code = RPC_HOST_UNKNOWN;
+	  return(NULL);
+     }
+
+
+#ifdef SUBPROC
+     if (!namcmp(hp -> h_name, myhostname)) {
+	  if (childus != NULL) {		/* have child, we reuse it */
+	       us = childus;
+	       return(childus);
+	  }
+
+	  if (socketpair(AF_UNIX,SOCK_STREAM,0,sv) < 0)
+	       panic ("can't do socket pair");
+	  
+	  parent = fork ();
+	  if (parent < 0)
+	       panic ("Can't fork");
+	  if (!parent) {				/* child's play */
+	       dup2(sv[1],0);		     	/* child takes second one */
+	       
+	       for (i = 3; i < 20; i++)
+		    (void) close (i);
+	       execl(SERVER, SERVER_NAME, 0);
+	       panic ("Can't exec");
+	  } else {
+	       (void) close (sv[1]);
+	       childus = USP_associate (sv[0]);
+	       us = childus;
+	       return(us);
+	  }
+     }
+#endif
+
+#ifndef CONNECT
+     *code = RPC_HOST_UNKNOWN;
+     return(NULL);
+#else
      if ((conv = USP_make_connection (host, serv)) == NULL) {
 	  if (errno == 0)
 	       *code = RPC_SERV_UNKNOWN;		/* sigh */
 	  else 
 	       *code = errno;
-	  return(0);
+	  return(NULL);
      }
 
      us = conv;
 
 #ifdef KERBEROS
-     ExpandHost(host, phost, krb_realm);
+     ExpandHost(hp, phost, krb_realm);
      if (rem == KSUCCESS)
 	  rem = mk_ap_req (&ticket, serv, phost, krb_realm, (u_long)0);
      if (rem == KSUCCESS) {			/* send ticket */
@@ -277,7 +324,6 @@ int *code;
 	  *code = rem + krb_err_base;
      }
 #endif
-
      return(conv);
 #endif
 }
@@ -439,8 +485,9 @@ char *str;
  */
 
 
-ExpandHost( alias, krb_host, krb_realm )
-	char *alias,*krb_host,*krb_realm;
+ExpandHost( hp, krb_host, krb_realm )
+        struct hostent *hp;
+	char *krb_host,*krb_realm;
 
 {
 	struct hostent *h;
@@ -457,10 +504,7 @@ ExpandHost( alias, krb_host, krb_realm )
 	 * give the command "menel echo foo" and we will resolve it to "menelaus".
 	 */
 	*krb_realm = '\0';		/* null for now */
-	if ( (h=gethostbyname(alias)) != (struct hostent *)NULL )
-	     sp = h -> h_name;
-	else
-	     sp = alias;
+	sp = hp -> h_name;
 
 	p = index( sp, '.' );
 	if (p) {
@@ -488,3 +532,30 @@ ExpandHost( alias, krb_host, krb_realm )
 	return;
 }
 #endif
+
+int namcmp(str1, str2)
+register char *str1, *str2;
+{
+     register char c1,c2;
+
+     while (*str1 && *str2) {
+	  if (*str1 == *str2) {
+	       *str1++,*str2++;
+	       continue;
+	  } else if (isalpha (*str1)) {
+	       c1 = *str1++;
+	       c2 = *str2++;
+	       if (islower (c1))
+		    c1 = toupper (c1);
+	       if (islower (c2))
+		    c2 = toupper (c2);
+	       if (c1 == c2)
+		    continue;
+	       return(1);
+	  } else
+	       return (1);
+     }
+
+     return (*str1 || *str2);
+}
+
