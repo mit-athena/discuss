@@ -9,11 +9,14 @@
 /*
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/rpproc.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/rpproc.c,v 1.7 1989-01-29 13:38:23 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/rpproc.c,v 1.8 1989-01-29 17:16:57 srz Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.7  89/01/29  13:38:23  srz
+ * Ken's changes.
+ * 
  * Revision 1.6  88/10/08  01:41:53  raeburn
  * Ensured that /dev/null file descriptor really is 1.
  * 
@@ -64,11 +67,16 @@
 
 /* global */
 char rpc_caller[50];
+static long hostaddr;
 
 extern int numprocs;
 extern struct proc_table procs [];
 extern char *malloc();
 extern int errno;
+#ifdef KERBEROS
+static char serv_name[20];
+extern int krb_err_base;
+#endif KERBEROS
 short recvshort();
 int rpc_err;
 extern tfile net_tfile ();
@@ -111,11 +119,6 @@ init_rpc (service,code)
     int fromlen,i;
     struct sockaddr_in from;
     char hostname[50];
-    long hostaddr;
-    char filename[50];
-    char instance[INST_SZ];
-    AUTH_DAT kdata;
-    KTEXT_ST ticket;
     struct hostent *hp;
     USPCardinal bt;
 #endif	  
@@ -212,6 +215,8 @@ init_rpc (service,code)
     strcat (rpc_caller, REALM);
     
 #ifdef KERBEROS
+
+    strcpy(serv_name, service);
     fromlen = sizeof (from);
     if (getpeername (snew, &from, &fromlen) < 0) {
 	*code = errno;
@@ -225,14 +230,38 @@ init_rpc (service,code)
 	bcopy(&from.sin_addr, &hostaddr, 4);
     }
     
-    if ((USP_rcv_blk(us, &bt) != SUCCESS) || bt != KRB_TICKET) {
+    if ((USP_rcv_blk(us, &bt) != SUCCESS) || (bt != KRB_TICKET &&
+					      bt != KRB_TICKET2)) {
 	*code = RPC_PROTOCOL;
 	return;
     }
     
+    handle_kerberos(bt,serv_name,hostaddr);
+#endif
+    *code = 0;
+    return;
+}
+
+#ifdef KERBEROS
+handle_kerberos(bt,service,haddr)
+USPCardinal bt;
+char *service;
+long haddr;
+{
+    int i,result;
+    char hostname[50];
+    char filename[50];
+    char instance[INST_SZ];
+    AUTH_DAT kdata;
+    KTEXT_ST ticket;
+
+    strcpy (rpc_caller, "???@");		/* safety drop */
+    strcat (rpc_caller, REALM);
+
     /* read authenticator off net */
     ticket.length = recvshort();
     if ((ticket.length<=0) || (ticket.length>MAX_KTXT_LEN)) {
+	result = RPC_PROTOCOL;
 	goto punt_kerberos;
     }
     for (i=0; i<ticket.length; i++) {
@@ -245,8 +274,8 @@ init_rpc (service,code)
     strcat (filename, "/srvtab");
     
     strcpy(instance,"*");
-    i = krb_rd_req (&ticket, service, instance, hostaddr, &kdata,filename);
-    if (i == 0) {
+    result = krb_rd_req (&ticket, service, instance, haddr, &kdata, filename);
+    if (result == 0) {
 	strcpy(rpc_caller, kdata.pname);
 	if (kdata.pinst[0] != '\0') {
 	    strcat(rpc_caller, ".");
@@ -256,14 +285,18 @@ init_rpc (service,code)
 	strcat(rpc_caller, kdata.prealm);
     }
     else {
+	result += krb_err_base;
 	goto punt_kerberos;
     }
 punt_kerberos:
     USP_flush_block(us);
-#endif
-    *code = 0;
-    return;
+    if (bt == KRB_TICKET2) {
+	 USP_begin_block(us,TICKET_REPLY);
+	 USP_put_long_integer(us, i);
+	 USP_end_block(us);
+    }
 }
+#endif KERBEROS
 
 /*
  *
@@ -283,6 +316,14 @@ recvit (code)
 	*code = errno;
 	return;
     }
+
+#ifdef KERBEROS
+    if (bt == KRB_TICKET || bt == KRB_TICKET2) {
+	 handle_kerberos(bt, serv_name, hostaddr);
+	 *code = 0;
+	 return;
+    }
+#endif KERBEROS
 
     procno = bt - PROC_BASE;
 
