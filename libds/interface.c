@@ -1,10 +1,13 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.5 1986-11-22 03:34:52 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.6 1987-01-09 20:51:00 srz Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.5  86/11/22  03:34:52  wesommer
+ * Corrected argument mismatch on get_access() call.
+ * 
  * Revision 1.4  86/11/16  06:09:04  wesommer
  * Added dsc_get_acl, dsc_get_access, dsc_set_access, and dsc_delete_access.
  * 
@@ -14,28 +17,20 @@
  */
 
 #ifndef lint
-static char *rcsid_interface_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.5 1986-11-22 03:34:52 wesommer Exp $";
+static char *rcsid_interface_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.6 1987-01-09 20:51:00 srz Exp $";
 #endif lint
 
 #include <stdio.h>
-#include "../include/rpc.h"
 #include "../include/tfile.h"
 #include "../include/interface.h"
 #include "../include/acl.h"
-
-typedef struct _connection{
-	struct _connection *next;
-	struct _connection *prev;
-	char *hostname;
-	rpc_conversation rc;
-} connection;
 
 typedef struct _meeting {
 	struct _meeting *next;
 	struct _meeting *prev;
 	char *unique_id;
 	char *name;
-	connection *cn;
+	char *module;
 } meeting;
 
 extern char *malloc();
@@ -44,7 +39,6 @@ extern char *new_string();
 static int initialized = 0;
 static meeting *meeting_list = (meeting *)NULL;
 meeting *cmtg = (meeting *) NULL;
-static connection *conn_list = (connection *) NULL;
 #define	mtg_name (cmtg->name)
 
 #define	FREE(ptr) { if (ptr) free(ptr); }
@@ -57,8 +51,8 @@ select_meeting(mtg_uid, code_ptr)
 	char *host, *path;
 	char *current_host;
 	register meeting *mp;
-	register connection *cp;
 	extern int errno;
+	int is_fatal;
 
 	*code_ptr = 0;
 	if (!initialized) {
@@ -78,40 +72,18 @@ select_meeting(mtg_uid, code_ptr)
 		get_mtg_location(mtg_uid, &host, &path, code_ptr);
 		if (*code_ptr) return;
 
-		if (!(mp = (meeting *)malloc(sizeof(meeting)))) {
-			*code_ptr = errno;
+		if (!(mp = (meeting *)malloc(sizeof (meeting)))) {
+		        *code_ptr = errno;
 			return;
 		}
 
-		/* find the conversation, if any.. */
-		for (cp = conn_list; cp; cp=cp->next) {
-			if (!strcmp(cp->hostname, host)) {
-				mp->cn = cp;
-				break;
-			}
-		}
-		if(!cp) {
-			if (!(cp = (connection *)malloc(sizeof(connection)))) {
-				FREE(mp);
-				*code_ptr = errno;
-				return;
-			}
-			if(!(cp->rc = open_rpc(host, "discuss", code_ptr))) {
-				FREE(mp);
-				FREE(cp);
-				return;
-			}
-			cp->hostname = new_string(host);
-			cp->prev = NULL;
-			cp->next = conn_list;
-			if (conn_list) conn_list->prev = cp;
-			conn_list = cp;
-		} else {
-			/* XXX warp cp to head of list */
-		}
-		mp->unique_id = new_string(mtg_uid);
+		mp -> module = malloc (strlen (host) + 9);
+		strcpy (mp -> module , "discuss@");
+		strcpy (&(mp -> module [8]), host);
+		FREE(host);
+
+ 		mp->unique_id = new_string(mtg_uid);
 		mp->name = path;
-		mp->cn = cp;
 		/* link 'em up.. */
 		mp->next = meeting_list;
 		mp->prev = NULL;
@@ -121,9 +93,12 @@ select_meeting(mtg_uid, code_ptr)
 	} else {
 		/*XXX should move mp to head of list.. but not yet */
 	}
-	set_rpc(mp->cn->rc);
-	/* XXX Should sanity check that "rc" is a valid connection.. */
+	set_module (mp->module, &is_fatal, code_ptr);
 	cmtg = mp;
+	if (*code_ptr && !is_fatal) {
+	     fprintf (stderr, "Warning: %s\n", error_message(*code_ptr));
+	     *code_ptr = 0;
+	}
 }
 
 dsc_add_trn(mtg_uid, text, subject, reply_trn, result_trn, code_ptr)
