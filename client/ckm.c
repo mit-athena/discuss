@@ -1,15 +1,18 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v 1.2 1987-04-08 03:53:42 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v 1.3 1987-04-08 08:32:13 wesommer Exp $
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.2  87/04/08  03:53:42  wesommer
+ * Fixed error message.
+ * 
  * Revision 1.1  87/03/24  14:11:09  spook
  * Initial revision
  * 
  */
 
 #ifndef lint
-static char *rcsid_ckm_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v 1.2 1987-04-08 03:53:42 wesommer Exp $";
+static char *rcsid_ckm_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v 1.3 1987-04-08 08:32:13 wesommer Exp $";
 #endif lint
 
 #include <strings.h>
@@ -89,7 +92,6 @@ do_mtg(mtg_name)
 		}
 	}
 	dsc_update_mtg_set(user_id, set, n_matches, &code);
-	/* XXX storage leak?? */
 	return(0);
 }
 
@@ -124,9 +126,9 @@ check_meetings (argc, argv)
 		if (!used[i])
 			do_mtg(argv[i]);
 	}
-	if (print_header) {
-		fprintf(stderr, "ckm: No changed meetings\n");
-	}
+	if (print_header)
+		ss_perror(sci_idx, 0, "No changed meetings");
+
 	free((char *)used);
 }
 
