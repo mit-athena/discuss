@@ -1,12 +1,12 @@
 #
-# $Id: Imakefile,v 1.4 1996-05-28 03:49:36 ghudson Exp $
+# $Id: Imakefile,v 1.5 1996-09-08 20:25:11 ghudson Exp $
 #
 
-do_subdirs_imakefile(ets include utils libds lib server client mclient edsc dsgrep)
+do_subdirs_imakefile(ets include usp libds lib server client mclient edsc dsgrep)
 
-foreach_subdirs_flags(all,ets include utils libds lib server client mclient edsc dsgrep,FLAGS="$(FLAGS)" $(FLAGS) DEFINES="-I../include -DUSPRPC -DZEPHYR $(CADDS)" LDDEFS="-L../lib -L$(ATHLIBDIR)")
-foreach_subdirs_flags(clean,ets include utils libds lib server client mclient edsc dsgrep,FLAGS="$(FLAGS)" $(FLAGS))
-foreach_subdirs_flags(depend,ets include utils libds lib server client mclient edsc dsgrep,FLAGS="$(FLAGS)" $(FLAGS) DEFINES="-I../include -DUSPRPC -DZEPHYR $(CADDS)")
-foreach_subdirs_flags(install,include utils libds server client mclient edsc dsgrep,FLAGS="$(FLAGS)" $(FLAGS))
+foreach_subdirs_flags(all,ets include usp libds lib server client mclient edsc dsgrep,FLAGS="$(FLAGS)" $(FLAGS) DEFINES="-I../include -DUSPRPC -DZEPHYR $$(CADDS)" LDDEFS="-L../lib -L$(ATHLIBDIR)")
+foreach_subdirs_flags(clean,ets include usp libds lib server client mclient edsc dsgrep,FLAGS="$(FLAGS)" $(FLAGS))
+foreach_subdirs_flags(depend,ets include usp libds lib server client mclient edsc dsgrep,FLAGS="$(FLAGS)" $(FLAGS) DEFINES="-I../include -DUSPRPC -DZEPHYR $$(CADDS)")
+foreach_subdirs_flags(install,include usp libds server client mclient edsc dsgrep,FLAGS="$(FLAGS)" $(FLAGS))
 
 install_man(discuss.1,discuss.1)
