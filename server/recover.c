@@ -314,7 +314,7 @@ static
 save_trn (position)
 int position;
 {
-     char *th_subject, *th_author;
+     char *th_subject, *th_author, *th_signature;
      tfile tf;
      int tfs,tocopy;
      trn_nums result_trn;
@@ -330,6 +330,11 @@ int position;
      th_author = malloc (th.author_len);
      lseek (trnf, th.author_addr, 0);
      read (trnf, th_author, th.author_len);
+
+     th_signature = NULL;
+     if (strlen (th_author) + 1 != th.author_len) {
+	  th_signature = th_author + strlen(th_author) + 1;
+     }
 
      /* start temp file */
      ftruncate(tempf,0);
@@ -348,7 +353,7 @@ int position;
 
      tf = unix_tfile (tempf);
 
-     add_trn_priv (location, tf, th_subject, th.orig_pref, th.current, th_author, th.date_entered, &result_trn, &result);
+     add_trn_priv (location, tf, th_subject, th_signature, th.orig_pref, th.current, th_author, th.date_entered, 0, &result_trn, &result);
      if (result != 0) {
 	  fprintf (stderr, "Couldn't add transaction %d; %s", th.current, error_message(result));
 	  exit(1);
@@ -360,8 +365,6 @@ int position;
      printf ("Added transaction %d\n", th.current);
      return;
 }
-
-
 
 /*
  *
