@@ -3,12 +3,15 @@
  *	Print-related requests for DISCUSS.
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.7 1986-10-29 10:28:59 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.8 1986-11-11 16:33:21 spook Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
  *
  *      $Log: not supported by cvs2svn $
+ * Revision 1.7  86/10/29  10:28:59  srz
+ * Fixed current handling, etc.
+ * 
  * Revision 1.6  86/10/19  10:00:17  spook
  * Changed to use dsc_ routines; eliminate refs to rpc.
  * 
@@ -33,7 +36,7 @@
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.7 1986-10-29 10:28:59 srz Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.8 1986-11-11 16:33:21 spook Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -63,11 +66,11 @@ static char *	request_name;
 static trn_info	t_info;
 static tfile	tf;
 
-static error_code
+static int
 display_trans(trn_no)
 	int trn_no;
 {
-	error_code code;
+	int code;
 	output_trans(trn_no, tf, &code);
 	if (code == 0) {
 	     dsc_public.highest_seen = max(dsc_public.highest_seen,trn_no);
@@ -94,7 +97,7 @@ prt_trans(sci_idx, argc, argv)
 	int txn_no;
 	int fd;
 	int (*old_sig)();
-	error_code code;
+	int code;
 	selection_list *trn_list;
 
 	request_name = ss_name(sci_idx);
@@ -112,10 +115,10 @@ prt_trans(sci_idx, argc, argv)
 	if (code)
 		t_info.current = 0;
 	else {
-	     free(t_info.subject);			/* don't need these */
-	     t_info.subject = NULL;
-	     free(t_info.author);
-	     t_info.author = NULL;
+		free(t_info.subject); /* don't need these */
+		t_info.subject = NULL;
+		free(t_info.author);
+		t_info.author = NULL;
 	}
 
 	if (argc == 1) {
@@ -157,7 +160,7 @@ prt_trans(sci_idx, argc, argv)
 	fd = ss_pager_create();
 	if (fd < 0) {
 		fprintf(stderr, "%s: Can't start pager: %s\n",
-			request_name, error_message(ERRNO));
+			request_name, error_message(errno));
 		return;
 	}
 	tf = unix_tfile(fd);

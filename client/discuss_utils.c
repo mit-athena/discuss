@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss_utils.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss_utils.c,v 1.8 1986-10-27 16:48:15 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss_utils.c,v 1.9 1986-11-11 16:32:44 spook Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board.
@@ -8,6 +8,9 @@
  *	Utility routines.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.8  86/10/27  16:48:15  wesommer
+ * Added form-feeds after each transaction.
+ * 
  * Revision 1.7  86/10/27  16:29:04  wesommer
  * Damnit, folks, use RCS.  
  * 
@@ -28,7 +31,7 @@
  */
 
 #ifndef lint
-static char *rcsid_discuss_utils_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss_utils.c,v 1.8 1986-10-27 16:48:15 wesommer Exp $";
+static char *rcsid_discuss_utils_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss_utils.c,v 1.9 1986-11-11 16:32:44 spook Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -112,7 +115,7 @@ output_trans(txn_no, tf, code)
  *	value DEFAULT_EDITOR) on the specified file.
  */
 
-error_code
+int
 edit(fn)
 	char *fn;
 {

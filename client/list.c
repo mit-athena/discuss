@@ -2,13 +2,17 @@
  *
  * List request for DISCUSS
  *
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.7 1986-10-29 10:26:34 srz Exp $
+ * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.8 1986-11-11 16:33:09 spook Exp $
  * $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v $
  * $Locker:  $
  *
  * Copyright (C) 1986 by the MIT Student Information Processing Board
  *
  * $Log: not supported by cvs2svn $
+ * Revision 1.7  86/10/29  10:26:34  srz
+ * Made generic map_trans, added retrieve and delete.
+ * Fixed bugs in current handling, etc.
+ * 
  * Revision 1.6  86/10/19  10:00:05  spook
  * Changed to use dsc_ routines; eliminate refs to rpc.
  * 
@@ -55,7 +59,7 @@ list_it(i)
 {
 	char newtime[26];
 	char *cp;
-	error_code code;
+	int code;
 
 	dsc_get_trn_info(dsc_public.mtg_uid, i, &t_info, &code);
 	if (code == DELETED_TRN) {

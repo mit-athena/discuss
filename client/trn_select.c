@@ -1,6 +1,6 @@
 /*
  *
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/trn_select.c,v 1.5 1986-10-29 10:31:18 srz Exp $
+ * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/trn_select.c,v 1.6 1986-11-11 16:33:17 spook Exp $
  * $Locker:  $
  *
  */
@@ -18,14 +18,14 @@ selection_list *
 sl_insert_range(low, high, old_list, code_ptr)
 	register int low, high;
 	register selection_list *old_list;
-	error_code *code_ptr;
+	int *code_ptr;
 {
 	register selection_list *p, *new;
 	p = old_list;
 
 	new = (selection_list *)malloc(sizeof(selection_list));
 	if (!new) {
-		*code_ptr = ERRNO;
+		*code_ptr = errno;
 		return((selection_list *)NULL);
 	}
 	new->low = low;
@@ -51,7 +51,7 @@ selection_list *
 sl_insert_num(num, old_list, code_ptr)
 	int num;
 	selection_list *old_list;
-	error_code *code_ptr;
+	int *code_ptr;
 {
 	return(sl_insert_range(num, num, old_list, code_ptr));
 }
@@ -94,11 +94,12 @@ trn_select(t_info, string, old_sl_ptr, code_ptr)
 	trn_info *t_info;
 	char *string;
 	selection_list *old_sl_ptr;
-	register error_code *code_ptr;
+	register int *code_ptr;
 {
 	int low, high;
 
-	*code_ptr = trnexpr_parse(&dsc_public.m_info, t_info, string, &low, &high);
+	*code_ptr = trnexpr_parse(&dsc_public.m_info, t_info, string,
+				  &low, &high);
 	if (*code_ptr != 0)
 		return((selection_list *)NULL);
 	old_sl_ptr = sl_insert_range(low, high, old_sl_ptr, code_ptr);
