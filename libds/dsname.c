@@ -180,6 +180,17 @@ static set_rc_filename(user, buf, len)
      register char *cp = NULL;
      extern char *getenv();
 
+     if (*user != '\0') {
+          pw = getpwnam(user);
+	  if (!pw) {
+	       fprintf(stderr, "Unknown user %s\n", user); /* XXX - should return error code */
+	       strncpy(buf, "/dev/null", len);
+	  } else {
+	       strncpy (buf, pw -> pw_dir, len);
+	       strncat (buf, "/.disrc", len);
+	  }
+	  return;
+     } 
      if (!disrcfile) {
 	  if ((cp = getenv("DISRC")) && !access(cp, R_OK|W_OK)) {
 	       strncpy(disrcbuf, cp, MAXPATHLEN-1);
@@ -189,10 +200,7 @@ static set_rc_filename(user, buf, len)
 		 &&  (!access(disrcbuf, R_OK|W_OK))) {
 	       /* got it */
 	  } else {
-	       if (*user == '\0')			/* current user */
-		    pw = getpwuid(getuid());
-	       else
-		    pw = getpwnam(user);
+	       pw = getpwuid(getuid());
 	       if (!pw) {
 		    printf("Who are you?\n"); /* XXX - use warning */
 		    strncpy(disrcbuf, "/tmp/.disrc");
