@@ -31,13 +31,7 @@
 #include <sys/stat.h>
 #include <sys/file.h>
 #ifdef SOLARIS
-/*
- * flock operations.
- */
-#define LOCK_SH               1       /* shared lock */
-#define LOCK_EX               2       /* exclusive lock */
-#define LOCK_NB               4       /* don't block when locking */
-#define LOCK_UN               8       /* unlock */
+#include <fcntl.h>
 #endif
 #define NULL 0
 #define max(a, b) (a > b ? a : b)
@@ -76,10 +70,21 @@ int d;
 {
      afile af;
      struct stat buf;
+#ifdef SOLARIS
+     struct flock lock;
+#endif
 
+#ifdef SOLARIS
+    lock.l_type = F_WRLCK;
+    lock.l_start = 0;
+    lock.l_whence = 0;
+    lock.l_len = 0;
+    if (fcntl(d, F_SETLK, &lock)) 
+      	  return (NULL);
+#else
      if (flock(d, LOCK_EX) < 0)
 	  return (NULL);
-
+#endif
      if (fstat (d, &buf) < 0)
 	  goto punt;
 
@@ -95,7 +100,15 @@ int d;
      return (af);
 
 punt:
+#ifdef SOLARIS
+     lock.l_type = F_UNLCK;
+     lock.l_start = 0;
+      lock.l_whence = 0;
+      lock.l_len = 0;
+     fcntl(d, F_SETLK, &lock);
+#else
      flock(d, LOCK_UN);
+#endif
      return (NULL);
 }
 
@@ -133,7 +146,11 @@ char *buf;
 	       if (result != toread)
 		    goto read_error;
 	  } else {
+#ifdef POSIX
+	       memmove (dest_ptr, bptr + offset,  toread);
+#else
 	       bcopy (bptr + offset, dest_ptr, toread);
+#endif
 	  }
 	  dest_ptr += toread;
 	  numleft -= toread;
@@ -185,7 +202,11 @@ char *buf;
 
 	       add_block (af, bn, bptr);
 	  }
+#ifdef POSIX
+	  memmove (bptr+offset, src_ptr, towrite);
+#else
 	  bcopy (src_ptr, bptr+offset, towrite);
+#endif
 	  src_ptr += towrite;
 	  numleft -= towrite;
 	  offset = 0;					/* after first, no offset */
@@ -208,6 +229,9 @@ afile af;
 {
      struct dir_blk *db,*olddb;
      register i;
+#ifdef SOLARIS
+    struct flock lock;
+#endif
 
      /* loop thru dir blocks, writing all blocks */
      for (db = (struct dir_blk *) af -> dir_list; db != NULL;) {
@@ -223,7 +247,15 @@ afile af;
      }
 
      fsync(af -> desc);				/* tell kernel to get a move on */
+#ifdef SOLARIS
+     lock.l_type = F_UNLCK;
+     lock.l_start = 0;
+     lock.l_whence = 0;
+     lock.l_len = 0;
+     fcntl(af -> desc, F_SETLK, &lock);
+#else
      flock(af -> desc, LOCK_UN);		/* and to let others at it */
+#endif
      af -> dir_list = NULL;
      maxdirty = max(maxdirty, af -> dirty_blks);
      af -> desc = -1;				/* to prevent reuse */
@@ -242,6 +274,10 @@ afile af;
 {
      struct dir_blk *db,*olddb;
      register i;
+#ifdef SOLARIS
+    struct flock lock;
+#endif
+
 
      /* loop thru dir blocks, freeing all blocks */
      for (db = (struct dir_blk *) af -> dir_list; db != NULL;) {
@@ -255,8 +291,16 @@ afile af;
      }
 
      ftruncate(af -> desc, (long)(af -> file_size));
+#ifdef SOLARIS
+     lock.l_type = F_UNLCK;
+     lock.l_start = 0;
+     lock.l_whence = 0;
+     lock.l_len = 0;
+     fcntl(af -> desc, F_SETLK, &lock);
+#else
      flock(af -> desc, LOCK_UN);
 
+#endif
      af -> dir_list = NULL;
      maxdirty = max(maxdirty, af -> dirty_blks);
      af -> desc = -1;				/* to prevent reuse */
