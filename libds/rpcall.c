@@ -5,9 +5,12 @@
  *		This file handles the caller's side of the connection.
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/rpcall.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/rpcall.c,v 1.6 1987-03-09 23:52:18 spook Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/rpcall.c,v 1.7 1987-03-10 00:07:23 wesommer Exp $
  *	$Locker:  $
  *	$Log: not supported by cvs2svn $
+ * Revision 1.6  87/03/09  23:52:18  spook
+ * Removed some unused variables; added an error check.
+ * 
  *
  */
 
@@ -206,12 +209,14 @@ rpc_conversation open_rpc (host, port_num, service_id, code)
 char *host;				/* hostname to connect to */
 int port_num;				/* port number to use */
 char *service_id;			/* authenticator service id */
-int *code;				/* return code */
+register int *code;				/* return code */
 {
      int parent,sv[2];
      rpc_conversation conv;
      struct hostent *hp;
-     int i,s,authl;
+     int authl;
+     register int i, s = -1;
+
      char *server_name,*authp;
      struct sockaddr_in address;
 
@@ -260,21 +265,16 @@ int *code;				/* return code */
      bcopy(hp->h_addr, (char *) &address.sin_addr, hp->h_length);
      address.sin_family = hp->h_addrtype;
      address.sin_port = port_num;
-     if((s = socket(hp->h_addrtype, SOCK_STREAM, 0)) < 0) {
-	  *code = errno;
-	  return(NULL);
-     }
-     if(connect(s, (char *) &address, sizeof(address)) < 0) {
-	  *code = errno;
-	  return(NULL);
-     }
+     if((s = socket(hp->h_addrtype, SOCK_STREAM, 0)) < 0)
+	  goto punt;
+
+     if(connect(s, (char *) &address, sizeof(address)) < 0)
+	  goto punt;
      
      conv = USP_associate (s);
      us = conv;
-     if (!us) {
-	     *code = errno;
-	     return(NULL);
-     }
+     if (!us)
+	  goto punt;
 
      get_authenticator(service_id, 0, &authp, &authl, code);
      if (! *code) {
@@ -290,6 +290,10 @@ int *code;				/* return code */
 	  USP_end_block(us);
      }
      return(conv);
+punt:
+     if (s >= 0) close(s);
+     *code = errno;
+     return(NULL);
 }
 
 /*
