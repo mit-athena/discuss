@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.15 1986-10-19 09:58:03 spook Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.16 1986-10-29 10:25:23 srz Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
@@ -9,6 +9,9 @@
  *	ss library for the command interpreter.
  *
  *      $Log: not supported by cvs2svn $
+ * Revision 1.15  86/10/19  09:58:03  spook
+ * Changed to use dsc_ routines; eliminate refs to rpc.
+ * 
  * Revision 1.14  86/09/16  21:52:10  wesommer
  * Close off RPC connections so we don't lose file descriptors.
  * 
@@ -53,7 +56,7 @@
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.15 1986-10-19 09:58:03 spook Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.16 1986-10-29 10:25:23 srz Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -65,7 +68,6 @@ static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athe
 #include "../include/tfile.h"
 #include "../include/interface.h"
 #include "../include/config.h"
-#include "../include/dsname.h"
 #include "../include/rpc.h"
 #include "globals.h"
 
@@ -76,19 +78,24 @@ static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athe
 #endif	lint
 
 #define	FREE(ptr)	{ if (ptr) free(ptr); }
+#define max(a, b) ((a) > (b) ? (a) : (b))
 
 extern ss_request_table discuss_cmds;
-trn_nums cur_trans = -1;
-char	*cur_mtg = (char *)NULL; /* meeting uid */
-char	*cur_mtg_name = (char *)NULL; /* meeting name */
+
+/* GLOBAL VARIABLES */
+
+struct _dsc_pub dsc_public = {0, 0, 0, (char *)NULL, (char *)NULL };
+
 char	*temp_file = (char *)NULL;
 char	*pgm = (char *)NULL;
-char	*malloc(), *getenv(), *gets(), *ctime();
-mtg_info m_info;
 char	buf[BUFSIZ];
 char	*buffer = &buf[0];
-tfile	unix_tfile();
 int	dsc_sci_idx;
+
+/* EXTERNAL ROUTINES */
+
+char	*malloc(), *getenv(), *gets(), *ctime();
+tfile	unix_tfile();
 
 main(argc, argv)
 	int argc;
@@ -124,39 +131,64 @@ main(argc, argv)
 	}
 	ss_listen (sci_idx, &code);
 	(void) unlink(temp_file);
+	leave_mtg();				/* clean up after ourselves */
 }
+
+
 
 repl(sci_idx, argc, argv)
 	int sci_idx;
 	int argc;
 	char **argv;
 {
-	int fd, txn_no;
+	int fd, txn_no, orig_trn;
 	tfile tf;
+	selection_list *trn_list;
 	trn_info t_info;
 	int code;
 
-	DONT_USE(sci_idx);
-	if (cur_mtg == (char *)NULL) {
-		(void) fprintf(stderr, "Not currently attending a meeting.\n");
+	if (!dsc_public.attending) {
+		ss_perror(sci_idx, 0, "No current meeting.\n");
 		return;
 	}
-	if (argc != 1) {
+
+	if (argc > 2) {
 		(void) fprintf(stderr, "Usage:  %s\n", argv[0]);
 		return;
 	}
-	if (cur_trans == -1) {
-		(void) fprintf(stderr, "No current transaction.\n");
-		return;
+	dsc_get_trn_info(dsc_public.mtg_uid, dsc_public.current, &t_info, &code);
+	if (code != 0)
+		t_info.current = 0;
+	else {
+	     free(t_info.subject);			/* don't need these */
+	     t_info.subject = NULL;
+	     free(t_info.author);
+	     t_info.author = NULL;
 	}
-	dsc_get_trn_info(cur_mtg, cur_trans, &t_info, &code);
+
+	trn_list = trn_select(&t_info, (argc == 1) ? "current" : argv[1],
+			      (selection_list *)NULL, &code);
+	if (code) {
+	     ss_perror(sci_idx, code, "");
+	     free(trn_list);
+	     return;
+	}
+
+	if (trn_list -> low != trn_list -> high) {
+	     ss_perror(sci_idx, 0, "Cannot reply to range");
+	     free(trn_list);
+	     return;
+	}
+
+	orig_trn = trn_list -> low;
+	free(trn_list);
+
+	dsc_get_trn_info(dsc_public.mtg_uid, orig_trn, &t_info, &code);
 	if (code != 0) {
-		
-		(void) fprintf(stderr,
-			       "Can't get info on current transaction: %s\n",
-			       error_message(code));
-		return;
+	     ss_perror(sci_idx, code, "");
+	     return;
 	}
+
 	if (strncmp(t_info.subject, "Re: ", 4)) {
 		char *new_subject = malloc((unsigned)strlen(t_info.subject)+5);
 		(void) strcpy(new_subject, "Re: ");
@@ -164,82 +196,42 @@ repl(sci_idx, argc, argv)
 		(void) free(t_info.subject);
 		t_info.subject = new_subject;
 	}
+
 	(void) unlink(temp_file);
 	if (edit(temp_file) != 0) {
 		(void) fprintf(stderr,
 			       "Error during edit; transaction not entered\n");
 		unlink(temp_file);
-		return;
+		goto abort;
 	}
 	fd = open(temp_file, O_RDONLY, 0);
 	if (fd < 0) {
 		(void) fprintf(stderr, "No file; not entered.\n");
-		return;
+		goto abort;
 	}
 	tf = unix_tfile(fd);
 	
-	dsc_add_trn(cur_mtg, tf, t_info.subject,
-		cur_trans, &txn_no, &code);
+	dsc_add_trn(dsc_public.mtg_uid, tf, t_info.subject,
+		orig_trn, &txn_no, &code);
 	if (code != 0) {
 		fprintf(stderr, "Error adding transaction: %s\n",
 			error_message(code));
-		return;
+		goto abort;
 	}
 	(void) printf("Transaction [%04d] entered in the %s meeting.\n",
-		      txn_no, cur_mtg);
-	cur_trans = txn_no;
-}
+		      txn_no, dsc_public.mtg_uid);
+	if (dsc_public.current == 0)
+		dsc_public.current = txn_no;
 
-del_trans(sci_idx, argc, argv)
-	int sci_idx;
-	int argc;
-	char **argv;
-{
-	int txn_no;
-	int code;
-	DONT_USE(sci_idx);
-	if (cur_mtg == (char *)NULL) {
-		(void) fprintf(stderr, "No current meeting.\n");
-		return;
+	/* and now a pragmatic definition of 'seen':  If you are up-to-date
+	   in a meeting, then you see transactions you enter. */
+	if (dsc_public.highest_seen == txn_no -1) {
+	     dsc_public.highest_seen = txn_no;
 	}
-	if (argc != 2) {
-		(void) fprintf(stderr, "Usage:  %s trn_no\n", argv[0]);
-		return;
-	}
-	txn_no = atoi(argv[1]);
-	dsc_delete_trn(cur_mtg, txn_no, &code);
-	if (code != 0) {
-		(void) fprintf(stderr, "Error deleting transaction %d: %s\n",
-			       txn_no, error_message(code));
-		return;
-	}
-	cur_trans = txn_no + 1;
-}
 
-ret_trans(sci_idx, argc, argv)
-	int sci_idx;
-	int argc;
-	char **argv;
-{
-	int txn_no;
-	int code;
-	DONT_USE(sci_idx);
-	if (cur_mtg == (char *)NULL) {
-		(void) fprintf(stderr, "No current meeting.\n");
-		return;
-	}
-	if (argc != 2) {
-		(void) fprintf(stderr, "Usage:  %s trn_no\n", argv[0]);
-		return;
-	}
-	txn_no = atoi(argv[1]);
-	dsc_retrieve_trn(cur_mtg, txn_no, &code);
-	if (code != 0) {
-		(void) fprintf(stderr, "Error retrieving transaction %d: %s\n",
-			       txn_no, error_message(code));
-		return;
-	}
-	cur_trans = txn_no;
+abort:
+	free(t_info.subject);
+	free(t_info.author);
 }
 
 goto_mtg(sci_idx, argc, argv)
@@ -248,22 +240,19 @@ goto_mtg(sci_idx, argc, argv)
 	char **argv;
 {
 	int code;
-	name_blk nb;
 
 	DONT_USE(sci_idx);
 	if (argc != 2) {
 		(void) fprintf(stderr, "Usage:  %s mtg_name\n", argv[0]);
 		return;
 	}
-	if (cur_mtg != (char *)NULL) {
-		(void) free(cur_mtg);
-	}
-	cur_mtg = (char *)NULL;
-	FREE(cur_mtg_name);
-	cur_mtg_name = malloc(strlen(argv[1])+1);
-	strcpy(cur_mtg_name, argv[1]);
 
-	get_mtg_unique_id ("", "", cur_mtg_name, &nb, &code);
+	leave_mtg();
+
+	dsc_public.mtg_name = malloc(strlen(argv[1])+1);
+	strcpy(dsc_public.mtg_name, argv[1]);
+
+	get_mtg_unique_id ("", "", dsc_public.mtg_name, &dsc_public.nb, &code);
 	if (code != 0) {
 		(void) fprintf (stderr,
 				"%s: Meeting not found in search path.\n",
@@ -271,16 +260,57 @@ goto_mtg(sci_idx, argc, argv)
 		return;
 	}
 
-	cur_mtg = malloc(strlen(nb.unique_id)+2);
-	strcpy(cur_mtg, nb.unique_id);
-	dsc_get_mtg_info(cur_mtg, &m_info, &code);
+	dsc_public.mtg_uid = dsc_public.nb.unique_id;	/* warning - sharing */
+	dsc_get_mtg_info(dsc_public.mtg_uid, &dsc_public.m_info, &code);
 	if (code != 0) {
 		(void) fprintf(stderr,
 			       "Error getting meeting info for %s: %s\n", 
-			       cur_mtg_name, error_message(code));
-		free(cur_mtg);
-		cur_mtg = (char *)NULL;
+			       dsc_public.mtg_name, error_message(code));
+		dsc_public.mtg_uid = (char *)NULL;
 		return;
 	}
+	dsc_public.attending = TRUE;
+        dsc_public.highest_seen = dsc_public.current = dsc_public.nb.last;
+	printf ("%s meeting;  %d last, %d new.\n\n",
+		dsc_public.m_info.long_name,
+		dsc_public.m_info.last,
+		max (dsc_public.m_info.last - dsc_public.highest_seen, 0));
+
 }
 
+/*
+ *
+ * leave_mtg () -- Internal routine to leave the current meeting, updating
+ *		   all the stuff we need.  Not a light-weight operation.
+ *
+ */
+
+leave_mtg()
+{
+     int code;
+
+     if (!dsc_public.attending)
+	  return;				/* bye, jack */
+     if (dsc_public.mtg_uid == (char *)NULL) {
+	  fprintf (stderr, "leave: Inconsistent meeting state\n");
+	  return;
+     }
+
+     dsc_public.nb.date_attended = time(0);
+     dsc_public.nb.last = dsc_public.highest_seen;
+     update_mtg_set ("", "", &dsc_public.nb, 1, &code);
+
+     /* done with everything.  start nuking stuff */
+     dsc_public.current = 0;
+     dsc_public.highest_seen = 0;
+     dsc_public.attending = FALSE;
+     dsc_public.mtg_uid = (char *)NULL;
+
+     /* Don't forget the women and children... */
+     FREE(dsc_public.mtg_name);
+     dsc_public.mtg_name = (char *)NULL;
+     FREE(dsc_public.m_info.chairman);
+     dsc_public.m_info.chairman = (char *)NULL;
+     FREE(dsc_public.m_info.location);
+     dsc_public.m_info.location = (char *)NULL;
+}
