@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl.c,v 1.8 1987-10-24 00:53:39 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl.c,v 1.9 1987-10-24 07:02:44 wesommer Exp $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
  *
@@ -8,6 +8,9 @@
  *	along with routines to move them to and from files.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.8  87/10/24  00:53:39  wesommer
+ * Robustify the acl_read routine.
+ * 
  * Revision 1.7  87/07/20  21:23:25  wesommer
  * Removed fdclose (kludge), added checking to acl_write() to detect
  * disk full conditions.
@@ -35,7 +38,7 @@
  */
 
 #ifndef lint
-static char *rcsid_acl_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl.c,v 1.8 1987-10-24 00:53:39 wesommer Exp $";
+static char *rcsid_acl_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl.c,v 1.9 1987-10-24 07:02:44 wesommer Exp $";
 #endif lint
 
 #include "../include/acl.h"
@@ -77,10 +80,12 @@ Acl *acl_read(fd)
 	if (!f) return NULL;	/* oops. */
 	
 	list = (Acl *) malloc(sizeof(Acl));
+	if (!list) goto punt;
 	list->acl_entries = (acl_entry *)NULL;
-
+	list->acl_length = 0;
+	
 	if (fgets(buf, 128, f) == NULL) goto punt;
-	if (!isdigit(buf[0])) goto punt;
+	if (!isdigit((unsigned)buf[0])) goto punt;
 	
 	n=atoi(buf);
 	list->acl_entries = (acl_entry *)malloc((unsigned)(n * sizeof(acl_entry)));
