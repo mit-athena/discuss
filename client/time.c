@@ -36,7 +36,7 @@ short_time(time)
      now->tm_mon++;
      put(now->tm_mon, 0);
      put(now->tm_mday, 3);
-     put(now->tm_year, 6);
+     put(now->tm_year % 100, 6);
      put(now->tm_hour, 9);
      put(now->tm_min, 12);
      return(time_buf);
