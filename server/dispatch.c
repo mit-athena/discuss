@@ -8,12 +8,13 @@
 #include "../include/rpc.h"
 #include "../include/interface.h"
 #include "../include/tfile.h"
+#include "../include/acl.h"
 
 extern bool recvbool();
 extern char *recvstr();
 extern tfile recvfile();
 extern char *malloc();
-
+extern char rpc_caller [];
 struct proc_table procs[] = {
      0, {0, 0, 0, 0, 0, 0, 0, 0},					/* unused */
      4, {STRTYPE, TFILETYPE, STRTYPE, INTTYPE,  0, 0, 0, 0},		/* add_trn */
@@ -24,9 +25,14 @@ struct proc_table procs[] = {
      1, {STRTYPE, 0, 0, 0, 0, 0, 0, 0},					/* old_get_mtg_info */
      0, { 0, 0, 0, 0, 0, 0, 0, 0},					/* start_mtg_info */
      0, { 0, 0, 0, 0, 0, 0, 0, 0},					/* next_mtg_info */
-     3, {STRTYPE, INTTYPE, TFILETYPE, 0, 0, 0, 0, 0},				/* get_trn */
+     3, {STRTYPE, INTTYPE, TFILETYPE, 0, 0, 0, 0, 0},			/* get_trn */
      1, {STRTYPE, 0, 0, 0, 0, 0, 0, 0},					/* remove_mtg */
-     1, {STRTYPE, 0, 0, 0, 0, 0, 0, 0}					/* get_mtg_info */
+     1, {STRTYPE, 0, 0, 0, 0, 0, 0, 0},					/* get_mtg_info */
+     1, {STRTYPE, 0, 0, 0, 0, 0, 0, 0},					/* get_acl */
+     2, {STRTYPE, STRTYPE, 0, 0, 0, 0, 0, 0}, 				/* get_access */
+     3, {STRTYPE, STRTYPE, STRTYPE, 0, 0, 0, 0, 0},			/* set_access */
+     2, {STRTYPE, STRTYPE, STRTYPE, 0, 0, 0, 0, 0},			/* delete_access */
+     0, {0, 0, 0, 0, 0, 0, 0, 0}					/* whoami */
 };
 
 int	numprocs = sizeof (procs) / sizeof (procs [0]);
@@ -34,11 +40,13 @@ int	numprocs = sizeof (procs) / sizeof (procs [0]);
 dispatch (procno)
 int procno;
 {
-     char *c1,*c2;
+     char *c1,*c2,*c3;
+     char *modes;
      int i1,i2;
      char b1,b2;
      tfile t1,mem_tfile();
      int result;
+     Acl *list;
      trn_info tinfo;
      mtg_info minfo;
 
@@ -175,6 +183,49 @@ int procno;
 	  sendreply();
 
 	  break;
+     /* get_acl (mtg_name) */
+     case GET_ACL:
+	  c1 = recvstr();			/* mtg_name */
+	  get_acl (c1, &result, &list);
+	  startreply();
+	  sendint(result);
+	  send_acl(list);
+	  sendreply();
+	  break;
+
+     /* get_access(mtg_name, princ_name) */
+     case GET_ACCESS:
+          c1 = recvstr();
+	  c2 = recvstr();
+	  get_access(c1, c2, &modes, &result);
+	  startreply();
+	  sendstr(modes);
+	  sendint(result);
+	  sendreply();
+	  break;
+     /* set_access(mtg_name, princ_name, mode) */
+     case SET_ACCESS:
+	  c1 = recvstr();	
+	  c2 = recvstr();
+	  c3 = recvstr();
+	  set_access(c1, c2, c3, &result);
+	  startreply();
+	  sendint(result);
+	  sendreply();
+	  break;
+     case DELETE_ACCESS:
+          c1 = recvstr();
+	  c2 = recvstr();
+	  delete_access(c1, c2, &result);
+	  startreply();
+	  sendint(result);
+	  sendreply();
+	  break;
+     case WHO_AM_I:
+	  startreply();
+	  sendstr(rpc_caller);
+	  sendreply();
+	  break;	  
      }
      return;					/* all done for now */
 }
@@ -245,3 +296,27 @@ mtg_info *minfo;
      sendbool (minfo -> public_flag);
      sendstr (minfo -> access_modes);
 }
+
+/*
+ *	send_acl -- Send an access control list.
+ */
+send_acl(acl)
+	Acl *acl;
+{
+	register acl_entry *ae;
+	register int n;
+
+	if (!acl) {
+		sendint(0);
+		return;
+	}
+
+	sendint (acl->acl_length);
+	for (ae=acl->acl_entries, n=acl->acl_length;
+	     n;
+	     --n, ++ae) {
+		sendstr(ae->modes);
+		sendstr(ae->principal);
+	}
+}
+
