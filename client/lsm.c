@@ -1,8 +1,11 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v 1.8 1987-03-22 04:38:12 spook Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v 1.9 1987-04-08 03:55:00 wesommer Exp $
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.8  87/03/22  04:38:12  spook
+ * Changes for new interfaces.
+ * 
  * Revision 1.7  87/01/06  23:47:21  rfrench
  * Added "new" field to lsm.
  * 
@@ -16,7 +19,7 @@
  */
 
 #ifndef lint
-static char *rcsid_lsm_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v 1.8 1987-03-22 04:38:12 spook Exp $";
+static char *rcsid_lsm_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v 1.9 1987-04-08 03:55:00 wesommer Exp $";
 #endif lint
 
 
@@ -45,6 +48,12 @@ do_mtg(mtg_name)
 	char last_host[140], last_path[140];
 
 	dsc_expand_mtg_set(auser_id, mtg_name, &set, &n_matches, &code);
+
+	if (code) {
+		ss_perror(sci_idx, code, "");
+		return(0);
+	}
+
 	if (!n_matches)
 		return (0);
 
