@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/goto.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/goto.c,v 1.7 1988-02-15 00:57:31 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/goto.c,v 1.8 1988-02-20 02:03:16 srz Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
@@ -11,7 +11,7 @@
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/goto.c,v 1.7 1988-02-15 00:57:31 wesommer Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/goto.c,v 1.8 1988-02-20 02:03:16 srz Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -65,14 +65,13 @@ switch_to_mtg(name)
 	name_blk nb;
 	
 	leave_mtg();
-	dsc_public.mtg_name = (char *)malloc((unsigned)strlen(name)+1);
-	(void) strcpy(dsc_public.mtg_name, name);
 
-	dsc_get_mtg (user_id, dsc_public.mtg_name, &nb, &code);
+	dsc_get_mtg (user_id, name, &nb, &code);
 	if (code != 0) {
 	     ss_perror(sci_idx, DISC_MTG_NOT_FOUND, name);
 	     return;
 	}
+
 	switch_to_mtg_nb (&nb);
 	dsc_destroy_name_blk (&nb);
 }
@@ -95,10 +94,14 @@ switch_to_mtg_nb(nbp)
 		     code = CANT_ATTEND;
 		(void) fprintf(stderr,
 			       "Error going to %s: %s\n", 
-			       dsc_public.mtg_name, error_message(code));
+			       dsc_public.nb.aliases[0], error_message(code));
 		dsc_public.host = (char *)NULL;
 		return;
 	}
+
+	dsc_public.mtg_name = (char *)malloc((unsigned)strlen(dsc_public.m_info.long_name)+1);
+	(void) strcpy(dsc_public.mtg_name, dsc_public.m_info.long_name);
+
 	dsc_public.attending = TRUE;
         dsc_public.highest_seen = dsc_public.current = dsc_public.nb.last;
 	printf ("%s meeting:  %d new, %d last.",
