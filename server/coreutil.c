@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.9 1988-01-05 01:08:02 rfrench Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.10 1988-01-05 01:37:54 srz Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
@@ -11,6 +11,9 @@
  *		  in-memory superblock, and to open & close meetings.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.9  88/01/05  01:08:02  rfrench
+ * #ifdef'd ZEPHYR stuff
+ * 
  * Revision 1.8  87/08/22  18:12:30  rfrench
  * Added Zephyr notifications
  * 
@@ -40,7 +43,7 @@
  */
 
 #ifndef lint
-static char *rcsid_coreutil_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.9 1988-01-05 01:08:02 rfrench Exp $";
+static char *rcsid_coreutil_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.10 1988-01-05 01:37:54 srz Exp $";
 #endif lint
 
 #include "../include/types.h"
@@ -49,9 +52,11 @@ static char *rcsid_coreutil_c = "$Header: /afs/dev.mit.edu/source/repository/ath
 #include "mtg.h"
 #include "../include/tfile.h"
 #include "../include/acl.h"
+#ifdef ZEPHYR
 #include <zephyr/zephyr.h>
+#endif ZEPHYR
 #include <errno.h>
-/*#include <sys/types.h>*/
+#include <sys/types.h>
 #include <netdb.h>
 #include <sys/file.h>
 #include <sys/stat.h>
