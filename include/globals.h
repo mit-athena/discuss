@@ -1,13 +1,13 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/include/globals.h,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/include/globals.h,v 1.13 1987-11-09 22:34:47 raeburn Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/include/globals.h,v 1.14 1989-01-05 00:08:54 raeburn Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
  *	Declarations of global variables for discuss.
  */
 
-#include "dsname.h"
+#include <discuss/dsname.h>
 
 /* Typedefs */
 
