@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/output.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/output.c,v 1.9 1989-01-29 17:08:58 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/output.c,v 1.10 1989-02-23 23:29:44 srz Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986, 1988 by the Student Information Processing Board.
@@ -11,7 +11,7 @@
 
 #ifndef lint
 static char rcsid_discuss_utils_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/output.c,v 1.9 1989-01-29 17:08:58 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/output.c,v 1.10 1989-02-23 23:29:44 srz Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -37,6 +37,7 @@ output_trans(txn_no, tf, code)
 	char newtime[26];
 	char line[255];
 	trn_info2 tinfo;
+	int flagged;
 
 	*code = 0;
 	dsc_get_trn_info2(&dsc_public.nb, txn_no,
@@ -51,11 +52,10 @@ output_trans(txn_no, tf, code)
 	else
 		plural = "";
      
-	(void) sprintf (line, "[%04d] %s  %s  %s (%d line%s)%s\n",
+	(void) sprintf (line, "[%04d] %s  %s  %s (%d line%s)\n",
 			tinfo.current, tinfo.author,
 			dsc_public.m_info.long_name,
-			newtime, tinfo.num_lines, plural,
-			((tinfo.flags & TRN_FLAG1) != 0) ? " (flagged)" : "");
+			newtime, tinfo.num_lines, plural);
 	twrite (tf, line, strlen (line), code);
 	if (tinfo.subject [0] != '\0') {
 		twrite (tf, "Subject: ", 9, code);
@@ -70,17 +70,22 @@ output_trans(txn_no, tf, code)
 	   do this */
 	tcontrol(tf, TFC_FORCE_NL, 0, code);
 
+	flagged = (tinfo.flags & TRN_FLAG1) != 0;
 	if (tinfo.pref == 0 && tinfo.nref == 0)
-		(void) sprintf (line, "--[%04d]--\n\f\n", tinfo.current);
+		(void) sprintf (line, "--[%04d]--%s\n\f\n", tinfo.current,
+				flagged ? " (flagged)" : "");
 	else if (tinfo.pref == 0)
-		(void) sprintf (line, "--[%04d]-- (nref = [%04d])\n\f\n",
-				tinfo.current, tinfo.nref);
+		(void) sprintf (line, "--[%04d]-- (nref = [%04d]%s)\n\f\n",
+				tinfo.current, tinfo.nref,
+				flagged ? ", flagged" : "");
 	else if (tinfo.nref == 0)
-		(void) sprintf (line, "--[%04d]-- (pref = [%04d])\n\f\n",
-				tinfo.current, tinfo.pref);
+		(void) sprintf (line, "--[%04d]-- (pref = [%04d]%s)\n\f\n",
+				tinfo.current, tinfo.pref,
+				flagged ? ", flagged" : "");
 	else
 	     (void) sprintf (line,
-			     "--[%04d]-- (pref = [%04d], nref = [%04d])\n\f\n",
-			     tinfo.current, tinfo.pref, tinfo.nref);
+			     "--[%04d]-- (pref = [%04d], nref = [%04d]%s)\n\f\n",
+			     tinfo.current, tinfo.pref, tinfo.nref,
+			     flagged ? ", flagged" : "");
 	twrite (tf, line, strlen (line), code);
 }
