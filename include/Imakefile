@@ -1,37 +1,18 @@
 #
-# $Id: Imakefile,v 1.4 1993-03-11 21:36:35 probe Exp $
+# $Id: Imakefile,v 1.5 1996-09-08 20:58:09 ghudson Exp $
 #
 
 INFODIR=/usr/athena/lib/discuss/info
 
 #LINKS=	 ss/mit-sipb-copyright.h com_err.h
 LINKS=	usp/usp.h usp/usp_et.h rpc_et.h discuss/dsc_et.h usp.h usp_et.h \
-	discuss_err.h ss/ss.h ss/ss_err.h ss.h regexp.h
+	discuss_err.h
 FILES=	ansi.h atom.h globals.h internal.h mit-copyright.h \
 	rpc.h trn_spec.h \
 	discuss/acl.h discuss/discuss.h discuss/dsname.h discuss/interface.h \
 	discuss/mit-sipb-copyright.h discuss/tfile.h discuss/types.h
 
 all depend:: $(LINKS) config.h
-
-ss:
-	-mkdir ss
-
-ss/ss.h: ss ../ss/ss.h
-	$(RM) ss/ss.h
-	ln -s ../../ss/ss.h ss/
-
-ss/ss_err.h: ss 
-	$(RM) ss/ss_err.h
-	ln -s ../../ss/ss_err.h ss/
-
-ss/mit-sipb-copyright.h: ss ../ss/mit-sipb-copyright.h
-	$(RM) ss/mit-sipb-copyright.h
-	ln -s ../../ss/mit-sipb-copyright.h ss/
-
-ss.h:
-	$(RM) ss.h
-	ln -s ss/ss.h .
 
 config.h: config.h.sed
 	$(RM) config.h
