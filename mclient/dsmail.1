@@ -1,0 +1,94 @@
+.TH DSMAIL SIPB "12 Feb 93" "Student Information Processing Board"
+.SH NAME
+dsmail \- discuss mail feed program
+.SH SYNOPSIS
+.B dsmail
+[
+.B \-dAD
+] [
+.B \-a
+.I regexp
+] [
+.B \-r
+.I regexp
+] [
+.B \-s
+.I subject-match-limit
+]
+.B meeting-path-name
+
+.SH DESCRIPTION
+.I Dsmail
+is used to feed incoming mail into the discuss conferencing system.
+It takes a mail message from standard input, formats it, and inserts
+it into the proper discuss meeting.  The user running 
+.B dsmail
+must have ``write'' permission for that meeting.  Typically this will
+be daemon, since sendmail runs as daemon.  To enter replies, the user
+must have ``answer`` permission for that meeting.
+.PP
+To setup a mail feed for a meeting, do the following:  Give the user
+daemon ``answer'', ``status'', and ``write''access using the discuss command
+.BR set_acl .
+Then, insert a pipe to
+.B dsmail
+into the sendmail aliases file /usr/lib/aliases.  For example:
+.in +0.5i
+tytso@charon.LOCAL:"/site/sipb/bin/dsmail -d 
+/usr/spool/discuss/mailtest"@charon.LOCAL
+.in
+Then, any mail sent to 
+.I tytso@charon.LOCAL
+will be entered in the meeting
+.IR mailtest .
+.PP
+If desired, dsmail will process the mail headers, and remove the
+unnecessary cruft.  If no options are specified, all of the mail
+headers are stripped.  By using the options detailed below, you can
+have fine control over which headers should be retained:
+.TP
+.B \-d
+will cause
+.B dsmail
+to retain the ``default'' fields.  These are the to, from, cc, and
+date fields, as well as any fields ending in ``-to'' or ``-from''.
+.TP
+.B \-A
+causes ALL fields to be retained.  This can be modified by the 
+.B \-r
+option.
+.TP
+.B \-a \fIregexp
+causes any fields matching the specified regular expression to be
+accepted.
+.TP
+.B \-r \fIregexp
+causes any fields matching the specified regular expression to be
+rejected.
+.TP
+.B \-s \fIsubject-match-limit
+specifies that subject matching should be used to chain transactions.  
+If this option is specified, the last subject-match-limit number of
+transactions are searched backwards to find a matching subject.  If found, the
+transaction is chained to the given transaction.  Daemon should have either
+``read'' or ``owner'' access to the meeting for this to work.
+.TP
+.B \-D
+turns on the debugging mode.  In this mode, the mail message is not
+entered into the discuss meeting.  Instead, it is sent to standard
+output so that the formatting of the mail messages can be checked
+easily.   This option should only be used interactively.
+
+.SH "IN-REPLY-TO"
+dsmail parses the ``In-reply-to'' field in the mail header for
+transaction numbers of the form ``[nnnn] in meeting name''.  If one is
+found where the given meeting name matches the short or long name of
+the meeting, the transaction chained to that transaction number.  If a
+meeting name is not given, or the user does not have access to find
+out the long name of the meeting, the transaction is automatically
+chained to that transaction number.
+
+.SH "SEE ALSO"
+discuss(1), aliases(5)
+.SH BUGS
+Hopefully few.
