@@ -8,13 +8,16 @@
 /*
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.27 1989-08-09 22:39:05 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.28 1990-02-24 18:58:08 srz Exp $
  *
  *
  * core.c --    Routines that are the meat of discuss.  These provide user
  *		callable routines.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.27  89/08/09  22:39:05  srz
+ * Added meeting forwarding.
+ * 
  * Revision 1.26  89/06/03  00:42:11  srz
  * Added standard copyright notice.
  * 
@@ -69,7 +72,7 @@
  */
 #ifndef lint
 static char rcsid_core_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.27 1989-08-09 22:39:05 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.28 1990-02-24 18:58:08 srz Exp $";
 #endif lint
 
 
@@ -128,27 +131,50 @@ trn_nums reply_trn;		/* trn replying to;  0 if original */
 trn_nums *result_trn;		/* trn number given to added trn */
 int *result;
 {
-     add_trn_priv (mtg_name, source_file, subject, reply_trn, 0,
-		   rpc_caller, (date_times) time ((long *)0),
+     add_trn_priv (mtg_name, source_file, subject, NULL, reply_trn, 0,
+		   rpc_caller, (date_times) time ((long *)0), 0, 
+		   result_trn, result);
+}
+
+/*
+ *
+ * add_trn2 () --
+ * adds a transaction to the given meeting, either as a reply or an
+ * original transaction.  Returns an error code, and the transaction number
+ * given to the transaction.  Also allows a signature for the author.
+ *
+ */
+add_trn2 (mtg_name, source_file, subject, signature, reply_trn, result_trn, result)
+char *mtg_name;
+tfile source_file;
+char *subject, *signature;
+trn_nums reply_trn;		/* trn replying to;  0 if original */
+trn_nums *result_trn;		/* trn number given to added trn */
+int *result;
+{
+     add_trn_priv (mtg_name, source_file, subject, signature, reply_trn, 0,
+		   rpc_caller, (date_times) time ((long *)0), 0,
 		   result_trn, result);
 }
 
 
 /* add_trn_priv:  For those who know exactly what they want and who they are */
 
-add_trn_priv (mtg_name, source_file, subject, reply_trn, desired_trn, author, date_entered, result_trn, result)
+add_trn_priv (mtg_name, source_file, subject, signature, reply_trn, desired_trn, author, date_entered, flags, result_trn, result)
 char *mtg_name;
 tfile source_file;
 char *subject;
+char *signature;
 trn_nums reply_trn;		/* trn replying to;  0 if original */
 trn_nums desired_trn;		/* trn num desired */
 char *author;
 date_times date_entered;
+int flags;
 trn_nums *result_trn;		/* trn number given to added trn */
 int *result;
 {
      chain_blk reply_cb, cb, spare_cb;
-     int tfs,tocopy,i;
+     int tfs,tocopy,i,len;
      char buffer[512],*bptr;
      trn_hdr th;
      
@@ -227,7 +253,7 @@ int *result;
      cb.nref = 0;
      cb.chain_fref = 0;
      cb.chain_lref = 0;
-     cb.flags = 0;
+     cb.flags = flags & ~CB_DELETED;
      cb.filler = 0;
      cb.trn_addr = fsize (u_trn_f);
 
@@ -273,6 +299,9 @@ int *result;
      super.date_modified = date_entered;
      super.high_water += sizeof (chain_blk);
 
+     if (signature != NULL && (*signature == '\0' || !strcmp(author, signature)))
+	  signature = NULL;			/* Signature is empty */
+
      /* now write out the transaction to the trn file */
      th.version = TRN_HDR_1;
      th.unique = TRN_HDR_UNIQUE;
@@ -285,6 +314,8 @@ int *result;
      super.highest_trn_addr = cb.trn_addr;
      th.subject_len = strlen (subject) + 1;
      th.author_len = strlen (author) + 1;
+     if (signature != NULL)
+	  th.author_len += strlen (signature) + 1;
      th.subject_addr = cb.trn_addr + sizeof(trn_hdr);
      th.author_addr = th.subject_addr + th.subject_len;
      th.text_addr = th.author_addr + th.author_len;
@@ -293,7 +324,14 @@ int *result;
      if (write (u_trn_f, (char *) &th, sizeof (th)) != sizeof (th)) goto werror;
 
      if (write (u_trn_f, subject, th.subject_len) != th.subject_len) goto werror;
-     if (write (u_trn_f, author, th.author_len) != th.author_len) goto werror;
+     if (signature == NULL) {
+	  if (write (u_trn_f, author, th.author_len) != th.author_len) goto werror;
+     } else {
+	  len = strlen(author)+1;
+	  if (write (u_trn_f, author, len) != len) goto werror;
+	  len = th.author_len - len;
+	  if (write (u_trn_f, signature, len) != len) goto werror;
+     }
 
      /* copy transaction from source_file, counting NL's. */
      tfs = th.num_chars;
@@ -320,7 +358,7 @@ int *result;
      /* Send this out...we want to do this BEFORE calling write_super
       * because things get freed...
       */
-     mtg_znotify(mtg_name, subject, author);
+     mtg_znotify(mtg_name, subject, author, signature);
 #endif ZEPHYR
      
      /* all done, start winding down */
@@ -468,7 +506,7 @@ int *result;
      *result = read_chain (cb.trn_chain, &spare_cb);
      if (*result) { core_abort(); return; }
 
-     *result = read_trn (cb.trn_addr, &th, &th_subject, &th_author);
+     *result = read_trn (cb.trn_addr, &th, &th_subject, &th_author, NULL);
      if (*result) { core_abort(); return; }
 
      finish_read();
@@ -569,7 +607,7 @@ int *result;
      *result = read_chain (cb.trn_chain, &spare_cb);
      if (*result) { core_abort(); return; }
 
-     *result = read_trn (cb.trn_addr, &th, &th_subject, &th_author);
+     *result = read_trn (cb.trn_addr, &th, &th_subject, &th_author, NULL);
      if (*result) { core_abort(); return; }
 
      finish_read();
@@ -601,6 +639,111 @@ int *result;
      info -> subject = th_subject;
      free (info -> author);
      info -> author = th_author;
+     info -> flags = cb.flags;
+
+     forget_super();
+
+     if (cb.flags & CB_DELETED)
+	  *result = DELETED_TRN;
+     else
+	  *result = 0;
+null_info:
+     return;
+}
+
+/*
+ *
+ * get_trn_info3 () --
+ * returns information about the given transaction in info, with an error
+ * code as its return argument.  This call returns expanded information,
+ * such as the flags and signature.
+ *
+ */
+get_trn_info3 (mtg_name, trn, info, result)
+char *mtg_name;
+trn_nums trn;
+trn_info3 *info;
+int *result;
+{
+     chain_blk cb,spare_cb;
+     trn_hdr th;
+     char *th_subject,*th_author, *th_signature;
+
+/*   printf ("get_trn_info: mtg %s, trn %d\n",
+	     mtg_name, trn);*/
+
+     /* safety -- set info up right */
+     info -> version = 0;
+     info -> current = 0;
+     info -> prev = 0;
+     info -> next = 0;
+     info -> pref = 0;
+     info -> nref = 0;
+     info -> fref = 0;
+     info -> lref = 0;
+     info -> chain_index = 0;
+     info -> date_entered = 0;
+     info -> num_lines = 0;
+     info -> num_chars = 0;
+     info -> subject = new_string ("");
+     info -> author = new_string ("");
+     info -> signature = new_string ("");
+     info -> flags = 0;
+
+     *result = open_mtg (mtg_name);
+     if (*result) return;
+
+     start_read();				/* starting to read */
+
+     *result = read_super ();
+     if (*result) { core_abort(); return; }
+
+     *result = read_chain (trn, &cb);
+     if (*result) { core_abort(); return; }
+
+     if (cb.trn_addr == 0) {
+	  *result = DELETED_TRN;
+	  core_abort();
+	  return;
+     }
+
+     *result = read_chain (cb.trn_chain, &spare_cb);
+     if (*result) { core_abort(); return; }
+
+     *result = read_trn (cb.trn_addr, &th, &th_subject, &th_author, &th_signature);
+     if (*result) { core_abort(); return; }
+
+     finish_read();
+
+     if (!has_trn_access(th_author, 'r')) {
+	  *result = NO_ACCESS;
+	  goto null_info;
+     }
+
+     if ((cb.flags & CB_DELETED) && !has_trn_access(th_author, 'd')) {
+	  *result = DELETED_TRN;
+	  goto null_info;
+     }
+
+     info -> version = 1;
+     info -> current = cb.current;
+     info -> prev = cb.prev;
+     info -> next = cb.next;
+     info -> pref = cb.pref;
+     info -> nref = cb.nref;
+     info -> fref = spare_cb.chain_fref;
+     info -> lref = spare_cb.chain_lref;
+     info -> chain_index = cb.trn_chain;
+
+     info -> date_entered = th.date_entered;
+     info -> num_lines = th.num_lines;
+     info -> num_chars = th.num_chars;
+     free (info -> subject);
+     info -> subject = th_subject;
+     free (info -> author);
+     info -> author = th_author;
+     free (info -> signature);
+     info -> signature = th_signature;
      info -> flags = cb.flags;
 
      forget_super();
@@ -649,7 +792,7 @@ int *result;
 	  core_abort (); return;
      }
 
-     *result = read_trn (cb.trn_addr, &th, (char **)0, &th_author);
+     *result = read_trn (cb.trn_addr, &th, (char **)0, &th_author, NULL);
      if (*result) { core_abort(); return; }
 
      if (!has_trn_access(th_author,'d')) {
@@ -714,7 +857,7 @@ int *result;
 	  core_abort (); return;
      }
 
-     *result = read_trn (cb.trn_addr, &th, (char **)0, &th_author);
+     *result = read_trn (cb.trn_addr, &th, (char **)0, &th_author, NULL);
      if (*result) { core_abort(); return; }
 
      if (!has_trn_access(th_author,'d')) {
@@ -839,7 +982,7 @@ int *result;
      }
 
      /* for paranoia, read transaction */
-     *result = read_trn (cb.trn_addr, &th, (char **)0, &th_author);
+     *result = read_trn (cb.trn_addr, &th, (char **)0, &th_author, NULL);
      if (*result) { core_abort(); return; }
 
      if (!has_trn_access(th_author,'d')) {
@@ -1304,7 +1447,7 @@ int *result;
 	  return;
      }
 
-     *result = read_trn (cb.trn_addr, &th, (char **)0, &th_author);
+     *result = read_trn (cb.trn_addr, &th, (char **)0, &th_author, NULL);
      if (*result) { core_abort(); return; }
 
      finish_read();
