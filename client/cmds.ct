@@ -33,6 +33,9 @@
 	request		repl, "Reply to a transaction.",
 			reply, rp;
 
+	request		randrp, "Reply to a random transaction.",
+			randrp, (dont_list);
+
 	request		list, "List transactions.",
 			list, ls;
 
