@@ -1,6 +1,6 @@
 /*
  *
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/include/globals.h,v 1.2 1986-09-22 06:19:58 spook Exp $
+ * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/include/globals.h,v 1.3 1986-10-19 09:59:48 spook Exp $
  * $Locker:  $
  *
  */
@@ -8,7 +8,8 @@
 /* Variables */
 
 extern trn_nums	cur_trans;	/* which is current transaction */
-extern char	*cur_mtg;	/* current meeting identifier */
+extern char	*cur_mtg;	/* current meeting unique identifier */
+extern char	*cur_mtg_name;	/* current meeting name */
 extern mtg_info	m_info;		/* current meeting info */
 extern char	*buffer;
 extern int	time_now, time_sixmonthsago;

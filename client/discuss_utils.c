@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss_utils.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss_utils.c,v 1.5 1986-09-13 20:31:56 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss_utils.c,v 1.6 1986-10-19 09:58:52 spook Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board.
@@ -8,6 +8,9 @@
  *	Utility routines.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.5  86/09/13  20:31:56  srz
+ * Include file fix
+ * 
  * Revision 1.4  86/08/22  00:20:38  spook
  * new error-table stuff; separated routines
  * 
@@ -19,7 +22,7 @@
  */
 
 #ifndef lint
-static char *rcsid_discuss_utils_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss_utils.c,v 1.5 1986-09-13 20:31:56 srz Exp $";
+static char *rcsid_discuss_utils_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss_utils.c,v 1.6 1986-10-19 09:58:52 spook Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -52,7 +55,7 @@ output_trans(txn_no, tf, code)
 	trn_info tinfo;
 
 	*code = 0;
-	get_trn_info(cur_mtg, txn_no, &tinfo, code);
+	dsc_get_trn_info(cur_mtg, txn_no, &tinfo, code);
 	if (*code != 0) return;
 
 	(void) strcpy (newtime, ctime (&(tinfo.date_entered)));
@@ -72,7 +75,7 @@ output_trans(txn_no, tf, code)
 		twrite (tf, tinfo.subject, strlen (tinfo.subject), code);
 		twrite (tf, "\n", 1, code);
 	}
-	get_trn(cur_mtg, txn_no, tf, code);
+	dsc_get_trn(cur_mtg, txn_no, tf, code);
 	if (*code != 0) return;
 
 	if (tinfo.pref == 0 && tinfo.nref == 0)

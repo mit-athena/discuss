@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v 1.2 1986-09-10 18:57:32 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v 1.3 1986-10-19 10:00:13 spook Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
@@ -8,6 +8,10 @@
  *	New-transaction routine for DISCUSS.  (Request 'talk'.)
  *
  *      $Log: not supported by cvs2svn $
+ * Revision 1.2  86/09/10  18:57:32  wesommer
+ * Made to work with kerberos; meeting names are now longer.
+ * ./
+ * 
  * Revision 1.1  86/08/22  00:23:58  spook
  * Initial revision
  * 
@@ -15,7 +19,7 @@
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v 1.2 1986-09-10 18:57:32 wesommer Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v 1.3 1986-10-19 10:00:13 spook Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -74,14 +78,13 @@ new_trans(sci_idx, argc, argv)
 		return;
 	}
 	tf = unix_tfile(fd);
-	add_trn(cur_mtg, tf, subject, 0, &txn_no, &code);
+	dsc_add_trn(cur_mtg, tf, subject, 0, &txn_no, &code);
 	if (code != 0) {
 		(void) fprintf(stderr, "Error adding transaction: %s\n", 
 			       error_message(code));
 		return;
 	}
 	(void) printf("Transaction [%04d] entered in the %s meeting.\n",
-		      txn_no, cur_mtg);
+		      txn_no, cur_mtg_name);
 	cur_trans = txn_no;
 }
-

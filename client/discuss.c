@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.14 1986-09-16 21:52:10 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.15 1986-10-19 09:58:03 spook Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
@@ -9,6 +9,9 @@
  *	ss library for the command interpreter.
  *
  *      $Log: not supported by cvs2svn $
+ * Revision 1.14  86/09/16  21:52:10  wesommer
+ * Close off RPC connections so we don't lose file descriptors.
+ * 
  * Revision 1.13  86/09/16  21:33:42  srz
  * bug fixes of last checkout.
  * 
@@ -50,7 +53,7 @@
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.14 1986-09-16 21:52:10 wesommer Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.15 1986-10-19 09:58:03 spook Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -72,12 +75,12 @@ static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athe
 #define	DONT_USE(var)	;
 #endif	lint
 
+#define	FREE(ptr)	{ if (ptr) free(ptr); }
+
 extern ss_request_table discuss_cmds;
 trn_nums cur_trans = -1;
-char	*cur_mtg = (char *)NULL;
-rpc_conversation cur_conv;		/* Current conversation; valid if
-					 *  cur_mtg != NULL
-					 */	
+char	*cur_mtg = (char *)NULL; /* meeting uid */
+char	*cur_mtg_name = (char *)NULL; /* meeting name */
 char	*temp_file = (char *)NULL;
 char	*pgm = (char *)NULL;
 char	*malloc(), *getenv(), *gets(), *ctime();
@@ -108,7 +111,6 @@ main(argc, argv)
 
 	init_disc_err_tbl();
 	init_dsc_err_tbl();
-	init_rpc();
 
 	temp_file = malloc(64);
 	pgm = malloc(64);
@@ -147,7 +149,7 @@ repl(sci_idx, argc, argv)
 		(void) fprintf(stderr, "No current transaction.\n");
 		return;
 	}
-	get_trn_info(cur_mtg, cur_trans, &t_info, &code);
+	dsc_get_trn_info(cur_mtg, cur_trans, &t_info, &code);
 	if (code != 0) {
 		
 		(void) fprintf(stderr,
@@ -176,7 +178,7 @@ repl(sci_idx, argc, argv)
 	}
 	tf = unix_tfile(fd);
 	
-	add_trn(cur_mtg, tf, t_info.subject,
+	dsc_add_trn(cur_mtg, tf, t_info.subject,
 		cur_trans, &txn_no, &code);
 	if (code != 0) {
 		fprintf(stderr, "Error adding transaction: %s\n",
@@ -205,7 +207,7 @@ del_trans(sci_idx, argc, argv)
 		return;
 	}
 	txn_no = atoi(argv[1]);
-	delete_trn(cur_mtg, txn_no, &code);
+	dsc_delete_trn(cur_mtg, txn_no, &code);
 	if (code != 0) {
 		(void) fprintf(stderr, "Error deleting transaction %d: %s\n",
 			       txn_no, error_message(code));
@@ -231,7 +233,7 @@ ret_trans(sci_idx, argc, argv)
 		return;
 	}
 	txn_no = atoi(argv[1]);
-	retrieve_trn(cur_mtg, txn_no, &code);
+	dsc_retrieve_trn(cur_mtg, txn_no, &code);
 	if (code != 0) {
 		(void) fprintf(stderr, "Error retrieving transaction %d: %s\n",
 			       txn_no, error_message(code));
@@ -246,7 +248,6 @@ goto_mtg(sci_idx, argc, argv)
 	char **argv;
 {
 	int code;
-	char *machine,*mtg_name;
 	name_blk nb;
 
 	DONT_USE(sci_idx);
@@ -256,39 +257,30 @@ goto_mtg(sci_idx, argc, argv)
 	}
 	if (cur_mtg != (char *)NULL) {
 		(void) free(cur_mtg);
-		close_rpc(cur_conv);
 	}
 	cur_mtg = (char *)NULL;
+	FREE(cur_mtg_name);
+	cur_mtg_name = malloc(strlen(argv[1])+1);
+	strcpy(cur_mtg_name, argv[1]);
 
-	get_mtg_unique_id ("", "", argv[1], &nb, &code);
+	get_mtg_unique_id ("", "", cur_mtg_name, &nb, &code);
 	if (code != 0) {
-		(void) fprintf (stderr, "%s: Meeting not found in search path.\n", argv[1]);
+		(void) fprintf (stderr,
+				"%s: Meeting not found in search path.\n",
+				argv[1]);
 		return;
 	}
 
-	get_mtg_location(nb.unique_id, &machine, &mtg_name, &code);
+	cur_mtg = malloc(strlen(nb.unique_id)+2);
+	strcpy(cur_mtg, nb.unique_id);
+	dsc_get_mtg_info(cur_mtg, &m_info, &code);
 	if (code != 0) {
-		(void) fprintf (stderr, "Bad form of unique name\n");
+		(void) fprintf(stderr,
+			       "Error getting meeting info for %s: %s\n", 
+			       cur_mtg_name, error_message(code));
+		free(cur_mtg);
+		cur_mtg = (char *)NULL;
 		return;
 	}
-	if ((cur_conv=open_rpc(machine, "discuss", &code)) == NULL) { 
-		(void) free (machine);
-		(void) fprintf (stderr, "%s: %s\n", argv[1], 
-				error_message(code));
-		return;
-	}
-	(void) free(machine);
-
-	if (code)
-		(void) fprintf (stderr, "Warning: %s\n", error_message(code));
-	get_mtg_info(mtg_name, &m_info, &code);
-	if (code != 0) {
-		(void) fprintf(stderr, "Error getting meeting info for %s: %s\n", 
-			       mtg_name, error_message(code));
-		return;
-	}
-	cur_mtg = (char *) malloc(strlen(mtg_name) + 1);
-	if (cur_mtg) strcpy(cur_mtg, mtg_name); 
-	else fprintf(stderr, "malloc failed; could not go to meeting\n");
 }
 

@@ -2,13 +2,16 @@
  *
  * List request for DISCUSS
  *
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.5 1986-10-14 22:59:06 spook Exp $
+ * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.6 1986-10-19 10:00:05 spook Exp $
  * $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v $
  * $Locker:  $
  *
  * Copyright (C) 1986 by the MIT Student Information Processing Board
  *
  * $Log: not supported by cvs2svn $
+ * Revision 1.5  86/10/14  22:59:06  spook
+ * Checking meeting info on each request.
+ * 
  * Revision 1.4  86/09/22  06:18:43  spook
  * changed selected-list manipulation
  * 
@@ -52,7 +55,7 @@ list_it(i)
 		new_trn_no = i;
 		cur_trans = i;
 	}
-	get_trn_info(cur_mtg, i, &t_info, &code);
+	dsc_get_trn_info(cur_mtg, i, &t_info, &code);
 	if (code == DELETED_TRN) {
 		code = 0;
 		goto punt;
@@ -63,7 +66,7 @@ list_it(i)
 			  "Can't read trn info");
 		goto punt;
 	}
-	cp=ctime(&t_info.date_entered);
+	cp = ctime(&t_info.date_entered);
 	if((t_info.date_entered < time_sixmonthsago) ||
 	   (t_info.date_entered > time_plusthreemonths))
 		(void) sprintf(newtime, "%-7.7s %-4.4s",
@@ -117,14 +120,14 @@ list(sci_arg, argc, argv)
 		ss_perror(sci_idx, 0, "No current meeting.\n");
 		return;
 	}
-	get_mtg_info(cur_mtg, &m_info, &code);
+	dsc_get_mtg_info(cur_mtg, &m_info, &code);
 	if (code != 0) {
 		(void) ss_perror(sci_idx, code, "Can't get meeting info");
 		return;
 	}
 	txn_no = m_info.first;
 
-	get_trn_info(cur_mtg, cur_trans, &t_info, &code);
+	dsc_get_trn_info(cur_mtg, cur_trans, &t_info, &code);
 	if (code != 0)
 		t_info.current = -1;
 

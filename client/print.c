@@ -3,12 +3,15 @@
  *	Print-related requests for DISCUSS.
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.5 1986-10-15 00:50:23 spook Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.6 1986-10-19 10:00:17 spook Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
  *
  *      $Log: not supported by cvs2svn $
+ * Revision 1.5  86/10/15  00:50:23  spook
+ * switch to use ss_pager_create
+ * 
  * Revision 1.4  86/10/15  00:18:26  spook
  * Added trn list parsing to print and write requests.
  * 
@@ -27,7 +30,7 @@
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.5 1986-10-15 00:50:23 spook Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.6 1986-10-19 10:00:17 spook Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -85,12 +88,12 @@ prt_trans(sci_idx, argc, argv)
 		(void) fprintf(stderr, "No current meeting.\n");
 		return;
 	}
-	get_mtg_info(cur_mtg, &m_info, &code);
+	dsc_get_mtg_info(cur_mtg, &m_info, &code);
 	if (code != 0) {
 		(void) ss_perror(sci_idx, code, "Can't get meeting info");
 		return;
 	}
-	get_trn_info(cur_mtg, cur_trans, &t_info, &code);
+	dsc_get_trn_info(cur_mtg, cur_trans, &t_info, &code);
 	if (code)
 		t_info.current = -1;
 
@@ -159,7 +162,7 @@ write_trans(sci_idx, argc, argv)
 		(void) fprintf(stderr, "No current meeting.\n");
 		return;
 	}
-	get_mtg_info(cur_mtg, &m_info, &code);
+	dsc_get_mtg_info(cur_mtg, &m_info, &code);
 	if (code != 0) {
 		(void) ss_perror(sci_idx, code, "Can't get meeting info");
 		return;
