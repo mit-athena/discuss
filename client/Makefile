@@ -1,29 +1,32 @@
-LIBS= ../lib/libdsk.a ../ets/dsc_et.o ../lib/libusp.a \
+LIBS= ../server/acl.o ../lib/libdsk.a ../ets/dsc_et.o ../lib/libusp.a \
 	../lib/libcom_err.a libss.a ../lib/libkrb.a ../lib/libdes.a
 
-CFLAGS=	-g
+CFLAGS=	-g -I../include
+LFLAGS=	-uhv -I../include
 
-OBJS=	discuss.o discuss_utils.o trn_expr.o list.o trn_select.o \
-	status.o new_trans.o print.o lsm.o \
+OBJS=	discuss.o edit.o output.o trn_expr.o list.o trn_select.o \
+	status.o new_trans.o print.o lsm.o addmtg.o list_acl.o \
+	interrupt.o \
 	cmds.o ../ets/discuss_err.o
 
-SRCS=	discuss.c discuss_utils.c trn_expr.c list.c trn_select.c \
-	status.c new_trans.c print.c lsm.c
+SRCS=	discuss.c edit.c output.c trn_expr.c list.c trn_select.c \
+	status.c new_trans.c print.c lsm.c addmtg.c list_acl.c \
+	interrupt.c
 
 .SUFFIXES:	.ct .h .et
 
 .ct.o:	
-	make_commands $*.ct
+	./make_commands $*.ct
 	cc -R -O -c $*.c
 	-rm -f $*.c
 
 .et.o:	# how to say that this regenerates .h files too?
-	../lib/compile_et $*.et
+	../et/compile_et $*.et
 	cc -R -O -c $*.c
 	-rm -f $*.c
 
 .et.h:
-	../lib/compile_et $*.et
+	../et/compile_et $*.et
 	cc -R -O -c $*.c
 	-rm -f $*.c
 
@@ -49,19 +52,35 @@ tags:	TAGS
 
 TAGS:	$(SRCS)
 
-lint:	$(SRCS)
-	lint $(SRCS)
+lint:	$(SRCS) ../server/acl.c ../libds/llib-lds.ln ../lib/llib-lcom_err.ln \
+			llib-lss.ln
+	lint $(LFLAGS) $(SRCS) ../lib/llib-lcom_err.ln llib-lss.ln \
+			../server/acl.c ../libds/llib-lds.ln |\
+		grep -v " unused in function " |\
+		grep -v " set but not used in function " |\
+		grep -v "possible pointer alignment "
 
 clean:
 	rm -f *.o *~ \#* *.bak
 	rm -f discuss trn_expr.c y.tab.c TAGS
+
+dist:	$(SRCS) Makefile make_commands libss.a trn_expr.y cmds.ct
+	-mkdir ../dist/client
+	cp -p $(SRCS) ../dist/client/
+	cp -p Makefile ../dist/client/
+	cp -p trn_expr.y cmds.ct ../dist/client/
+	tar cf - info | (cd ../dist/client ; tar xfv - )
+	ln -s ../include/ss.h ../dist/client/ss.h
+	ln -s ../include/ss_err.h ../dist/client/ss_err.h
+	ln -s ../ss/make_commands ../dist/client/make_commands
+	ln -s ../lib/libss.a ../dist/client/
 
 ./discuss_err.h: discuss_err.h
 
 # 'make depend' code
 CFILES=	$(SRCS)
 depend: 
-	${CC} -M ${COPTS} ${CFILES} | \
+	${CC} -M -I../include ${COPTS} ${CFILES} | \
 	sed -e ':loop' \
 	    -e 's/\.\.\/[^ /]*\/\.\./../' \
 	    -e 't loop' | \
@@ -81,36 +100,56 @@ depend:
 
 discuss.o: discuss.c /usr/include/stdio.h /usr/include/sys/file.h
 discuss.o: /usr/include/signal.h /usr/include/strings.h /usr/include/sys/wait.h
-discuss.o: ./../include/ss.h ./../include/ss_err.h ./../include/tfile.h
-discuss.o: ./../include/interface.h ./../include/types.h ./../include/config.h
-discuss.o: ./../include/dsname.h ./../include/rpc.h /usr/include/stdio.h
-discuss.o: ./../include/usp.h ./../include/rpc_et.h ./globals.h
-discuss_utils.o: discuss_utils.c /usr/include/stdio.h /usr/include/sys/file.h
-discuss_utils.o: /usr/include/strings.h /usr/include/signal.h ./../include/ss.h
-discuss_utils.o: ./../include/ss_err.h ./../include/tfile.h
-discuss_utils.o: ./../include/interface.h ./../include/types.h
-discuss_utils.o: ./../include/config.h ./../include/discuss_err.h
-discuss_utils.o: /usr/include/sys/wait.h
-trn_expr.o: trn_expr.c /usr/include/ctype.h ./../include/interface.h
-trn_expr.o: ./../include/types.h ./../include/discuss_err.h
-list.o: list.c /usr/include/stdio.h /usr/include/strings.h ./../include/ss.h
-list.o: ./../include/ss_err.h ./../include/tfile.h ./../include/interface.h
-list.o: ./../include/types.h ./../include/config.h ./../include/dsc_et.h
-list.o: ./globals.h
-trn_select.o: trn_select.c /usr/include/stdio.h ./../include/interface.h
-trn_select.o: ./../include/types.h ./../include/discuss_err.h ./globals.h
-status.o: status.c /usr/include/stdio.h ./../include/ss.h ./../include/ss_err.h
-status.o: ./../include/interface.h ./../include/types.h ./../include/config.h
-status.o: ./globals.h
+discuss.o: ./ss.h ./ss_err.h ../include/tfile.h ../include/interface.h
+discuss.o: ../include/types.h ../include/config.h ../include/rpc.h
+discuss.o: /usr/include/stdio.h ../include/usp.h ../include/usp_et.h
+discuss.o: ../include/rpc_et.h ../include/globals.h ../include/dsname.h
+discuss.o: ../include/acl.h ../include/types.h
+edit.o: edit.c /usr/include/stdio.h /usr/include/sys/file.h
+edit.o: /usr/include/strings.h /usr/include/signal.h ./ss.h ./ss_err.h
+edit.o: ../include/tfile.h ../include/interface.h ../include/types.h
+edit.o: ../include/config.h ../include/discuss_err.h ../include/globals.h
+edit.o: ../include/dsname.h /usr/include/sys/wait.h /usr/include/sys/types.h
+edit.o: /usr/include/sys/stat.h /usr/include/sys/errno.h
+output.o: output.c /usr/include/stdio.h /usr/include/sys/file.h
+output.o: /usr/include/strings.h /usr/include/signal.h ./ss.h ./ss_err.h
+output.o: ../include/tfile.h ../include/interface.h ../include/types.h
+output.o: ../include/config.h ../include/discuss_err.h ../include/globals.h
+output.o: ../include/dsname.h
+trn_expr.o: trn_expr.c /usr/include/ctype.h ../include/interface.h
+trn_expr.o: ../include/types.h ../include/discuss_err.h ../include/globals.h
+trn_expr.o: ../include/dsname.h
+list.o: list.c /usr/include/stdio.h /usr/include/strings.h ./ss.h ./ss_err.h
+list.o: ../include/tfile.h ../include/interface.h ../include/types.h
+list.o: ../include/config.h ../include/dsc_et.h ../include/globals.h
+list.o: ../include/dsname.h
+trn_select.o: trn_select.c /usr/include/stdio.h ../include/interface.h
+trn_select.o: ../include/types.h ../include/discuss_err.h ../include/globals.h
+trn_select.o: ../include/dsname.h
+status.o: status.c /usr/include/stdio.h ./ss.h ./ss_err.h
+status.o: ../include/interface.h ../include/types.h ../include/config.h
+status.o: ../include/globals.h ../include/dsname.h ../include/acl.h
+status.o: ../include/types.h
 new_trans.o: new_trans.c /usr/include/stdio.h /usr/include/sys/file.h
 new_trans.o: /usr/include/signal.h /usr/include/strings.h
-new_trans.o: /usr/include/sys/wait.h ./../include/ss.h ./../include/ss_err.h
-new_trans.o: ./../include/tfile.h ./../include/interface.h ./../include/types.h
-new_trans.o: ./../include/config.h ./globals.h
-print.o: print.c /usr/include/stdio.h /usr/include/sys/file.h
-print.o: /usr/include/signal.h /usr/include/strings.h /usr/include/sys/wait.h
-print.o: ./../include/ss.h ./../include/ss_err.h ./../include/tfile.h
-print.o: ./../include/interface.h ./../include/types.h ./../include/config.h
-print.o: ./../include/dsc_et.h ./globals.h
-lsm.o: lsm.c /usr/include/strings.h /usr/include/stdio.h ./../include/types.h
-lsm.o: ./../include/dsname.h
+new_trans.o: /usr/include/sys/wait.h ./ss.h ./ss_err.h ../include/tfile.h
+new_trans.o: ../include/interface.h ../include/types.h ../include/config.h
+new_trans.o: ../include/globals.h ../include/dsname.h ../include/acl.h
+new_trans.o: ../include/types.h
+print.o: print.c /usr/include/stdio.h /usr/include/errno.h
+print.o: /usr/include/sys/file.h /usr/include/signal.h /usr/include/strings.h
+print.o: /usr/include/sys/wait.h ./ss.h ./ss_err.h ../include/tfile.h
+print.o: ../include/interface.h ../include/types.h ../include/config.h
+print.o: ../include/dsc_et.h ../include/globals.h ../include/dsname.h
+lsm.o: lsm.c /usr/include/strings.h /usr/include/stdio.h ../include/types.h
+lsm.o: ../include/interface.h ../include/types.h ../include/globals.h
+lsm.o: ../include/dsname.h
+addmtg.o: addmtg.c /usr/include/strings.h /usr/include/stdio.h
+addmtg.o: /usr/include/fcntl.h ../include/tfile.h ../include/types.h
+addmtg.o: ../include/interface.h ../include/types.h ../include/globals.h
+addmtg.o: ../include/dsname.h
+list_acl.o: list_acl.c /usr/include/strings.h /usr/include/stdio.h
+list_acl.o: ../include/types.h ../include/interface.h ../include/types.h
+list_acl.o: ../include/acl.h ../include/types.h ../include/globals.h
+list_acl.o: ../include/dsname.h
+interrupt.o: interrupt.c /usr/include/signal.h
