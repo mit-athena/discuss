@@ -82,7 +82,7 @@
 */
 
 /*
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/usp/main.c,v 1.2 1991-09-04 11:44:24 lwvanels Exp $
+ * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/usp/main.c,v 1.3 1994-03-25 17:09:42 miki Exp $
  * $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/usp/main.c,v $
  * $Locker:  $
  */
@@ -98,7 +98,7 @@
 #include "usp.h"
 
 static char rcsid[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/usp/main.c,v 1.2 1991-09-04 11:44:24 lwvanels Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/usp/main.c,v 1.3 1994-03-25 17:09:42 miki Exp $";
 
 /* connection operations */
 
@@ -123,8 +123,12 @@ char	*service;
      if(! (host_info = gethostbyname(host))) {
 	 return(NULL);
      }
-     bzero((char *) &address, sizeof(address));
+     memset((char *) &address, 0, sizeof(address));
+#ifdef POSIX
+   memmove((char *) &address.sin_addr, host_info->h_addr, host_info->h_length);
+#else
      bcopy(host_info->h_addr, (char *) &address.sin_addr, host_info->h_length);
+#endif
      address.sin_family = host_info->h_addrtype;
      address.sin_port = svc_info->s_port;
      if((s = socket(host_info->h_addrtype, SOCK_STREAM, 0)) == ERROR) {
