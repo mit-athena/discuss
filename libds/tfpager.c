@@ -1,27 +1,30 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tfpager.c,v $
- *	$Author: ghudson $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tfpager.c,v 1.2 1996-09-19 22:30:53 ghudson Exp $
+ *	$Author: danw $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tfpager.c,v 1.3 1998-11-05 14:40:38 danw Exp $
  *
  *	Copyright (C) 1987 by the Massachusetts Institute of Technology
  *
  *	An auto-paging tfile.
  *
  *	$Log: not supported by cvs2svn $
+ *	Revision 1.2  1996/09/19 22:30:53  ghudson
+ *	BSD -> ANSI string and memory functions
+ *
  *	Revision 1.1  1993/10/12 05:58:26  probe
  *	Initial revision
  *
  */
 
 #ifndef lint
-static char *rcsid_tfpager_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tfpager.c,v 1.2 1996-09-19 22:30:53 ghudson Exp $";
+static char *rcsid_tfpager_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tfpager.c,v 1.3 1998-11-05 14:40:38 danw Exp $";
 #endif lint
 
 #include <stdio.h>
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/ioctl.h>
-#include <sys/signal.h>
+#include <signal.h>
 #include "tfile.h"
 #include <ctype.h>
 #define TABSTOP	8
