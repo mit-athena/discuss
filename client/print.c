@@ -2,7 +2,7 @@
  *	Print-related requests for DISCUSS.
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.17 1989-01-05 00:58:33 raeburn Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.18 1989-03-27 02:19:11 srz Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986, 1988 by the Student Information Processing Board
@@ -11,7 +11,7 @@
 
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.17 1989-01-05 00:58:33 raeburn Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.18 1989-03-27 02:19:11 srz Exp $";
 #endif /* lint */
 
 #include <stdio.h>
@@ -43,27 +43,28 @@ extern void sl_free();
 extern char *error_message();
 
 static int
-display_trans(trn_no)
-	int trn_no;
+display_trans(t_infop, codep)
+trn_info2 *t_infop;
+int *codep;
 {
-	int code;
-	output_trans(trn_no, tf, &code);
-	if (code == 0) {
-	     dsc_public.highest_seen = max(dsc_public.highest_seen,trn_no);
-	     dsc_public.current = trn_no;
+	output_trans(t_infop, tf, codep);
+	if (*codep == 0) {
+	     dsc_public.highest_seen = max(dsc_public.highest_seen,t_infop->current);
+	     dsc_public.current = t_infop->current;
 	     performed = TRUE;
-	} else if (code == EPIPE) {
-	     dsc_public.current = trn_no;
+	} else if (*codep == EPIPE) {
+	     dsc_public.current = t_infop->current;
 	     performed = TRUE;
-	     return(code);		/* silently quit */
+	     return;			/* silently quit */
 	}
-	else if (code != DELETED_TRN) {
+	else if (*codep != DELETED_TRN) {
 	     fprintf(stderr, "Error printing transaction: %s\n",
-		     error_message(code));
-	     return(code);
+		     error_message(*codep));
+	     return;
 	}
 
-	return(0);
+	*codep = 0;
+	return;
 }
 
 prt_trans(argc, argv)
@@ -90,6 +91,7 @@ prt_trans(argc, argv)
 	     ss_perror(sci_idx, DISC_NO_MTG, (char *)NULL);
 	     return;
 	}
+	dsc_destroy_mtg_info(&dsc_public.m_info);
 	dsc_get_mtg_info(&dsc_public.nb,
 			 &dsc_public.m_info, &code);
 	if (code != 0) {
@@ -105,12 +107,8 @@ prt_trans(argc, argv)
 		t_info.prev = dsc_public.current-1;
 	} else if (code)
 		t_info.current = 0;
-	else {
-		free(t_info.subject); /* don't need these */
-		t_info.subject = NULL;
-		free(t_info.author);
-		t_info.author = NULL;
-	}
+
+	dsc_destroy_trn_info(&t_info);
 
 	if (argc == 1) {
 		char *ref;
@@ -124,7 +122,7 @@ prt_trans(argc, argv)
 				      (selection_list *)NULL, &code);
 		if (code) {
 			ss_perror(sci_idx, code, "");
-			free((char *)trn_list);
+			sl_free(trn_list);
 			return;
 		}
 	}
@@ -161,7 +159,8 @@ prt_trans(argc, argv)
 	     return;
 	}
 	tf = unix_tfile(fd);
-	(void) sl_map(display_trans, trn_list);
+	(void) sl_map(display_trans, trn_list,FALSE);
+	sl_free(trn_list);
 	tclose(tf, &code);
 	(void) close(fd);
 	(void) tdestroy(tf);
@@ -184,6 +183,7 @@ write_trans(argc, argv)
 	     ss_perror(sci_idx, DISC_NO_MTG, "");
 	     return;
 	}
+	dsc_destroy_mtg_info(&dsc_public.m_info);
 	dsc_get_mtg_info(&dsc_public.nb,
 			 &dsc_public.m_info, &code);
 	if (code != 0) {
@@ -218,7 +218,8 @@ write_trans(argc, argv)
 		return;
 	}
 	tf = unix_tfile(fd);
-	(void) sl_map(display_trans, trn_list);
+	(void) sl_map(display_trans, trn_list, FALSE);
+	sl_free(trn_list);
 	tclose(tf, &code);
 	(void) close(fd);
 	(void) tdestroy(tf);

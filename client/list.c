@@ -2,7 +2,7 @@
  *
  * List request for DISCUSS
  *
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.20 1989-02-23 23:29:08 srz Exp $
+ * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.21 1989-03-27 02:18:49 srz Exp $
  * $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v $
  * $Locker:  $
  *
@@ -11,7 +11,7 @@
  */
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.20 1989-02-23 23:29:08 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.21 1989-03-27 02:18:49 srz Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -33,73 +33,70 @@ static int setting;		/* Whether we are turning flag on or off */
 
 void map_trns();
 
-static list_it(i)
-	int i;
+static list_it(t_infop, codep)
+trn_info2 *t_infop;
+int *codep;
 {
 	char newtime[26], nlines[10];
 	char *cp;
 	int max_len;
-	int code;
 
-	dsc_get_trn_info2(&dsc_public.nb, i, &t_info, &code);
-	if (code == DELETED_TRN) {
-		code = 0;
+	if (*codep == DELETED_TRN) {
+		*codep = 0;
 		goto punt;
 		/* should check -idl flag */
 	}
-	else if (code == NO_ACCESS) {
-	        code = 0;
+	else if (*codep == NO_ACCESS) {
+	        *codep = 0;
 	        barred = TRUE;
 		goto punt;
 	}
-	else if (code != 0) {
-		ss_perror(sci_idx, code,
+	else if (*codep != 0) {
+		ss_perror(sci_idx, *codep,
 			  "Can't read transaction info");
 		goto punt;
 	}
 
-	if (t_info.pref && only_initial) {
-		code = 0;
+	if (t_infop->pref && only_initial) {
+		*codep = 0;
 		goto punt;
 	}
 
 	if (!performed) {
 	    performed = TRUE;
-	    dsc_public.current = i; /* current = first */
+	    dsc_public.current = t_infop->current; /* current = first */
 	}
 
-	strcpy(newtime, short_time(&t_info.date_entered));
+	strcpy(newtime, short_time(t_infop->date_entered));
 	/*
 	 * If author ends with current realm, punt the realm.
 	 */
-	if ((cp=index(t_info.author, '@')) != NULL)
+	if ((cp=index(t_infop->author, '@')) != NULL)
 		if (!strcmp(cp+1, local_realm()))
 			*cp = '\0';
 
-	(void) sprintf (nlines, "(%d)", t_info.num_lines);
+	(void) sprintf (nlines, "(%d)", t_infop->num_lines);
 	(void) sprintf (buffer, " [%04d]%s%c",
-			t_info.current,
-			((t_info.flags & TRN_FLAG1) != 0) ? "F" : "",
-			(t_info.current == dsc_public.current) ? '*' : ' ');
+			t_infop->current,
+			((t_infop->flags & TRN_FLAG1) != 0) ? "F" : "",
+			(t_infop->current == dsc_public.current) ? '*' : ' ');
 	(void) strncat (buffer, "     ",
 			MIN (5, 13-strlen (buffer)) - strlen (nlines));
 
-	if (strlen(t_info.author) > 15)
-		(void) strcpy(&t_info.author[12], "...");
+	if (strlen(t_infop->author) > 15)
+		(void) strcpy(&t_infop->author[12], "...");
 
 	(void) sprintf (buffer + strlen (buffer), "%s %s %-15s ",
-			nlines, newtime, t_info.author);
+			nlines, newtime, t_infop->author);
 	max_len = 80 - strlen (buffer);
 
-	if (!long_subjects && strlen (t_info.subject) > max_len)
-	    (void) strcpy (&t_info.subject [max_len - 3], "...");
+	if (!long_subjects && strlen (t_infop->subject) > max_len)
+	    (void) strcpy (&t_infop->subject [max_len - 3], "...");
 
-	(void) printf ("%s%s\n", buffer, t_info.subject);
+	(void) printf ("%s%s\n", buffer, t_infop->subject);
 
- punt:
-	(void) free (t_info.author);
-	(void) free (t_info.subject);
-	return(code);
+punt:
+	return;
 }
 
 list (argc, argv, sci_idx)
@@ -121,33 +118,40 @@ list (argc, argv, sci_idx)
 		*ap2++ = *ap, ac++;
 	}
 	*ap2 = (char *) NULL;
-	map_trns(ac, nargv, "all", list_it);
+	map_trns(ac, nargv, "all", list_it, FALSE);
 	free (ap2);
 	return;
 }
 
-static delete_it (i)
-    int i;
+static delete_it (t_infop, codep)
+trn_info2 *t_infop;
+int *codep;
 {
-     int code;
-
      if (only_initial) {
-	     ss_perror(sci_idx, 0, "flag '-initial' not accepted");
-	     return 1;
-     }
-     dsc_delete_trn(&dsc_public.nb, i, &code);
-     if (code == NO_ACCESS) {
-	  barred = TRUE;
-     } else if (code == 0) {
-	  performed = TRUE;
-     } else if (code != DELETED_TRN) {
-	  (void) fprintf(stderr, "Error deleting transaction %d: %s\n",
-			 i, error_message(code));
-	  if (code != EXPUNGED_TRN)
-	       return(code);				/* stop now */
+	  ss_perror(sci_idx, 0, "flag '-initial' not accepted");
+	  *codep = 1;
+	  return;
      }
 
-     return(0);
+     if (*codep == DELETED_TRN) {		/* Already deleted, done */
+	  *codep = 0;
+	  return;
+     }
+
+     dsc_delete_trn(&dsc_public.nb, t_infop->current, codep);
+     if (*codep == NO_ACCESS) {
+	  barred = TRUE;
+     } else if (*codep == 0) {
+	  performed = TRUE;
+     } else {
+	  (void) fprintf(stderr, "Error deleting transaction %d: %s\n",
+			 t_infop->current, error_message(*codep));
+	  if (*codep != EXPUNGED_TRN)
+	       return;					/* stop now */
+     }
+
+     *codep = 0;
+     return;
 }
 
 
@@ -155,49 +159,54 @@ del_trans(argc, argv)
 	int argc;
 	char **argv;
 {
-	map_trns(argc, argv, "current", delete_it);
+	map_trns(argc, argv, "current", delete_it, FALSE);
 	dsc_public.current = 0;
 	return;
 }
 
-static retrieve_it (i)
-    int i;
+static retrieve_it (t_infop, codep)
+trn_info2 *t_infop;
+int *codep;
 {
-     int code;
-
      if (only_initial) {
-	     ss_perror(sci_idx, 0, "flag '-initial' not accepted");
-	     return 1;
+	  ss_perror(sci_idx, 0, "flag '-initial' not accepted");
+	  *codep = 1;
+	  return;
      }
-     dsc_retrieve_trn(&dsc_public.nb, i, &code);
-     if (code == NO_ACCESS) {
+
+     if (*codep == 0) {				/* Transaction exists */
+	  return;
+     }
+
+     dsc_retrieve_trn(&dsc_public.nb, t_infop->current, codep);
+     if (*codep == NO_ACCESS) {
 	  barred = TRUE;
-     } else if (code == 0) {
+     } else if (*codep == 0) {
 	  performed = TRUE;
-	  dsc_public.current = i;
-     } else if (code != TRN_NOT_DELETED) {
+	  dsc_public.current = t_infop->current;
+     } else {
 	  (void) fprintf(stderr, "Error retrieving transaction %d: %s\n",
-			 i, error_message(code));
-	  return(code);
+			 t_infop->current, error_message(*codep));
+	  return;
      }
-     return (0);
+     *codep = 0;
+     return;
 }
-
-
 
 ret_trans(argc, argv)
 	int argc;
 	char **argv;
 {
-	map_trns(argc, argv, "current", retrieve_it);
+	map_trns(argc, argv, "current", retrieve_it, TRUE);
 	return;
 }
 
-void map_trns(argc, argv, defalt, proc)
+void map_trns(argc, argv, defalt, proc, include_deleted)
 	int argc;
 	char **argv;
 	char *defalt;
 	int (*proc)();
+	int include_deleted;     
 {
 	int i, code;
 	selection_list *trn_list;
@@ -206,6 +215,7 @@ void map_trns(argc, argv, defalt, proc)
 		ss_perror(sci_idx, 0, "No current meeting.\n");
 		return;
 	}
+	dsc_destroy_mtg_info(&dsc_public.m_info);
 	dsc_get_mtg_info(&dsc_public.nb,
 			 &dsc_public.m_info, &code);
 	if (code != 0) {
@@ -217,12 +227,8 @@ void map_trns(argc, argv, defalt, proc)
 			 &t_info, &code);
 	if (code != 0)
 		t_info.current = 0;
-	else {
-	     free(t_info.subject);
-	     t_info.subject = NULL;
-	     free(t_info.author);
-	     t_info.author = NULL;
-	}
+
+	dsc_destroy_trn_info(&t_info);		/* Get rid of dynamic stuff */
 
 	only_initial = 0;
 	trn_list = (selection_list *)NULL;
@@ -245,7 +251,7 @@ void map_trns(argc, argv, defalt, proc)
 				      (selection_list *)NULL, &code);
 		if (code) {
 			ss_perror(sci_idx, code, defalt);
-			free(trn_list);
+			sl_free(trn_list);
 			return;
 		}
 	}
@@ -253,51 +259,47 @@ void map_trns(argc, argv, defalt, proc)
 	performed = FALSE;
 	barred = FALSE;
 
-	(void) sl_map(proc, trn_list);
+	(void) sl_map(proc, trn_list, include_deleted);
+	sl_free(trn_list);
 	if (!performed)
 	     ss_perror(sci_idx, barred ? NO_ACCESS : DISC_NO_TRN, "");
 }
 
-static flag_it(i)
-int i;
+static flag_it(t_infop, codep)
+trn_info2 *t_infop;
+int *codep;
 {
-     int code;
-
-     dsc_get_trn_info2(&dsc_public.nb, i, &t_info, &code);
-     if (code == DELETED_TRN) {
-	  code = 0;
-	  goto punt;
-     } else if (code == NO_ACCESS) {
-	  code = 0;
+     if (*codep == DELETED_TRN) {
+	  *codep = 0;
+	  return;
+     } else if (*codep == NO_ACCESS) {
+	  *codep = 0;
 	  barred = TRUE;
-	  goto punt;
-     } else if (code != 0) {
-	  ss_perror(sci_idx, code,
+	  return;
+     } else if (*codep != 0) {
+	  ss_perror(sci_idx, *codep,
 		    "Can't read transaction info");
-	  goto punt;
+	  return;
      }
 
      if (setting)
-	  t_info.flags |= TRN_FLAG1;
+	  t_infop->flags |= TRN_FLAG1;
      else
-	  t_info.flags &= ~TRN_FLAG1;
+	  t_infop->flags &= ~TRN_FLAG1;
 
-     dsc_set_trn_flags(&dsc_public.nb, i, t_info.flags, &code);
-     if (code == NO_ACCESS) {
+     dsc_set_trn_flags(&dsc_public.nb, t_infop->current, t_infop->flags, codep);
+     if (*codep == NO_ACCESS) {
 	  barred = TRUE;
-     } else if (code == 0) {
+     } else if (*codep == 0) {
 	  performed = TRUE;
-     } else if (code != DELETED_TRN) {
+     } else {
 	  (void) fprintf(stderr, "Error setting flags for transaction %d: %s\n",
-			 i, error_message(code));
-	  goto punt;
+			 t_infop->current, error_message(*codep));
+	  return;
      }
-     code = 0;
+     *codep = 0;
 
-punt:
-     (void) free (t_info.author);
-     (void) free (t_info.subject);
-     return(code);
+     return;
 }
 
 int switch_cmd(argc, argv)
@@ -317,7 +319,7 @@ char **argv;
      if (strcmp(argv[1], "flag"))
 	  goto usage;
      argc--,argv++;
-     map_trns(argc, argv, "current", flag_it);
+     map_trns(argc, argv, "current", flag_it, FALSE);
      return;
 
 usage:
