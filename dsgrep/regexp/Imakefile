@@ -23,9 +23,7 @@ all::	libregexp.a
 
 libregexp.a: $(OBJS)
 	ar cruv libregexp.a $(OBJS)
-#ifndef SOLARIS
-	ranlib libregexp.a
-#endif
+	$(RANLIB) libregexp.a
 
 clean::
 	-rm -f libregexp.a
