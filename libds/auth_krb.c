@@ -1,7 +1,7 @@
 /*
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/auth_krb.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/auth_krb.c,v 1.4 1987-06-27 01:30:09 spook Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/auth_krb.c,v 1.5 1988-07-04 07:09:38 raeburn Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
@@ -10,7 +10,8 @@
  *
  */
 #ifndef lint
-static char *rcsid_auth_krb_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/auth_krb.c,v 1.4 1987-06-27 01:30:09 spook Exp $";
+static char *rcsid_auth_krb_c =
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/auth_krb.c,v 1.5 1988-07-04 07:09:38 raeburn Exp $";
 #endif lint
 
 #include <strings.h>
@@ -52,9 +53,9 @@ int *result;
 	  realmp = "";
 	  strncpy (serv, service_id, sizeof (serv));
      } else {
-	  bcopy (service_id, serv, realmp - service_id);	/* copy over to serv */
-	  serv [realmp - service_id] = '\0';
-	  realmp++;
+	 bcopy (service_id, serv, realmp - service_id); /* copy over to serv */
+	 serv [realmp - service_id] = '\0';
+	 realmp++;
      }
 
      /* look for service instance */
@@ -65,7 +66,7 @@ int *result;
 	  *instancep++ = '\0';
      }
 
-     rem = mk_ap_req (&ticket, serv, instancep, realmp, checksum);
+     rem = krb_mk_req (&ticket, serv, instancep, realmp, checksum);
      if (rem == KSUCCESS) {
 	  *authl = ticket.length;
 	  *authp = (char *) ticket.dat;
