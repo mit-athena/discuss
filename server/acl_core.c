@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v 1.2 1986-11-22 06:19:08 spook Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v 1.3 1987-02-04 15:53:41 srz Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
@@ -8,6 +8,9 @@
  *	Originally written for the discuss system by Bill Sommerfeld
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.2  86/11/22  06:19:08  spook
+ * Changed to make lint happy.
+ * 
  * Revision 1.1  86/11/16  06:03:56  wesommer
  * Initial revision
  * 
@@ -23,12 +26,11 @@
 #include <strings.h>
 
 #ifndef lint
-static char *rcsid_acl_core_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v 1.2 1986-11-22 06:19:08 spook Exp $";
+static char *rcsid_acl_core_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v 1.3 1987-02-04 15:53:41 srz Exp $";
 #endif lint
 
 extern Acl *mtg_acl;
 extern char rpc_caller [];
-extern uid_t geteuid();
 extern int errno;
 
 /*
