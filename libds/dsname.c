@@ -1,13 +1,13 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v 1.10 1987-06-27 01:13:42 spook Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v 1.11 1987-07-17 02:17:42 spook Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
  */
 
 #ifndef lint
-static char *rcsid_dsname_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v 1.10 1987-06-27 01:13:42 spook Exp $";
+static char *rcsid_dsname_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v 1.11 1987-07-17 02:17:42 spook Exp $";
 #endif lint
 
 /*
@@ -40,12 +40,11 @@ static server_name_blk current = {
 
 extern char *malloc();
 extern int errno;
-
+extern char *local_realm();
 
 static char disrcbuf[MAXPATHLEN]; /* user's MEETINGS file */
 static char *disrcfile = NULL;	/* pointer to above */
 static char *me = NULL;		/* user's own user_id field */
-
 
 /*
  * Attempt to locate user's .meetings file.  This is intended to be
