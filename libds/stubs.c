@@ -11,13 +11,16 @@
 /*
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/stubs.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/stubs.c,v 1.12 1989-01-29 17:17:59 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/stubs.c,v 1.13 1989-03-27 00:33:07 srz Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
  * stubs.c -- These are stubs that handle the calling of routines.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.12  89/01/29  17:17:59  srz
+ * Added flag routines, and version check.
+ * 
  * Revision 1.11  89/01/04  20:52:00  raeburn
  * Still fixing includes..
  * 
@@ -43,7 +46,7 @@
  */
 #ifndef lint
 static char rcsid_stubs_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/stubs.c,v 1.12 1989-01-29 17:17:59 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/stubs.c,v 1.13 1989-03-27 00:33:07 srz Exp $";
 #endif lint
 
 /* Derived from CORE.PAS 06/21/86 by SRZ */
@@ -105,6 +108,8 @@ trn_nums trn;
 trn_info *info;
 int *result;
 {
+     info -> subject = NULL;			/* Not allocated */
+     info -> author = NULL;
      startsend(GET_TRN_INFO);
      if (rpc_err) { *result = rpc_err; return; }
      sendstr(mtg_name);
@@ -129,9 +134,11 @@ int *result;
 get_trn_info2 (mtg_name, trn, info, result)
 char *mtg_name;
 trn_nums trn;
-trn_info *info;
+trn_info2 *info;
 int *result;
 {
+     info -> subject = NULL;			/* Not allocated */
+     info -> author = NULL;
      startsend(GET_TRN_INFO2);
      if (rpc_err) { *result = rpc_err; return; }
      sendstr(mtg_name);
@@ -240,6 +247,9 @@ char *mtg_name;
 mtg_info *info;
 int *result;
 {
+     info -> location = NULL;
+     info -> long_name = NULL;
+     info -> chairman = NULL;
      startsend(OLD_GET_MTG_INFO);
      if (rpc_err) { *result = rpc_err; return; }
      sendstr(mtg_name);
@@ -264,6 +274,10 @@ char *mtg_name;
 mtg_info *info;
 int *result;
 {
+     info -> location = NULL;
+     info -> long_name = NULL;
+     info -> chairman = NULL;
+     info -> access_modes = NULL;
      startsend(GET_MTG_INFO);
      if (rpc_err) { *result = rpc_err; return; }
      sendstr(mtg_name);
@@ -382,6 +396,7 @@ get_access(mtg_name, princ_name, modes, result)
 	char **modes;		/* RETURN */
 	int *result;		/* RETURN */
 {
+	*modes = NULL;     
 	startsend(GET_ACCESS);
 	rpccheck;
 	sendstr(mtg_name);
@@ -459,6 +474,7 @@ dwhoami(ident, result)
 	int *result;
 {
 	*result = 0;
+	*ident = NULL;
 	startsend(WHO_AM_I);
 	rpccheck;
 	sendit(discuss);
