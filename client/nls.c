@@ -2,7 +2,7 @@
  *
  * List request for DISCUSS
  *
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/nls.c,v 1.1 1987-07-08 22:49:14 wesommer Exp $
+ * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/nls.c,v 1.2 1991-09-04 11:30:37 lwvanels Exp $
  * $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/nls.c,v $
  * $Locker:  $
  *
@@ -10,7 +10,7 @@
  *
  */
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/nls.c,v 1.1 1987-07-08 22:49:14 wesommer Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/nls.c,v 1.2 1991-09-04 11:30:37 lwvanels Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -95,7 +95,9 @@ nlist(argc, argv)
 	flag_interrupts();
 	
 	if ((code = tg_next_trn(tg)) == 0) {
+#ifdef notdef
 		dsc_public.current = tg->current;
+#endif notdef
 		list_it(&tg->tinfo);
 		while (!interrupt && (code = tg_next_trn(tg)) == 0) {
 			if (interrupt) break;
