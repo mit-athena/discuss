@@ -1,0 +1,31 @@
+
+	command_table	discuss_cmds;
+
+	request		new_trans, "Enter a new transaction.",
+			talk, enter, send, t;
+
+	request		prt_trans, "Print a transaction.",
+			print, pr, p;
+
+	request		goto_mtg, "Go to specified meeting.",
+			goto, go, g;
+
+	request		del_trans, "Delete a transaction.",
+			delete, dl, d;
+
+	request		ret_trans, "Retrieve a deleted transaction.",
+			retrieve, rt;
+
+	request		repl, "Reply to a transaction.",
+			reply, repl, rp, r;
+
+	request		list, "List transactions.",
+			list, ls;
+
+	request		ss_help, "Show help file on topic.",
+			help;
+
+	request		ss_abort_subsystem, "Quit.",
+			quit, exit, q;
+
+	end;
