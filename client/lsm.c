@@ -1,8 +1,12 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v 1.11 1987-06-14 21:07:47 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v 1.12 1987-06-20 13:35:55 srz Exp $
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.11  87/06/14  21:07:47  srz
+ * Added control-C handling.  Removed sorting stuff so that meetings
+ * appear in the order of the .meetings file.
+ * 
  * Revision 1.10  87/04/19  22:16:56  srz
  * Reverted definition of 'changed' to include new meetings.
  * 
@@ -25,7 +29,7 @@
  */
 
 #ifndef lint
-static char *rcsid_lsm_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v 1.11 1987-06-14 21:07:47 srz Exp $";
+static char *rcsid_lsm_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v 1.12 1987-06-20 13:35:55 srz Exp $";
 #endif lint
 
 
@@ -79,20 +83,15 @@ do_mtg(mtg_name)
 		     this_mtg = TRUE;
 		} else {
 		     this_mtg = FALSE;
-		     dsc_updated_mtg(nbp, &updated, &code);
+		     dsc_updated_mtg(nbp, &updated, &code);	
+		     if (interrupt)
+			  break;
 		     if (code) {
 			  fprintf(stderr, "Error checking meeting %s: %s\n",
 				  nbp -> aliases[0], error_message(code));
 			  continue;
 		     }
 		}
-		if (code) {
-			fprintf(stderr, "Error checking meeting %s: %s\n",
-				nbp -> aliases[0], error_message(code));
-			continue;
-		}
-		if (interrupt)
-		     	break;
 		if (!strcmp(last_host,nbp->hostname) && !strcmp(last_path, nbp->pathname))
 			printf("        %-30s   %s\n","",nbp->aliases[0]);
 		else {

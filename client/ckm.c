@@ -1,8 +1,11 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v 1.7 1987-06-14 21:08:44 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v 1.8 1987-06-20 13:36:15 srz Exp $
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.7  87/06/14  21:08:44  srz
+ * Added control-C handling.
+ * 
  * Revision 1.6  87/06/14  16:28:24  srz
  * White space changes + changed fprintf into ss_perror.
  * 
@@ -24,7 +27,7 @@
  */
      
 #ifndef lint
-static char *rcsid_ckm_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v 1.7 1987-06-14 21:08:44 srz Exp $";
+static char *rcsid_ckm_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v 1.8 1987-06-20 13:36:15 srz Exp $";
 #endif lint
 
 #include <strings.h>
@@ -62,6 +65,8 @@ do_mtg(mtg_name)
 	       updated = (dsc_public.highest_seen < dsc_public.m_info.last);
 	  } else {
 	       dsc_updated_mtg(nbp, &updated, &code);
+	       if (interrupt)
+		    break;
 	       if (code) {
 		    fprintf(stderr,
 			    "Error checking meeting %s: %s\n",
@@ -70,13 +75,6 @@ do_mtg(mtg_name)
 		    continue;
 	       }
 	  }
-	  if (code) {
-	       fprintf(stderr, "Error checking meeting %s: %s\n",
-		       nbp -> aliases[0], error_message(code));
-	       continue;
-	  }
-	  if (interrupt)
-	          break;
 	  if (strcmp(last_host,nbp->hostname) || strcmp(last_path, nbp->pathname)) {
 	       strcpy(last_host,nbp->hostname);
 	       strcpy(last_path,nbp->pathname);
@@ -101,6 +99,8 @@ do_mtg(mtg_name)
 	       }
 	  }
      }
+     if (interrupt)
+	  return(0);
      dsc_update_mtg_set(user_id, set, n_matches, &code);
      return(0);
 }
