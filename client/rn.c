@@ -8,9 +8,12 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/rn.c,v $
  *	$Author: probe $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/rn.c,v 1.10 1991-07-22 01:28:26 probe Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/rn.c,v 1.11 1993-03-07 06:21:45 probe Exp $
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.10  91/07/22  01:28:26  probe
+ * POSIX integration
+ * 
  * Revision 1.9  89/06/02  23:38:39  srz
  * Added standard copyright notice.
  * 
@@ -44,7 +47,7 @@
 
 #ifndef lint
 static char rcsid_update_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/rn.c,v 1.10 1991-07-22 01:28:26 probe Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/rn.c,v 1.11 1993-03-07 06:21:45 probe Exp $";
 #endif /* lint */
 
 #include <discuss/discuss.h>
@@ -59,6 +62,7 @@ static char rcsid_update_c[] =
 #endif
 
 static unseen_transactions();
+static char ss_buf[512];
 
 static changed_meetings()
 {
@@ -88,7 +92,8 @@ rn(argc, argv, ss_idx)
 	printf("Checking meetings...\n");
 	fflush(stdout);
 
-	ss_execute_line(ss_idx, "ckm", &code);
+	strcpy(ss_buf, "ckm");
+	ss_execute_line(ss_idx, ss_buf, &code);
 	if (code != 0) goto punt;
 
 	flag_interrupts();
@@ -117,7 +122,8 @@ rn(argc, argv, ss_idx)
 	     }
 	}
 first_meeting:
-	ss_execute_line(ss_idx, "nm", &code);
+	strcpy(ss_buf, "nm")
+	ss_execute_line(ss_idx, ss_buf, &code);
 	if (code != 0) goto punt;
 
 	while (1) {			/* we get out when changed_meetings is false */
@@ -138,28 +144,33 @@ first_meeting:
 			case ' ':
 			case 'n':
 				if (dsc_public.current == 0)
-					ss_execute_line(ss_idx, "pr first", &code);
+				    strcpy(ss_buf, "pr first");
 				else
-					ss_execute_line(ss_idx, "next", &code);
+				    strcpy(ss_buf "next");
+				ss_execute_line(ss_idx, ss_buf, &code);
 				if (code != 0) goto punt;
 				break;
 			case 'c':
 				catchup(0,0);
 				break;
 			case 'p':
-				ss_execute_line(ss_idx, "prev", &code);
+				strcpy(ss_buf, "prev");
+				ss_execute_line(ss_idx, ss_buf, &code);
 				if (code != 0) goto punt;
 				break;
 			case '\022':
-				ss_execute_line(ss_idx, "pr", &code);
+				strcpy(ss_buf, "pr");
+				ss_execute_line(ss_idx, ss_buf, &code);
 				if (code != 0) goto punt;
 				break;
 			case 'r':
-				ss_execute_line(ss_idx, "reply", &code);
+				strcpy(ss_buf, "reply");
+				ss_execute_line(ss_idx, ss_buf, &code);
 				if (code != 0) goto punt;
 				break;
 			case 't':
-				ss_execute_line(ss_idx, "talk", &code);
+				strcpy(ss_buf, "talk");
+				ss_execute_line(ss_idx, ss_buf, &code);
 				if (code != 0) goto punt;
 				break;
 			case '?':
@@ -188,23 +199,28 @@ first_meeting:
 		     goto punt;
 		case ' ':
 		case 'n':
-		     ss_execute_line(ss_idx, "nm", &code);
+		     strcpy(ss_buf, "nm");
+		     ss_execute_line(ss_idx, ss_buf, &code);
 		     if (code != 0) goto punt;
 		     break;
 		case 'p':
-		     ss_execute_line(ss_idx, "prev", &code);
+		     strcpy(ss_buf, "prev");
+		     ss_execute_line(ss_idx, ss_buf, &code);
 		     if (code != 0) goto punt;
 		     break;
                 case '\022':
-		     ss_execute_line(ss_idx, "pr", &code);
+		     strcpy(ss_buf, "pr");
+		     ss_execute_line(ss_idx, ss_buf, &code);
 		     if (code != 0) goto punt;
 		     break;
 		case 'r':
-		     ss_execute_line(ss_idx, "reply", &code);
+		     strcpy(ss_buf, "reply");
+		     ss_execute_line(ss_idx, ss_buf, &code);
 		     if (code != 0) goto punt;
 		     break;
 		case 't':
-		     ss_execute_line(ss_idx, "talk", &code);
+		     strcpy(ss_buf, "talk")
+		     ss_execute_line(ss_idx, ss_buf, &code);
 		     if (code != 0) goto punt;
 		     break;
 		case '?':

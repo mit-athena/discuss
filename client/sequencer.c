@@ -1,18 +1,21 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/sequencer.c,v $
  *	$Author: probe $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/sequencer.c,v 1.2 1991-07-22 01:29:03 probe Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/sequencer.c,v 1.3 1993-03-07 06:22:02 probe Exp $
  *
  *	Copyright (C) 1987 by the Massachusetts Institute of Technology
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.2  91/07/22  01:29:03  probe
+ * POSIX integration
+ * 
  * Revision 1.1  91/07/05  00:48:53  probe
  * Initial revision
  * 
  */
 
 #ifndef lint
-static char *rcsid_sequencer_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/sequencer.c,v 1.2 1991-07-22 01:29:03 probe Exp $";
+static char *rcsid_sequencer_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/sequencer.c,v 1.3 1993-03-07 06:22:02 probe Exp $";
 #endif lint
 
 #include "types.h"
@@ -21,6 +24,8 @@ static char *rcsid_sequencer_c = "$Header: /afs/dev.mit.edu/source/repository/at
 #include <sys/types.h>
 #include <sys/file.h>
 #include <sys/ioctl.h>
+
+static char ss_buf[512];
 
 static changed_meetings()
 {
@@ -50,7 +55,8 @@ sequencer(argc, argv, ss_idx)
 {
 	int code;
 	int cmd;
-	ss_execute_line(ss_idx, "ckm", &code);
+	strcpy(ss_buf, "ckm");
+	ss_execute_line(ss_idx, ss_buf, &code);
 	if (code != 0) goto punt;
 
 	while(changed_meetings()) {
@@ -63,7 +69,8 @@ sequencer(argc, argv, ss_idx)
 		case 'n':
 			break;
 		}
-		ss_execute_line(ss_idx, "nm", &code);
+		strcpy(ss_buf, "nm");
+		ss_execute_line(ss_idx, ss_buf, &code);
 		if (code != 0) goto punt;
 		
 		while (unseen_transactions()) {
@@ -75,7 +82,8 @@ sequencer(argc, argv, ss_idx)
 			case 'n':
 				break;
 			}
-			ss_execute_line(ss_idx, "next", &code);
+			strcpy(ss_buf, "next");
+			ss_execute_line(ss_idx, ss_buf, &code);
 			if (code != 0) goto punt;
 		}
 	}
