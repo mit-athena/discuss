@@ -7,7 +7,7 @@
  */
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v $
- *	$Id: dsname.c,v 1.23 1993-04-28 11:46:34 miki Exp $
+ *	$Id: dsname.c,v 1.24 1994-03-25 16:44:44 miki Exp $
  *
  */
 
@@ -34,7 +34,7 @@
 
 #ifndef lint
 static const char rcsid_dsname_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v 1.23 1993-04-28 11:46:34 miki Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v 1.24 1994-03-25 16:44:44 miki Exp $";
 #endif
 
 extern char *malloc (), *local_realm (), *getenv ();
@@ -79,7 +79,11 @@ INLINE static char * ds(s)
 {
     register int len = strlen (s) + 1;
     register char *ns = malloc (len);
+#ifdef POSIX
+    memmove (ns, s, len);
+#else
     bcopy (s, ns, len);
+#endif
     return (ns);
 }
 
@@ -151,7 +155,7 @@ static int set_rc_filename(auser_id, buf, len)
 	strncpy(buf, disrcbuf, MAXPATHLEN-1);
 	return 0;
     }
-    cp = index(auser_id, '@');
+    cp = strchr(auser_id, '@');
     if (cp)
 	*cp = '\0';
     pw = getpwnam(auser_id);
@@ -216,14 +220,14 @@ static int getdbent()
 	return 0;
     }
 
-    bufp = index(buffer, '\n');
+    bufp = strchr(buffer, '\n');
     if (bufp)
 	*bufp = '\0';
     bufp = buffer;
 
     /* meeting status flags (per-user) */
     current.status = atoi(bufp);
-    bufp = index(bufp, ':');
+    bufp = strchr(bufp, ':');
     if (!bufp) {
     bad_fmt:
 	errno = BAD_MTGS_FILE;
@@ -234,7 +238,7 @@ static int getdbent()
 
     /* date user last attended meeting */
     current.date_attended = atoi(bufp);
-    bufp = index(bufp, ':');
+    bufp = strchr(bufp, ':');
     if (!bufp)
 	goto bad_fmt;
     else
@@ -242,7 +246,7 @@ static int getdbent()
 
     /* last transaction seen */
     current.last = atoi(bufp);
-    bufp = index(bufp, ':');
+    bufp = strchr(bufp, ':');
     if (!bufp)
 	goto bad_fmt;
     else
@@ -251,7 +255,7 @@ static int getdbent()
     /* hostname of meeting */
     if (current.hostname)
 	free(current.hostname);
-    cp = index(bufp, ':');
+    cp = strchr(bufp, ':');
     if (cp == NULL) goto bad_fmt;
     else {
 	*cp = '\0';
@@ -262,7 +266,7 @@ static int getdbent()
     /* pathname of meeting on remote host */
     if (current.pathname)
 	free(current.pathname);
-    cp = index(bufp, ':');
+    cp = strchr(bufp, ':');
     if (cp == NULL) goto bad_fmt;
     else {
 	*cp = '\0';
@@ -273,7 +277,7 @@ static int getdbent()
     /* list of aliases for meeting */
     if (current.alias_list)
 	free(current.alias_list);
-    cp = index(bufp, ':');
+    cp = strchr(bufp, ':');
     if (cp == NULL) goto bad_fmt;
     else {
 	*cp = '\0';
@@ -329,7 +333,7 @@ static int is_a_name(name)
 	if (!strncmp(name, ns, len) && (!ns[len] || ns[len] == ',')) {
 	    return(1);
 	}
-	ns = index(ns+1, ',');
+	ns = strchr(ns+1, ',');
 	if (!ns || !ns[1]) {
 	    return(0);
 	}
@@ -346,7 +350,7 @@ static char ** expand(list)
     register char **rv, **rv1;
     for (cp = list; cp;) {
 	num++;
-	cp = index(cp, ',');
+	cp = strchr(cp, ',');
 	if (cp)
 	    cp++;
     }
@@ -355,7 +359,7 @@ static char ** expand(list)
     while (list && *list) {
 	while (*list == ',')
 	    list++;
-	cp = index(list, ',');
+	cp = strchr(list, ',');
 	if (cp)
 	    *cp = '\0';
 	*rv1 = ds(list);
@@ -437,7 +441,7 @@ dsc_expand_mtg_set(user_id, name, set, num, result)
     while ((r=getdbent()) > 0)
 	if (is_a_name(name)) {
 	    register name_blk *nb = *set + (*num)++;
-	    bzero((char *)nb, sizeof(*nb));
+	    memset((char *)nb, 0, sizeof(*nb));
 	    nb->date_attended = current.date_attended;
 	    nb->last = current.last;
 	    nb->status = current.status;
@@ -542,7 +546,11 @@ dsc_get_mtg (user_id, name, nbp, result)
 	    dsc_destroy_name_blk(&set[i]);
 	}
     }
+#ifdef POSIX
+    memmove(nbp, &set[0], sizeof(name_blk));
+#else
     bcopy(&set[0], nbp, sizeof(name_blk));
+#endif
 
 bad:
     if (set)
