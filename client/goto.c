@@ -7,7 +7,7 @@
  */
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/goto.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/goto.c,v 1.15 1989-07-29 18:22:11 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/goto.c,v 1.16 1992-12-23 11:47:30 probe Exp $
  *	$Locker:  $
  *
  *	Code for "goto" request in discuss.
@@ -16,13 +16,13 @@
 
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/goto.c,v 1.15 1989-07-29 18:22:11 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/goto.c,v 1.16 1992-12-23 11:47:30 probe Exp $";
 #endif lint
 
 #include <stdio.h>
 #include <sys/file.h>
 #include <signal.h>
-#include <string.h>
+#include <strings.h>
 #include <sys/wait.h>
 #include <ctype.h>
 #include "ss.h"
@@ -36,13 +36,15 @@ static char rcsid_discuss_c[] =
 #endif	lint
 
 #define	FREE(ptr)	{ if (ptr) free(ptr); }
+#ifndef max
 #define max(a, b) ((a) > (b) ? (a) : (b))
+#endif
 
 extern ss_request_table discuss_cmds;
 
 /* EXTERNAL ROUTINES */
 
-char	*malloc(), *getenv(), *gets(), *ctime(), *error_message(), *index();
+char	*malloc(), *getenv(), *gets(), *ctime(), *error_message();
 tfile	unix_tfile();
 void	leave_mtg ();
 

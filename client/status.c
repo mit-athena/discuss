@@ -9,14 +9,14 @@
  *
  * Status request for DISCUSS
  *
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/status.c,v 1.12 1989-06-02 23:38:54 srz Exp $
+ * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/status.c,v 1.13 1992-12-23 11:47:32 probe Exp $
  * $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/status.c,v $
  * $Locker:  $
  *
  */
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/status.c,v 1.12 1989-06-02 23:38:54 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/status.c,v 1.13 1992-12-23 11:47:32 probe Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -25,11 +25,9 @@ static char rcsid_discuss_c[] =
 #include <discuss/discuss.h>
 #include "config.h"
 #include "globals.h"
-#include <string.h>
+#include <strings.h>
 
-extern char *rindex();
 static int sending_msg;
-
 static char msg_buf[64];
 
 static

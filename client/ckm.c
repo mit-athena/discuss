@@ -7,16 +7,16 @@
  */
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v 1.21 1992-11-08 18:03:07 epeisach Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v 1.22 1992-12-23 11:46:37 probe Exp $
  *
  */
      
 #ifndef lint
 static char rcsid_ckm_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v 1.21 1992-11-08 18:03:07 epeisach Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v 1.22 1992-12-23 11:46:37 probe Exp $";
 #endif lint
 
-#include <string.h>
+#include <strings.h>
 #include <stdio.h>
 #include <discuss/discuss.h>
 #include "globals.h"
@@ -111,7 +111,7 @@ check_meetings (argc, argv)
 	} else if (!strcmp(argv[i], "-list") || !strcmp(argv[i], "-ls")) {
 		display=1; used[i]=1;
 	} else if (*argv[i] == '-') {
-	       sprintf(errbuf, "Unknown control argument %s\n", argv[i]));
+	       sprintf(errbuf, "Unknown control argument %s\n", argv[i]);
 	       ss_perror(sci_idx, 0, errbuf);
 	       free((char *)used);
 	       return;
