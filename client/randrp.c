@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/randrp.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/randrp.c,v 1.7 1989-03-29 00:32:10 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/randrp.c,v 1.8 1989-05-04 02:58:17 srz Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1988 by the Student Information Processing Board
@@ -11,7 +11,7 @@
 
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/randrp.c,v 1.7 1989-03-29 00:32:10 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/randrp.c,v 1.8 1989-05-04 02:58:17 srz Exp $";
 #endif lint
 
 #include <discuss/discuss.h>
@@ -37,6 +37,7 @@ randrp(argc, argv, sci_idx)
 	int rnd_trn;
 	int pid = getpid();
 	int noeditor = FALSE;
+	int prompt_subject = FALSE;
 	trn_info t_info;
 	trn_nums current_transaction;
 
@@ -61,6 +62,10 @@ randrp(argc, argv, sci_idx)
 			}
 		} else if (!strcmp(*argv, "-no_editor")) {
 			noeditor = TRUE;
+		} else if (!strcmp(*argv, "-subject") ||
+			   !strcmp(*argv, "-sj")) {
+		    /* prompt for subject */   
+		    prompt_subject = TRUE;
 		} else {
 			ss_perror(sci_idx, 0,
 				  "Cannot specify transaction in random reply");
@@ -114,15 +119,19 @@ randrp(argc, argv, sci_idx)
 	}
 		
 	if ((editor != NULL) && !noeditor) {
-		(void) sprintf(buffer, "reply -editor %s %d", editor, rnd_trn);
+		(void) sprintf(buffer, "reply %s-editor %s %d",
+			       prompt_subject ? "-subject " : "",
+			       editor, rnd_trn);
 		ss_execute_line(sci_idx, buffer, &code);
 	}
 	else if (noeditor) {
-		(void) sprintf(buffer, "reply -no_editor %d",rnd_trn);
+		(void) sprintf(buffer, "reply %s-no_editor %d",
+			       prompt_subject ? "-subject " : "",rnd_trn);
 		ss_execute_line(sci_idx, buffer, &code);
 	}
 	else {
-		(void) sprintf(buffer, "reply %d",rnd_trn);
+		(void) sprintf(buffer, "reply %s%d",
+			       prompt_subject ? "-subject " : "",rnd_trn);
 		ss_execute_line(sci_idx, buffer, &code);
 	}
 

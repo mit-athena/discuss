@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v 1.13 1989-03-29 00:32:22 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v 1.14 1989-05-04 02:57:54 srz Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
@@ -12,7 +12,7 @@
 
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v 1.13 1989-03-29 00:32:22 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v 1.14 1989-05-04 02:57:54 srz Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -42,6 +42,8 @@ repl(argc, argv)
 	selection_list *trn_list;
 	trn_info t_info;
 	int code;
+	int prompt_subject = FALSE;
+	char *subject = &buffer[0];
 	char *editor = NULL;
 	char *trans = NULL;
 	char *mtg = NULL;
@@ -68,6 +70,10 @@ repl(argc, argv)
 			}
 		} else if (!strcmp(*argv, "-no_editor")) {
 			editor = "";
+		} else if (!strcmp(*argv, "-subject") ||
+			   !strcmp(*argv, "-sj")) {
+		    /* prompt for subject */   
+		    prompt_subject = TRUE;
 		} else {
 			if (!trans) trans = *argv; 
 			else {
@@ -144,16 +150,27 @@ repl(argc, argv)
 	free(myname);
 	myname = NULL;
 	
-	if (strncmp(t_info.subject, "Re: ", 4)) {
+	if (prompt_subject) {
+	    (void) printf("Subject: ");
+	    if (fgets(subject,BUFSIZ,stdin) == (char *)NULL) {
+		clearerr(stdin);
+		if (interrupt) goto abort;
+		ss_perror(sci_idx, errno, "Error reading subject.");
+		goto abort;
+	    }
+	    if (interrupt) goto abort;
+	    subject[strlen(subject)-1] = '\0';		/* Get rid of NL */
+	} else {
+	    if (strncmp(t_info.subject, "Re: ", 4)) {
 		char *new_subject = malloc((unsigned)strlen(t_info.subject)+5);
 		(void) strcpy(new_subject, "Re: ");
 		(void) strcat(new_subject, t_info.subject);
 		(void) free(t_info.subject);
 		t_info.subject = new_subject;
+	    }
+
+	    printf("Subject: %s\n", t_info.subject);
 	}
-
-	printf("Subject: %s\n", t_info.subject);
-
 	(void) unlink(temp_file);
 	if (edit(temp_file, editor) != 0) {
 		(void) fprintf(stderr,
@@ -169,7 +186,8 @@ repl(argc, argv)
 	}
 	tf = unix_tfile(fd);
 	
-	dsc_add_trn(&dsc_public.nb, tf, t_info.subject,
+	dsc_add_trn(&dsc_public.nb, tf,
+		    prompt_subject ? subject : t_info.subject,
 		    orig_trn, &txn_no, &code);
 	if (code != 0) {
 		ss_perror(sci_idx, code, "while adding transaction\n");
