@@ -11,13 +11,16 @@
 /*
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/stubs.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/stubs.c,v 1.11 1989-01-04 20:52:00 raeburn Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/stubs.c,v 1.12 1989-01-29 17:17:59 srz Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
  * stubs.c -- These are stubs that handle the calling of routines.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.11  89/01/04  20:52:00  raeburn
+ * Still fixing includes..
+ * 
  * Revision 1.10  88/10/16  14:04:50  raeburn
  * Changed includes and type names.
  * 
@@ -40,7 +43,7 @@
  */
 #ifndef lint
 static char rcsid_stubs_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/stubs.c,v 1.11 1989-01-04 20:52:00 raeburn Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/stubs.c,v 1.12 1989-01-29 17:17:59 srz Exp $";
 #endif lint
 
 /* Derived from CORE.PAS 06/21/86 by SRZ */
@@ -111,6 +114,33 @@ int *result;
      recvreply();
      if (rpc_err) { *result = rpc_err; return; }
      recv_trn_info(info);
+     *result = recvint();
+     if (rpc_err) { *result = rpc_err; return; }
+     return;
+}
+
+/*
+ *
+ * get_trn_info2 () --
+ * returns information about the given transaction in info, with an error
+ * code as its return argument
+ *
+ */
+get_trn_info2 (mtg_name, trn, info, result)
+char *mtg_name;
+trn_nums trn;
+trn_info *info;
+int *result;
+{
+     startsend(GET_TRN_INFO2);
+     if (rpc_err) { *result = rpc_err; return; }
+     sendstr(mtg_name);
+     sendint(trn);
+     sendit(discuss);
+     if (rpc_err) { *result = rpc_err; return; }
+     recvreply();
+     if (rpc_err) { *result = rpc_err; return; }
+     recv_trn_info2(info);
      *result = recvint();
      if (rpc_err) { *result = rpc_err; return; }
      return;
@@ -403,6 +433,27 @@ delete_access(mtg_name, princ_name, result)
 	return;
 }
 
+set_trn_flags(mtg_name, trn, flags, result)
+char *mtg_name;
+trn_nums trn;
+int flags;
+int *result;
+{
+     startsend(SET_TRN_FLAGS);
+     if (rpc_err) { *result = rpc_err; return; }
+     sendstr(mtg_name);
+     sendint(trn);
+     sendint(flags);
+     sendit(discuss);
+     if (rpc_err) { *result = rpc_err; return; }
+     recvreply();
+     if (rpc_err) { *result = rpc_err; return; }
+     *result = recvint();
+     if (rpc_err) { *result = rpc_err; return; }
+     return;
+}
+
+
 dwhoami(ident, result)
 	char **ident;
 	int *result;
@@ -419,6 +470,22 @@ dwhoami(ident, result)
 	return;
 }
 
+get_server_version()
+{
+        int vers_num,result;
+
+        startsend(GET_SERVER_VERSION);
+	if (rpc_err) return (SERVER_0);
+	sendit(discuss);
+	if (rpc_err) return (SERVER_0);
+	recvreply();
+	if (rpc_err) return (SERVER_0);
+	vers_num = recvint();
+	if (rpc_err) return (SERVER_0);
+	result = recvint();
+	if (rpc_err) return (SERVER_0);
+	return(vers_num);
+}
 
 /*
  *
@@ -442,6 +509,31 @@ trn_info *tinfo;
      tinfo -> num_chars = recvint ();
      tinfo -> subject = recvstr ();
      tinfo -> author = recvstr ();
+}
+
+/*
+ *
+ * recv_trn_info2 -- recv a trn_info2 struct.
+ *
+ */
+recv_trn_info2(tinfo)
+trn_info2 *tinfo;
+{
+     tinfo -> version = recvint ();
+     tinfo -> current = recvint ();
+     tinfo -> prev = recvint ();
+     tinfo -> next = recvint ();
+     tinfo -> pref = recvint ();
+     tinfo -> nref = recvint ();
+     tinfo -> fref = recvint ();
+     tinfo -> lref = recvint ();
+     tinfo -> chain_index = recvint ();
+     tinfo -> date_entered = recvint ();
+     tinfo -> num_lines = recvint ();
+     tinfo -> num_chars = recvint ();
+     tinfo -> subject = recvstr ();
+     tinfo -> author = recvstr ();
+     tinfo -> flags = recvint ();
 }
     
 /*

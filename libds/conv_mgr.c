@@ -1,7 +1,7 @@
 /*
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/conv_mgr.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/conv_mgr.c,v 1.9 1989-01-04 20:39:34 raeburn Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/conv_mgr.c,v 1.10 1989-01-29 17:20:06 srz Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
@@ -17,7 +17,7 @@
 
 #ifndef lint
 static const char rcsid_conv_mgr_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/conv_mgr.c,v 1.9 1989-01-04 20:39:34 raeburn Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/conv_mgr.c,v 1.10 1989-01-29 17:20:06 srz Exp $";
 #endif lint
 
 #include <errno.h>
@@ -35,6 +35,7 @@ struct conv {
      char *hostname;
      char *service_id;
      rpc_conversation rc;
+     int server_version;
      int result;
 };
 
@@ -170,7 +171,8 @@ create_entry:
      convp -> module = malloc (strlen (module)+1);
      strcpy (convp -> module, module);
      convp -> port = port;
-     
+
+     convp -> server_version = get_server_version();
      return;
 }
 
@@ -211,3 +213,10 @@ void flush_convs ()
      cur_conv = -1;
 }
 
+get_conv_server_version()
+{
+     if (cur_conv == -1)
+	  return(SERVER_0);
+
+     return (conv_base[cur_conv].server_version);
+}

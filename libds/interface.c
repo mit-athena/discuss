@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.19 1988-11-27 19:22:27 raeburn Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.20 1989-01-29 17:19:55 srz Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
@@ -8,7 +8,7 @@
 
 #ifndef lint
 static char rcsid_interface_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.19 1988-11-27 19:22:27 raeburn Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.20 1989-01-29 17:19:55 srz Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -18,6 +18,8 @@ static char rcsid_interface_c[] =
 #include <discuss/interface.h>
 #include <discuss/acl.h>
 #include <discuss/dsname.h>
+#include "rpc.h"
+#include "dsc_et.h"
 
 /* for linked list of meetings */
 
@@ -149,6 +151,37 @@ dsc_get_trn_info(nbp, trn, info, code_ptr)
 	select_meeting(nbp, code_ptr);
 	if (*code_ptr) return;
 	get_trn_info(mtg_name, trn, info, code_ptr);
+}
+
+dsc_get_trn_info2(nbp, trn, info, code_ptr)
+	name_blk *nbp;
+	trn_nums trn;
+	trn_info2 *info;
+	int *code_ptr;
+{
+	select_meeting(nbp, code_ptr);
+	if (*code_ptr) return;
+	if (get_conv_server_version() >= SERVER_1)
+	     get_trn_info2(mtg_name, trn, info, code_ptr);
+	else {
+	     get_trn_info(mtg_name, trn, (trn_info *) info, code_ptr);
+	     info -> flags = 0;
+	}
+}
+
+dsc_set_trn_flags(nbp, trn, flags, code_ptr)
+	name_blk *nbp;
+	trn_nums trn;
+	int flags;
+	int *code_ptr;
+{
+	select_meeting(nbp, code_ptr);
+	if (*code_ptr) return;
+	if (get_conv_server_version() >= SERVER_1)
+	     set_trn_flags(mtg_name, trn, flags, code_ptr);
+	else {
+	     *code_ptr = NO_SUPPORT;
+	}
 }
 
 dsc_delete_trn(nbp, trn, code_ptr)
