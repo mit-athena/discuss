@@ -9,14 +9,14 @@
  *
  * List request for DISCUSS
  *
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.28 1990-02-24 18:51:58 srz Exp $
+ * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.29 1991-08-07 09:04:27 lwvanels Exp $
  * $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v $
  * $Locker:  $
  *
  */
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.28 1990-02-24 18:51:58 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.29 1991-08-07 09:04:27 lwvanels Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -43,7 +43,7 @@ int *codep;
 {
 	char newtime[26], nlines[10];
 	char *cp,*author;
-	int max_len;
+	int len;
 
 	if (*codep == NO_ACCESS) {
 	        *codep = 0;
@@ -81,18 +81,18 @@ int *codep;
 			t_infop->current,
 			((t_infop->flags & TRN_FLAG1) != 0) ? "F" : "",
 			(t_infop->current == dsc_public.current) ? '*' : ' ');
-	(void) strncat (buffer, "     ",
-			MIN (5, 13-strlen (buffer)) - strlen (nlines));
+	if ((len = MIN(5, 13-strlen (buffer)) - strlen (nlines)) > 0)
+		(void) strncat (buffer, "     ", len);
 
 	if (strlen(author) > 15)
 		(void) strcpy(&author[12], "...");
 
 	(void) sprintf (buffer + strlen (buffer), "%s %s %-15s ",
 			nlines, newtime, author);
-	max_len = 79 - strlen (buffer);
+	len = 79 - strlen (buffer);
 
-	if (!long_subjects && strlen (t_infop->subject) > max_len)
-	    (void) strcpy (&t_infop->subject [max_len - 3], "...");
+	if (!long_subjects && strlen (t_infop->subject) > len)
+	    (void) strcpy (&t_infop->subject [len - 3], "...");
 
 	(void) printf ("%s%s\n", buffer, t_infop->subject);
 

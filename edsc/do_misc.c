@@ -12,9 +12,10 @@
  */
 
 #include <stdio.h>
+#include <sys/types.h>
 #include <sys/file.h>
 #include <signal.h>
-#include <strings.h>
+#include <string.h>
 #include <sys/wait.h>
 #include <ctype.h>
 #include <sys/time.h>
@@ -31,6 +32,36 @@ do_gpv(args)
 {
 	printf("(%s \"%s\")\n", edsc_protocol_version, edsc_version_string,
 	       edsc_protocol_version);
+}
+
+int use_vectors;
+
+typedef struct {
+	char *val;
+	int ok;
+} gotten_word;
+
+do_set (args)
+	char	*args;
+{
+	char *varname, *value, *tmp, delim;
+
+	if (get_word (&args, &tmp, " ", &delim) < 0) {
+		printf ("; Missing variable name\n");
+		return;
+	}
+	varname = tmp;
+	if (get_word (&args, &tmp, ")", &delim) < 0) {
+		printf ("; Missing value\n");
+		return;
+	}
+	value = tmp;
+	if (args[2]) {
+		printf ("; Extra parameters supplied\n");
+		return;
+	}
+	if (!strcmp (varname, "use_vectors"))
+		use_vectors = atoi (value);
 }
 
 do_pacl(args)
@@ -289,7 +320,7 @@ do_ls(args)
 		if (flags & filter_FLAG_RESET)
 			if (t_info.flags & TRN_FLAG1)
 				goto loop_end;
-		list_it(&t_info,f,flags & flag_LONG_SUBJ);
+		list_it(&t_info,f, 1);
 		num_printed++;
 	loop_end:
 		if (flags &
@@ -318,7 +349,7 @@ static list_it(t_infop, f, long_subjects)
 {
 	char newtime[26], nlines[10];
 	char *cp;
-	int max_len;
+	int len;
 
 	strcpy(newtime, short_time(&t_infop->date_entered));
 	/*
@@ -333,18 +364,18 @@ static list_it(t_infop, f, long_subjects)
 			t_infop->current,
 			((t_infop->flags & TRN_FLAG1) != 0) ? 'F' : ' ',
 			((t_infop->flags & TRN_FDELETED) != 0) ? 'D' : ' ');
-	(void) strncat (buffer, "     ",
-			MIN (5, 13-strlen (buffer)) - strlen (nlines));
+	if ((len = MIN(5, 13-strlen (buffer)) - strlen (nlines)) > 0)
+		(void) strncat (buffer, "     ", len);
 
 	if (strlen(t_infop->author) > 15)
 		(void) strcpy(&t_infop->author[12], "...");
 
 	(void) sprintf (buffer + strlen (buffer), "%s %s %-15s ",
 			nlines, newtime, t_infop->author);
-	max_len = 79 - strlen (buffer);
+	len = 79 - strlen (buffer);
 
-	if (!long_subjects && strlen (t_infop->subject) > max_len)
-	    (void) strcpy (&t_infop->subject [max_len - 3], "...");
+	if (!long_subjects && strlen (t_infop->subject) > len)
+	    (void) strcpy (&t_infop->subject [len - 3], "...");
 
 	(void) fprintf (f, "%s%s\n", buffer, t_infop->subject);
 
