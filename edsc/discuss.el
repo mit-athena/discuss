@@ -1,10 +1,17 @@
+;;
+;; WARNING --- change discuss-source-dir when installing this file! 
+;; 
+
+(defvar discuss-source-dir "/mit/discuss/source/edsc"
+  "Source directory which this version of discuss is loaded from.")
+
 ;;;
 ;;;	Copyright (C) 1989 by the Massachusetts Institute of Technology
 ;;;    	Developed by the MIT Student Information Processing Board (SIPB).
 ;;;    	For copying information, see the file mit-copyright.h in this release.
 ;;;
 ;;;	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v $
-;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.25 1991-03-08 21:05:33 tytso Exp $
+;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.26 1991-03-09 16:33:49 tytso Exp $
 ;;;
 ;;;  Emacs lisp code to remote control a "discuss" shell process to
 ;;;  provide an emacs-based interface to the discuss conferencing system.
@@ -13,6 +20,10 @@
 ;;;  Written by Stan Zanarotti, Bill Sommerfeld and Theodore Ts'o.
 ;;;
 ;;;  $Log: not supported by cvs2svn $
+; Revision 1.25  91/03/08  21:05:33  tytso
+; Fixed locking problem with the changed behavior of the "ss" command in
+; edsc protocol version 2.4
+; 
 ; Revision 1.24  91/02/24  14:46:58  bjaspan
 ; fixed my brain-dead discuss-catchup implementation
 ; 
@@ -105,14 +116,7 @@
 ; Initial revision
 ; 
 
-;;
-;; WARNING --- change discuss-source-dir when installing this file! 
-;; 
-
 (provide 'discuss)
-
-(defvar discuss-source-dir "/mit/discuss/source/edsc"
-  "Source directory which this version of discuss is loaded from.")
 
 (defvar discuss-DWIM nil
   "If true, enable Do_What_I_Mean mode.  Allows the user to read discuss by
@@ -446,7 +450,7 @@ a	Add meeting."
 				discuss-highest-seen
 				discuss-meeting)
 			nil
-			'discuss-read-form)))
+			(if discuss-old-ss nil 'discuss-read-form))))
   (switch-to-buffer discuss-cur-mtg-buf)
   (setq discuss-meeting meeting)
   (setq discuss-current-meeting meeting)   ;;; denigrated
@@ -727,7 +731,7 @@ the argument or the current transaction and leaves the meeting."
 				      discuss-highest-seen
 				      discuss-meeting)
 			      nil
-			      'discuss-read-form))
+			      (if discuss-old-ss nil 'discuss-read-form)))
 	(kill-buffer (buffer-name discuss-cur-mtg-buf))
 	(setq discuss-cur-mtg-buf nil)
 	(setq discuss-current-meeting nil)
@@ -766,7 +770,8 @@ the argument or the current transaction and leaves the meeting."
   (let ((meeting (nth 1 discuss-form))
 	(highest (nth 6 discuss-form)))
     (discuss-send-cmd (format "(ss %d %s)\n" highest meeting)
-		      nil 'discuss-read-form)
+		      nil 
+		      (if discuss-old-ss nil 'discuss-read-form))
     (discuss-mark-read-meeting meeting)
     (discuss-next-meeting t)
     (message "Done.")
@@ -1116,6 +1121,8 @@ Flushes the discuss cache and destroys the edsc process."
 	  (if (> 23 discuss-vers)
 	      (setq discuss-version-string "")
 	    (setq discuss-version-string (cadr discuss-form)))
+	  (if (= 23 discuss-vers)
+	      (setq discuss-old-ss t))
 	  (if (> 20 discuss-vers)
 	      (progn
 		(discuss-restart)
@@ -1203,7 +1210,7 @@ discuss server while we spin-block."
 ; run this at each load
 (defun discuss-initialize nil
   (setq discuss-version
-	"$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.25 1991-03-08 21:05:33 tytso Exp $")
+	"$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.26 1991-03-09 16:33:49 tytso Exp $")
 
 ;;;
 ;;; Lots of autoload stuff....
