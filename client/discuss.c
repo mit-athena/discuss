@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.25 1986-12-08 00:43:30 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.26 1986-12-14 12:04:11 spook Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
@@ -9,6 +9,10 @@
  *	ss library for the command interpreter.
  *
  *      $Log: not supported by cvs2svn $
+ * Revision 1.25  86/12/08  00:43:30  wesommer
+ * Implemented -editor, -no_editor control args for program, 
+ * similar args and -mtg arg for repl.
+ * 
  * Revision 1.24  86/12/07  21:51:10  wesommer
  * Added -editor and -no_editor control args to permit use under emacs.
  * 
@@ -88,7 +92,7 @@
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.25 1986-12-08 00:43:30 wesommer Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.26 1986-12-14 12:04:11 spook Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -124,8 +128,6 @@ char	*pgm = (char *)NULL;
 char	buf[BUFSIZ];
 char	*buffer = &buf[0];
 int	sci_idx;
-bool	use_editor = TRUE;
-char 	*editor_path = NULL;
 
 /* EXTERNAL ROUTINES */
 
