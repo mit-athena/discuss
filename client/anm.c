@@ -1,12 +1,15 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/anm.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/anm.c,v 1.1 1987-04-08 23:41:52 rfrench Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/anm.c,v 1.2 1987-04-09 05:06:09 spook Exp $
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.1  87/04/08  23:41:52  rfrench
+ * Initial revision
+ * 
  */
 
 #ifndef lint
-static char *rcsid_anm_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/anm.c,v 1.1 1987-04-08 23:41:52 rfrench Exp $";
+static char *rcsid_anm_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/anm.c,v 1.2 1987-04-09 05:06:09 spook Exp $";
 #endif lint
 
 #include "sys/file.h"
@@ -16,6 +19,8 @@ static char *rcsid_anm_c = "$Header: /afs/dev.mit.edu/source/repository/athena/b
 #include "config.h"
 #include "rpc.h"
 #include "globals.h"
+
+extern tfile unix_tfile();
 
 announce_mtg (argc, argv)
 	int argc;
