@@ -4,7 +4,7 @@
 ;;;    	For copying information, see the file mit-copyright.h in this release.
 ;;;
 ;;;	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss-misc.el,v $
-;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss-misc.el,v 1.4 1990-12-06 17:27:11 tytso Exp $
+;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss-misc.el,v 1.5 1991-02-17 20:24:06 bjaspan Exp $
 ;;;
 ;;;  Emacs lisp code with random parts of the emacs discuss user interface
 ;;;  We may want to split out the mail functions into a separate file if
@@ -12,6 +12,9 @@
 ;;;  Written by Theodore Ts'o, Barry Jaspan, and Mark Eichin
 ;;;
 ;;; $Log: not supported by cvs2svn $
+; Revision 1.4  90/12/06  17:27:11  tytso
+; Added a require line so that mail-utils will always be loaded.
+; 
 ; Revision 1.3  90/12/06  17:24:27  tytso
 ; Checking in Barry's changes so that added meetings show up on the 
 ; completion list.
@@ -54,8 +57,8 @@
   (interactive
    (if (or current-prefix-arg
 	   (not (eq (current-buffer) discuss-cur-mtg-buf)))
-       (list (read-input "Host Name:")
-	     (read-input "Pathname:"))
+       (list (read-input "Host Name: ")
+	     (read-input "Pathname: " "/usr/spool/discuss/"))
      (discuss-parse-meeting-announcement)))
   (message "Trying to add meeting....")
   (discuss-send-cmd (format "(am %s %s)\n"
