@@ -2,13 +2,16 @@
  *
  * List request for DISCUSS
  *
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.4 1986-09-22 06:18:43 spook Exp $
+ * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.5 1986-10-14 22:59:06 spook Exp $
  * $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v $
  * $Locker:  $
  *
  * Copyright (C) 1986 by the MIT Student Information Processing Board
  *
  * $Log: not supported by cvs2svn $
+ * Revision 1.4  86/09/22  06:18:43  spook
+ * changed selected-list manipulation
+ * 
  * Revision 1.3  86/09/10  18:57:27  wesommer
  * Made to work with kerberos; meeting names are now longer.
  * ./
@@ -112,6 +115,11 @@ list(sci_arg, argc, argv)
 
 	if (cur_mtg == (char *)NULL) {
 		ss_perror(sci_idx, 0, "No current meeting.\n");
+		return;
+	}
+	get_mtg_info(cur_mtg, &m_info, &code);
+	if (code != 0) {
+		(void) ss_perror(sci_idx, code, "Can't get meeting info");
 		return;
 	}
 	txn_no = m_info.first;
