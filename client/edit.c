@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/edit.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/edit.c,v 1.2 1986-12-07 19:32:06 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/edit.c,v 1.3 1986-12-07 21:51:37 wesommer Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board.
@@ -8,6 +8,9 @@
  *	Utility routines.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.2  86/12/07  19:32:06  wesommer
+ * [spook] Create file before entering.
+ * 
  * Revision 1.1  86/12/07  01:30:14  rfrench
  * Initial revision
  * 
@@ -40,7 +43,7 @@
  */
 
 #ifndef lint
-static char *rcsid_discuss_utils_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/edit.c,v 1.2 1986-12-07 19:32:06 wesommer Exp $";
+static char *rcsid_discuss_utils_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/edit.c,v 1.3 1986-12-07 21:51:37 wesommer Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -78,6 +81,21 @@ edit(fn)
 	int (*handler)();
 	union wait wbuf;
 
+	if (!use_editor) {
+		FILE *of = fopen(fn, "w");
+		char buf[BUFSIZ];
+		if (!of) { 
+			perror(fn);
+			return(errno);
+		}
+		ftruncate(fileno(of), 0);
+		while(gets(buf) != NULL && strcmp(buf, ".")) {
+			fputs(buf, of);
+			fputc('\n', of);
+		}
+		fclose(of);
+		return(0);
+	}
 	if (!ed)
 		ed = DEFAULT_EDITOR;
 

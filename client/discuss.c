@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.23 1986-12-07 17:49:30 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.24 1986-12-07 21:51:10 wesommer Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
@@ -9,6 +9,9 @@
  *	ss library for the command interpreter.
  *
  *      $Log: not supported by cvs2svn $
+ * Revision 1.23  86/12/07  17:49:30  wesommer
+ * Lint fixes.
+ * 
  * Revision 1.22  86/12/07  16:04:23  rfrench
  * Globalized sci_idx
  * 
@@ -83,7 +86,7 @@
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.23 1986-12-07 17:49:30 wesommer Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.24 1986-12-07 21:51:10 wesommer Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -119,6 +122,7 @@ char	*pgm = (char *)NULL;
 char	buf[BUFSIZ];
 char	*buffer = &buf[0];
 int	sci_idx;
+bool	use_editor = TRUE;
 
 /* EXTERNAL ROUTINES */
 
@@ -156,6 +160,10 @@ main(argc, argv)
 			quit = 1;
 		else if (!strcmp(*argv, "-no_quit"))
 			quit = 0;
+		else if (!strcmp(*argv, "-editor"))
+			use_editor = TRUE;
+		else if (!strcmp(*argv, "-no_editor"))
+			use_editor = FALSE;
 		else if (**argv == '-') {
 			fprintf(stderr, "Unknown control argument %s\n",
 				*argv);
