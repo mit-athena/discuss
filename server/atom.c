@@ -34,7 +34,7 @@
 
 typedef unsigned short block_num;
 
-typedef struct dir_blk {
+struct dir_blk {
      struct dir_blk *next;
      short used;
      char *bptr [ABLKSINDIR];
@@ -184,7 +184,6 @@ aclose(af)
 afile af;
 {
      struct dir_blk *db,*olddb;
-     block_num bnum;
      register i;
 
      /* loop thru dir blocks, writing all blocks */
@@ -218,7 +217,6 @@ aabort(af)
 afile af;
 {
      struct dir_blk *db,*olddb;
-     block_num bnum;
      register i;
 
      /* loop thru dir blocks, freeing all blocks */
