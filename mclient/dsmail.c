@@ -12,6 +12,9 @@
  *        $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/dsmail.c,v $
  *
  *        $Log: not supported by cvs2svn $
+ *        Revision 1.7  1998/04/07 22:00:03  danw
+ *        Add Message-ID and MIME headers to the list of default (-d) headers to keep
+ *
  *        Revision 1.6  1997/12/17 00:31:38  ghudson
  *        Oops, REG_BASIC isn't universal.  (It's 0 where it is defined, so just
  *        punt it.)
@@ -119,6 +122,7 @@
 #include <sys/file.h>
 #include <sysexits.h>
 #include <regex.h>
+#include <sys/fcntl.h>
 
 
 #include <discuss/discuss.h>
@@ -136,7 +140,7 @@
 
 #ifndef	lint
 static char rcsid[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/dsmail.c,v 1.7 1998-04-07 22:00:03 danw Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/dsmail.c,v 1.8 1998-04-16 22:17:33 ghudson Exp $";
 #endif
 
 char *malloc(), *realloc ();
@@ -192,7 +196,7 @@ main(argc,argv)
      FILE *f;
      char line[BUFFLEN+1],*colonp,*ep;
      char *subject=NULL,*reply_to_str=NULL;
-     int i,ok_prev=0,iscont = 0, have_signature = 0, len;
+     int i,ok_prev=0,iscont = 0, have_signature = 0, len, d;
      char filename[60], signature[35], field_name[100];
      
      init_dsc_err_tbl();
@@ -205,16 +209,16 @@ main(argc,argv)
 	  f=stdout;
      else {
 	  (void) mktemp(strcpy(filename, "/tmp/DSXXXXXX"));
-	  if ((f = fopen(filename,"w+")) == NULL)
+	  if ((d = open(filename, O_CREAT|O_EXCL|O_RDWR, 0600)) == -1)
 	    {
 	      fprintf (stderr, "250-Can't create temporary file ");
 	      fflush (stderr);
 	      perror(filename);
 	      return EX_TEMPFAIL;
 	    }
-	  if (fchmod(fileno(f),0600))
+	  if ((f = fdopen(d, "w+")) == NULL)
 	    {
-	      perror("250-Can't chmod temporary file");
+	      perror("250-Can't fdopen temporary file");
 	      return EX_TEMPFAIL;
 	    }
      }
@@ -249,6 +253,8 @@ main(argc,argv)
 		    /* ignore second subject line */
 		    if (subject==NULL) {
 			 subject=malloc(ep-cp+1);
+			 if (!subject)
+			     exit (EX_TEMPFAIL);				
 			 (void) strcpy(subject,cp);
 
 			 /* Trim subject */
@@ -262,6 +268,8 @@ main(argc,argv)
 
 		    if (reply_to_str==NULL) {
 			 reply_to_str=malloc(ep-cp+1);
+			 if (!reply_to_str)
+			     exit (EX_TEMPFAIL);				
 			 (void) strcpy(reply_to_str,cp);
 		    }	
 	       }
@@ -280,6 +288,8 @@ main(argc,argv)
 	       if (list_compare(field_name, inreplyto) && reply_to_str != NULL) {
 		    /* Concat reply-to */
 		    reply_to_str = realloc(reply_to_str,strlen(reply_to_str) + strlen(line) + 1);
+		    if (!reply_to_str)
+		        exit (EX_TEMPFAIL);				
 		    strcpy(reply_to_str+strlen(reply_to_str),line);
 	       }
 	  }
