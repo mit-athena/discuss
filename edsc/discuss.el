@@ -4,7 +4,7 @@
 ;;;    	For copying information, see the file mit-copyright.h in this release.
 ;;;
 ;;;	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v $
-;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.18 1990-11-05 14:46:02 eichin Exp $
+;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.19 1990-12-05 16:23:50 raeburn Exp $
 ;;;
 ;;;  Emacs lisp code to remote control a "discuss" shell process to
 ;;;  provide an emacs-based interface to the discuss conferencing system.
@@ -13,6 +13,9 @@
 ;;;  Written by Stan Zanarotti, Bill Sommerfeld and Theodore Ts'o.
 ;;;
 ;;;  $Log: not supported by cvs2svn $
+; Revision 1.18  90/11/05  14:46:02  eichin
+; moved autoload path dependencies into discuss-source-dir variable.
+; 
 ; Revision 1.17  90/11/01  21:32:56  eichin
 ; changed cadr, caddr, cddr to functions - the macros were breaking
 ; things in several places, particularly wrt byte-compiling.
@@ -267,11 +270,10 @@ a	Add meeting."
 
 ;;; Main entry point:  Start up a slave process and listen for requests.
 
-(defun discuss (arg)
+(defun discuss (&optional arg)
   "Enter discuss mode for emacs and list meetings."
   (interactive "P")
   (message "Starting discuss....")
-  (sit-for 1)
   (let ((old-buffer (current-buffer)))
     (if (not (and (get-buffer discuss-main-buffer)
 		  (buffer-name (get-buffer discuss-main-buffer))
@@ -279,12 +281,10 @@ a	Add meeting."
 	(progn
 	  (switch-to-buffer (get-buffer-create discuss-main-buffer))
 	  (discuss-mtgs-mode)
-	  (if current-prefix-arg		;not quite right...
-	      nil
+	  (if arg
+	      (message "Hit `g' and enter a meeting name.")	      
 	    (discuss-lsm)))
-      (switch-to-buffer discuss-main-buffer))
-    (if arg
-	(switch-to-buffer old-buffer))))
+      (switch-to-buffer discuss-main-buffer))))
 
 ;;; Entry points typically entered through key sequences.
 
@@ -319,14 +319,11 @@ a	Add meeting."
 		(t
 		 "         "))
 	  (cadr entry))
-  (if (cddr entry)
-      (mapcar 'discuss-lsm-2 (cddr entry)))
-  (insert "\n")
-  (if (stringp (car entry))
-      (progn
-	(ding)
-	(message "%s: %s" (cadr entry) (car entry))
-	(sit-for 1))))
+  (cond ((stringp (car entry))
+	 (insert " (" (car entry) ")"))
+	((cddr entry)
+	 (mapcar 'discuss-lsm-2 (cddr entry))))
+  (insert "\n"))
 
 (defun discuss-lsm-2 (name)
   (insert ", " name))
@@ -494,9 +491,9 @@ a	Add meeting."
 (defun discuss-end-of-stat ()
   (setq discuss-current-meeting-info discuss-form)
   (setq discuss-meeting-info discuss-form)
-    (let ((last (nth 4 discuss-form))
-	  (highest-seen (nth 11 discuss-form)))
-      (if (and (equal (cadr discuss-form) discuss-current-meeting)
+  (let ((last (nth 4 discuss-form))
+	(highest-seen (nth 11 discuss-form)))
+    (if (and (equal (cadr discuss-form) discuss-current-meeting)
 	     (not (= discuss-highest-seen 0)))
 	(setq highest-seen discuss-highest-seen))    ;; This is wrong...
     (message "%s meeting: %d new, %d last."
@@ -1123,7 +1120,7 @@ discuss server while we spin-block."
 ; run this at each load
 (defun discuss-initialize nil
   (setq discuss-version
-	"$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.18 1990-11-05 14:46:02 eichin Exp $")
+	"$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.19 1990-12-05 16:23:50 raeburn Exp $")
 
 ;;;
 ;;; Lots of autoload stuff....
