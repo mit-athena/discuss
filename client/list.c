@@ -2,7 +2,7 @@
  *
  * List request for DISCUSS
  *
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.19 1989-01-29 17:08:38 srz Exp $
+ * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.20 1989-02-23 23:29:08 srz Exp $
  * $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v $
  * $Locker:  $
  *
@@ -11,7 +11,7 @@
  */
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.19 1989-01-29 17:08:38 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.20 1989-02-23 23:29:08 srz Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -300,7 +300,7 @@ punt:
      return(code);
 }
 
-int set_flag(argc, argv)
+int switch_cmd(argc, argv)
 int argc;
 char **argv;
 {
@@ -309,17 +309,18 @@ char **argv;
 	  goto usage;
      }
 
-     if (!strcmp(argv[1], "on"))
+     if (!strcmp(argv[0], "switch_on") || !strcmp(argv[0], "swn"))
 	  setting = TRUE;
-     else if (!strcmp(argv[1], "off"))
+     else
 	  setting = FALSE;
-     else goto usage;
 
+     if (strcmp(argv[1], "flag"))
+	  goto usage;
      argc--,argv++;
      map_trns(argc, argv, "current", flag_it);
      return;
 
 usage:
-     (void) fprintf(stderr, "Usage: set flag [on|off] [trn_specs]\n");
+     (void) fprintf(stderr, "Usage: %s flag [trn_specs]\n",argv[0]);
      return;
 }
