@@ -23,7 +23,7 @@ tfile unix_tfile();
 char *mktemp();
 
 #ifndef	lint
-static char rcsid[] = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/dspipe.c,v 1.4 1989-06-03 00:31:04 srz Exp $";
+static char rcsid[] = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/dspipe.c,v 1.5 1990-02-24 18:44:54 srz Exp $";
 #endif
 
 main (argc,argv)
@@ -32,6 +32,7 @@ char **argv;
 {
 	char *usr_mtg = "";
 	char *subject = "";
+	char *signature = "";
 	char mtg_name [100],host[70];
 	int result;
 	int fatal_err;
@@ -52,6 +53,12 @@ char **argv;
 				if (++i < argc)
 					subject = argv[i];
 				continue;
+
+			case 's':
+				if (++i < argc)
+					signature = argv[i];
+				continue;
+
 			default:
 				goto lusage;
 			}
@@ -101,7 +108,15 @@ char **argv;
 	     (void) fprintf (stderr, "Warning: %s\n", error_message(result));
 	}
 
-	add_trn (mtg_name, tf, subject, 0, &result_trn, &result);
+	if (signature[0] == '\0') {
+	     add_trn (mtg_name, tf, subject, 0, &result_trn, &result);
+	} else {
+	     if (get_server_version() < SERVER_2)
+		  add_trn (mtg_name, tf, subject, 0, &result_trn, &result);
+	     else
+		  add_trn2(mtg_name, tf, subject, signature, 0, &result_trn, &result);
+	}
+		  
 	if (result != 0) {
 		(void) fprintf (stderr, "%s\n", error_message(result));
 		exit_code = 1;
@@ -121,7 +136,7 @@ char **argv;
 	exit (exit_code);
 
  lusage:
-	(void) fprintf (stderr, "Usage: dspipe {mtgname} -t {topic}\n");
+	(void) fprintf (stderr, "Usage: dspipe {mtgname} -t {topic} -s {signature}\n");
 	exit (1);
 }
 
