@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v 1.1 1986-11-16 06:03:56 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v 1.2 1986-11-22 06:19:08 spook Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
@@ -8,6 +8,9 @@
  *	Originally written for the discuss system by Bill Sommerfeld
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.1  86/11/16  06:03:56  wesommer
+ * Initial revision
+ * 
  */
 
 #include "../include/types.h"
@@ -17,13 +20,15 @@
 #include <errno.h>
 #include <stdio.h>
 #include <sys/param.h>
+#include <strings.h>
 
 #ifndef lint
-static char *rcsid_acl_core_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v 1.1 1986-11-16 06:03:56 wesommer Exp $";
+static char *rcsid_acl_core_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v 1.2 1986-11-22 06:19:08 spook Exp $";
 #endif lint
 
 extern Acl *mtg_acl;
 extern char rpc_caller [];
+extern uid_t geteuid();
 extern int errno;
 
 /*
@@ -150,7 +155,7 @@ set_access(mtg_name, princ_name, modes, code)
 	}
 	*code = 0;
  punt:
-	free(n_modes);
+	(void) free(n_modes);
 	return;
 }
 
@@ -226,8 +231,8 @@ locked_open_mtg(mtg_name, lockfd, acl_name, acl)
 		result = errno;
 		goto punt;
 	}
-	strcpy (acl_name, mtg_name);
-	strcat (acl_name, "/acl");
+	(void) strcpy (acl_name, mtg_name);
+	(void) strcat (acl_name, "/acl");
 
 	if ((u_acl_f = open(acl_name, O_RDONLY, 0700)) < 0) {
 		if (errno == ENOENT)
@@ -238,18 +243,18 @@ locked_open_mtg(mtg_name, lockfd, acl_name, acl)
 			result = BAD_PATH;
 		goto punt;
 	}
-	if (!fis_owner (u_acl_f, geteuid())) {
+	if (!fis_owner (u_acl_f, (int)geteuid())) {
 		result = NO_ACCESS;
 		goto punt;
 	}
 
 	*acl = acl_read (u_acl_f);
-	close(u_acl_f);
+	(void) close(u_acl_f);
 	u_acl_f = 0;
 	return 0;
 punt:
-	if (*lockfd >= 0) close(*lockfd);
-	if (u_acl_f >= 0) close(u_acl_f);
+	if (*lockfd >= 0) (void) close(*lockfd);
+	if (u_acl_f >= 0) (void) close(u_acl_f);
 	if (*acl) acl_destroy(*acl);
 
 	return result;
@@ -261,7 +266,7 @@ locked_abort(mtg_name, lockfd, acl_name, acl)
 	char *acl_name;
 	Acl *acl;
 {
-	close(lockfd);		/* unlocks, too */
+	(void) close(lockfd);	/* unlocks, too */
 	acl_destroy(acl);
 }
 
@@ -283,8 +288,8 @@ locked_close_mtg(mtg_name, lockfd, acl_name, acl)
 	/*
 	 * 4: Open up acl file for writing and write new acl.
 	 */
-	strcpy(acl_nname, acl_name);
-	strcat(acl_nname, "~");
+	(void) strcpy(acl_nname, acl_name);
+	(void) strcat(acl_nname, "~");
 
 	if ((u_acl_f = open(acl_nname, O_WRONLY|O_TRUNC|O_CREAT, 0600)) < 0) {
 		result = errno; /*XXX*/
@@ -296,7 +301,7 @@ locked_close_mtg(mtg_name, lockfd, acl_name, acl)
 		goto punt;
 	}
 
-	close(u_acl_f); u_acl_f = -1;
+	(void) close(u_acl_f); u_acl_f = -1;
 	
 	/*
 	 * 5: the commit point; rename the file.
@@ -312,8 +317,9 @@ locked_close_mtg(mtg_name, lockfd, acl_name, acl)
 
 	result = 0;
  punt:
-	close(lockfd);	 	/* unlock */
+	(void) close(lockfd);	/* unlock */
 	acl_destroy(acl); 	/* kaboom */
-	if (u_acl_f >= 0) close(u_acl_f);
+	if (u_acl_f >= 0)
+		(void) close(u_acl_f);
 	return result;
 }
