@@ -5,6 +5,10 @@
  *
  */
 
+#ifndef lint
+static char *rcsid_dsname_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v 1.4 1986-10-27 16:04:25 wesommer Exp $";
+#endif lint
+
 #include <strings.h>
 #include <ctype.h>
 #include <errno.h>
@@ -333,17 +337,16 @@ static struct nment *getnment()
 static setnment(user)
 char *user;
 {
-     static char my_user[NB_USER_SZ] = "";
-     static int got_my_user = 0;
+     static char last_user[NB_USER_SZ] = "";
      char buffer[MAXPATHLEN];
      struct passwd *pw;
 
-     if (nm_file == NULL || !got_my_user) {
+     if (nm_file == NULL || strcmp(user, last_user) != 0) {
+	  if (nm_file) endnment();
 	  set_rc_filename(user, buffer, sizeof(buffer));
 	  nm_file = fopen (buffer, "r");
 	  if (nm_file != NULL) {
-	       got_my_user = 1;
-	       strcpy (my_user, user);
+	       strcpy (last_user, user);
 	  }
      }
      if (nm_file != NULL)
