@@ -1,158 +1,51 @@
+;;; Emacs lisp code to remote control a "discuss" shell process to
+;;; provide an emacs-based interface to the discuss conferencing system.
+;;;
+;;; Copyright (C) 1989, 1993 by the Massachusetts Institute of Technology
+;;; Developed by the MIT Student Information Processing Board (SIPB).
+;;; Written by Stan Zanarotti, Bill Sommerfeld and Theodore Ts'o.
+;;; For copying information, see the file mit-copyright.h in this release.
+;;;
+;;; $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v $
+;;; $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.34 1996-04-12 22:30:49 ghudson Exp $
+;;;
+
 ;;
-;; WARNING --- change discuss-source-dir when installing this file! 
-;; 
-
-(defvar discuss-source-dir "/usr/athena/lib/elisp"
-  "Source directory which this version of discuss is loaded from.")
-
-;;;
-;;;	Copyright (C) 1989 by the Massachusetts Institute of Technology
-;;;    	Developed by the MIT Student Information Processing Board (SIPB).
-;;;    	For copying information, see the file mit-copyright.h in this release.
-;;;
-;;;	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v $
-;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.33 1992-07-13 16:47:54 lwvanels Exp $
-;;;
-;;;  Emacs lisp code to remote control a "discuss" shell process to
-;;;  provide an emacs-based interface to the discuss conferencing system.
-;;;
-;;;  Copyright (c) 1986 by the Massachusetts Institute of Technology.
-;;;  Written by Stan Zanarotti, Bill Sommerfeld and Theodore Ts'o.
-;;;
-;;;  $Log: not supported by cvs2svn $
-; Revision 1.32  1992/04/16  18:24:47  lwvanels
-; [tytso]
-; Ripped out caching code which was in version 1; requires edsc protocol
-; version 2.4 or greater, which will take care of the discuss transaction
-; cache.
-; This also solves the problem with edsc spinning occasionally, waiting
-; for input.  [changes.74#1612]
-;
-; Revision 1.31  1991/07/30  20:06:59  lwvanels
-; top dir now /usr/athena/lib/elisp
-; don't explicitly look for .elc files
-;
-; Revision 1.30  91/07/22  11:19:52  lwvanels
-; fixed location of edsc
-; 
-; Revision 1.29  91/04/26  17:24:17  raeburn
-; Don't use ptys for subprocesses.
-; 
-; Revision 1.28  91/03/12  17:57:40  tytso
-; Cleaned up error handling for discuss-catchup.  Calling discuss-goto-error
-; was a bad move!
-; 
-; Have discuss-goto check to see whether or not it has read access to
-; the meeting.
-; 
-; Revision 1.27  91/03/09  22:34:09  tytso
-; Fixed stupid mistake in setting discuss-old-ss
-; 
-; Revision 1.26  91/03/09  16:33:49  tytso
-; *** empty log message ***
-; 
-; Revision 1.25  91/03/08  21:05:33  tytso
-; Fixed locking problem with the changed behavior of the "ss" command in
-; edsc protocol version 2.4
-; 
-; Revision 1.24  91/02/24  14:46:58  bjaspan
-; fixed my brain-dead discuss-catchup implementation
-; 
-; Revision 1.23  91/02/19  16:13:50  bjaspan
-; removed useless check for machine-type in (edsc-machine-type).
-; 
-; Revision 1.22  91/02/01  17:45:59  tytso
-; Removed useless let in mainline discuss entrance point.
-; 
-; Changed message and removed bell when emacs-discuss tries to update
-; the changed flag for a meeting and fails (usually because the list of
-; meetings isn't in the buffer at the moment).
-; 
-; Revision 1.21  91/01/04  19:30:46  bjaspan
-; added doc for l and F to discuss-trn-mode.
-; 
-; Revision 1.20  91/01/03  22:23:31  bjaspan
-; added discuss-set-seen-and-leave-mtg and discuss-catchup
-; 
-; Revision 1.19  90/12/05  16:23:50  raeburn
-; Removed one-second delay at startup.  Argument to `discuss' is now
-; optional, and no longer causes reversion to previous buffer.  Error
-; messages now show up associated with meeting names, rather than
-; showing up in the minibuffer and then disappearing.
-; 
-; Revision 1.18  90/11/05  14:46:02  eichin
-; moved autoload path dependencies into discuss-source-dir variable.
-; 
-; Revision 1.17  90/11/01  21:32:56  eichin
-; changed cadr, caddr, cddr to functions - the macros were breaking
-; things in several places, particularly wrt byte-compiling.
-; 
-; Revision 1.16  90/10/29  22:55:04  bjaspan
-; fixed a stupid bug in discuss-delete-trn
-; 
-; Revision 1.15  90/09/19  16:29:02  bjaspan
-; merged my changes: meeting name completion, discuss-safe-delete
-; 
-; Revision 1.1  89/02/25  00:12:20  tytso
-; Initial revision
-;
-; Revision 1.14  89/12/07  22:12:12  raeburn
-; revamped mechanism for determining machine type
-; 
-; Revision 1.13  89/11/12  20:54:04  raeburn
-; Pointed `edsc' to /mit/discuss/exl, where a pmax version exists also,
-; and checked to see if we're on a pmax.
-; 
-; Revision 1.12  89/06/02  23:45:11  srz
-; Added standard copyright notice.
-; 
-; Revision 1.11  88/12/15  13:50:06  srz
-; Add patch so that broken meetings won't lose information.
-; 
-; Revision 1.10  88/12/05  08:18:12  eichin
-; added discuss-next-meeting. [previous fix to discuss-goto was
-; harmless, but not a bug. I had loaded a different version of the
-; function, oops...]
-; 
-; Revision 1.9  88/12/05  08:11:22  eichin
-; Fixed ^O [discuss-output-last-file wasn't getting set, probably
-; because discuss-send-cmd doesn't really return...] and tested it.
-; 
-; Revision 1.8  88/11/08  07:28:26  raeburn
-; typo fixes...
-; 
-; Revision 1.7  88/11/08  06:50:38  raeburn
-; Fixed nref code not to reference variable "prev"; changed
-; output-transaction routine to default to <mtg-name>.trans.
-; 
-; Revision 1.6  88/11/08  06:24:10  raeburn
-; Removed some old comments; made "C-u M-x discuss" not list meetings,
-; but accept meeting name; caused quit to send "(quit)" and disown
-; process before killing buffer.  Also defined discuss-version function
-; and variable with RCS id, misc other tweaks.
-; 
-; Revision 1.5  88/10/29  01:47:34  balamac
-; Added randrp support.
-; 
-; Revision 1.4  88/10/26  23:25:47  srz
-; Now goes to next transaction when going to a meeting.
-; 
-; Revision 1.3  88/10/26  15:23:15  eichin
-; fix path for non-exl edsc client.
-; 
-; Revision 1.2  88/10/26  15:17:01  eichin
-; Added discuss-trn-output
-; 
-; Revision 1.1  88/10/24  22:32:58  srz
-; Initial revision
-; 
+;; WARNING --- change discuss-source-dir when installing this file!
+;;
 
 (provide 'discuss)
 
+(defvar discuss-source-dir nil
+  "Source directory from which this version of discuss is loaded, including
+the trailing `/'.  It must end with `/', since it will be directly
+concatenated to other file names.  Setting this to nil or an empty string
+will cause load-path to be used.")
+
+; Pathname for subprocess.  Pretty gross Athena-specific hacks here.
+
+(defvar edsc-machine-type
+  (let ((foo nil)
+	(process-connection-type nil)
+	(buf (get-buffer-create " *edsc-xyzzy*")))
+    (save-excursion
+      (set-buffer buf)
+      (erase-buffer)
+      (call-process-region (point) (point) "/bin/athena/machtype" nil t nil)
+      (goto-char (point-max))
+      (delete-backward-char 1)
+      (setq foo (buffer-string))
+      (kill-buffer buf)
+      (if (eq foo "")
+	  (error "Can't determine machine type.")
+	foo)
+      )))
+(defvar discuss-pathname "/usr/athena/etc/edsc"
+  "*Name of program to run as slave process for discuss.")
+
 (defvar discuss-DWIM nil
   "If true, enable Do_What_I_Mean mode.  Allows the user to read discuss by
-repeatedly hitting the space bar.  For the truly discrimining and lazy 
-user.")
+repeatedly hitting the space bar.  For the truly lazy user.")
 
 (defvar discuss-safe-delete nil
   "If true, discuss asks for confirmation before deleting a transaction with
@@ -200,7 +93,7 @@ meetings.")
 
 (defvar discuss-meeting nil
   "Buffer-local variable containing the name of the meeting of a discuss
-transaction buffer.  Nil means this buffer is not a discuss-transaction 
+transaction buffer.  Nil means this buffer is not a discuss-transaction
 buffer.")
 
 (defvar discuss-meeting-info nil
@@ -221,11 +114,8 @@ Currently ignored (always async).")
 (defvar discuss-in-show-trn nil)
 
 (defvar discuss-error nil
-  "Contains error message returned by edsc process.  If nil, means last 
+  "Contains error message returned by edsc process.  If nil, means last
 request completed successfully.")
-
-(defvar discuss-pathname "/usr/athena/etc/edsc"
-  "*Name of program to run as slave process for discuss.")
 
 
 ;;; Major modes defined by this package.
@@ -237,14 +127,15 @@ request completed successfully.")
 This looks a lot like RMAIL.  This works by using ``edsc'' as a subjob.
 
 The following commands are available:
-SPC,n   go to next meeting that has unread transactions
-DEL,p   go to previous meeting has unread transactions
-l	list meetings
-g	go to meeting listed on line
-a	add meeting
-d	delete meeting
-c	mark a meeting as read (catch up)
-q	Quit Discuss mode."
+\\[describe-mode]	List available commands.
+\\[discuss-forward-meeting]	Go to next meeting that has unread transactions.
+\\[discuss-prev-meeting]	Go to previous meeting has unread transactions.
+\\[discuss-lsm]	List meetings.
+\\[discuss-goto]	Go to meeting listed on line.
+\\[discuss-add-mtg]	Add meeting.
+\\[discuss-del-mtg]	Delete meeting listed on line.
+\\[discuss-catchup]	Mark a meeting as read (catch up).
+\\[discuss-quit]	Quit Discuss."
   (interactive)
   (kill-all-local-variables)
   (setq major-mode 'discuss-mtgs-mode)
@@ -278,28 +169,32 @@ discuss subsystem.
 All normal editing commands are turned off.
 Instead, these commands are available:
 
-SPC	Scroll to next screen of this transaction.
-DEL	Scroll to previous screen of this transaction.
-n	Move to Next transaction.
-p	Move to Previous transaction.
-M-n	Move to Next transaction in chain.
-M-p	Move to Previous transaction in chain.
-M-f	Move to First transaction in a chain.
-M-l	Move to Last transaction in a chain.
->	Move to Last transaction in meeting.
-<	Move to First transaction in meeting.
-g	Goto transaction.
-d	Delete transaction (and move forwards).
-C-d	Delete transaction (and move backwards).
-R	Retrieve transaction.
-q       Quit meeting.
-r	Reply to this transaction.
-f	Forward this transaction via mail.
-t	Talk.  Enter a new transaction.
-c	Catch up.  Mark the rest of the transactions in this meeting as read.
-l	Mark transaction as highest-seen and leave meeting.
-F	Toggle the flag on the current transaction.
-a	Add meeting."
+\\[describe-mode]	List available commands.
+\\[discuss-scroll-up]	Scroll to next screen of this transaction.
+\\[scroll-down]	Scroll to previous screen of this transaction.
+\\[discuss-ls]	List headers of remaining transactions.
+\\[discuss-next-trn]	Move to Next transaction.
+\\[discuss-prev-trn]	Move to Previous transaction.
+\\[discuss-last-trn]	Move to Last transaction in meeting.
+\\[discuss-first-trn]	Move to First transaction in meeting.
+\\[discuss-nref]	Move to Next transaction in chain.
+\\[discuss-pref]	Move to Previous transaction in chain.
+\\[discuss-fref]	Move to First transaction in chain.
+\\[discuss-lref]	Move to Last transaction in chain.
+\\[discuss-show-trn]	Goto a specific transaction.
+\\[discuss-delete-trn]	Delete transaction (and move forwards).
+\\[discuss-delete-trn-backwards]	Delete transaction (and move backwards).
+\\[discuss-retrieve-trn]	Retrieve (undelete) a deleted transaction.
+\\[discuss-reply]	Reply to this transaction (via discuss.)
+\\[discuss-reply-by-mail]	Reply to this transaction (via mail.)
+\\[discuss-forward]	Forward this transaction via mail.
+\\[discuss-trn-output]	Append this transaction to a UNIX file.
+\\[discuss-talk]	Talk.  Enter a new transaction.
+\\[discuss-toggle-trn-flag]	Toggle the flag on this transaction.
+\\[discuss-set-seen-and-leave-mtg]	Mark transaction as highest-seen and leave meeting.
+\\[discuss-catchup]	Catch up.  Mark all of the transactions in this meeting as read.
+\\[discuss-add-mtg]	Add meeting (if this transaction is a meeting annoucement).
+\\[discuss-leave-mtg]	Quit (leave) meeting."
   (interactive)
   (kill-all-local-variables)
   (setq major-mode 'discuss-trn-mode)
@@ -331,7 +226,7 @@ a	Add meeting."
 	(discuss-mtgs-mode)
 	(setq discuss-meeting-list nil)
 	(if arg
-	    (message "Hit `g' and enter a meeting name.")	      
+	    (message "Hit `g' and enter a meeting name.")	
 	  (discuss-lsm)))
     (switch-to-buffer discuss-main-buffer)))
 
@@ -391,12 +286,12 @@ a	Add meeting."
     newlist))
 
 (defun copy-list (list)
-  (if (eq nil list) 
+  (if (eq nil list)
       '()
     (cons (car list) (copy-list (cdr list)))))
 
 (defun discuss-end-of-lsm ()
-  (message "Listing meetings...done.")
+  (message "Listing meetings...")
   (let ((orig-buffer (current-buffer)))
     (set-buffer discuss-main-buffer)
     (setq discuss-meeting-list (apply 'vector discuss-form))
@@ -404,6 +299,7 @@ a	Add meeting."
 	  (mapcar (function (lambda (x) (cons x 0)))
 		  (flatten (mapcar 'cdr discuss-form))))
     (let ((buffer-read-only nil))
+      (erase-buffer)
       (goto-char (point-min))
       (insert " Flags   Meeting name\n"
 	      " -----   ------------\n")
@@ -412,7 +308,8 @@ a	Add meeting."
       (backward-delete-char 1))
     (goto-char (point-min))
     (forward-line 2)
-    (set-buffer orig-buffer)))
+    (set-buffer orig-buffer))
+  (message "Listing meetings...done."))
 
 ; Not working yet...
 (defun discuss-find-meeting (meeting)
@@ -471,7 +368,7 @@ a	Add meeting."
   (setq discuss-current-meeting meeting)   ;;; denigrated
   (setq discuss-output-last-file (concat discuss-meeting ".trans"))
   (discuss-send-cmd (format "(gmi %s)\n" meeting)
-		    'discuss-end-of-goto 'discuss-read-form 
+		    'discuss-end-of-goto 'discuss-read-form
 		    'discuss-goto-error))
 
 (defun discuss-goto-error ()
@@ -512,7 +409,7 @@ a	Add meeting."
 				       discuss-highest-seen
 				       discuss-meeting)
 ;			       'discuss-next-goto
-			       '(lambda () (progn (discuss-show-trn 
+			       '(lambda () (progn (discuss-show-trn
 						   (car discuss-form))))
 			       'discuss-read-form)))))
 
@@ -564,7 +461,7 @@ a	Add meeting."
 	     (string-to-int (read-string "Transaction number: "))
 	   current-prefix-arg)))
   (if (and trn-num (numberp trn-num))
-      (progn 
+      (progn
 	(setq discuss-show-num trn-num)
 	(discuss-send-cmd (format "(gtfc %d %d %s)\n"
 				  discuss-cur-direction
@@ -597,8 +494,8 @@ a	Add meeting."
 	(progn
 	  (message "Last transaction in %s" discuss-meeting)
 	  (discuss-mark-read-meeting discuss-meeting)
-	  (discuss-next-meeting t)
-	  ))))
+	  (discuss-next-meeting t)))
+    (run-hooks 'discuss-show-trn-hooks)))
 
 (defun discuss-update ()
   "Update Discuss display to show new transactions."
@@ -732,7 +629,7 @@ a	Add meeting."
 				    discuss-meeting)
 			    'nil 'discuss-read-form)
 	  (message "Toggling the transaction flag....")
-	  (discuss-send-cmd (format "(sfl %d %d %s)\n" 
+	  (discuss-send-cmd (format "(sfl %d %d %s)\n"
 				    (logxor old-flag 2)
 				    discuss-current-transaction
 				    discuss-meeting)
@@ -804,7 +701,7 @@ the argument or the current transaction and leaves the meeting."
   (let ((meeting (nth 1 discuss-form))
 	(highest (nth 6 discuss-form)))
     (discuss-send-cmd (format "(ss %d %s)\n" highest meeting)
-		      nil 
+		      nil
 		      (if discuss-old-ss nil 'discuss-read-form))
     (discuss-mark-read-meeting meeting)
     (discuss-next-meeting t)
@@ -849,7 +746,7 @@ the argument or the current transaction and leaves the meeting."
       (if (and info
 	       (= discuss-current-transaction trn-num))
 	  (progn
-	    (if backwards 
+	    (if backwards
 		(setq discuss-current-transaction (cadr info)
 		      other (caddr info))
 	      (setq discuss-current-transaction (caddr info)
@@ -909,7 +806,7 @@ the argument or the current transaction and leaves the meeting."
   (interactive)
   (condition-case err
       (scroll-up nil)
-    (error 
+    (error
      (if (and discuss-DWIM
 	      (equal err '(end-of-buffer)))
 	 (if (equal discuss-current-transaction
@@ -951,7 +848,7 @@ Flushes the discuss cache and destroys the edsc process."
       (let ((process-connection-type nil))
 	(if (not (file-exists-p discuss-pathname))
 	    (error "%s does not exist!" discuss-pathname))
-	(setq discuss-process (start-process "discuss-shell" 
+	(setq discuss-process (start-process "discuss-shell"
 					     nil
 					     discuss-pathname))
 	(set-process-sentinel discuss-process 'discuss-edsc-sentinel)
@@ -959,14 +856,14 @@ Flushes the discuss cache and destroys the edsc process."
 	(discuss-block-til-ready t)
 	(let* ((discuss-vers (cond (discuss-form
 				    (car discuss-form))
-				   ((equal discuss-error 
+				   ((equal discuss-error
 					  "Unimplemented operation")
 				    10)
 				   (t
-				    (error "Edsc returned error: %s" 
+				    (error "Edsc returned error: %s"
 					   discuss-error))))
-	       (ver-string 
-		(format "%d.%d" 
+	       (ver-string
+		(format "%d.%d"
 			(/ discuss-vers 10)
 			(- discuss-vers (* (/ discuss-vers 10) 10)))))
 	  (if (> 23 discuss-vers)
@@ -976,19 +873,19 @@ Flushes the discuss cache and destroys the edsc process."
 	  (if (> 25 discuss-vers)
 	      (progn
 		(discuss-restart)
-		(error 
+		(error
 		 "Bad version of edsc (%s) --- you need at least version 2.5."
 		 ver-string))
 	    (progn
-	      (message "Started edsc process.... version %s %s)" 
+	      (message "Started edsc process.... version %s %s)"
 		       ver-string discuss-version-string)
 	      (sit-for 1))))))
-    
+
   ;; block until we have control over things..
   (discuss-block-til-ready t)
   (if filter-func
       (setq discuss-in-progress t))
-  (save-excursion 
+  (save-excursion
     (setq discuss-debug-cmd cmd)
     (setq discuss-reading-string "")
     (setq discuss-cont end-func)
@@ -998,10 +895,10 @@ Flushes the discuss cache and destroys the edsc process."
 
 (defun discuss-block-til-ready (verbose)
   "Block, waiting until the previous operation for discuss finished.
-If VERBOSE is non-nil, then print a message that we're waiting for the 
+If VERBOSE is non-nil, then print a message that we're waiting for the
 discuss server while we spin-block."
   (if discuss-in-progress
-      (progn 
+      (progn
 	(while discuss-in-progress
 	  (if verbose
 	      (message "waiting for discuss..."))
@@ -1020,7 +917,7 @@ discuss server while we spin-block."
       (discuss-restart))
      ((eq status 'signal)
       (ding)
-      (message "discuss-shell: %s." 
+      (message "discuss-shell: %s."
 	       (substring signal 0 -1))
       (discuss-restart))
      )))
@@ -1033,7 +930,7 @@ discuss server while we spin-block."
   (let* ((end-of-line (string-match "\n" discuss-reading-string)))
     (if end-of-line
 	(let ((flag-char (substring discuss-reading-string 0 1))
-	      (first-line (substring discuss-reading-string 1 
+	      (first-line (substring discuss-reading-string 1
 				     end-of-line)))
 	  (setq discuss-error nil)
 	  (cond ((equal flag-char "-") ; warning
@@ -1057,7 +954,7 @@ discuss server while we spin-block."
 		 (if discuss-unwind
 		     (apply discuss-unwind nil)))
 		(t
-		 (setq discuss-form 
+		 (setq discuss-form
 		       (car (read-from-string (concat "(" first-line))))
 		 (setq discuss-in-progress nil)
 		 (if discuss-cont
@@ -1067,45 +964,45 @@ discuss server while we spin-block."
 ; run this at each load
 (defun discuss-initialize nil
   (setq discuss-version
-	"$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.33 1992-07-13 16:47:54 lwvanels Exp $")
+	"$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.34 1996-04-12 22:30:49 ghudson Exp $")
 
 ;;;
 ;;; Lots of autoload stuff....
 ;;;
 
-(autoload 'discuss-talk (concat discuss-source-dir "/discuss-enter")
+(autoload 'discuss-talk (concat discuss-source-dir "discuss-enter")
 	  "Enter a new discuss transaction." t)
 
-(autoload 'discuss-reply (concat discuss-source-dir "/discuss-enter")
+(autoload 'discuss-reply (concat discuss-source-dir "discuss-enter")
 	  "Reply to an existing discuss transaction." t)
 
-(autoload 'discuss-randrp (concat discuss-source-dir "/discuss-enter")
+(autoload 'discuss-randrp (concat discuss-source-dir "discuss-enter")
 	  "Random reply in a meeting." t)
 
-(autoload 'discuss-ls (concat discuss-source-dir "/discuss-ls")
+(autoload 'discuss-ls (concat discuss-source-dir "discuss-ls")
 	  "List the headings of the transactions in a meeting." t)
 
-(autoload 'discuss-list-acl (concat discuss-source-dir "/discuss-acl")
+(autoload 'discuss-list-acl (concat discuss-source-dir "discuss-acl")
 	  "List the ACL of a meeting." t)
 
-(autoload 'discuss-forward (concat discuss-source-dir "/discuss-misc")
+(autoload 'discuss-forward (concat discuss-source-dir "discuss-misc")
 	  "Forward a transaction via mail." t)
 
 (autoload 'discuss-forward-to-meeting
-	  (concat discuss-source-dir "/discuss-misc")
+	  (concat discuss-source-dir "discuss-misc")
 	  "Forward a transaction to another discuss meeting." t)
 
-(autoload 'discuss-reply-by-mail (concat discuss-source-dir "/discuss-misc")
+(autoload 'discuss-reply-by-mail (concat discuss-source-dir "discuss-misc")
 	  "Forward a transaction via mail." t)
 
-(autoload 'discuss-add-mtg (concat discuss-source-dir "/discuss-misc")
+(autoload 'discuss-add-mtg (concat discuss-source-dir "discuss-misc")
 	  "Add a discuss meeting" t)
 
-(autoload 'discuss-del-mtg (concat discuss-source-dir "/discuss-misc")
+(autoload 'discuss-del-mtg (concat discuss-source-dir "discuss-misc")
 	  "Delete a discuss meeting" t)
 
 ;;; Keymaps, here at the end, where the trash belongs..
-  
+
 (if discuss-mtgs-mode-map
     nil
   (setq discuss-mtgs-mode-map (make-keymap))
@@ -1128,15 +1025,14 @@ discuss server while we spin-block."
   (setq discuss-trn-mode-map (make-keymap))
   (suppress-keymap discuss-trn-mode-map)
   (define-key discuss-trn-mode-map "." 'discuss-update)
-  (define-key discuss-trn-mode-map " " 'scroll-up)
   (define-key discuss-trn-mode-map " " 'discuss-scroll-up)
   (define-key discuss-trn-mode-map "\177" 'scroll-down)
   (define-key discuss-trn-mode-map "n" 'discuss-next-trn)
   (define-key discuss-trn-mode-map "p" 'discuss-prev-trn)
   (define-key discuss-trn-mode-map "d" 'discuss-delete-trn)
   (define-key discuss-trn-mode-map "R" 'discuss-retrieve-trn)
-  (define-key discuss-trn-mode-map "\en" 'discuss-nref)
-  (define-key discuss-trn-mode-map "\ep" 'discuss-pref)
+  (define-key discuss-trn-mode-map "\M-n" 'discuss-nref)
+  (define-key discuss-trn-mode-map "\M-p" 'discuss-pref)
   (define-key discuss-trn-mode-map "g" 'discuss-show-trn)
   (define-key discuss-trn-mode-map "<" 'discuss-first-trn)
   (define-key discuss-trn-mode-map ">" 'discuss-last-trn)
@@ -1147,7 +1043,7 @@ discuss server while we spin-block."
   (define-key discuss-trn-mode-map "t" 'discuss-talk)
   (define-key discuss-trn-mode-map "r" 'discuss-reply)
   (define-key discuss-trn-mode-map "\C-c\C-r" 'discuss-randrp)
-  (define-key discuss-trn-mode-map "\er" 'discuss-reply-by-mail)
+  (define-key discuss-trn-mode-map "\M-r" 'discuss-reply-by-mail)
   (define-key discuss-trn-mode-map "\C-o" 'discuss-trn-output)
   (define-key discuss-trn-mode-map "i" 'discuss-trn-input)
   (define-key discuss-trn-mode-map "q" 'discuss-leave-mtg)
@@ -1155,8 +1051,8 @@ discuss server while we spin-block."
   (define-key discuss-trn-mode-map "s" 'discuss-stat)
   (define-key discuss-trn-mode-map "a" 'discuss-add-mtg)
   (define-key discuss-trn-mode-map "\C-d" 'discuss-delete-trn-backwards)
-  (define-key discuss-trn-mode-map "\ef" 'discuss-fref)
-  (define-key discuss-trn-mode-map "\el" 'discuss-lref)
+  (define-key discuss-trn-mode-map "\M-f" 'discuss-fref)
+  (define-key discuss-trn-mode-map "\M-l" 'discuss-lref)
   (define-key discuss-trn-mode-map "=" 'discuss-ls)
   (define-key discuss-trn-mode-map "c" 'discuss-catchup)
   (define-key discuss-trn-mode-map "l" 'discuss-set-seen-and-leave-mtg)
@@ -1243,11 +1139,11 @@ discuss server while we spin-block."
   "Mark a meeting as read on the discuss-mode listing.  An optional
 argument means insert that character instead of a space before the
 meeting (usually a c)."
-  (setq inschar (or inschar \032))
+  (setq inschar (or inschar ?\ ))
   (save-excursion
     (set-buffer discuss-main-buffer)
     (goto-char (point-min))
-    (if (not (re-search-forward (concat " " (regexp-quote meeting) 
+    (if (not (re-search-forward (concat " " (regexp-quote meeting)
 					"\\(,\\|$\\)")
 			     nil t))
 	(progn
@@ -1263,3 +1159,182 @@ meeting (usually a c)."
 (defun discuss-mark-unread-meeting (meeting)
   "Mark a meeting as unread on the discuss-mode listing."
   (discuss-mark-read-meeting meeting ?c))
+
+;;;  $Log: not supported by cvs2svn $
+; Revision 1.1  1995/08/06  05:54:13  ghudson
+; Initial revision
+;
+; Revision 2.13  1993/10/24  12:02:36  ckclark
+; Added discuss-show-trn-hooks to be run when a transaction
+; is shown.
+;
+; Revision 2.12  1993/05/16  00:41:02  raeburn
+; Moved copyright/comment info to the start of the file, long RCS log messages to
+; end.
+;
+; Made edsc-machine-type a variable rather than function, since the function is
+; only invoked once, and the variable can be overriden more easily.
+;
+; Fixed use of discuss-source-dir so a nil value should search load-path.
+; Improved documentation.
+;
+; In discuss-end-of-lsm, don't display "done" version of message until the end,
+; since time to process the data is non-trivial.
+;
+; Revision 2.11  1992/07/12  17:01:49  ckclark
+; Improved mode documentation strings.
+;
+; Revision 2.10  1992/06/26  02:16:11  raeburn
+; getting in sync with current source tree
+;
+; Revision 2.9  92/06/07  14:55:26  srz
+; Changed discuss-source-dir definitions to refer to /afs, build tree.
+;
+; Revision 2.8  92/05/16  01:12:57  srz
+; Documentation fixes, as suggested by rjbarbal.  Also gratuitous "." at the
+; end of documentation strings.  We must be GC (grammatically correct).
+;
+; Revision 2.7  92/03/19  21:53:31  bjaspan
+; fixed buggy interaction between discuss-DWIM and discuss-set-seen-and-
+; leave-mtg
+;
+; Revision 2.6  1992/02/21  00:16:53  tytso
+; Fixed spelling mistake so that we are using pipes to talk to the edsc.
+;
+; Added crock to support ?!@#! shared library warning message on Sun's.
+;
+; Revision 2.5  1992/01/02  21:47:24  srz
+; Moved discuss-pathname definition up to the top of the file.
+;
+; Revision 2.4  91/08/08  16:05:04  bjaspan
+; added autoload for discuss-forward-by-meeting (no key binding), and
+; documented M-f and M-l
+;
+; Revision 2.3  91/08/06  13:54:30  tytso
+; don't explicitly look for .elc files
+;
+; Revision 2.2  91/08/05  19:46:54  bjaspan
+; discuss-next-trn on last trn leaves meeting if DWIM is set.  This is
+; not the same as just hitting space because it means you don't have to
+; page through a long, last trn.
+;
+; Revision 2.1  91/08/05  15:13:49  bjaspan
+; added discuss-mark-unread-meeting, generalized -mark-read-meeting
+; a little to support it, changed set-last-seen to use it
+;
+; Revision 2.0  91/07/24  17:38:57  tytso
+; Ripped out caching code which was in version 1; requires edsc protocol
+; version 2.4 or greater, which will take care of the discuss transaction
+; cache.
+;
+; Revision 1.29  91/04/26  17:24:17  raeburn
+; Don't use ptys for subprocesses.
+;
+; Revision 1.28  91/03/12  17:57:40  tytso
+; Cleaned up error handling for discuss-catchup.  Calling discuss-goto-error
+; was a bad move!
+;
+; Have discuss-goto check to see whether or not it has read access to
+; the meeting.
+;
+; Revision 1.27  91/03/09  22:34:09  tytso
+; Fixed stupid mistake in setting discuss-old-ss
+;
+; Revision 1.26  91/03/09  16:33:49  tytso
+; *** empty log message ***
+;
+; Revision 1.25  91/03/08  21:05:33  tytso
+; Fixed locking problem with the changed behavior of the "ss" command in
+; edsc protocol version 2.4
+;
+; Revision 1.24  91/02/24  14:46:58  bjaspan
+; fixed my brain-dead discuss-catchup implementation
+;
+; Revision 1.23  91/02/19  16:13:50  bjaspan
+; removed useless check for machine-type in (edsc-machine-type).
+;
+; Revision 1.22  91/02/01  17:45:59  tytso
+; Removed useless let in mainline discuss entrance point.
+;
+; Changed message and removed bell when emacs-discuss tries to update
+; the changed flag for a meeting and fails (usually because the list of
+; meetings isn't in the buffer at the moment).
+;
+; Revision 1.21  91/01/04  19:30:46  bjaspan
+; added doc for l and F to discuss-trn-mode.
+;
+; Revision 1.20  91/01/03  22:23:31  bjaspan
+; added discuss-set-seen-and-leave-mtg and discuss-catchup
+;
+; Revision 1.19  90/12/05  16:23:50  raeburn
+; Removed one-second delay at startup.  Argument to `discuss' is now
+; optional, and no longer causes reversion to previous buffer.  Error
+; messages now show up associated with meeting names, rather than
+; showing up in the minibuffer and then disappearing.
+;
+; Revision 1.18  90/11/05  14:46:02  eichin
+; moved autoload path dependencies into discuss-source-dir variable.
+;
+; Revision 1.17  90/11/01  21:32:56  eichin
+; changed cadr, caddr, cddr to functions - the macros were breaking
+; things in several places, particularly wrt byte-compiling.
+;
+; Revision 1.16  90/10/29  22:55:04  bjaspan
+; fixed a stupid bug in discuss-delete-trn
+;
+; Revision 1.15  90/09/19  16:29:02  bjaspan
+; merged my changes: meeting name completion, discuss-safe-delete
+;
+; Revision 1.1  89/02/25  00:12:20  tytso
+; Initial revision
+;
+; Revision 1.14  89/12/07  22:12:12  raeburn
+; revamped mechanism for determining machine type
+;
+; Revision 1.13  89/11/12  20:54:04  raeburn
+; Pointed `edsc' to /mit/discuss/exl, where a pmax version exists also,
+; and checked to see if we're on a pmax.
+;
+; Revision 1.12  89/06/02  23:45:11  srz
+; Added standard copyright notice.
+;
+; Revision 1.11  88/12/15  13:50:06  srz
+; Add patch so that broken meetings won't lose information.
+;
+; Revision 1.10  88/12/05  08:18:12  eichin
+; added discuss-next-meeting. [previous fix to discuss-goto was
+; harmless, but not a bug. I had loaded a different version of the
+; function, oops...]
+;
+; Revision 1.9  88/12/05  08:11:22  eichin
+; Fixed ^O [discuss-output-last-file wasn't getting set, probably
+; because discuss-send-cmd doesn't really return...] and tested it.
+;
+; Revision 1.8  88/11/08  07:28:26  raeburn
+; typo fixes...
+;
+; Revision 1.7  88/11/08  06:50:38  raeburn
+; Fixed nref code not to reference variable "prev"; changed
+; output-transaction routine to default to <mtg-name>.trans.
+;
+; Revision 1.6  88/11/08  06:24:10  raeburn
+; Removed some old comments; made "C-u M-x discuss" not list meetings,
+; but accept meeting name; caused quit to send "(quit)" and disown
+; process before killing buffer.  Also defined discuss-version function
+; and variable with RCS id, misc other tweaks.
+;
+; Revision 1.5  88/10/29  01:47:34  balamac
+; Added randrp support.
+;
+; Revision 1.4  88/10/26  23:25:47  srz
+; Now goes to next transaction when going to a meeting.
+;
+; Revision 1.3  88/10/26  15:23:15  eichin
+; fix path for non-exl edsc client.
+;
+; Revision 1.2  88/10/26  15:17:01  eichin
+; Added discuss-trn-output
+;
+; Revision 1.1  88/10/24  22:32:58  srz
+; Initial revision
+;
