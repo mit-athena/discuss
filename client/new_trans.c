@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v 1.3 1986-10-19 10:00:13 spook Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v 1.4 1986-10-29 10:28:40 srz Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
@@ -8,6 +8,9 @@
  *	New-transaction routine for DISCUSS.  (Request 'talk'.)
  *
  *      $Log: not supported by cvs2svn $
+ * Revision 1.3  86/10/19  10:00:13  spook
+ * Changed to use dsc_ routines; eliminate refs to rpc.
+ * 
  * Revision 1.2  86/09/10  18:57:32  wesommer
  * Made to work with kerberos; meeting names are now longer.
  * ./
@@ -19,7 +22,7 @@
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v 1.3 1986-10-19 10:00:13 spook Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v 1.4 1986-10-29 10:28:40 srz Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -52,7 +55,7 @@ new_trans(sci_idx, argc, argv)
 	int code;
 
 	USE(sci_idx);
-	if (cur_mtg == (char *)NULL) {
+	if (!dsc_public.attending) {
 		(void) fprintf(stderr, "Not currently attending a meeting.\n");
 		return;
 	}
@@ -78,13 +81,20 @@ new_trans(sci_idx, argc, argv)
 		return;
 	}
 	tf = unix_tfile(fd);
-	dsc_add_trn(cur_mtg, tf, subject, 0, &txn_no, &code);
+	dsc_add_trn(dsc_public.mtg_uid, tf, subject, 0, &txn_no, &code);
 	if (code != 0) {
 		(void) fprintf(stderr, "Error adding transaction: %s\n", 
 			       error_message(code));
 		return;
 	}
 	(void) printf("Transaction [%04d] entered in the %s meeting.\n",
-		      txn_no, cur_mtg_name);
-	cur_trans = txn_no;
+		      txn_no, dsc_public.mtg_name);
+	if (dsc_public.current == 0)
+	     dsc_public.current = txn_no;
+
+	/* and now a pragmatic definition of 'seen':  If you are up-to-date
+	   in a meeting, then you see transactions you enter. */
+	if (dsc_public.highest_seen == txn_no -1) {
+	     dsc_public.highest_seen = txn_no;
+	}
 }
