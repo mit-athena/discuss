@@ -249,6 +249,79 @@ werror:
 }
 /*
  *
+ * expunge_trn () -- Entry to mark a given transaction as expunged.
+ *		     This makes a kosher chain_blk, except there's
+ *		     no transaction info associated with this.
+ *
+ */
+expunge_trn(mtg_name, desired_trn, result)
+char *mtg_name;
+trn_nums desired_trn;
+int *result;
+{
+     chain_blk cb, spare_CB;
+
+     *result = open_mtg (mtg_name);
+     if (*result) { core_abort (); return; }
+
+     if (!has_mtg_access('c')) {
+	  *result = NO_ACCESS;
+	  core_abort (); return;
+     }
+
+     a_control_f = aopen (u_control_f);
+     nuclear = TRUE;
+
+     *result = read_super ();
+     if (*result) { core_abort(); return; }
+
+     if (desired_trn == 0 || desired_trn <= super.highest)
+	  super.highest++;
+     else
+	  super.highest = desired_trn;
+     
+     /* Initialize chain block */
+     cb.version = CHAIN_BLK_1;
+     cb.unique = CHAIN_BLK_UNIQUE;
+     cb.current = super.highest;
+     cb.prev = 0;
+     cb.next = 0;
+     cb.nref = 0;
+     cb.chain_fref = 0;
+     cb.chain_lref = 0;
+     cb.deleted = TRUE;
+     cb.filler = 0;
+     cb.trn_addr = 0;
+
+     if (write_chain (&cb) != 0)			/* write it out */
+	  goto werror;
+
+     super.date_modified = time(0);
+     super.high_water += sizeof (chain_blk);
+
+     write_super();
+
+     aclose(a_control_f);
+     nuclear = 0;
+
+     *result = 0;
+     return;
+
+werror:
+     core_abort();
+     *result = NO_WRITE;
+     return;
+}
+
+
+
+
+
+
+
+
+/*
+ *
  * get_trn_info () --
  * returns information about the given transaction in info, with an error
  * code as its return argument
@@ -295,6 +368,11 @@ int *result;
      *result = read_chain (trn, &cb);
      if (*result) { core_abort(); return; }
 
+     if (cb.trn_addr == 0) {
+	  *result = DELETED_TRN;
+	  core_abort();
+	  return;
+     }
 
      *result = read_chain (cb.trn_chain, &spare_cb);
      if (*result) { core_abort(); return; }
@@ -374,7 +452,7 @@ int *result;
      *result = read_chain (trn, &cb);
      if (*result) { core_abort(); return; }
 
-     if (cb.deleted) {
+     if (cb.deleted || cb.trn_addr == 0) {
 	  *result = DELETED_TRN;
 	  core_abort (); return;
      }
@@ -660,14 +738,15 @@ char *location,*long_mtg_name;
 bool public;
 int *result;
 {
-     create_mtg_priv (location, long_mtg_name, public, (date_times) time ((long *)0), rpc_caller, result);
+     create_mtg_priv (location, long_mtg_name, public, (date_times) time ((long *)0), rpc_caller, NULL, result);
 }
 
 /* create_mtg_priv -- for people who know the chairman and date_created */
-create_mtg_priv (location, long_mtg_name, public, date_created, chairman, result)
+create_mtg_priv (location, long_mtg_name, public, date_created, chairman, new_acl, result)
 char *location,*long_mtg_name,*chairman;
 bool public;
 date_times date_created;
+Acl *new_acl;
 int *result;
 {
      char str[256];
@@ -769,10 +848,14 @@ int *result;
      strcpy (current_mtg, location);			/* it's legal */
      if (mtg_acl != NULL)
 	  acl_destroy(mtg_acl);
-     mtg_acl = acl_create ();
-     acl_add_access(mtg_acl, chairman, "acdorsw");	/* add chairman */
-     if (public)
-	  acl_add_access(mtg_acl, "*", "arosw");	/* public mtg */
+     if (new_acl == NULL) {
+	  mtg_acl = acl_create ();
+	  acl_add_access(mtg_acl, chairman, "acdorsw");	/* add chairman */
+	  if (public)
+	       acl_add_access(mtg_acl, "*", "arosw");	/* public mtg */
+     } else 
+	  mtg_acl = acl_copy(new_acl);
+
 
      strcpy (str, location);
      strcat (str, "/acl");
@@ -884,6 +967,12 @@ int *result;
 
      *result = read_chain (trn, &cb);
      if (*result) { core_abort(); return; }
+
+     if (cb.trn_addr == 0) {
+	  *result = DELETED_TRN;
+	  core_abort();
+	  return;
+     }
 
      *result = read_trn (cb.trn_addr, &th, (char **)0, &th_author);
      if (*result) { core_abort(); return; }
