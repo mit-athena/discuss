@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.1 1999-02-02 20:40:38 kcr Exp $
+# $Id: Makefile.in,v 1.2 1999-03-23 19:01:14 ghudson Exp $
 #
 
 SHELL=/bin/sh
@@ -41,7 +41,7 @@ depend:
 install:
 	${top_srcdir}/mkinstalldirs ${DESTDIR}${sbindir}
 	${INSTALL_PROGRAM} discussd ${DESTDIR}${sbindir}
-	${INSTALL} -m 4755 disserve ${DESTDIR}${sbindir}
+	${INSTALL} -o discuss -m 4755 disserve ${DESTDIR}${sbindir}
 
 discussd: $(DISCUSSD_OBJS)
 	${CC} ${LDFLAGS} -o $@ $(DISCUSSD_OBJS) ${LIBS}
