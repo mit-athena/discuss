@@ -19,7 +19,7 @@ CFLAGS=${DEBUG} ${INCLUDES} ${DEFS}
 COMERR=../lib/libcom_err.a
 LIBS=${ZEPHYRLIB} ../lib/libdsk.a ${KRBLIB} ${DESLIB} ../lib/libusp.a $(COMERR)
 
-all:	disserve discussd debug recover expunge
+all:	disserve discussd debug recover expunge byteswap
 
 disserve: $(OBJS) rpproc.nk.o core.o coreutil.o
 	rm -f disserve
@@ -44,6 +44,13 @@ expunge: expunge.o core.o coreutil.o atom.o acl.o acl_core.o \
 		$(COMERR)
 	rm -rf expunge
 	${CC} $(CFLAGS) -o expunge expunge.o core.o coreutil.o atom.o acl.o \
+		acl_core.o glue.o $(LIBS)
+
+byteswap: byteswap.o core.o coreutil.o atom.o acl.o acl_core.o \
+		../libds/tunix.o ../libds/tfile.o glue.o ../ets/dsc_et.o \
+		$(COMERR)
+	rm -rf byteswap
+	${CC} $(CFLAGS) -o byteswap byteswap.o core.o coreutil.o atom.o acl.o \
 		acl_core.o glue.o $(LIBS)
 
 discussd: $(OBJS) rpproc.k.o core.o coreutil.o
