@@ -7,7 +7,7 @@
  */
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.24 1994-03-25 17:22:07 miki Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.25 1994-06-04 15:04:22 cfields Exp $
  *
  *
  * coreutil.c  -- These contain lower-layer, utility type routines to
@@ -15,6 +15,10 @@
  *		  in-memory superblock, and to open & close meetings.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.24  94/03/25  17:22:07  miki
+ * changed the calls to flock with calls to fcntl for SOLARIS
+ * chnaged bzero into memset
+ * 
  * Revision 1.23  93/04/29  17:06:50  miki
  *  ported to Solaris2.1
  * 
@@ -96,7 +100,7 @@
 const
 #endif
 static char rcsid_coreutil_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.24 1994-03-25 17:22:07 miki Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.25 1994-06-04 15:04:22 cfields Exp $";
 #endif /* lint */
 
 #include <discuss/types.h>
@@ -121,7 +125,9 @@ static char rcsid_coreutil_c[] =
 #include <string.h>
 #include <fcntl.h>
 #endif
+#ifndef NULL
 #define NULL 0
+#endif
 
 /* global variables */
 char current_mtg [256] = "";	/* meeting that's opened */
@@ -145,7 +151,9 @@ int use_zephyr = 0;
 
 
 /* EXTERNAL */
+#ifdef NOTDEF
 extern char *malloc();
+#endif
 extern off_t lseek();
 extern int errno;
 extern char rpc_caller [];
