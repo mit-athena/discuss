@@ -86,6 +86,12 @@
 	request		set_cmd, "Set options.",
 			set;
 
+	request		switch_cmd, "Switch on flags",
+			switch_on,swn;
+
+	request		switch_cmd, "Switch off flags",
+			switch_off,swf;
+
 	request		ss_list_requests, "List available commands.",
 			list_requests, lr, "?";
 
