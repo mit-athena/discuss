@@ -11,7 +11,7 @@
 /*
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.11 1987-04-11 00:10:00 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.12 1987-04-11 23:48:31 spook Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
@@ -21,10 +21,13 @@
  *		callable routines.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.11  87/04/11  00:10:00  srz
+ * Added RCS junk
+ * 
  *
  */
 #ifndef lint
-static char *rcsid_core_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.11 1987-04-11 00:10:00 srz Exp $";
+static char *rcsid_core_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.12 1987-04-11 23:48:31 spook Exp $";
 #endif lint
 
 
@@ -271,7 +274,7 @@ char *mtg_name;
 trn_nums desired_trn;
 int *result;
 {
-     chain_blk cb, spare_CB;
+     chain_blk cb;
 
      *result = open_mtg (mtg_name);
      if (*result) { core_abort (); return; }
