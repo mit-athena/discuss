@@ -4,7 +4,7 @@
 ;;;    	For copying information, see the file mit-copyright.h in this release.
 ;;;
 ;;;	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss-misc.el,v $
-;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss-misc.el,v 1.2 1990-09-19 16:34:39 bjaspan Exp $
+;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss-misc.el,v 1.3 1990-12-06 17:24:27 tytso Exp $
 ;;;
 ;;;  Emacs lisp code with random parts of the emacs discuss user interface
 ;;;  We may want to split out the mail functions into a separate file if
@@ -12,6 +12,9 @@
 ;;;  Written by Theodore Ts'o, Barry Jaspan, and Mark Eichin
 ;;;
 ;;; $Log: not supported by cvs2svn $
+; Revision 1.2  90/09/19  16:34:39  bjaspan
+; merged my changes (meeting name completion)
+; 
 ; Revision 1.1  90/09/19  16:26:15  bjaspan
 ; Initial revision
 ; 
@@ -63,6 +66,10 @@
        (discuss-lsm-1 discuss-form)
        (goto-char (point-max))
        (backward-delete-char 1)))
+  ;; A hack so added meetings show up on the completion list.
+  (setq discuss-meeting-completion-list
+	(cons (cons (cadr discuss-form) 0)
+	      discuss-meeting-completion-list))
   (message "%s meeting added." (cadr discuss-form)))
 
 (defun discuss-del-mtg (&optional meeting)
