@@ -3,7 +3,7 @@ LFLAGS = -Lregexp
 
 #define ISUBDIRS regexp
 
-DEFINES = -I./regexp -I../include
+CADDS = -I./regexp
 
 OBJS= dsgrep.o regerror.o
 
