@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.47 1989-01-05 05:00:36 raeburn Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.48 1989-05-06 01:54:42 srz Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
@@ -13,7 +13,7 @@
 
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.47 1989-01-05 05:00:36 raeburn Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.48 1989-05-06 01:54:42 srz Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -200,7 +200,6 @@ command from the shell.\n\n");
 	}
 	if (!quit || code)
 		(void) ss_listen (sci_idx, &code);
-	(void) unlink(temp_file);
 	leave_mtg();				/* clean up after ourselves */
 	return 0;
 }

@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v 1.22 1989-05-06 01:29:59 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v 1.23 1989-05-06 01:55:28 srz Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
@@ -12,7 +12,7 @@
 
 #ifndef lint
 static char rcsid_discuss_c[] =
-     "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v 1.22 1989-05-06 01:29:59 srz Exp $";
+     "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v 1.23 1989-05-06 01:55:28 srz Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -144,6 +144,7 @@ new_trans(argc, argv)
      }
 
      close(fd);
+     (void) unlink(temp_file);
 
      (void) printf("Transaction [%04d] entered in the %s meeting.\n",
 		    txn_no, dsc_public.mtg_name);
