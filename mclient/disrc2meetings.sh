@@ -8,24 +8,31 @@
 # Modified same date Ken Raeburn to add 'echo' comments, and use
 # homedir for files.
 #
-
+# Modified 4/8/87 Bill Sommerfeld to also add the long-form names to 
+# the meeting (by calling a C program to do this..)
 #
 # usage: disrc2meetings
 #
 
 echo "  "
 echo "  This shell script will create a .meetings file for you"
-echo "  from a .disrc file."
-echo "  "
-echo "  This new .meetings file will use only the secondary"
-echo "  names of meetings; if you want to have the real names,"
-echo "  you can add them by hand -- we haven't got a tool to do"
-echo "  it yet, unfortunately..  The namelist is the last"
-echo "  nonblank field, with commas between names."
+echo "  from a .disrc file if you do not have a .meetings file."
 echo "  "
 
-set noclobber
-cat ~/.disrc \
-| awk -F: '{ print "0:"$3":"$2":"$4":"$5":"$5":" }' \
-| sed "s.:[0-9]*/.:/." \
-| sed 's&:[^:]*/\([^:]*\):$&:\1:&' > ~/.meetings
+if ( ! -f ~/.disrc ) then
+	echo "  You don't seem to have a .disrc file.  Run dsc_setup instead."
+	exit
+endif
+
+if ( -f ~/.meetings) then
+	echo "  You already have a meetings file.  Only adding long names.. "
+else
+	echo "  Creating .meetings file:"
+	set noclobber
+	sed < ~/.disrc >~/.meetings \
+		's/\([^:]*\):\([^:]*\):\([^:]*\):\([^:]*\):[0-9]*\([^:]*\)/0:\3:\2:\4:\5:\1:/'
+
+	echo "  Adding long names into .meetings file:"
+endif
+
+crmtgs
