@@ -8,13 +8,26 @@
 /*
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.30 1990-09-11 19:02:59 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.31 1992-07-14 17:37:03 mar Exp $
  *
  *
  * core.c --    Routines that are the meat of discuss.  These provide user
  *		callable routines.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.33  92/05/28  23:44:09  srz
+ * Disallow linefeeds in subjects.
+ * 
+ * Revision 1.32  91/08/12  20:32:19  srz
+ * Changes acl to cacl for meeting creation to avoid submeeting
+ * creation.
+ * 
+ * Revision 1.31  91/07/05  19:47:44  bjaspan
+ * ported to svr4
+ * 
+ * Revision 1.30  90/09/11  19:02:59  srz
+ * Added per-meeting Zephyr flag (to be patched for the moment).
+ * 
  * Revision 1.29  90/03/19  13:38:51  srz
  * Fixed bug where rmds would cause reset connections as a sub-process.
  * 
@@ -81,7 +94,7 @@
  */
 #ifndef lint
 static char rcsid_core_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.30 1990-09-11 19:02:59 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.31 1992-07-14 17:37:03 mar Exp $";
 #endif lint
 
 
@@ -96,11 +109,14 @@ static char rcsid_core_c[] =
 #include <discuss/acl.h>
 #include "internal.h"
 #include <errno.h>
-#include <sys/file.h>
 #include <sys/types.h>
+#include <sys/file.h>
 #include <sys/stat.h>
 #include <sys/param.h>
 #include <string.h>
+#ifdef SVR4
+#include <fcntl.h>
+#endif
 
 #define min(a, b) (a < b ? a : b)
 #define NULL 0
@@ -184,7 +200,7 @@ int *result;
 {
      chain_blk reply_cb, cb, spare_cb;
      int tfs,tocopy,i,len;
-     char buffer[512],*bptr;
+     char buffer[512],*bptr,*cp;
      trn_hdr th;
      
 
@@ -312,6 +328,11 @@ int *result;
 	  signature = NULL;			/* Signature is empty */
 
      /* now write out the transaction to the trn file */
+     /* First, eliminate NL in subject */
+     cp = index(subject, '\n');
+     if (cp != NULL)
+	  *cp = '\0';
+
      th.version = TRN_HDR_1;
      th.unique = TRN_HDR_UNIQUE;
      th.current = cb.current;
@@ -1205,7 +1226,7 @@ int *result;
      if (!has_privs) {
 	  int aclfd;
 	  strcpy (str, location);
-	  strcat (str, "/../acl");
+	  strcat (str, "/../cacl");
 
 	  if ((aclfd = open(str, O_RDONLY, 0700)) < 0) {
 	       *result = NO_ACCESS;
