@@ -22,6 +22,7 @@
 #include "../include/atom.h"
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/file.h>
 
 #define NULL 0
 #define max(a, b) (a > b ? a : b)
