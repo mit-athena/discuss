@@ -49,21 +49,37 @@ create an initial .meetings file. */
 
 
 /* Server to exec (assumed to be in SERVERDIR) */
+#ifndef SERVER
 #define SERVER "/usr/local/disserve"
+#endif
+#ifndef SERVER_LOCAL
 #define SERVER_LOCAL "/usr/local/disserve-fs"
+#endif
+#ifndef SERVER_NAME
 #define SERVER_NAME "disserve"
+#endif
 
 /* Info directory */
+#ifndef INFO_DIR
 #define INFO_DIR "/usr/sipb/lib/discuss/info"
+#endif
 
 /* Name server / Kerberos realm */
+#ifndef REALM
 #define REALM  "ATHENA.MIT.EDU"
+#endif
 
 /* Service name */
+#ifndef SERVICE_NAME
 #define SERVICE_NAME "discuss"
+#endif
 
 /* Place where dsmail can find dspipe */
+#ifndef DSPIPE
 #define DSPIPE "/usr/local/dspipe"
+#endif
 
 /* dsc_setup command */
+#ifndef DSC_SETUP
 #define DSC_SETUP "dsc_setup"
+#endif
