@@ -3,18 +3,21 @@
  *	Print-related requests for DISCUSS.
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.1 1986-08-22 00:24:01 spook Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.2 1986-09-10 17:43:16 wesommer Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
  *
  *      $Log: not supported by cvs2svn $
+ * Revision 1.1  86/08/22  00:24:01  spook
+ * Initial revision
+ * 
  * 
  */
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.1 1986-08-22 00:24:01 spook Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.2 1986-09-10 17:43:16 wesommer Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -63,7 +66,7 @@ prt_trans(sci_idx, argc, argv)
 	old_sig = signal(SIGPIPE, SIG_IGN);
 	fd = pager_create();
 	if (fd < 0) {
-		ss_perror(sci_idx, ERRNO, "Can't start pager");
+		ss_perror(sci_idx, errno, "Can't start pager");
 		return;
 	}
 	tf = unix_tfile(fd);
@@ -109,7 +112,7 @@ write_trans(sci_idx, argc, argv)
 
 	fd = open(argv[argc-1], O_CREAT|O_APPEND|O_WRONLY, 0666);
 	if (fd < 0) {
-		ss_perror(sci_idx, ERRNO, "Can't open output file");
+		ss_perror(sci_idx, errno, "Can't open output file");
 		return;
 	}
 	tf = unix_tfile(fd);
