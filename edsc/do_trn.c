@@ -73,6 +73,8 @@ char *args;
      }
 
      t_info.subject = do_quote(t_info.subject);
+     t_info.author = do_quote(t_info.author);
+     t_info.signature = do_quote(t_info.signature ? t_info.signature : "");
      printf("(%d %d %d %d %d %d %d %d \"%s\" %d %d \"%s\" \"%s\" %d \"%s\")\n",
 	    t_info.current,
 	    t_info.prev,
@@ -88,7 +90,7 @@ char *args;
 	    t_info.subject,
 	    t_info.author,
 	    t_info.flags,
-	    t_info.signature ? t_info.signature : "");
+	    t_info.signature);
      
      dsc_destroy_name_blk(&nb);
      dsc_destroy_trn_info3(&t_info);
