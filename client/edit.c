@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/edit.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/edit.c,v 1.8 1989-01-05 00:17:56 raeburn Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/edit.c,v 1.9 1989-01-24 19:34:14 srz Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board.
@@ -8,6 +8,9 @@
  *	Utility routines.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.8  89/01/05  00:17:56  raeburn
+ * replaced included header files with <discuss/discuss.h>
+ * 
  * Revision 1.7  88/04/03  21:55:11  srz
  * Added check for interrupt in edit loop, so that won't have to
  * end transaction to have ^C work.
@@ -60,7 +63,7 @@
 
 #ifndef lint
 static char rcsid_discuss_utils_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/edit.c,v 1.8 1989-01-05 00:17:56 raeburn Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/edit.c,v 1.9 1989-01-24 19:34:14 srz Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -129,6 +132,7 @@ edit(fn, edit_path)
 		}
 
 		ftruncate(fileno(the_file), 0);
+		fchmod(fileno(the_file), 0700);
 		printf("Enter transaction; end with ^D or '.' on a line by itself.\n");
 		for (;;) {
 			if ((gets(buffer) == NULL) || interrupt || !strcmp(buffer, ".")) break;
