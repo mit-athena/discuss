@@ -1,7 +1,7 @@
 /*
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/conv_mgr.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/conv_mgr.c,v 1.4 1987-05-03 01:02:55 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/conv_mgr.c,v 1.5 1987-06-20 13:36:38 srz Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
@@ -10,14 +10,21 @@
  *		  stream for the given module.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.4  87/05/03  01:02:55  srz
+ * Changed it so that connection errors will set a conversation as 'down',
+ * and it won't retry that conversation, but simply return a fatal_error
+ * that happened.
+ * 
  * Revision 1.3  87/04/11  00:05:50  srz
  * Added RCS junk
  * 
  *
  */
 #ifndef lint
-static char *rcsid_conv_mgr_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/conv_mgr.c,v 1.4 1987-05-03 01:02:55 srz Exp $";
+static char *rcsid_conv_mgr_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/conv_mgr.c,v 1.5 1987-06-20 13:36:38 srz Exp $";
 #endif lint
+
+#include <errno.h>
 
 #include "rpc.h"
 
@@ -140,6 +147,9 @@ int *fatal_error,*result;
      rc = open_rpc (hostname, port, service_id, result);
      if (rc == NULL) {
 	  *fatal_error = 1;
+	  if (*result == EINTR) {		/* control-C: don't create conversation */
+	       return;
+	  }
      }
 
 create_entry:
