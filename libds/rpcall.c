@@ -12,9 +12,12 @@
  *		This file handles the caller's side of the connection.
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/rpcall.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/rpcall.c,v 1.15 1989-06-03 00:21:41 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/rpcall.c,v 1.16 1992-11-08 22:58:54 probe Exp $
  *	$Locker:  $
  *	$Log: not supported by cvs2svn $
+ * Revision 1.15  89/06/03  00:21:41  srz
+ * Added standard copyright notice.
+ * 
  * Revision 1.14  89/06/03  00:12:42  srz
  * Ken's changes.
  * 
@@ -49,7 +52,7 @@
  */
 #ifndef lint
 static char rcsid_rpcall_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/rpcall.c,v 1.15 1989-06-03 00:21:41 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/rpcall.c,v 1.16 1992-11-08 22:58:54 probe Exp $";
 #endif lint
 
 /* INCLUDES */
@@ -74,7 +77,7 @@ static char rcsid_rpcall_c[] =
 
 /* EXTERNAL ROUTINES */
 
-char *malloc(),*rindex();
+char *malloc();
 extern int errno;
 
 int rpc_err;

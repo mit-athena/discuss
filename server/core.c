@@ -8,13 +8,19 @@
 /*
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.31 1992-07-14 17:37:03 mar Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.32 1992-11-08 23:00:49 probe Exp $
  *
  *
  * core.c --    Routines that are the meat of discuss.  These provide user
  *		callable routines.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.31  92/07/14  17:37:03  mar
+ * don't allow newline in subject line
+ * compile under SVR4
+ * rename /usr/spool/discuss/acl to /usr/spool/discuss/cacl for security
+ * 	reasons.
+ * 
  * Revision 1.33  92/05/28  23:44:09  srz
  * Disallow linefeeds in subjects.
  * 
@@ -94,7 +100,7 @@
  */
 #ifndef lint
 static char rcsid_core_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.31 1992-07-14 17:37:03 mar Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.32 1992-11-08 23:00:49 probe Exp $";
 #endif lint
 
 
@@ -113,14 +119,18 @@ static char rcsid_core_c[] =
 #include <sys/file.h>
 #include <sys/stat.h>
 #include <sys/param.h>
-#include <string.h>
+#include <strings.h>
 #ifdef SVR4
 #include <fcntl.h>
 #endif
 
+#ifndef min
 #define min(a, b) (a < b ? a : b)
+#endif
+#ifndef NULL
 #define NULL 0
-extern char *malloc(),*index();
+#endif
+extern char *malloc();
 extern char *new_string();
 extern long time();
 extern off_t lseek();
