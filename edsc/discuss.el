@@ -4,14 +4,21 @@
 ;;;    	For copying information, see the file mit-copyright.h in this release.
 ;;;
 ;;;	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v $
-;;;	$Id: discuss.el,v 1.14 1989-12-07 22:12:12 raeburn Exp $
+;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.15 1990-09-19 16:29:02 bjaspan Exp $
 ;;;
 ;;;  Emacs lisp code to remote control a "discuss" shell process to
 ;;;  provide an emacs-based interface to the discuss conferencing system.
 ;;;
-;;;  Written by Stan Zanarotti and Bill Sommerfeld.
+;;;  Copyright (c) 1986 by the Massachusetts Institute of Technology.
+;;;  Written by Stan Zanarotti, Bill Sommerfeld and Theodore Ts'o.
 ;;;
 ;;;  $Log: not supported by cvs2svn $
+; Revision 1.1  89/02/25  00:12:20  tytso
+; Initial revision
+;
+; Revision 1.14  89/12/07  22:12:12  raeburn
+; revamped mechanism for determining machine type
+; 
 ; Revision 1.13  89/11/12  20:54:04  raeburn
 ; Pointed `edsc' to /mit/discuss/exl, where a pmax version exists also,
 ; and checked to see if we're on a pmax.
@@ -47,7 +54,6 @@
 ; Revision 1.5  88/10/29  01:47:34  balamac
 ; Added randrp support.
 ; 
-; 
 ; Revision 1.4  88/10/26  23:25:47  srz
 ; Now goes to next transaction when going to a meeting.
 ; 
@@ -61,20 +67,20 @@
 ; Initial revision
 ; 
 
+;;
+;; WARNING --- HARDCODED PATHNAMES NEAR END OF FILE... search for "autoload".
+;; 
+
 (provide 'discuss)
 
-(require 'backquote)
+(defvar discuss-DWIM nil
+  "If true, enable Do_What_I_Mean mode.  Allows the user to read discuss by
+repeatedly hitting the space bar.  For the truly discrimining and lazy 
+user.")
 
-(autoload 'make-shell "shell" "" t)
-
-(autoload 'discuss-talk "discuss-enter"
-	  "Enter a new discuss transaction." t)
-
-(autoload 'discuss-reply "discuss-enter"
-	  "Reply to an existing discuss transaction." t)
-
-(autoload 'discuss-randrp "discuss-enter"
-	  "Random reply in a meeting." t)
+(defvar discuss-safe-delete nil
+  "If true, discuss asks for confirmation before deleting a transaction with
+discuss-delete-trn.")
 
 (defvar discuss-mtgs-mode-map nil
   "Keymap used by the meetings-list mode of the discuss subsystem")
@@ -92,11 +98,14 @@ meetings")
 (defvar discuss-version nil "Version of discuss code loaded.")
 (defun discuss-version nil (interactive) (message discuss-version))
 
-(defvar discuss-shell-buffer nil
-  "Buffer used to communicate with slave discuss subprocess.")
+(defvar discuss-process nil
+  "Structure discribing the slave discuss subprocess.")
 
 (defvar discuss-cont nil
   "Internal hook to call when discuss subprocess is done.")
+
+(defvar discuss-unwind nil
+  "Internal hook to call when discuss subprocess returns an error.")
 
 (defvar discuss-in-progress nil
   "t if a request to the slave subprocess is outstanding")
@@ -107,8 +116,20 @@ meetings")
 (defvar discuss-meeting-list nil
   "Meeting list.")
 
+(defvar discuss-meeting-completion-list nil
+  "Meeting list changed into the right format for completion-read")
+
 (defvar discuss-show-num 0
   "Current discuss transaction number")
+
+(defvar discuss-meeting nil
+  "Buffer-local variable containing the name of the meeting of a discuss
+transaction buffer.  Nil means this buffer is not a discuss-transaction 
+buffer.")
+
+(defvar discuss-meeting-info nil
+  "Buffer-local variable containing the info struction for the discuss
+transaction buffer.")
 
 (defvar discuss-cur-mtg-buf nil
   "Name of buffer for current Discuss meeting")
@@ -117,6 +138,12 @@ meetings")
   "*Run discuss commands asynchronously.
 
 Currently ignored (always async).")
+
+(defvar discuss-in-show-trn nil)
+
+(defvar discuss-error nil
+  "Contains error message returned by edsc process.  If nil, means last 
+request completed successfully.")
 
 ;;
 ;;  Determine pathname for subprocess.  Pretty gross.
@@ -136,7 +163,7 @@ Currently ignored (always async).")
 	(error "Can't determine machine type.")))))
 
 (defvar discuss-pathname
-  (concat "/mit/discuss/exl/edsc." (edsc-machine-type))
+  (concat "/afs/sipb.mit.edu/user/tytso/src/edsc/edsc." (edsc-machine-type))
   "*Name of program to run as slave process for discuss.")
 
 
@@ -151,8 +178,12 @@ This looks a lot like RMAIL.  This works by using ``edsc'' as a subjob.
 The following commands are available:
 n	go to next line.
 p	go to previous line.
+SPC     go to next meeting that has unread transactions
+DEL     go to previous meeting has unread transactions
 l	list meetings.
 g	go to meeting listed on line.
+a	add meeting
+d	delete meeting
 q	Quit Discuss mode."
   (interactive)
   (kill-all-local-variables)
@@ -193,13 +224,17 @@ n	Move to Next transaction.
 p	Move to Previous transaction.
 M-n	Move to Next transaction in chain.
 M-p	Move to Previous transaction in chain.
-l	Move to Last transaction in meeting.
-f	Move to First transaction in meeting.
+>	Move to Last transaction in meeting.
+<	Move to First transaction in meeting.
 g	Goto transaction.
+d	Delete transaction (and move forwards).
+C-d	Delete transaction (and move backwards).
+R	Retrieve transaction
 q       Quit meeting.
 r	Reply to this transaction.
+f	Forward this transaction via mail.
 t	Talk.  Enter a new transaction.
-a	Add meeting.  Not implemented yet."
+a	Add meeting."
   (interactive)
   (kill-all-local-variables)
   (setq major-mode 'discuss-trn-mode)
@@ -211,28 +246,32 @@ a	Add meeting.  Not implemented yet."
   (make-local-variable 'discuss-highest-seen)
   (setq discuss-highest-seen 0)
   (make-local-variable 'discuss-output-last-file)
+  (make-local-variable 'discuss-meeting)
+  (make-local-variable 'discuss-meeting-info)
   (setq discuss-output-last-file nil)
   (run-hooks 'discuss-trn-hooks))
 
 
 ;;; Main entry point:  Start up a slave process and listen for requests.
 
-(defun discuss ()
+(defun discuss (arg)
   "Enter discuss mode for emacs and list meetings."
-  (interactive)
-
-  (discuss-start-slave)
-  (switch-to-buffer (get-buffer-create discuss-main-buffer))
-  (discuss-mtgs-mode)
-  (if current-prefix-arg		;not quite right...
-      nil
-    (discuss-lsm)))
-
-(defun discuss-start-slave nil
-  (if discuss-shell-buffer
-      nil
-    (setq discuss-shell-buffer (make-shell "discuss-shell" discuss-pathname)))
-  )
+  (interactive "P")
+  (message "Starting discuss....")
+  (sit-for 1)
+  (let ((old-buffer (current-buffer)))
+    (if (not (and (get-buffer discuss-main-buffer)
+		  (buffer-name (get-buffer discuss-main-buffer))
+		  (> (length discuss-meeting-list) 0)))
+	(progn
+	  (switch-to-buffer (get-buffer-create discuss-main-buffer))
+	  (discuss-mtgs-mode)
+	  (if current-prefix-arg		;not quite right...
+	      nil
+	    (discuss-lsm)))
+      (switch-to-buffer discuss-main-buffer))
+    (if arg
+	(switch-to-buffer old-buffer))))
 
 ;;; Entry points typically entered through key sequences.
 
@@ -257,79 +296,136 @@ a	Add meeting.  Not implemented yet."
   (` (cdr (cdr (, x)))))
 
 (defun discuss-lsm-1 (entry)
-  (insert (if (= (car entry) 1)
-	      " c"
-	    "  ")
-	  "       "
+  (insert (cond ((eq (car entry) 1)
+		 " c       ")
+		((stringp (car entry))
+		 "   X     ")
+		(t
+		 "         "))
 	  (cadr entry))
   (if (cddr entry)
       (mapcar 'discuss-lsm-2 (cddr entry)))
-  (insert "\n"))
+  (insert "\n")
+  (if (stringp (car entry))
+      (progn
+	(ding)
+	(message "%s: %s" (cadr entry) (car entry))
+	(sit-for 1))))
 
 (defun discuss-lsm-2 (name)
   (insert ", " name))
 
+;; Compliments of jik
+(defun flatten (list)
+  (if (eq nil list) '())
+  (let* ((newlist (copy-list (car list)))
+        (restoflist (cdr list))
+        (pointer newlist))
+    (while (not (eq nil restoflist))
+      (while (not (eq nil (cdr pointer)))
+        (setq pointer (cdr pointer)))
+      (setcdr pointer (copy-list (car restoflist)))
+      (setq restoflist (cdr restoflist)))
+    newlist))
+
+(defun copy-list (list)
+  (if (eq nil list) 
+      '()
+    (cons (car list) (copy-list (cdr list)))))
+
 (defun discuss-end-of-lsm ()
   (message "Listing meetings...done.")
-  (set-buffer discuss-main-buffer)
-  (setq discuss-meeting-list (apply 'vector discuss-form))
-  (let ((buffer-read-only nil))
+  (let ((orig-buffer (current-buffer)))
+    (set-buffer discuss-main-buffer)
+    (setq discuss-meeting-list (apply 'vector discuss-form))
+    (setq discuss-meeting-completion-list
+	  (mapcar (function (lambda (x) (cons x 0)))
+		  (flatten (mapcar 'cdr discuss-form))))
+    (let ((buffer-read-only nil))
+      (goto-char (point-min))
+      (insert " Flags   Meeting name\n"
+	      " -----   ------------\n")
+      (mapcar 'discuss-lsm-1 discuss-form)
+      (goto-char (point-max))
+      (backward-delete-char 1))
     (goto-char (point-min))
-    (insert " Flags   Meeting name\n"
-	    " -----   ------------\n")
-    (mapcar 'discuss-lsm-1 discuss-form)
-    (goto-char (point-max))
-    (backward-delete-char 1))
-  (goto-char (point-min))
-  (forward-line 2))
+    (forward-line 2)
+    (set-buffer orig-buffer)))
+
+; Not working yet...
+(defun discuss-find-meeting (meeting)
+  (let ((i 0)
+	(eol (length discuss-meeting-list)))
+    (while (and (< i eol)
+		(not (memq meeting (aref discuss-meeting-list i))))
+	(setq i (1+ i)))
+    (if (< i eol)
+	i
+      nil)))
+	
 
 (defun discuss-quit ()
   "Exits Discuss mode."
   (interactive)
   (if discuss-cur-mtg-buf
       (discuss-leave-mtg))
-  (save-excursion
-    ; go bash discuss-shell-buffer
-    (set-buffer discuss-shell-buffer)
-    (let ((proc (get-buffer-process (buffer-name))))
-      (send-string proc "(quit)\n")
-      (set-process-buffer proc nil)	; Fly, be free!
-      (kill-buffer discuss-shell-buffer)
-      (setq discuss-shell-buffer nil)))
-  (kill-buffer discuss-main-buffer))
-
-(defun goto-column (num)
-  (insert-char 32 (max 0 (- num (current-column)))))
+  (discuss-restart)
+  (switch-to-buffer (other-buffer))
+  (bury-buffer discuss-main-buffer))
 
 (defun discuss-goto (&optional meeting)
   "Go to a meeting"
   (interactive (list (if (or current-prefix-arg
 			     (not (equal (buffer-name) discuss-main-buffer))
 			     (= (point) 1))
-			 (read-string "Meeting name:  "))))
+			 (completing-read "Meeting name:  "
+					  discuss-meeting-completion-list
+					  nil t ""))))
   (if (not meeting)
-      (let ((curline (- (count-lines 1 (1+ (point))) 3)))
+      (let ((curline (- (count-lines 1 (min (1+ (point)) (point-max))) 3)))
 	(if (< curline 0)
 	    (error "Not looking at a meeting."))
 	(setq meeting (cadr (aref discuss-meeting-list
 				  curline)))))
-  (setq discuss-cur-mtg-buf
-	(get-buffer (concat "*" meeting " meeting*")))
-  (if (not discuss-cur-mtg-buf)
+  (if (not (and discuss-cur-mtg-buf
+	       (buffer-name discuss-cur-mtg-buf)
+	       (equal discuss-current-meeting meeting)))
       (progn
+	(if discuss-cur-mtg-buf
+	    (discuss-leave-mtg))
 	(setq discuss-cur-mtg-buf
 	      (get-buffer-create (concat "*" meeting " meeting*")))
 	(switch-to-buffer discuss-cur-mtg-buf)
-	(discuss-trn-mode)))
+	(discuss-trn-mode))
+    (progn
+      (set-buffer discuss-cur-mtg-buf)
+      (discuss-send-cmd (format "(ss %d %s)\n"
+				discuss-highest-seen
+				discuss-meeting))))
   (switch-to-buffer discuss-cur-mtg-buf)
-  (setq discuss-current-meeting meeting)
-  (setq discuss-output-last-file (concat discuss-current-meeting ".trans"))
+  (setq discuss-meeting meeting)
+  (setq discuss-current-meeting meeting)   ;;; denigrated
+  (setq discuss-output-last-file (concat discuss-meeting ".trans"))
   (discuss-send-cmd (format "(gmi %s)\n" meeting)
-		    'discuss-end-of-goto 'discuss-read-form))
+		    'discuss-end-of-goto 'discuss-read-form 
+		    'discuss-goto-error))
+
+(defun discuss-goto-error ()
+  "Called to back out when there's an error in going to a meeting."
+  (kill-buffer (buffer-name discuss-cur-mtg-buf))
+  (setq discuss-cur-mtg-buf nil)
+  (setq discuss-current-meeting nil)
+  (switch-to-buffer discuss-main-buffer))
 
 (defun discuss-end-of-goto ()
   (let ((last (nth 4 discuss-form)))
     (setq discuss-highest-seen (nth 11 discuss-form))
+    (if (> discuss-highest-seen last)
+	(progn
+	  (beep)
+	  (message "Warning!  Last seen transaction higher than last transaction")
+	  (sit-for 1)
+	  (setq discuss-highest-seen last)))
     (message "%s meeting: %d new, %d last."
 	     (cadr discuss-form)
 	     (- last discuss-highest-seen)
@@ -342,12 +438,55 @@ a	Add meeting.  Not implemented yet."
 	   (discuss-show-trn last))
 	  (t (discuss-send-cmd (format "(nut %d %s)\n"
 				       discuss-highest-seen
-				       discuss-current-meeting)
-			       'discuss-next-goto
+				       discuss-meeting)
+;			       'discuss-next-goto
+			       '(lambda () (progn (discuss-la-cache-transaction
+						   (car discuss-form))
+						  (discuss-block-til-ready nil)
+						  (discuss-show-trn 
+						   (car discuss-form))))
 			       'discuss-read-form)))))
 
-(defun discuss-next-goto ()
-  (discuss-show-trn (car discuss-form)))
+;(defun discuss-next-goto ()
+;  (discuss-show-trn (car discuss-form)))
+
+;;;
+;;; This is broken --- only works in transaction buffer.  Of course, this is
+;;; is the only place that you'd really want to use it.  Actually, it
+;;; sort of works in meetings-mode too, but only barely so.
+;;; This should be cleaned up.  -- TYT
+;;;
+(defun discuss-stat (&optional meeting)
+  "Go to a meeting"
+  (interactive (list (if (eq (current-buffer) discuss-cur-mtg-buf)
+			 discuss-meeting
+		       (if (or current-prefix-arg
+			       (not (equal (buffer-name) discuss-main-buffer))
+			       (= (point) 1))
+			 (completing-read "Meeting name:  "
+					  discuss-meeting-completion-list
+					  nil t "")))))
+  (if (not meeting)
+      (let ((curline (- (count-lines 1 (min (1+ (point)) (point-max))) 3)))
+	(if (< curline 0)
+	    (error "Not looking at a meeting."))
+	(setq meeting (cadr (aref discuss-meeting-list
+				  curline)))))
+  (discuss-send-cmd (format "(gmi %s)\n" meeting)
+		    'discuss-end-of-stat 'discuss-read-form))
+
+(defun discuss-end-of-stat ()
+  (setq discuss-current-meeting-info discuss-form)
+  (setq discuss-meeting-info discuss-form)
+    (let ((last (nth 4 discuss-form))
+	  (highest-seen (nth 11 discuss-form)))
+      (if (and (equal (cadr discuss-form) discuss-current-meeting)
+	     (not (= discuss-highest-seen 0)))
+	(setq highest-seen discuss-highest-seen))    ;; This is wrong...
+    (message "%s meeting: %d new, %d last."
+	     (cadr discuss-form)
+	     (- last highest-seen)
+	     last)))
 
 (defun discuss-show-trn (trn-num)
   "Show transaction number N (prefix argument)."
@@ -358,43 +497,60 @@ a	Add meeting.  Not implemented yet."
   (if (and trn-num (numberp trn-num))
       (progn 
 	(setq discuss-show-num trn-num)
-	(discuss-send-cmd (format "(gti %d %s)\n"
-				  discuss-show-num
-				  discuss-current-meeting)
-			  'discuss-show-current-1
-			  'discuss-read-form))))
-  
-(defun discuss-show-current-1 nil
-  (set-buffer discuss-cur-mtg-buf)
-  (setq discuss-current-transaction-info discuss-form)
-  (discuss-send-cmd (format "(gt %d %s)\n"
-			    discuss-show-num
-			    discuss-current-meeting)
-		    'discuss-show-current-2
-		    'discuss-read-trn))
+	(setq discuss-la-to-cache nil)	; invalidate to do list
+	(setq discuss-la-next-chaining 0)
+	(let ((discuss-cache-file (discuss-la-get-art trn-num)))
+	  (if (not discuss-cache-file)
+	      (progn
+		(discuss-la-cache-transaction trn-num)
+		(setq discuss-cache-file (discuss-la-get-art trn-num))
+		(if (not discuss-cache-file)
+		    (error "Can't find transaction %d in cache!!!" trn-num))))
+	  ;
+	  ; OK, start queueing next transaction to be cached.
+	  ;
+	  (setq discuss-la-next-trn trn-num)
+	  (setq discuss-la-next-chaining discuss-max-next-chaining)
 
-(defun discuss-show-current-2 nil
-  (set-buffer discuss-cur-mtg-buf)
-  (setq discuss-current-transaction discuss-show-num)
-  (setq discuss-highest-seen (max discuss-highest-seen discuss-current-transaction))
-  (setq mode-line-process (format " %d/%d"
-				  discuss-current-transaction
-				  (nth 4 discuss-current-meeting-info)))
-  (let ((buffer-read-only nil))
-    (erase-buffer)
-    (insert discuss-text)
-    (goto-char (point-min))))
+	  (set-buffer discuss-cur-mtg-buf)
+	  (setq discuss-current-transaction-info discuss-form)
+	  (setq discuss-current-transaction discuss-show-num)
+	  (setq discuss-highest-seen (max discuss-highest-seen
+					  discuss-current-transaction))
+	  (if (>= discuss-current-transaction
+		     (nth 4 discuss-current-meeting-info))
+	      (let ((discuss-in-show-trn t))
+		(discuss-update)
+		(discuss-block-til-ready nil)))
+
+	  (setq mode-line-process (format " %d/%d"
+					  discuss-current-transaction
+					  (nth 4 discuss-current-meeting-info)))
+	  (let ((buffer-read-only nil))
+	    (erase-buffer)
+	    (insert-file-contents discuss-cache-file)
+	    (goto-char (point-min)))
+	  (if (= (caddr discuss-current-transaction-info) 0)
+	      (progn
+		(message "Last transaction in %s" discuss-meeting)
+		(discuss-mark-read-meeting discuss-meeting)
+		(discuss-next-meeting t)
+		))
+	  (discuss-la-do-cache)
+	  ))))
 
 (defun discuss-update ()
   "Update Discuss display to show new transactions"
   (interactive)
-  (discuss-send-cmd (format "(gmi %s)\n" discuss-current-meeting)
+  (discuss-send-cmd (format "(gmi %s)\n" discuss-meeting)
 		    'discuss-end-of-update 'discuss-read-form))
 
 (defun discuss-end-of-update ()
   (setq discuss-current-meeting-info discuss-form)
-  (set-buffer discuss-cur-mtg-buf)
-  (discuss-show-trn discuss-current-transaction))
+  (save-excursion
+    (set-buffer discuss-cur-mtg-buf)
+    (if (not discuss-in-show-trn)
+	(discuss-show-trn discuss-current-transaction))))
 
 (defun discuss-next-trn ()
   "Show next transaction."
@@ -404,7 +560,17 @@ a	Add meeting.  Not implemented yet."
       (error "Not looking at transactions")
     (let ((next (caddr discuss-current-transaction-info)))
       (if (= next 0)
-	  (error "No next transaction.")
+	  (progn
+	    (discuss-la-invalidate discuss-current-transaction)
+	    (discuss-la-cache-transaction discuss-current-transaction)
+	    (discuss-la-block-til-ready)
+	    (let ((cache-entry (discuss-la-search discuss-current-transaction)))
+	      (if (and cache-entry
+		       (caddr cache-entry))
+		    (setq discuss-current-transaction-info (caddr cache-entry))))
+	    (if (= 0 (caddr discuss-current-transaction-info))
+		(error "No next transaction.")
+	      (discuss-next-trn)))
 	(discuss-show-trn next)))))
 
 (defun discuss-prev-trn ()
@@ -417,6 +583,7 @@ a	Add meeting.  Not implemented yet."
       (if (= prev 0)
 	  (error "No previous transaction.")
 	(discuss-show-trn prev)))))
+
 
 (defun discuss-nref ()
   "Show next transaction in chain."
@@ -440,6 +607,28 @@ a	Add meeting.  Not implemented yet."
 	  (error "No previous reference.")
 	(discuss-show-trn pref)))))
 
+(defun discuss-lref ()
+  "Show last transaction in chain."
+  (interactive)
+  (if (or (not discuss-current-transaction)
+	  (= discuss-current-transaction 0))
+      (error "Not looking at transactions")
+    (let ((lref (nth 6 discuss-current-transaction-info)))
+      (if (= lref 0)
+	  (error "No last reference.")
+	(discuss-show-trn lref)))))
+
+(defun discuss-fref ()
+  "Show first transaction in chain."
+  (interactive)
+  (if (or (not discuss-current-transaction)
+	  (= discuss-current-transaction 0))
+      (error "Not looking at transactions")
+    (let ((fref (nth 5 discuss-current-transaction-info)))
+      (if (= fref 0)
+	  (error "No first reference.")
+	(discuss-show-trn fref)))))
+
 (defun discuss-first-trn ()
   "Show first transaction of meeting."
   (interactive)
@@ -452,16 +641,129 @@ a	Add meeting.  Not implemented yet."
   (let ((last (nth 4 discuss-current-meeting-info)))
 	(discuss-show-trn last)))
 
+(defun discuss-toggle-trn-flag ()
+  "Toggle the per-transaction flag"
+  (interactive)
+  (let ((old-flag (nth 13 discuss-current-transaction-info)))
+    (if old-flag
+	(progn
+	  (discuss-la-invalidate discuss-current-transaction)
+	  (message "Toggling the transaction flag....")
+	  (discuss-send-cmd (format "(sfl %d %d %s)\n" 
+				    (logxor old-flag 2)
+				    discuss-current-transaction
+				    discuss-meeting)
+			    'discuss-end-of-toggle 'discuss-read-form)))))
+
+(defun discuss-end-of-toggle ()
+  (discuss-show-trn discuss-current-transaction)
+  (message ""))
+
+
 (defun discuss-leave-mtg ()
   "Leave the current discuss meeting"
   (interactive)
-  (if (not (= discuss-highest-seen 0))
-      (discuss-send-cmd (format "(ss %d %s)\n"
-			    discuss-highest-seen
-			    discuss-current-meeting)))
-  (kill-buffer (buffer-name discuss-cur-mtg-buf))
-  (setq discuss-cur-mtg-buf nil)
-  (switch-to-buffer discuss-main-buffer))
+  (discuss-la-flush)
+  (if (buffer-name discuss-cur-mtg-buf)
+      (progn
+	(set-buffer discuss-cur-mtg-buf)
+	(if (not (= discuss-highest-seen 0))
+	    (discuss-send-cmd (format "(ss %d %s)\n"
+				      discuss-highest-seen
+				      discuss-meeting)))
+	(kill-buffer (buffer-name discuss-cur-mtg-buf))
+	(setq discuss-cur-mtg-buf nil)
+	(setq discuss-current-meeting nil)
+	(switch-to-buffer discuss-main-buffer))))
+
+(defun discuss-delete-trn-backwards (trn-num)
+  (interactive
+   (cond (current-prefix-arg
+	  (if discuss-cur-mtg-buf
+	      (list (string-to-int (read-input "Transaction to delete: ")))
+	    (error "Not currently visiting a meeting.")))
+	 ((eq (current-buffer) discuss-cur-mtg-buf)
+	  (list discuss-current-transaction))
+	 (t
+	  (if discuss-cur-mtg-buf
+	      (list (string-to-int (read-input "Transaction to delete: ")))
+	    (error "Not currently visiting a meeting.")))
+	 ))
+  (discuss-delete-trn trn-num t))
+
+(defun discuss-delete-trn (trn-num &optional backwards)
+  (interactive
+   (cond (current-prefix-arg
+	  (if discuss-cur-mtg-buf
+	      (list (string-to-int (read-input "Transaction to delete: ")))
+	    (error "Not currently visiting a meeting.")))
+	 ((eq (current-buffer) discuss-cur-mtg-buf)
+	  (list discuss-current-transaction))
+	 (t
+	  (if discuss-cur-mtg-buf
+	      (list (string-to-int (read-input "Transaction to delete: ")))
+	    (error "Not currently visiting a meeting.")))
+	 ))
+  ;; Probably we should make sure the transaction can be deleted before
+  ;; asking this question, but the cache code is too confusing...
+  (if (not (and discuss-safe-delete 
+		(yes-or-no-p (format "Delete transaction %d? " trn-num))))
+      nil
+    (let (info
+	  other
+	  (cache-entry (discuss-la-search trn-num)))
+      (if (and cache-entry
+	       (= discuss-current-transaction trn-num))
+	  (progn
+	    (setq info (caddr cache-entry))
+	    (if backwards 
+		(setq discuss-current-transaction (cadr info)
+		      other (caddr info))
+	      (setq discuss-current-transaction (caddr info)
+		    other (cadr info)))
+	    (if (= discuss-current-transaction 0)
+		(setq discuss-current-transaction other))
+	    (if (= discuss-current-transaction 0)
+		(progn
+		  (message "No more transactions in meeting!")
+		  (beep)))
+	    )))
+    (discuss-la-invalidate trn-num)
+    (discuss-la-invalidate-relatives trn-num)
+    (message "Deleting %d...." trn-num)
+    (discuss-send-cmd (format "(dt %d %s)\n" trn-num discuss-meeting)
+		      'discuss-end-del-trn 'discuss-read-form)))
+
+(defun discuss-end-del-trn ()
+  (message "Done.")
+  (discuss-show-trn discuss-current-transaction))
+
+(defun discuss-retrieve-trn (trn-num)
+  (interactive "nTransaction to retrieve: ")
+  (setq discuss-current-transaction trn-num)
+  (message "Retrieving %d...." trn-num)
+  (discuss-send-cmd (format "(rt %d %s)\n" trn-num discuss-meeting)
+		    'discuss-end-rt-trn 'discuss-read-form))
+
+(defun discuss-end-rt-trn ()
+  (message "Done.")
+  (discuss-la-invalidate-relatives discuss-current-transaction)
+  (discuss-show-trn discuss-current-transaction))
+
+(defun discuss-la-invalidate-relatives (trn-num)
+  (discuss-la-cache-transaction trn-num)
+  (discuss-la-block-til-ready)
+  (let (info
+	(cache-entry (discuss-la-search trn-num)))
+    (if cache-entry
+	(progn
+	  (setq info (caddr cache-entry))
+	  (discuss-la-invalidate (caddr info))	; next
+	  (discuss-la-invalidate (cadr info))	; prev
+	  (discuss-la-invalidate (nth 3 info))	; pref
+	  (discuss-la-invalidate (nth 4 info))  ; nref
+	  (discuss-la-invalidate (nth 6 info))))) ; lref
+  )
 
 (defun discuss-format-trn-num (num)
   (format "[%s%d]"
@@ -471,8 +773,197 @@ a	Add meeting.  Not implemented yet."
 		(t ""))
 	  num))
 
-(defun region-to-string ()
-  (buffer-substring (min (point) (mark)) (max (point) (mark))))
+;;; Discuss DWIM
+(defun discuss-scroll-up ()
+  (interactive)
+  (condition-case err
+      (scroll-up nil)
+    (error 
+     (if (and discuss-DWIM
+	      (equal err '(end-of-buffer)))
+	 (if (equal discuss-current-transaction
+		    (nth 4 discuss-current-meeting-info))
+	     (discuss-leave-mtg)
+	   (discuss-next-trn))
+       (signal (car err) (cdr err))))))
+
+
+;;; These routines attempt to do transaction lookahead, to speed the discuss
+;;; reading process.
+;;;
+
+(defvar discuss-la-cache-dir "/tmp"
+  "The directory of where to store the cached transaction.")
+
+(defvar discuss-la-cache nil
+  "List of cached discuss transactions.")
+
+(defvar discuss-la-to-cache nil
+  "List of transaction that should be cached.")
+
+(defvar discuss-max-cache-length 32
+  "Maximum number of cached transactions.")
+
+(defvar discuss-max-next-chaining 5
+  "Maximum number of look-ahead in the forward direction.")
+
+(defvar discuss-la-next-chaining 0
+  "Number of look ahead's we have left to do.")
+
+(defvar discuss-la-next-trn 0
+  "This points to the pref of the transaction that should be cached next.")
+
+(defvar discuss-reading-form ""
+  "This is a scratch variable where output from the discuss backend is 
+accumulated.")
+
+(defvar discuss-la-in-progress nil
+  "Contains the cache entry that we're currently working on in lookahead-
+article.  If it is set to nil, we will abort processing the 
+lookahead-article.")
+
+(defun discuss-la-flush nil
+  "Flushes the look-ahead cache.  Required when you exit a meeting."
+  (setq discuss-la-in-progress nil)
+  (while discuss-la-cache
+    (if (file-exists-p (cadr (car discuss-la-cache)))
+	(delete-file (cadr (car discuss-la-cache))))
+    (setq discuss-la-cache (cdr discuss-la-cache)))
+  )
+
+(defun discuss-la-block-til-ready ()
+  "Block, waiting until the previous operation look-ahead operation completes"
+  (if discuss-la-in-progress
+      (progn 
+	(while discuss-la-in-progress
+	  (message "waiting for (la) discuss...")
+	  (sit-for 1)
+	  (accept-process-output))
+	(message ""))))
+
+(defun discuss-la-search (key)
+  (let ((prev nil)
+	(this discuss-la-cache))
+    (while (and this
+		(not (equal key (car (car this)))))
+      (setq prev this)
+      (setq this (cdr this)))
+    ;;
+    ;; This is horrible mutator hacking is done to keep
+    ;; discuss-la-cache in LRU order
+    ;;
+    (if (and this prev)
+	(progn
+	  (setcdr prev (cdr this))
+	  (setcdr this discuss-la-cache)
+	  (setq discuss-la-cache this)))
+    (car this)))
+	
+(defun discuss-la-invalidate (num)
+  (let ((cache-entry (discuss-la-search num)))
+    (if cache-entry
+	(setcar (cdr (cdr cache-entry)) nil))))
+
+(defun discuss-la-get-art (num)
+  (discuss-la-block-til-ready)
+  (let ((cache-entry (discuss-la-search num)))
+    (setq discuss-form (nth 2 cache-entry))
+    (if (and cache-entry
+	     discuss-form)
+	(progn
+;	  (message "Cache hit!")
+	  (setq discuss-show-num num)
+	  (discuss-la-cache-transaction)
+	  (cadr cache-entry))
+      nil)))
+
+(defun discuss-la-cache-transaction (&optional num)
+  (if (and (not discuss-la-in-progress)
+	   (not num)
+	   discuss-la-to-cache)
+      (setq num (car discuss-la-to-cache)
+	    discuss-la-to-cache (cdr discuss-la-to-cache)))
+  (if (and (not discuss-la-in-progress)
+	   (not num)
+	   (> discuss-la-next-chaining 0))
+      (let ((cache-entry (assoc discuss-la-next-trn discuss-la-cache)))
+	(if cache-entry
+	    (progn
+	      (setq discuss-la-next-chaining (1- discuss-la-next-chaining))
+	      (setq num (caddr (caddr cache-entry)))	; Next trn to cache
+	      (if (= num 0)
+		  (progn
+		    (setq num nil)
+		    (setq discuss-la-next-chaining 0)))
+	      (setq discuss-la-next-trn num))
+	  (setq discuss-la-next-chaining 0
+		discuss-la-next-trn 0))))
+  (if num
+      (let ((cache-entry (discuss-la-search num)))
+	(if (not (and cache-entry
+		      (nth 2 cache-entry)))
+	    (progn
+	      (discuss-la-block-til-ready)
+;	      (message "Starting to cache %d" num)
+	      (if cache-entry
+		  (setq discuss-la-in-progress cache-entry)
+		(progn
+		  (setq discuss-la-in-progress 
+			(list num 
+			      (make-temp-name (format "%s/edsc%d"
+						      discuss-la-cache-dir 
+						      num
+						      ))
+			      nil))
+		  (setq discuss-la-cache (cons discuss-la-in-progress
+					       discuss-la-cache))))
+	      (discuss-send-cmd (format "(gtf %s %d %s)\n"
+					(cadr discuss-la-in-progress)
+					num
+					discuss-current-meeting)
+				'discuss-la-cache-transaction-1
+				'discuss-read-form
+				'discuss-la-flush))
+	  (progn
+;	    (message "%s already cached." num)
+	    (discuss-la-cache-transaction))))))
+
+(defun discuss-la-cache-transaction-1 nil
+  (if discuss-la-in-progress
+      (progn
+	(setcar (cdr (cdr discuss-la-in-progress)) discuss-form)
+;	(message "Cache finished")
+	;;
+	;; If we have too many transactions in the cache, then
+	;; we need to purge the least recently used transaction.
+	;;
+	(if (> (length discuss-la-cache) discuss-max-cache-length)
+	    (let ((file (cadr (nth (1- (length discuss-la-cache)) 
+				   discuss-la-cache))))
+	      (if (file-exists-p file)
+		  (delete-file file))
+	      (setcdr (nthcdr (- (length discuss-la-cache) 2) 
+			      discuss-la-cache) nil)))
+	(setq discuss-la-in-progress nil)
+	(discuss-la-cache-transaction)
+	)))
+
+(defun discuss-la-do-cache (&optional no-retry)
+  (let ((next (caddr discuss-current-transaction-info))
+	(prev (cadr discuss-current-transaction-info))
+	(nref (nth 4 discuss-current-transaction-info))
+	(pref (nth 3 discuss-current-transaction-info)))
+    (if (> next 0)
+	(setq discuss-la-to-cache (cons next discuss-la-to-cache)))
+    (if (> prev 0)
+	(setq discuss-la-to-cache (cons prev discuss-la-to-cache)))
+    (if (> nref 0)
+	(setq discuss-la-to-cache (cons nref discuss-la-to-cache)))
+    (if (> pref 0)
+	(setq discuss-la-to-cache (cons pref discuss-la-to-cache)))
+    (discuss-la-cache-transaction)))
+
+    
 
 
 ;;; Routines for communicating with slave process.  Since things are
@@ -490,99 +981,183 @@ a	Add meeting.  Not implemented yet."
 ;;; breaks unexpectedly, I should put in a lock timeout and a function to
 ;;; unlock things).
 
-(defun discuss-send-cmd (cmd &optional end-func filter-func)
+(defun discuss-restart ()
+  "Used to save the world when edsc gets hung or dies...
+
+Flushes the discuss cache and destroys the edsc process."
+  (interactive)
+  (discuss-la-flush)
+  (if (and discuss-process
+	   (equal (process-status discuss-process) 'run))
+      (send-string discuss-process "(quit)\n"))
+  (setq discuss-process nil
+	discuss-in-progress nil))
+
+(defun discuss-send-cmd (cmd &optional end-func filter-func unwind-func)
+  "Send an command to the edsc process"
+  (if (not discuss-process)
+      (progn
+	(if (not (file-exists-p discuss-pathname))
+	    (error "%s does not exist!" discuss-pathname))
+	(setq discuss-process (start-process "discuss-shell" 
+					     nil
+					     discuss-pathname))
+	(set-process-sentinel discuss-process 'discuss-edsc-sentinel)
+	(discuss-send-cmd "(gpv)\n" nil 'discuss-read-form)
+	(discuss-block-til-ready t)
+	(let* ((discuss-vers (cond (discuss-form
+				    (car discuss-form))
+				   ((equal discuss-error 
+					  "Unimplemented operation")
+				    10)
+				   (t
+				    (error "Edsc returned error: %s" 
+					   discuss-error))))
+	       (ver-string 
+		(format "%d.%d" 
+			(/ discuss-vers 10)
+			(- discuss-vers (* (/ discuss-vers 10) 10)))))
+	  (if (> 23 discuss-vers)
+	      (setq discuss-version-string "")
+	    (setq discuss-version-string (cadr discuss-form)))
+	  (if (> 20 discuss-vers)
+	      (progn
+		(discuss-restart)
+		(error "Bad version of edsc (%s) --- need version 2.0."
+		       ver-string))
+	    (progn
+	      (message "Started edsc process.... version %s %s)" 
+		       ver-string discuss-version-string)
+	      (sit-for 1))))))
+    
   ;; block until we have control over things..
-  (discuss-block-til-ready)
+  (discuss-block-til-ready t)
   (if filter-func
       (setq discuss-in-progress t))
-  (let ((proc (get-buffer-process discuss-shell-buffer)))
-    (save-excursion 
-      (set-buffer discuss-shell-buffer)
-      (erase-buffer)
-      (if end-func (setq discuss-cont end-func))
-      (if filter-func (set-process-filter proc filter-func))
-      (send-string proc cmd))))
+  (save-excursion 
+    (setq discuss-reading-string "")
+    (setq discuss-cont end-func)
+    (setq discuss-unwind unwind-func)
+    (if filter-func (set-process-filter discuss-process filter-func))
+    (send-string discuss-process cmd)))
 
-(defun discuss-block-til-ready ()
-  "Block, waiting until the previous operation for discuss finished"
+(defun discuss-block-til-ready (verbose)
+  "Block, waiting until the previous operation for discuss finished.
+If VERBOSE is non-nil, then print a message that we're waiting for the 
+discuss server while we spin-block."
   (if discuss-in-progress
       (progn 
 	(while discuss-in-progress
-	  (message "waiting for discuss...")
+	  (if verbose
+	      (message "waiting for discuss..."))
 	  (sit-for 1)
 	  (accept-process-output))
 	(message ""))))
+
+;;;
+;;; This gets called when something nasty has happened to our edsc.
+;;;
+(defun discuss-edsc-sentinel (process signal)
+  (let ((buffer (process-buffer process))
+	(status (process-status process)))
+    (cond
+     ((eq status 'exit)
+      (discuss-restart))
+     ((eq status 'signal)
+      (ding)
+      (message "discuss-shell: %s." 
+	       (substring signal 0 -1))
+      (discuss-restart))
+     )))
 
 ;;; Routines to filter the output from discuss.
 ;;; These are pretty simplistic
 
 (defun discuss-read-form (process string)
-  (let ((curbuf (current-buffer)))
-    (set-buffer discuss-shell-buffer)
-    (insert string)
-    (if (equal (substring string -1 nil) "\n")
-	(let ((end-of-line (string-match "\n" (buffer-string))))
-	  (cond ((equal (buffer-substring 1 2) "-") ; warning
-		 (message (buffer-substring 2 (1+ end-of-line)))
-		 (delete-region 1 (+ 2 end-of-line))
-		 (discuss-read-form process buffer-string))
-		((equal (buffer-substring 1 2) ";") ; error
-		 (message (buffer-substring 2 (1+ end-of-line)))
+  (setq discuss-reading-string (concat discuss-reading-string string))
+  (let* ((end-of-line (string-match "\n" discuss-reading-string)))
+    (if end-of-line
+	(let ((flag-char (substring discuss-reading-string 0 1))
+	      (first-line (substring discuss-reading-string 1 
+				     end-of-line)))
+	  (setq discuss-error nil)
+	  (cond ((equal flag-char "-") ; warning
+		 (message first-line)
+		 (setq discuss-reading-string
+		       (substring discuss-reading-string (1+ end-of-line)))
+		 (discuss-read-form process ""))
+		((equal flag-char ";") ; error
+		 (setq discuss-error first-line)
+		 (message discuss-error)
 		 (ding)
-		 (delete-region 1 (+ 2 end-of-line))
-		 (setq discuss-in-progress nil))
-		(t
-		 (setq discuss-form (car (read-from-string (buffer-string))))
+		 (setq discuss-reading-string
+		       (substring discuss-reading-string (1+ end-of-line)))
 		 (setq discuss-in-progress nil)
-		 (set-buffer curbuf)
-		 (apply discuss-cont nil)))))))
-
-(defun discuss-read-trn (process string)
-  (let ((curbuf (current-buffer)))
-    (set-buffer discuss-shell-buffer)
-    (insert string)
-    (if (equal (substring string -1 nil) "\n")
-	(let ((end-of-line (string-match "\n" (buffer-string))))
-	  (cond ((equal (buffer-substring 1 2) "-") ; warning
-		 (message (buffer-substring 2 (1+ end-of-line)))
-		 (delete-region 1 (+ 2 end-of-line))
-		 (discuss-read-form process buffer-string))
-		((equal (buffer-substring 1 2) ";") ; error
-		 (message (buffer-substring 2 (1+ end-of-line)))
-		 (ding)
-		 (delete-region 1 (+ 2 end-of-line))
-		 (setq discuss-in-progress nil))
+		 (setq discuss-form nil)
+		 (if discuss-unwind
+		     (apply discuss-unwind nil)))
 		(t
-		 (setq discuss-form (car (read-from-string (buffer-string))))
-		 (if (> (count-lines (point-min) (point-max))
-			(car discuss-form))
-		     (progn
-		       (setq discuss-text (buffer-substring (+ end-of-line 2) (point-max)))
-		       (setq discuss-in-progress nil)
-		       (set-buffer curbuf)
-		       (apply discuss-cont nil)))))))))
-
-(defun discuss-read-nil (process string)
-  (setq discuss-in-progress nil))
+		 (setq discuss-form 
+		       (car (read-from-string (concat "(" first-line))))
+		 (setq discuss-in-progress nil)
+		 (if discuss-cont
+		     (apply discuss-cont nil))))))))
 
 
 ; run this at each load
 (defun discuss-initialize nil
   (setq discuss-version
-	"$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.14 1989-12-07 22:12:12 raeburn Exp $")
+	"$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.15 1990-09-19 16:29:02 bjaspan Exp $")
+
+;;;
+;;; Lots of autoload stuff....
+;;;
+
+(autoload 'discuss-talk "/afs/athena/user/t/tytso/em/discuss-enter.elc"
+	  "Enter a new discuss transaction." t)
+
+(autoload 'discuss-reply "/afs/athena/user/t/tytso/em/discuss-enter.elc"
+	  "Reply to an existing discuss transaction." t)
+
+(autoload 'discuss-randrp "/afs/athena/user/t/tytso/em/discuss-enter.elc"
+	  "Random reply in a meeting." t)
+
+(autoload 'discuss-ls "/afs/athena/user/t/tytso/em/discuss-ls.elc"
+	  "List the headings of the transactions in a meeting." t)
+
+(autoload 'discuss-list-acl "/afs/athena/user/t/tytso/em/discuss-acl.elc"
+	  "List the ACL of a meeting." t)
+
+(autoload 'discuss-forward "/afs/athena/user/t/tytso/em/discuss-misc.elc"
+	  "Forward a transaction via mail." t)
+
+(autoload 'discuss-reply-by-mail "/afs/athena/user/t/tytso/em/discuss-misc.elc"
+	  "Forward a transaction via mail." t)
+
+(autoload 'discuss-add-mtg "/afs/athena/user/t/tytso/em/discuss-misc.elc"
+	  "Add a discuss meeting" t)
+
+(autoload 'discuss-del-mtg "/afs/athena/user/t/tytso/em/discuss-misc.elc"
+	  "Delete a discuss meeting" t)
+
+
 
 ;;; Keymaps, here at the end, where the trash belongs..
-
+  
 (if discuss-mtgs-mode-map
     nil
   (setq discuss-mtgs-mode-map (make-keymap))
   (suppress-keymap discuss-mtgs-mode-map)
-  (define-key discuss-mtgs-mode-map "n" 'next-line)
-  (define-key discuss-mtgs-mode-map "p" 'previous-line)
+  (define-key discuss-mtgs-mode-map "a" 'discuss-add-mtg)
+  (define-key discuss-mtgs-mode-map "d" 'discuss-del-mtg)
+  (define-key discuss-mtgs-mode-map "n" 'discuss-forward-meeting)
+  (define-key discuss-mtgs-mode-map "p" 'discuss-prev-meeting)
   (define-key discuss-mtgs-mode-map " " 'discuss-next-meeting)
+  (define-key discuss-mtgs-mode-map "\177" 'discuss-prev-meeting)
   (define-key discuss-mtgs-mode-map "l" 'discuss-lsm)
   (define-key discuss-mtgs-mode-map "g" 'discuss-goto)
   (define-key discuss-mtgs-mode-map "q" 'discuss-quit)
+  (define-key discuss-mtgs-mode-map "s" 'discuss-stat)
   (define-key discuss-mtgs-mode-map "?" 'describe-mode))
 
 (if discuss-trn-mode-map
@@ -591,14 +1166,19 @@ a	Add meeting.  Not implemented yet."
   (suppress-keymap discuss-trn-mode-map)
   (define-key discuss-trn-mode-map "." 'discuss-update)
   (define-key discuss-trn-mode-map " " 'scroll-up)
+  (define-key discuss-trn-mode-map " " 'discuss-scroll-up)
   (define-key discuss-trn-mode-map "\177" 'scroll-down)
   (define-key discuss-trn-mode-map "n" 'discuss-next-trn)
   (define-key discuss-trn-mode-map "p" 'discuss-prev-trn)
+  (define-key discuss-trn-mode-map "d" 'discuss-delete-trn)
+  (define-key discuss-trn-mode-map "R" 'discuss-retrieve-trn)
   (define-key discuss-trn-mode-map "\en" 'discuss-nref)
   (define-key discuss-trn-mode-map "\ep" 'discuss-pref)
   (define-key discuss-trn-mode-map "g" 'discuss-show-trn)
-  (define-key discuss-trn-mode-map "f" 'discuss-first-trn)
-  (define-key discuss-trn-mode-map "l" 'discuss-last-trn)
+  (define-key discuss-trn-mode-map "<" 'discuss-first-trn)
+  (define-key discuss-trn-mode-map ">" 'discuss-last-trn)
+  (define-key discuss-trn-mode-map "f" 'discuss-forward)
+  (define-key discuss-trn-mode-map "F" 'discuss-toggle-trn-flag)
   (define-key discuss-trn-mode-map "h" 'discuss-trn-summary)
   (define-key discuss-trn-mode-map "\e\C-h" 'discuss-trn-summary)
   (define-key discuss-trn-mode-map "t" 'discuss-talk)
@@ -609,8 +1189,14 @@ a	Add meeting.  Not implemented yet."
   (define-key discuss-trn-mode-map "i" 'discuss-trn-input)
   (define-key discuss-trn-mode-map "q" 'discuss-leave-mtg)
   (define-key discuss-trn-mode-map "?" 'describe-mode)
-;  (define-key discuss-trn-mode-map "\C-d" 'discuss-trn-delete-backward)
+  (define-key discuss-trn-mode-map "s" 'discuss-stat)
+  (define-key discuss-trn-mode-map "a" 'discuss-add-mtg)
+  (define-key discuss-trn-mode-map "\C-d" 'discuss-delete-trn-backwards)
+  (define-key discuss-trn-mode-map "\ef" 'discuss-fref)
+  (define-key discuss-trn-mode-map "\el" 'discuss-lref)
+  (define-key discuss-trn-mode-map "=" 'discuss-ls)
 )
+
 
   (fmakunbound 'discuss-initialize)
   )					;end of discuss-initialize
@@ -644,15 +1230,63 @@ a	Add meeting.  Not implemented yet."
       (insert "\n")			;other modifying here as well
       (append-to-file (point-min) (point-max) file-name))
     (kill-buffer tembuf)))
+
 ;;;
 ;;; this is just a quick hack, but I don't see an `better' way to do it...
 ;;;
-(defun discuss-next-meeting ()
+(defun discuss-next-meeting (&optional quiet)
   "Find the next changed meeting in the discuss *meetings* buffer, or wrap."
   (interactive)
-  (if (not (re-search-forward "^ c " nil t))
+  (let ((buffer (current-buffer)))
+    (set-buffer discuss-main-buffer)
+    ;; If we're in DWIM mode, and we're currently looking at a changed
+    ;; meeting, go to it.
+    (if (and discuss-DWIM
+	     (re-search-backward "^ c" (save-excursion (beginning-of-line)
+						       (point))
+				 t))
+	(discuss-goto)
+      (if (not (re-search-forward "^ c " nil t))
+	  (progn
+	    (goto-char (point-min))
+	    (if (not (re-search-forward "^ c " nil t))
+		(if (not quiet)
+		    (message "No new meetings, try discuss-lsm instead."))
+	      ))))
+    (set-buffer buffer)))
+
+(defun discuss-forward-meeting (&optional quiet)
+  (interactive)
+  (let ((discuss-DWIM nil))
+    (discuss-next-meeting quiet)))
+
+(defun discuss-prev-meeting ()
+  "Find the next changed meeting in the discuss *meetings* buffer, or wrap."
+  (interactive)
+  (beginning-of-line)
+  (if (not (re-search-backward "^ c " nil t))
       (progn
-	(goto-char (point-min))
-	(if (not (re-search-forward "^ c " nil t))
+	(goto-char (point-max))
+	(if (not (re-search-backward "^ c " nil t))
 	    (message "No new meetings, try discuss-lsm instead.")
-	  ))))
+	  )))
+  (forward-char 3))
+
+(defun discuss-mark-read-meeting (meeting)
+  "Mark a meeting as read on the discuss-mode listing."
+  (save-excursion
+    (set-buffer discuss-main-buffer)
+    (goto-char (point-min))
+    (if (not (re-search-forward (concat " " (regexp-quote meeting) 
+					"\\(,\\|$\\)")
+			     nil t))
+	(progn
+	  (ding)
+	  (message "Can't find meeting %s." meeting))
+      (progn
+	(beginning-of-line)
+	(forward-char 1)
+	(let ((buffer-read-only nil))
+	  (insert-char \032 1)
+	  (delete-char 1))))))
+
