@@ -19,7 +19,7 @@
 #include "mtg.h"
 
 #define NULL 0
-#define MAX_TRNS 1000
+#define MAX_TRNS 20000
 #define min(a, b) (a < b ? a : b)
 
 static trn_base tb;
@@ -32,6 +32,7 @@ static int current_pos;
 static char *mtg_name = NULL, *location = NULL, *chairman = NULL, *trn_file = NULL;
 static int trn_pos[MAX_TRNS];
 static int found_eof = 0;
+static char *temp_dir = "/tmp";
 
 tfile unix_tfile ();
 char *malloc();
@@ -58,6 +59,11 @@ char **argv;
 	  case 'n':
 	       if (++i < argc)
 		    mtg_name = argv[i];
+	       continue;
+
+	   case 't':
+	       if (++i < argc)
+		   temp_dir = argv[i];
 	       continue;
 
 	  default:
@@ -392,14 +398,16 @@ char *s;
  */
 create_temp()
 {
-     char filename [20];
+     char *filename;
 
-     strcpy (filename, "/tmp/rcXXXXXX");
+     filename = malloc (strlen (temp_dir) + 10);
+     strcpy (filename, temp_dir);
+     strcat (filename, "/rcXXXXXX");
      mktemp (filename);
 
      tempf = open (filename, O_RDWR | O_CREAT, 0700);
      if (tempf < 0) {
-	  fprintf (stderr, "Cannot open temp file\n");
+	  fprintf (stderr, "Cannot open temp file `%s'\n", filename);
 	  exit (1);
      }
 }
