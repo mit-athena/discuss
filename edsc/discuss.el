@@ -6,7 +6,7 @@
 ;;; Written by Stan Zanarotti, Bill Sommerfeld and Theodore Ts'o.
 ;;; For copying information, see the file mit-copyright.h in this release.
 ;;;
-;;; $Id: discuss.el,v 1.37 1999-01-22 23:09:44 ghudson Exp $
+;;; $Id: discuss.el,v 1.38 1999-01-26 17:25:10 danw Exp $
 ;;;
 
 ;;
@@ -60,6 +60,26 @@ In-Reply-To: [###] in Meeting.")
 Reply-To addresses that should be inserted into replies by mail (to help
 ensure that people don't drop the CC to the discuss meeting.)")
 
+(defvar discuss-font-lock-keywords '(("^\\(From: .*\\)" 1 'bold t)
+				     ("^\\(Subject: .*\\)" 1 'bold t))
+  "Keywords to highlight in transactions if using font-lock mode.
+(Add (add-hook 'discuss-show-trn-hooks 'font-lock-mode) to your
+.emacs to enable discuss font-lock mode.)")
+
+(defvar discuss-visible-headers nil
+  "If non-nil, a regexp matching the mail headers to display in discuss
+meetings fed by mailing lists. If nil, the value of discuss-invisible-headers
+is used instead.")
+
+(defvar discuss-invisible-headers "^From \\|^Received:"
+  "If discuss-visible-headers is nil, discuss-invisible-headers is a regexp
+matching the mail headers to be not shown by default in discuss meetings
+fed by mailing lists.")
+
+(defvar discuss-keep-discuss-ls nil
+  "If nil, windows containing *discuss-ls* buffers will be deleted when
+leaving transaction mode.")
+
 (defvar discuss-mtgs-mode-map nil
   "Keymap used by the meetings-list mode of the discuss subsystem.")
 
@@ -99,6 +119,9 @@ meetings.")
 
 (defvar discuss-show-num 0
   "Current discuss transaction number.")
+
+(defvar discuss-show-headers nil
+  "Whether or not all headers are being displayed on the current transaction.")
 
 (defvar discuss-meeting nil
   "Buffer-local variable containing the name of the meeting of a discuss
@@ -194,6 +217,8 @@ Instead, these commands are available:
 \\[discuss-delete-trn]	Delete transaction (and move forwards).
 \\[discuss-delete-trn-backwards]	Delete transaction (and move backwards).
 \\[discuss-retrieve-trn]	Retrieve (undelete) a deleted transaction.
+\\[discuss-update]	Redisplay this transaction from the top.
+\\[discuss-show-trn-with-headers]	Redisplay this transaction with full mail headers.
 \\[discuss-reply]	Reply to this transaction (via discuss.)
 \\[discuss-reply-by-mail]	Reply to this transaction (via mail.)
 \\[discuss-forward]	Forward this transaction via mail.
@@ -463,7 +488,12 @@ Instead, these commands are available:
 	     (- last highest-seen)
 	     last)))
 
-(defun discuss-show-trn (trn-num)
+(defun discuss-show-trn-with-headers ()
+  "Show transaction with full headers."
+  (interactive)
+  (discuss-show-trn discuss-current-transaction t))
+
+(defun discuss-show-trn (trn-num &optional show-headers)
   "Show transaction number N (prefix argument)."
   (interactive
    (list (if (not (numberp current-prefix-arg))
@@ -472,6 +502,7 @@ Instead, these commands are available:
   (if (and trn-num (numberp trn-num))
       (progn
 	(setq discuss-show-num trn-num)
+	(setq discuss-show-headers show-headers)
 	(discuss-send-cmd (format "(gtfc %d %d %s)\n"
 				  discuss-cur-direction
 				  trn-num
@@ -498,13 +529,42 @@ Instead, these commands are available:
     (let ((buffer-read-only nil))
       (erase-buffer)
       (insert-file-contents transaction-file)
+      (if (not discuss-show-headers)
+	  (discuss-clean-msg-header))
       (goto-char (point-min)))
     (if (= (caddr discuss-current-transaction-info) 0)
 	(progn
 	  (message "Last transaction in %s" discuss-meeting)
 	  (discuss-mark-read-meeting discuss-meeting)
 	  (discuss-next-meeting t)))
+    (make-local-variable 'font-lock-defaults)
+    (setq font-lock-defaults '(discuss-font-lock-keywords t))
     (run-hooks 'discuss-show-trn-hooks)))
+
+(defun discuss-clean-msg-header ()
+  (save-excursion
+    (goto-char (point-min))
+    (next-line 2)	; skip title and subject
+    (if (looking-at "From \\|[^ ]+:")
+	(let ((start (point)))
+	  (save-restriction
+	    (if (search-forward "\n\n" nil 'move)
+		(backward-char 1))
+	    (narrow-to-region start (point))
+	    (goto-char (point-min))
+	    (if discuss-visible-headers
+		(while (< (point) (point-max))
+		  (cond ((looking-at discuss-visible-headers)
+			 (re-search-forward "\n[^ \t]"))
+			(t
+			 (delete-region (point)
+					(progn (re-search-forward "\n[^ \t]")
+					       (- (point) 1))))))
+	      (while (re-search-forward discuss-invisible-headers nil t)
+		(beginning-of-line)
+		(delete-region (point) (progn (re-search-forward "\n[^ \t]")
+					      (- (point) 1)))
+		(beginning-of-line))))))))
 
 (defun discuss-update ()
   "Update Discuss display to show new transactions."
@@ -676,6 +736,8 @@ the argument or the current transaction and leaves the meeting."
 	(kill-buffer (buffer-name discuss-cur-mtg-buf))
 	(setq discuss-cur-mtg-buf nil)
 	(setq discuss-current-meeting nil)
+	(if (and (not discuss-keep-discuss-ls) (get-buffer "*discuss-ls*"))
+	    (delete-windows-on (get-buffer "*discuss-ls*")))
 	(switch-to-buffer discuss-main-buffer))))
 
 (defun discuss-catchup (&optional meeting)
@@ -973,7 +1035,7 @@ discuss server while we spin-block."
 ; run this at each load
 (defun discuss-initialize nil
   (setq discuss-version
-	"$Id: discuss.el,v 1.37 1999-01-22 23:09:44 ghudson Exp $")
+	"$Id: discuss.el,v 1.38 1999-01-26 17:25:10 danw Exp $")
 
 ;;;
 ;;; Lots of autoload stuff....
@@ -1034,6 +1096,7 @@ discuss server while we spin-block."
   (setq discuss-trn-mode-map (make-keymap))
   (suppress-keymap discuss-trn-mode-map)
   (define-key discuss-trn-mode-map "." 'discuss-update)
+  (define-key discuss-trn-mode-map "," 'discuss-show-trn-with-headers)
   (define-key discuss-trn-mode-map " " 'discuss-scroll-up)
   (define-key discuss-trn-mode-map "\177" 'scroll-down)
   (define-key discuss-trn-mode-map "n" 'discuss-next-trn)
