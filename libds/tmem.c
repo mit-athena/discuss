@@ -7,12 +7,15 @@
  */
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tmem.c,v $
- *	$Author: ghudson $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tmem.c,v 1.5 1996-09-19 22:30:54 ghudson Exp $
+ *	$Author: cfields $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tmem.c,v 1.6 1997-06-29 00:35:31 cfields Exp $
  *
  *	tfile module for ``memory'' tfiles. 
  * 
  *	$Log: not supported by cvs2svn $
+ *	Revision 1.5  1996/09/19 22:30:54  ghudson
+ *	BSD -> ANSI string and memory functions
+ *
  *	Revision 1.4  1994/03/25 16:45:04  miki
  *	replaced bzero with memset
  *
@@ -29,8 +32,8 @@
 
 #ifndef lint
 static char rcsid_tmem_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tmem.c,v 1.5 1996-09-19 22:30:54 ghudson Exp $";
-#endif lint
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tmem.c,v 1.6 1997-06-29 00:35:31 cfields Exp $";
+#endif /* lint */
 
 #include <errno.h>
 #include <sys/types.h>
@@ -61,7 +64,7 @@ static int iovmove (direct, iovpp, buf, len)
 		len -= count;
 		moved += count;
 		buf += count;
-		iovp->iov_base += count;
+		iovp->iov_base = (char *)iovp->iov_base + count;
 		iovp->iov_len -= count;
 		if (iovp->iov_len == 0) {
 			iovp ++;
