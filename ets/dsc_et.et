@@ -67,4 +67,7 @@
 	ec	CANT_ATTEND,
 		"Insufficent access to attend meeting"
 
+	ec	NO_SUPPORT,
+		"Server does not support this operation"
+
 	end
