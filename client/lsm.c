@@ -1,8 +1,11 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v 1.12 1987-06-20 13:35:55 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v 1.13 1987-07-07 23:06:17 wesommer Exp $
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.12  87/06/20  13:35:55  srz
+ * Cleaned up Control-C code.
+ * 
  * Revision 1.11  87/06/14  21:07:47  srz
  * Added control-C handling.  Removed sorting stuff so that meetings
  * appear in the order of the .meetings file.
@@ -29,7 +32,7 @@
  */
 
 #ifndef lint
-static char *rcsid_lsm_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v 1.12 1987-06-20 13:35:55 srz Exp $";
+static char *rcsid_lsm_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v 1.13 1987-07-07 23:06:17 wesommer Exp $";
 #endif lint
 
 
@@ -39,7 +42,7 @@ static char *rcsid_lsm_c = "$Header: /afs/dev.mit.edu/source/repository/athena/b
 #include "interface.h"
 #include "globals.h"
 
-extern char *malloc(),*ctime(), *error_message();
+extern char *malloc(), *calloc(), *ctime(), *error_message();
 
 static int print_header, long_output;
 static char *auser_id;
@@ -48,10 +51,10 @@ static
 do_mtg(mtg_name)
 	char *mtg_name;
 {
-	name_blk *set,set_temp;
+	name_blk *set;
 	register name_blk *nbp;
-	int n_matches, i, j, code;
-	bool updated,this_mtg;
+	int n_matches, i, code;
+	bool updated;
 	char last_host[140], last_path[140];
 
 	dsc_expand_mtg_set(auser_id, mtg_name, &set, &n_matches, &code);
@@ -70,19 +73,16 @@ do_mtg(mtg_name)
 	        if (interrupt)
 		        break;
 		if (print_header) {
-			printf("%-7s %-30s   %-30s  %s\n",
-			       " Flags","Meeting ID","Short name",
-			       ""
-			       );
+		        char *fmt = "%-7s %-30s   %-30s\n";
+			printf(fmt, " Flags", "Meeting ID", "Short name");
+			printf(fmt, " -----", "----------", "----------");
 			print_header = 0;
 		}
 		nbp = &set[i];
 		/* Test to see if we are attending this meeting */
 		if (dsc_public.attending && !strcmp(dsc_public.host, nbp ->hostname) && !strcmp(dsc_public.path, nbp->pathname)) {
 		     updated = (dsc_public.highest_seen < dsc_public.m_info.last);
-		     this_mtg = TRUE;
 		} else {
-		     this_mtg = FALSE;
 		     dsc_updated_mtg(nbp, &updated, &code);	
 		     if (interrupt)
 			  break;
@@ -162,7 +162,6 @@ list_meetings (argc, argv)
 	if (*auser)
 		(void) strcpy(auser_id, auser);
 	else {
-		register char *at;
 		(void) strcpy(auser_id, user_id);
 	}
 
