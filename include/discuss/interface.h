@@ -14,7 +14,7 @@
  * with the core discuss routines.  The exact protocol between the two 
  * has not been defined, although something ala RPC should be investiaged
  *
- * $Id: interface.h,v 1.7 1999-01-22 23:09:51 ghudson Exp $
+ * $Id: interface.h,v 1.8 1999-04-12 13:42:47 ghudson Exp $
  */
 
 #include <discuss/types.h>
@@ -299,4 +299,4 @@ code *result;
  *
 
 
-/* end of routine definitions */
+end of routine definitions */
