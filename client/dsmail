@@ -3,8 +3,13 @@ path=/bin:/site/sipb/bin
 cat >/tmp/dsmail$$
 subject=`sed '/^$/q' </tmp/dsmail$$ | grep '^Subject: ' | sed 's/^Subject: //'`
 awk 'BEGIN { foo=0 }
+/From: / { print }
 /^$/ { foo = 1 }
 { if(foo) print }' </tmp/dsmail$$ | dspipe $* -t "$subject"
 rm /tmp/dsmail$$
 
-
+#
+#	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/dsmail,v $
+#	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/dsmail,v 1.2 1986-07-21 13:59:20 wesommer Exp $
+#
+# 	Handle mail into dspipe..
