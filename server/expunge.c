@@ -21,6 +21,7 @@
 
 #define NULL 0
 #define MAX_TRNS 1000
+#define BUFFER_SIZE 500000
 #define min(a, b) (a < b ? a : b)
 
 static int tempf;
@@ -28,6 +29,8 @@ static char *mtg_name = NULL, *location = NULL, *chairman = NULL, *trn_file = NU
 static char *backup_location = NULL;
 static int found_eof = 0;
 static int error_occurred = 0;
+
+static char tran_buf[BUFFER_SIZE];
 
 tfile unix_tfile ();
 char *malloc();
@@ -159,9 +162,13 @@ char **argv;
 		    error_occurred = TRUE;
 	       }
 	  } else if (result == 0) {
-	       ftruncate(tempf,0);
-	       lseek(tempf,0,0);
-	       tf = unix_tfile (tempf);
+	       if (old_trn_info.num_chars > BUFFER_SIZE) {
+		    ftruncate(tempf,0);
+		    lseek(tempf,0,0);
+		    tf = unix_tfile (tempf);
+	       } else {
+		    tf = mem_tfile (tran_buf, old_trn_info.num_chars);
+	       }
 
 	       get_trn (backup_location, i, tf, &result);
 	       if (result != 0) {
@@ -173,14 +180,20 @@ char **argv;
 	       }
 
 	       tdestroy (tf);
-	       lseek(tempf,0,0);
 
-	       tf = unix_tfile (tempf);
+	       if (old_trn_info.num_chars > BUFFER_SIZE) {
+		    lseek(tempf,0,0);
+		    tf = unix_tfile (tempf);
+	       } else {
+		    tf = mem_tfile (tran_buf, old_trn_info.num_chars);
+	       }
+
 	       add_trn_priv (location, tf, old_trn_info.subject, old_trn_info.pref, old_trn_info.current, old_trn_info.author, old_trn_info.date_entered, &n, &result);
 	       if (result != 0) {
 		    fprintf(stderr, "Error getting info for transaction %d: %s\n", i, error_message(result));
 		    error_occurred = TRUE;
 	       }
+	       tdestroy (tf);
 	       free(old_trn_info.author);
 	       free(old_trn_info.subject);
 	  }
