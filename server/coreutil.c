@@ -7,7 +7,7 @@
  */
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.18 1989-08-09 22:39:43 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.19 1989-09-01 11:51:18 srz Exp $
  *
  *
  * coreutil.c  -- These contain lower-layer, utility type routines to
@@ -15,6 +15,9 @@
  *		  in-memory superblock, and to open & close meetings.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.18  89/08/09  22:39:43  srz
+ * Added meeting forwarding.
+ * 
  * Revision 1.17  89/06/03  00:42:34  srz
  * Added standard copyright notice.
  * 
@@ -77,7 +80,7 @@
 const
 #endif
 static char rcsid_coreutil_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.18 1989-08-09 22:39:43 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.19 1989-09-01 11:51:18 srz Exp $";
 #endif /* lint */
 
 #include <discuss/types.h>
@@ -332,7 +335,9 @@ write_super ()
      }
 
      free (super_chairman);
+     super_chairman = NULL;
      free (super_long_name);
+     super_long_name = NULL;
      super.unique = 0;					/* prevent accidents */
 
      return;
@@ -346,9 +351,13 @@ write_super ()
  */
 forget_super()
 {
-     free(super_long_name);
-     free(super_chairman);
+     if (super_long_name != NULL)
+	  free(super_long_name);
+     super_long_name = NULL;
 
+     if (super_chairman != NULL)
+	  free(super_chairman);
+     super_chairman = NULL;
      super.unique = 0;
 }
 
@@ -500,6 +509,8 @@ core_abort ()
      if (read_lock)
 	  finish_read();
 
+     forget_super();
+
      return;
 }
 
@@ -593,8 +604,6 @@ char mode;
 	  break;
 
      case 'c':
-	  if (!strcmp (super_chairman, rpc_caller))
-	       return (TRUE);
 	  test_modes = "c";
 	  break;
 
