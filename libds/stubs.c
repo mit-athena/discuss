@@ -11,13 +11,16 @@
 /*
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/stubs.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/stubs.c,v 1.7 1987-07-08 02:00:16 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/stubs.c,v 1.8 1987-07-20 20:57:47 srz Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
  * stubs.c -- These are stubs that handle the calling of routines.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.7  87/07/08  02:00:16  wesommer
+ * Added whoami(), dsc_whoami() (the server support was always there.
+ * 
  * Revision 1.6  87/06/27  01:10:55  spook
  * *** empty log message ***
  * 
@@ -27,7 +30,7 @@
  *
  */
 #ifndef lint
-static char *rcsid_stubs_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/stubs.c,v 1.7 1987-07-08 02:00:16 wesommer Exp $";
+static char *rcsid_stubs_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/stubs.c,v 1.8 1987-07-20 20:57:47 srz Exp $";
 #endif lint
 
 /* Derived from CORE.PAS 06/21/86 by SRZ */
@@ -391,7 +394,7 @@ delete_access(mtg_name, princ_name, result)
 	return;
 }
 
-whoami(ident, result)
+dwhoami(ident, result)
 	char **ident;
 	int *result;
 {

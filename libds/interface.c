@@ -1,10 +1,13 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.10 1987-07-08 01:59:44 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.11 1987-07-20 20:56:26 srz Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.10  87/07/08  01:59:44  wesommer
+ * Added whoami(), dsc_whoami() (the server support was always there.
+ * 
  * Revision 1.9  87/06/27  01:16:46  spook
  * *** empty log message ***
  * 
@@ -29,7 +32,7 @@
  */
 
 #ifndef lint
-static char *rcsid_interface_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.10 1987-07-08 01:59:44 wesommer Exp $";
+static char *rcsid_interface_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.11 1987-07-20 20:56:26 srz Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -263,5 +266,5 @@ dsc_whoami(nbp, ident, result)
 {
 	select_meeting(nbp, result);
 	if (*result) return;
-	whoami(ident, result);
+	dwhoami(ident, result);
 }
