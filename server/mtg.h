@@ -148,10 +148,10 @@ typedef struct {
 	int num_chars;				/* # chars in trn */
 	faddr prev_trn;				/* addr of prev */
 	faddr subject_addr;			/* address of subject */
-	faddr author_addr;			/* address of author */
+	faddr author_addr;			/* addr of author & signature*/
 	faddr text_addr;			/* address of trn text */
 	slen subject_len;			/* subject len (incl NULL) */
-	slen author_len;			/* author len */
+	slen author_len;			/* author + signature len */
 } trn_hdr;
 
 #define TRN_HDR_1 1
