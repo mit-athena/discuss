@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.3 1986-11-22 06:25:42 spook Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.4 1987-02-04 15:48:18 srz Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
@@ -11,6 +11,9 @@
  *		  in-memory superblock, and to open & close meetings.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.3  86/11/22  06:25:42  spook
+ * Changed to make lint happy.
+ * 
  * Revision 1.2  86/11/16  06:05:37  wesommer
  * Changed open_mtg to stat(2) the acl file before assuming that it's 
  * up to date, and revert the acl from there if the in-core version
@@ -19,7 +22,7 @@
  */
 
 #ifndef lint
-static char *rcsid_coreutil_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.3 1986-11-22 06:25:42 spook Exp $";
+static char *rcsid_coreutil_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.4 1987-02-04 15:48:18 srz Exp $";
 #endif lint
 
 #include "../include/types.h"
@@ -52,7 +55,6 @@ char *super_long_name;
 
 /* EXTERNAL */
 extern char *malloc();
-extern uid_t geteuid();
 extern off_t lseek();
 extern int errno;
 extern char rpc_caller [];
