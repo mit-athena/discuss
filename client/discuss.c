@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.44 1988-12-02 23:56:26 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.45 1988-12-03 01:42:13 raeburn Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
@@ -12,17 +12,17 @@
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.44 1988-12-02 23:56:26 srz Exp $";
+static char rcsid_discuss_c[] =
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.45 1988-12-03 01:42:13 raeburn Exp $";
 #endif lint
 
 #include <stdio.h>
 #include <sys/file.h>
 #include <signal.h>
-#include <strings.h>
+#include <string.h>
 #include <sys/wait.h>
 #include <sys/signal.h>
 #include <pwd.h>
-#include <ctype.h>
 #include "ss.h"
 #include "tfile.h"
 #include "interface.h"
@@ -53,9 +53,9 @@ char	*malloc(), *getenv(), *gets(), *ctime();
 tfile	unix_tfile();
 char	*local_realm();
 static char	buf[BUFSIZ];
-char	*buffer;
+char	*buffer = buf;
 
-main(argc, argv)
+int main (argc, argv)
 	int argc;
 	char **argv;
 {
@@ -68,7 +68,6 @@ main(argc, argv)
 	bool flame = FALSE;	/* Have we flamed them for multiple  */
 
 	signal(SIGPIPE, SIG_IGN);
-	buffer = &buf[0];
 	editor_path = getenv ("DISCUSS_EDITOR");
 
 	while (++argv, --argc) {
@@ -117,7 +116,7 @@ main(argc, argv)
 		}
 		else {
 			if (initial_meeting) {
-				if(!flame) {
+				if (!flame) {
 					fprintf(stderr, 
 "More than one meeting name supplied on command line; using %s\n", 
 						initial_meeting);
@@ -134,7 +133,8 @@ main(argc, argv)
 		
 
 		if (user_pw == NULL) {
-		     fprintf(stderr, "You do not appear /etc/passwd.  Cannot continue.\n");
+		     fprintf(stderr,
+			 "You do not appear /etc/passwd.  Cannot continue.\n");
 		     exit(1);
 		}
 		user = user_pw -> pw_name;
@@ -147,8 +147,8 @@ main(argc, argv)
 	sci_idx = ss_create_invocation(subsystem_name, dsc_version,
 				       (char *)NULL, &discuss_cmds, &code);
 	if (code) {
-		ss_perror(sci_idx, code, "creating invocation");
-		exit(1);
+	    com_err (subsystem_name, code, "creating invocation");
+	    exit(1);
 	}
 	(void) ss_add_info_dir(sci_idx, INFO_DIR, &code);
 	if (code) {
@@ -181,7 +181,7 @@ command from the shell.\n\n");
 		  } else break;
 	     }
 	     if (code)
-		  log_warning(code, "- continuing anyway");
+		 ss_perror (sci_idx, code, "- continuing anyway");
 	}
 	else if (!quit) {
 	     printf("Discuss version %s.  Type '?' for a list of commands.\n",
@@ -208,20 +208,21 @@ command from the shell.\n\n");
 	return 0;
 }
 
-int
-getyn(prompt,def)
-char *prompt,def;
+int getyn(prompt,def)
+    char *prompt, def;
 {
-	char yn_inp[128];
+	char inp[128];
 
 	for (;;) {
 		(void) printf("%s ",prompt);
-		if (gets(yn_inp) == NULL)
-			return(FALSE);		/* ^D = No */
-		if (yn_inp[0] == '\0')
-			yn_inp[0] = def;
-		if (toupper(yn_inp[0]) == 'Y' || toupper(yn_inp[0]) == 'N')
-			return (toupper(yn_inp[0]) == 'Y');
+		if (fgets (inp, stdin, 128) == NULL)
+		    return FALSE;
+		else if (inp[0] = '\n')
+		    inp[0] = def;
+		if (inp[0] == 'y' || inp[0] == 'Y')
+		    return 1;
+		else if (inp[0] == 'n' || inp[0] == 'N')
+		    return 0;
 		printf("Please enter 'Yes' or 'No'\n\n");
 	}
 }
