@@ -5,9 +5,12 @@
  *		This file handles the caller's side of the connection.
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/rpcall.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/rpcall.c,v 1.7 1987-03-10 00:07:23 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/rpcall.c,v 1.8 1987-03-18 12:24:35 srz Exp $
  *	$Locker:  $
  *	$Log: not supported by cvs2svn $
+ * Revision 1.7  87/03/10  00:07:23  wesommer
+ * Added cleanup routines and error exit path for open connection.
+ * 
  * Revision 1.6  87/03/09  23:52:18  spook
  * Removed some unused variables; added an error check.
  * 
@@ -310,9 +313,13 @@ recvreply ()
 	  return;
      }
 
-     if (bt != REPLY_TYPE)
-	  rpc_err = RPC_PROTOCOL;
-
+     if (bt != REPLY_TYPE) {
+	  if (bt == UNKNOWN_CALL)
+	       rpc_err = RPC_UNIMPL_CALL;
+ 	  else
+	       rpc_err = RPC_PROTOCOL;
+	  USP_flush_block(us);
+     }
      return;
 
 }

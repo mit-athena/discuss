@@ -238,8 +238,14 @@ int *code;
 
      procno = bt - PROC_BASE;
 
-     if (procno == 0 || procno > numprocs) {
+     if (procno == 0) {
 	  *code = RPC_PROTOCOL;
+	  return;
+     }
+     if (procno > numprocs) {
+	  USP_flush_block(us);
+	  senddunno();
+	  *code = 0;
 	  return;
      }
 
@@ -387,6 +393,21 @@ bool b;
  */
 sendreply()
 {
+     if (USP_end_block(us) != SUCCESS) {
+	  rpc_err = rpc_err_base + errno;
+	  return;
+     }
+     return;
+}
+
+/*
+ *
+ * senddunno () -- Send a 'I don't know this call' reply
+ *
+ */
+senddunno()
+{
+     USP_begin_block(us,UNKNOWN_CALL);
      if (USP_end_block(us) != SUCCESS) {
 	  rpc_err = rpc_err_base + errno;
 	  return;
