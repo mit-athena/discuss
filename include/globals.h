@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/include/globals.h,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/include/globals.h,v 1.7 1987-01-18 14:43:28 spook Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/include/globals.h,v 1.8 1987-01-18 22:45:13 spook Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
@@ -37,7 +37,7 @@ extern int	map_size;	/* size of chosen_trn_map */
 extern char	*temp_file;	/* generic temporary file... */
 extern int	sci_idx;
 
-extern int	interupt;
+extern int	interrupt;
 
 extern int	errno;		/* lusing UNIX method to pass error values */
 
