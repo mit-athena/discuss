@@ -2,7 +2,7 @@
  *
  * set request for Discuss
  *
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/set.c,v 1.1 1988-09-10 17:55:15 srz Exp $
+ * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/set.c,v 1.2 1989-01-05 02:14:15 raeburn Exp $
  * $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/set.c,v $
  * $Locker:  $
  *
@@ -11,18 +11,12 @@
  */
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/set.c,v 1.1 1988-09-10 17:55:15 srz Exp $";
-#endif lint
+static char rcsid_discuss_c[] =
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/set.c,v 1.2 1989-01-05 02:14:15 raeburn Exp $";
+#endif /* lint */
 
 #include <stdio.h>
-#include <strings.h>
-#include "discuss_err.h"
-#include "ss.h"
-#include "tfile.h"
-#include "interface.h"
-#include "config.h"
-#include "dsc_et.h"
-#include "globals.h"
+#include <string.h>
 
 int set_seen();
 
