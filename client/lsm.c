@@ -1,12 +1,16 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v 1.5 1987-01-04 23:13:41 rfrench Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v 1.6 1987-01-05 11:08:42 srz Exp $
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.5  87/01/04  23:13:41  rfrench
+ * First major change to lsm command:
+ * Alphabetizes by long name and lists all local names together.
+ * 
  */
 
 #ifndef lint
-static char *rcsid_lsm_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v 1.5 1987-01-04 23:13:41 rfrench Exp $";
+static char *rcsid_lsm_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v 1.6 1987-01-05 11:08:42 srz Exp $";
 #endif lint
 
 
@@ -67,10 +71,10 @@ do_mtg(mtg_name)
 	last_id[0] = '\0';
 	for (i = 0; i < n_matches; i++) {
 		if (print_header) {
-			printf("%-7.7s %-30.30s %s\n",
+			printf("%-7.7s %-30.30s   %s\n",
 			       " Flags",
 			       "Meeting ID",
-			       "Short name(s)");
+			       "Short name");
 			print_header = 0;
 		}
 		nbp = &set[i];
