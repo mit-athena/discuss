@@ -9,7 +9,7 @@
  *	Print-related requests for DISCUSS.
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.19 1989-06-02 23:38:12 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.20 1990-02-24 18:50:33 srz Exp $
  *	$Locker:  $
  *
  */
@@ -17,7 +17,7 @@
 
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.19 1989-06-02 23:38:12 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.20 1990-02-24 18:50:33 srz Exp $";
 #endif /* lint */
 
 #include <stdio.h>
@@ -50,7 +50,7 @@ extern char *error_message();
 
 static int
 display_trans(t_infop, codep)
-trn_info2 *t_infop;
+trn_info3 *t_infop;
 int *codep;
 {
 	output_trans(t_infop, tf, codep);
