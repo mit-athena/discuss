@@ -1,41 +1,11 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v 1.14 1987-07-08 01:57:43 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v 1.15 1987-07-17 00:14:59 spook Exp $
  *
- *	$Log: not supported by cvs2svn $
- * Revision 1.13  87/07/07  23:06:17  wesommer
- * [spook] changed format.
- * 
- * Revision 1.12  87/06/20  13:35:55  srz
- * Cleaned up Control-C code.
- * 
- * Revision 1.11  87/06/14  21:07:47  srz
- * Added control-C handling.  Removed sorting stuff so that meetings
- * appear in the order of the .meetings file.
- * 
- * Revision 1.10  87/04/19  22:16:56  srz
- * Reverted definition of 'changed' to include new meetings.
- * 
- * Revision 1.9  87/04/08  03:55:00  wesommer
- * Don't ignore code from dsc_expand_mtg_set.
- * 
- * Revision 1.8  87/03/22  04:38:12  spook
- * Changes for new interfaces.
- * 
- * Revision 1.7  87/01/06  23:47:21  rfrench
- * Added "new" field to lsm.
- * 
- * Revision 1.6  87/01/05  11:08:42  srz
- * Massaged header.
- * 
- * Revision 1.5  87/01/04  23:13:41  rfrench
- * First major change to lsm command:
- * Alphabetizes by long name and lists all local names together.
- * 
  */
 
 #ifndef lint
-static char *rcsid_lsm_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v 1.14 1987-07-08 01:57:43 wesommer Exp $";
+static char *rcsid_lsm_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v 1.15 1987-07-17 00:14:59 spook Exp $";
 #endif lint
 
 
@@ -90,8 +60,7 @@ int do_line(nbp, code, updated)
 		printf(")\n");
 		return 0;
 	}
-	if (!strcmp(last_host,nbp->hostname) && 
-		!strcmp(last_path, nbp->pathname))
+	if(!strcmp(last_host,nbp->hostname)&&!strcmp(last_path,nbp->pathname))
 		printf("        %-22s   %s\n","",nbp->aliases[0]);
 	else {
 		printf(" %c      %-22s   %*s",updated?'c':' ',
@@ -188,7 +157,7 @@ list_meetings (argc, argv)
 		     auser = "discuss";
 		     used[i] = 1;
 		}
-		else if (!strcmp(argv[i],"-f") || !strcmp(argv[i], "-fast"))
+		else if (!strcmp(argv[i],"-f") || !strcmp(argv[i], "-fast") || !strcmp(argv[i], "-brief") || !strcmp("-bf"))
 		     fast = 1;
 		else if (*argv[i] == '-') {
 			fprintf(stderr,

@@ -1,11 +1,11 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v 1.11 1987-07-09 16:22:54 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v 1.12 1987-07-17 00:13:45 spook Exp $
  *
  */
      
 #ifndef lint
-static char *rcsid_ckm_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v 1.11 1987-07-09 16:22:54 wesommer Exp $";
+static char *rcsid_ckm_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v 1.12 1987-07-17 00:13:45 spook Exp $";
 #endif lint
 
 #include <strings.h>
@@ -85,9 +85,11 @@ check_meetings (argc, argv)
      display = 1;
      
      for (i = 1; i < argc; i++) {
-	  if (!strcmp(argv[i], "-quiet") || !strcmp(argv[i], "-q")) {
+	  if (!strcmp(argv[i], "-quiet") || !strcmp(argv[i], "-q") || !strcmp(argv[i], "-no_list") || !strcmp(argv[i], "-nls")) {
 		display=0; used[i]=1;
-	  } else if (*argv[i] == '-') {
+	} else if (!strcmp(argv[i], "-list") || !strcmp(argv[i], "-ls")) {
+		display=1; used[i]=1;
+	} else if (*argv[i] == '-') {
 	       ss_perror(sci_idx, 0,
 			 sprintf(errbuf, "Unknown control argument %s\n",
 				 argv[i]));
@@ -131,16 +133,20 @@ next_meeting(argc, argv)
      
      while (argc) {
 	     if (**argv == '-') {
-		     if (!strcmp(*argv, "-list") ||
-			 !strcmp(*argv, "-ls")) ls_flag++;
+		     if (!strcmp(*argv, "-list") || !strcmp(*argv, "-ls"))
+			     ls_flag++;
+		     else if(!strcmp(*argv,"-no_list")||!strcmp(*argv,"-nls"))
+			     ls_flag = 0;
 		     else {
-			     ss_perror(sci_idx, 0, "Unknown control argument.");
+			     ss_perror(sci_idx, 0,
+				       "Unknown control argument.");
 		     usage:
-			     
 			     printf("Usage: nm [-list]\n");
 			     return;
 		     }
-	     } else goto usage;
+	     }
+	     else
+		     goto usage;
 	     --argc;
 	     ++argv;
      }
@@ -156,7 +162,7 @@ next_meeting(argc, argv)
 	  return;
      }
      print_header = 1;
-     
+
      for (i = 0; i < n_matches; i++) {
 	  nbp = &set[i];
 	  if (nbp->status & DSC_ST_CHANGED) {
@@ -174,7 +180,8 @@ next_meeting(argc, argv)
 	  }
      }
      if (!checked_meetings && print_header) {
-	  ss_perror(sci_idx, 0, "Use check_meetings first.");
+	  ss_perror(sci_idx, 0,
+		    "No meetings listed as changed; use check_meetings.");
      } else if (print_header)
 	  ss_perror(sci_idx, 0, "No more changed meetings.");
  done:
