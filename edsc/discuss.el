@@ -11,7 +11,7 @@
 ;;;    	For copying information, see the file mit-copyright.h in this release.
 ;;;
 ;;;	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v $
-;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.28 1991-03-12 17:57:40 tytso Exp $
+;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.29 1991-04-26 17:24:17 raeburn Exp $
 ;;;
 ;;;  Emacs lisp code to remote control a "discuss" shell process to
 ;;;  provide an emacs-based interface to the discuss conferencing system.
@@ -20,6 +20,13 @@
 ;;;  Written by Stan Zanarotti, Bill Sommerfeld and Theodore Ts'o.
 ;;;
 ;;;  $Log: not supported by cvs2svn $
+; Revision 1.28  91/03/12  17:57:40  tytso
+; Cleaned up error handling for discuss-catchup.  Calling discuss-goto-error
+; was a bad move!
+; 
+; Have discuss-goto check to see whether or not it has read access to
+; the meeting.
+; 
 ; Revision 1.27  91/03/09  22:34:09  tytso
 ; Fixed stupid mistake in setting discuss-old-ss
 ; 
@@ -200,6 +207,7 @@ request completed successfully.")
 ;;  Determine pathname for subprocess.  Pretty gross.
 (defun edsc-machine-type nil
   (let ((foo nil)
+	(process-connection-type nil)
 	(buf (get-buffer-create " *edsc-xyzzy*")))
     (save-excursion
       (set-buffer buf)
@@ -1110,7 +1118,7 @@ Flushes the discuss cache and destroys the edsc process."
 (defun discuss-send-cmd (cmd &optional end-func filter-func unwind-func)
   "Send an command to the edsc process"
   (if (not discuss-process)
-      (progn
+      (let ((process-conection-type nil))
 	(if (not (file-exists-p discuss-pathname))
 	    (error "%s does not exist!" discuss-pathname))
 	(setq discuss-process (start-process "discuss-shell" 
@@ -1222,7 +1230,7 @@ discuss server while we spin-block."
 ; run this at each load
 (defun discuss-initialize nil
   (setq discuss-version
-	"$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.28 1991-03-12 17:57:40 tytso Exp $")
+	"$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.29 1991-04-26 17:24:17 raeburn Exp $")
 
 ;;;
 ;;; Lots of autoload stuff....
