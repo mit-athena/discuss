@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v 1.8 1988-05-31 17:43:49 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v 1.9 1988-10-08 01:36:18 raeburn Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
@@ -8,6 +8,9 @@
  *	Originally written for the discuss system by Bill Sommerfeld
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.8  88/05/31  17:43:49  srz
+ * Bill's changes broke expunge.  Fixed to work if has_privs is set.
+ * 
  * Revision 1.7  87/10/24  07:01:03  wesommer
  * Rearrange to allow access routines to work on meeting-group acls as
  * well.
@@ -37,17 +40,23 @@
 #include "../include/types.h"
 #include "../include/dsc_et.h"
 #include "../include/acl.h"
+#include "../include/internal.h"
 #include <sys/file.h>
 #include <errno.h>
 #include <stdio.h>
 #include <sys/param.h>
 #include <strings.h>
 
+#ifndef __STDC__
+#define const
+#endif
+
 #ifndef lint
-static char *rcsid_acl_core_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v 1.8 1988-05-31 17:43:49 srz Exp $";
+static const char rcsid_acl_core_c[] =
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v 1.9 1988-10-08 01:36:18 raeburn Exp $";
 #endif lint
 
-extern Acl *mtg_acl;
+extern dsc_acl *mtg_acl;
 extern char rpc_caller [];
 extern int errno;
 extern int has_privs;
@@ -85,13 +94,13 @@ extern char *new_string();
  *	are atomic), there is no need to read-lock when getting the ACL.
  */
 	
-static Acl *read_acl(mtg_name, code_ptr, check)
+static dsc_acl *read_acl(mtg_name, code_ptr, check)
 	char *mtg_name;
 	int *code_ptr;
 	int check;
 {
 	int fd = -1;
-	Acl *list = NULL;
+	dsc_acl *list = NULL;
 	int result = 0;
 	int mtg_name_len = strlen(mtg_name);
 	char acl_name[MAXPATHLEN];
@@ -110,7 +119,7 @@ static Acl *read_acl(mtg_name, code_ptr, check)
 	}
 
 	errno = 0;
-	if ((list = acl_read(fd)) == (Acl *) NULL) {
+	if ((list = acl_read(fd)) == (dsc_acl *) NULL) {
 		result = errno?errno:NO_ACCESS;
 		goto punt;
 	}
@@ -133,7 +142,7 @@ punt:
 get_acl(mtg_name, code, list)
 	char *mtg_name;
 	int *code;		/* RETURN */
-	Acl **list;		/* RETURN */
+	dsc_acl **list;		/* RETURN */
 {
 	*list = read_acl(mtg_name, code, !has_privs);
 	return;
@@ -145,7 +154,7 @@ get_access(mtg_name, princ_name, modes, code)
 	char **modes;		/* RETURN */
 	int *code;		/* RETURN */
 {
-	Acl *list;
+	dsc_acl *list;
 	*modes = NULL;
 	
 	*code = 0;
@@ -169,7 +178,7 @@ set_access(mtg_name, princ_name, modes, code)
 {
 	int lockfd;
 	char acl_name[MAXPATHLEN];
-	Acl *acl;
+	dsc_acl *acl;
 	char *n_modes;
 	/*
 	 * We do not use open_mtg here; it does more than what we need.
@@ -215,7 +224,7 @@ delete_access(mtg_name, princ_name, code)
 {
 	int lockfd;
 	char acl_name[MAXPATHLEN];
-	Acl *acl;
+	dsc_acl *acl;
 
 	/*
 	 * We do not use open_mtg here; it does more than what we need.
@@ -254,7 +263,7 @@ locked_open_mtg(mtg_name, lockfd, acl_name, acl)
 	char *mtg_name;
 	int *lockfd;		/* RETURN */
 	char *acl_name;		/* RETURN - address of buffer */
-	Acl **acl;		/* RETURN */
+	dsc_acl **acl;		/* RETURN */
 {
 	int mtg_name_len = strlen (mtg_name);
 	int result;
@@ -309,7 +318,7 @@ locked_abort(mtg_name, lockfd, acl_name, acl)
 	char *mtg_name;
 	int lockfd;
 	char *acl_name;
-	Acl *acl;
+	dsc_acl *acl;
 {
 	(void) close(lockfd);	/* unlocks, too */
 	acl_destroy(acl);
@@ -324,7 +333,7 @@ locked_close_mtg(mtg_name, lockfd, acl_name, acl)
 	char *mtg_name;
 	int lockfd;
 	char *acl_name;
-	Acl *acl;
+	dsc_acl *acl;
 {
 	int u_acl_f = -1;
 	int result;
