@@ -1,19 +1,18 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v 1.17 1988-06-17 23:16:14 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v 1.18 1989-01-05 01:36:14 raeburn Exp $
  *
  */
      
 #ifndef lint
-static char *rcsid_ckm_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v 1.17 1988-06-17 23:16:14 srz Exp $";
+static char rcsid_ckm_c[] =
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v 1.18 1989-01-05 01:36:14 raeburn Exp $";
 #endif lint
 
-#include <strings.h>
+#include <string.h>
 #include <stdio.h>
-#include "types.h"
-#include "interface.h"
+#include <discuss/discuss.h>
 #include "globals.h"
-#include "dsc_et.h"
 
 extern char *malloc(),*ctime(), *error_message(), *calloc();
 

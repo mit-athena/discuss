@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v 1.11 1988-10-12 13:39:05 raeburn Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v 1.12 1989-01-05 01:32:35 raeburn Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
@@ -11,7 +11,8 @@
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v 1.11 1988-10-12 13:39:05 raeburn Exp $";
+static char rcsid_discuss_c[] =
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v 1.12 1989-01-05 01:32:35 raeburn Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -19,12 +20,9 @@ static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athe
 #include <strings.h>
 #include <sys/wait.h>
 #include "ss.h"
-#include "tfile.h"
-#include "interface.h"
+#include <discuss/discuss.h>
 #include "config.h"
-#include "rpc.h"
 #include "globals.h"
-#include "acl.h"
 
 /* EXTERNAL ROUTINES */
 
