@@ -4,30 +4,13 @@
 ;;;    	For copying information, see the file mit-copyright.h in this release.
 ;;;
 ;;;	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss-misc.el,v $
-;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss-misc.el,v 1.6 1992-04-16 18:29:29 lwvanels Exp $
+;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss-misc.el,v 1.7 1996-04-12 22:16:18 ghudson Exp $
 ;;;
 ;;;  Emacs lisp code with random parts of the emacs discuss user interface
 ;;;  We may want to split out the mail functions into a separate file if
 ;;;  if they grow much more....
 ;;;  Written by Theodore Ts'o, Barry Jaspan, and Mark Eichin
 ;;;
-;;; $Log: not supported by cvs2svn $
-; Revision 1.5  1991/02/17  20:24:06  bjaspan
-; added initial "/usr/spool/discuss/" to add-mtg
-;
-; Revision 1.4  90/12/06  17:27:11  tytso
-; Added a require line so that mail-utils will always be loaded.
-; 
-; Revision 1.3  90/12/06  17:24:27  tytso
-; Checking in Barry's changes so that added meetings show up on the 
-; completion list.
-; 
-; Revision 1.2  90/09/19  16:34:39  bjaspan
-; merged my changes (meeting name completion)
-; 
-; Revision 1.1  90/09/19  16:26:15  bjaspan
-; Initial revision
-; 
 
 ; We use mail-fetch-field
 (require 'mail-utils)
@@ -81,8 +64,9 @@
        (backward-delete-char 1)))
   ;; A hack so added meetings show up on the completion list.
   (setq discuss-meeting-completion-list
-	(cons (cons (cadr discuss-form) 0)
-	      discuss-meeting-completion-list))
+	(append (list (cons (cadr discuss-form) 0)
+		      (cons (caddr discuss-form) 0))
+		discuss-meeting-completion-list))
   (message "%s meeting added." (cadr discuss-form)))
 
 (defun discuss-del-mtg (&optional meeting)
@@ -190,14 +174,14 @@
 	(cc (discuss-fetch-mail-field "Cc"))
 	(subject (nth 11 discuss-current-transaction-info))
 	(author (nth 12 discuss-current-transaction-info))
-	(in-reply (concat "[" (int-to-string
+	(in-reply (concat "\"[" (int-to-string
 			       (car discuss-current-transaction-info))
-			  "]")))
+			  "] in "
+			  (nth 1 discuss-current-meeting-info)
+			  "\"")))
     
     (if (equal from "")
-	(setq from author
-	      in-reply (concat (nth 1 discuss-current-meeting-info)
-			       ":" in-reply)))
+	(setq from author))
     
     (if (and (> (length subject) 3)
 	     (not (string-match "[Rr]e: " (substring subject 0 4))))
