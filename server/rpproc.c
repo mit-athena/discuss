@@ -16,9 +16,15 @@
 /*
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/rpproc.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/rpproc.c,v 1.12 1996-09-19 22:32:25 ghudson Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/rpproc.c,v 1.12.2.1 1997-06-02 17:23:44 ghudson Exp $
  *
  *	$Log: not supported by cvs2svn $
+ *	Revision 1.13  1997/06/02 17:23:05  ghudson
+ *	From mhpower: fix a buffer overrun.
+ *
+ *	Revision 1.12  1996/09/19 22:32:25  ghudson
+ *	BSD -> ANSI string and memory functions
+ *
  *	Revision 1.11  1994/03/25 17:22:48  miki
  *	replaced bcopy with memmove for POSIX
  *
@@ -85,7 +91,11 @@
 #define min(a, b) (a < b ? a : b)
 
 /* global */
+#ifdef KERBEROS
+char rpc_caller[MAX_K_NAME_SZ + 1];
+#else
 char rpc_caller[50];
+#endif
 static long hostaddr;
 
 extern int numprocs;
