@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v 1.11 1987-07-07 21:59:18 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v 1.12 1987-07-08 01:56:12 wesommer Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
@@ -12,7 +12,7 @@
 
 #ifndef lint
 static char rcsid_discuss_c[] =
-     "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v 1.11 1987-07-07 21:59:18 wesommer Exp $";
+     "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v 1.12 1987-07-08 01:56:12 wesommer Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -46,11 +46,12 @@ new_trans(argc, argv)
      char *subject = &buffer[0];
      char *whoami = argv[0];
      char *mtg = NULL;
+     char *myname = NULL;
      int code;
      char *editor = NULL;
 
      USE(sci_idx);
-	
+
      while (++argv, --argc) {
 	  if (!strcmp (*argv, "-meeting") || !strcmp (*argv, "-mtg")) {
 	       if (argc==1) {
@@ -77,53 +78,70 @@ new_trans(argc, argv)
 	       return;
 	  }
      }
+
+     flag_interrupts();
 	
      if (mtg) {
 	  (void) sprintf(buffer, "goto %s", mtg);
 	  ss_execute_line(sci_idx, buffer, &code);
 	  if (code != 0) {
 	       ss_perror(sci_idx, code, buffer);
-	       return;
+	       goto punt;
 	  }
+	  if (interrupt) goto punt;
      }
 
      if (!dsc_public.attending) {
 	  ss_perror(sci_idx, DISC_NO_MTG, "");
-	  return;
+	  goto punt;
      }
 
-     /*
-      * Sanity check on access control; this could be changed on the fly
-      * (which is why it is only a warning)
-      */
-     if(!acl_is_subset("w", dsc_public.m_info.access_modes))
+     if(!acl_is_subset("w", dsc_public.m_info.access_modes)) {
 	  ss_perror(sci_idx, 0,
-		    "Warning: meeting is read-only (enter will fail).\n");
+		    "You do not have permission to create transactions in this meeting.");
+	  goto punt;
+     }
 
+     dsc_whoami(&dsc_public.nb, &myname, &code);
+     if (interrupt) goto punt;
+     if (code != 0) {
+          ss_perror(sci_idx, code, "while checking for anonymity");
+     } else {
+	  if (strncmp(myname, "???", 3) == 0) {
+		printf("Entry will be anonymous.\n");
+	  }
+	  free(myname);
+	  myname = NULL;
+     }
+	
      (void) printf("Subject: ");
      if (gets(subject) == (char *)NULL) {
-	  ss_perror(sci_idx, errno, "Error reading subject.");
 	  clearerr(stdin);
-	  return;
+	  if (interrupt) goto punt;
+	  ss_perror(sci_idx, errno, "Error reading subject.");
+	  goto punt;
      }
+     if (interrupt) goto punt;
+
      (void) unlink(temp_file);
      if ((code = edit(temp_file, editor)) != 0) {
 	  ss_perror(sci_idx, code,
 		    "Error during edit; transaction not entered.");
 	  unlink(temp_file);
-	  return;
+	  goto punt;
      }
+     if (interrupt) goto punt;
      fd = open(temp_file, O_RDONLY, 0);
      if (fd < 0) {
 	  ss_perror(sci_idx, errno, "Can't read transaction");
-	  return;
+	  goto punt;
      }
      tf = unix_tfile(fd);
      dsc_add_trn(&dsc_public.nb, tf, subject, 0,
 		 &txn_no, &code);
      if (code != 0) {
 	  ss_perror(sci_idx, errno, "Error adding transaction");
-	  return;
+	  goto punt;
      }
      (void) printf("Transaction [%04d] entered in the %s meeting.\n",
 		   txn_no, dsc_public.mtg_name);
@@ -135,4 +153,6 @@ new_trans(argc, argv)
      if (dsc_public.highest_seen == txn_no -1) {
 	  dsc_public.highest_seen = txn_no;
      }
+punt:
+     dont_flag_interrupts();
 }
