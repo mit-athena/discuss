@@ -2,13 +2,16 @@
  *
  * List request for DISCUSS
  *
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.2 1986-08-23 21:43:09 spook Exp $
+ * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.3 1986-09-10 18:57:27 wesommer Exp $
  * $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v $
  * $Locker:  $
  *
  * Copyright (C) 1986 by the MIT Student Information Processing Board
  *
  * $Log: not supported by cvs2svn $
+ * Revision 1.2  86/08/23  21:43:09  spook
+ * moved timecheck for list into list module
+ * 
  * Revision 1.1  86/08/22  00:23:56  spook
  * Initial revision
  * 
@@ -21,6 +24,7 @@
 #include "../include/tfile.h"
 #include "../include/interface.h"
 #include "../include/config.h"
+#include "../include/dsc_et.h"
 #include "globals.h"
 
 char *ctime(), *malloc();

@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.10 1986-09-10 17:20:11 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.11 1986-09-10 18:57:03 wesommer Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
@@ -9,6 +9,9 @@
  *	ss library for the command interpreter.
  *
  *      $Log: not supported by cvs2svn $
+ * Revision 1.10  86/09/10  17:20:11  wesommer
+ * Ken, please use RCS..
+ * 
  * Revision 1.9  86/08/23  21:42:48  spook
  * moved timecheck for list into list module
  * 
@@ -37,7 +40,7 @@
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.10 1986-09-10 17:20:11 wesommer Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.11 1986-09-10 18:57:03 wesommer Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -90,6 +93,7 @@ main(argc, argv)
 	}
 
 	init_disc_err_tbl();
+	init_dsc_err_tbl();
 	init_rpc();
 
 	temp_file = malloc(64);
@@ -131,9 +135,10 @@ repl(sci_idx, argc, argv)
 	}
 	get_trn_info(cur_mtg, cur_trans, &t_info, &code);
 	if (code != 0) {
+		
 		(void) fprintf(stderr,
-			       "Can't get info on current transaction.  Error %d.\n",
-			       code);
+			       "Can't get info on current transaction: %s\n",
+			       error_message(code));
 		return;
 	}
 	if (strncmp(t_info.subject, "Re: ", 4)) {
@@ -160,7 +165,8 @@ repl(sci_idx, argc, argv)
 	add_trn(cur_mtg, tf, t_info.subject,
 		cur_trans, &txn_no, &code);
 	if (code != 0) {
-		(void) fprintf(stderr, "Error %d.\n", code);
+		fprintf(stderr, "Error adding transaction: %s\n",
+			error_message(code));
 		return;
 	}
 	(void) printf("Transaction [%04d] entered in the %s meeting.\n",
@@ -187,7 +193,8 @@ del_trans(sci_idx, argc, argv)
 	txn_no = atoi(argv[1]);
 	delete_trn(cur_mtg, txn_no, &code);
 	if (code != 0) {
-		(void) fprintf(stderr, "Error %d.\n", code);
+		(void) fprintf(stderr, "Error deleting transaction %d: %s\n",
+			       txn_no, error_message(code));
 		return;
 	}
 	cur_trans = txn_no + 1;
@@ -212,7 +219,8 @@ ret_trans(sci_idx, argc, argv)
 	txn_no = atoi(argv[1]);
 	retrieve_trn(cur_mtg, txn_no, &code);
 	if (code != 0) {
-		(void) fprintf(stderr, "Error %d.\n", code);
+		(void) fprintf(stderr, "Error retrieving transaction %d: %s\n",
+			       txn_no, error_message(code));
 		return;
 	}
 	cur_trans = txn_no;
@@ -223,30 +231,62 @@ goto_mtg(sci_idx, argc, argv)
 	int argc;
 	char **argv;
 {
-	char *path;
 	int code;
+	char machine [50],mtg_name[100];
+
 	DONT_USE(sci_idx);
 	if (argc != 2) {
 		(void) fprintf(stderr, "Usage:  %s mtg_name\n", argv[0]);
 		return;
 	}
-	if (cur_mtg != (char *)NULL)
+	if (cur_mtg != (char *)NULL) {
 		(void) free(cur_mtg);
+		/* XXX Close the current RPC connection */
+	}
 	cur_mtg = (char *)NULL;
-	path = malloc((unsigned)((strlen(argv[1]) + 20) * sizeof(char)));
-	(void) strcpy(path, "/usr/spool/discuss/");
-	(void) strcat(path, argv[1]);
-	get_mtg_info(path, &m_info, &code);
-	if (code != 0) {
-		if (code == NO_SUCH_MTG)
-			(void) fprintf(stderr, "No such meeting. %s\n",
-				       argv[1]);
-		else if (code == BAD_MTG_NAME)
-			(void) fprintf(stderr, "Bad meeting name. %s\n",
-				       argv[1]);
-		else
-			(void) fprintf(stderr, "Error %d.\n", code);
+
+	resolve_mtg(argv[1], machine, mtg_name);
+	/* XXX should keep a handle on RPC connection */
+	if (open_rpc(machine, "discuss", &code) == 0) { 
+		(void) fprintf (stderr, "%s: %s\n", argv[1], 
+				error_message(code));
 		return;
 	}
-	cur_mtg = path;
+	if (code)
+		(void) fprintf (stderr, "Warning: %s\n", error_message(code));
+	get_mtg_info(mtg_name, &m_info, &code);
+	if (code != 0) {
+		(void) fprintf(stderr, "Error getting meeting info for %s: %s\n", 
+			       mtg_name, error_message(code));
+		return;
+	}
+	cur_mtg = (char *) malloc(strlen(mtg_name) + 1);
+	if (cur_mtg) strcpy(cur_mtg, mtg_name);
+	else fprintf(stderr, "malloc failed; could not go to meeting\n");
+}
+/*
+ *
+ * resolve_mtg:  Procedure to resolve a user meeting name into its host
+ * 	         an pathname.
+ *
+ */
+resolve_mtg (usr_string, machine, mtg_name)
+char *usr_string,*machine,*mtg_name;
+{
+     char *colon;
+     int machine_len;
+
+     colon = index (usr_string, ':');
+
+     if (colon == 0) {
+	  strcpy (mtg_name, usr_string);
+	  gethostname (machine, 50);
+	  return;
+     }
+
+     machine_len = colon - usr_string;
+     bcopy (usr_string, machine, machine_len);
+     machine [machine_len] = '\0';
+     strcpy (mtg_name, colon+1);
+     return;
 }

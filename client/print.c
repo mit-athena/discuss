@@ -3,12 +3,15 @@
  *	Print-related requests for DISCUSS.
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.2 1986-09-10 17:43:16 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.3 1986-09-10 18:57:35 wesommer Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
  *
  *      $Log: not supported by cvs2svn $
+ * Revision 1.2  86/09/10  17:43:16  wesommer
+ * Ken, please clean up after yourself.
+ * 
  * Revision 1.1  86/08/22  00:24:01  spook
  * Initial revision
  * 
@@ -17,7 +20,7 @@
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.2 1986-09-10 17:43:16 wesommer Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.3 1986-09-10 18:57:35 wesommer Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -29,6 +32,7 @@ static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athe
 #include "../include/tfile.h"
 #include "../include/interface.h"
 #include "../include/config.h"
+#include "../include/dsc_et.h" 
 #include "globals.h"
 
 #ifdef	lint
@@ -72,13 +76,8 @@ prt_trans(sci_idx, argc, argv)
 	tf = unix_tfile(fd);
 	output_trans(txn_no, tf, &code);
 	if(code) {
-		if (code == DELETED_TRN)
-			(void) fprintf(stderr,
-				       "Transaction has been deleted.\n");
-		else if (code == NO_SUCH_TRN)
-			(void) fprintf(stderr, "No such transaction.\n");
-		else
-			(void) fprintf(stderr, "Error %d.\n", code);
+		fprintf(stderr, "Error printing transaction: %s\n",
+			error_message(code));
 	}
 	tclose(tf, &code);
 	(void) close(fd);
@@ -117,14 +116,9 @@ write_trans(sci_idx, argc, argv)
 	}
 	tf = unix_tfile(fd);
 	output_trans(txn_no, tf, &code);
-	if (code) {
-		if (code == DELETED_TRN)
-			(void) fprintf(stderr,
-				       "Transaction has been deleted.\n");
-		else if (code == NO_SUCH_TRN)
-			(void) fprintf(stderr, "No such transaction.\n");
-		else
-			(void) fprintf(stderr, "Error %d.\n", code);
+	if(code) {
+		fprintf(stderr, "Error printing transaction: %s\n",
+			error_message(code));
 	}
 	tclose(tf, &code);
 	(void) close(fd);
