@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v 1.12 1987-07-08 01:56:12 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v 1.13 1987-07-17 00:20:53 spook Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
@@ -12,7 +12,7 @@
 
 #ifndef lint
 static char rcsid_discuss_c[] =
-     "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v 1.12 1987-07-08 01:56:12 wesommer Exp $";
+     "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v 1.13 1987-07-17 00:20:53 spook Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -27,6 +27,9 @@ static char rcsid_discuss_c[] =
 #include "globals.h"
 #include "acl.h"
 #include "discuss_err.h"
+#ifdef	ZEPHYR
+#include "zephyr.h"
+#endif	/* ZEPHYR */
 
 #ifdef	lint
 #define	USE(var)	var=var;
@@ -49,6 +52,11 @@ new_trans(argc, argv)
      char *myname = NULL;
      int code;
      char *editor = NULL;
+     char announcement[1024];
+#ifdef	ZEPHYR
+     ZNotice_t notice;
+     char buf[1024];
+#endif	/* ZEPHYR */
 
      USE(sci_idx);
 
@@ -69,7 +77,7 @@ new_trans(argc, argv)
 		    --argc;
 		    editor = *(++argv);
 	       }
-	  } else if (!strcmp(*argv, "-no_editor")) {
+	  } else if (!strcmp(*argv, "-no_editor") || !strcmp(*argv, "-ned")) {
 	       editor = "";
 	  } else {
 	       (void) fprintf(stderr,
@@ -80,7 +88,7 @@ new_trans(argc, argv)
      }
 
      flag_interrupts();
-	
+
      if (mtg) {
 	  (void) sprintf(buffer, "goto %s", mtg);
 	  ss_execute_line(sci_idx, buffer, &code);
@@ -113,7 +121,7 @@ new_trans(argc, argv)
 	  free(myname);
 	  myname = NULL;
      }
-	
+
      (void) printf("Subject: ");
      if (gets(subject) == (char *)NULL) {
 	  clearerr(stdin);
@@ -143,10 +151,31 @@ new_trans(argc, argv)
 	  ss_perror(sci_idx, errno, "Error adding transaction");
 	  goto punt;
      }
-     (void) printf("Transaction [%04d] entered in the %s meeting.\n",
-		   txn_no, dsc_public.mtg_name);
+
+     (void) sprintf(announcement,
+		    "Transaction [%04d] entered in the %s meeting.",
+		    txn_no, dsc_public.mtg_name);
+#ifdef	ZEPHYR
+     notice.z_kind = UNSAFE;
+     notice.z_port = 0;
+     notice.z_class = "discuss";
+     notice.z_class_inst = buf;
+     (void) sprintf(buf, "%s:%s", dsc_public.nb.hostname,
+		    dsc_public.nb.pathname);
+     
+     notice.z_opcode = "new_trn";
+     notice.z_sender = 0;
+     notice.z_recipient = "";
+     notice.z_message = announcement;
+     notice.z_message_len = strlen(announcement)+1;
+
+     ZInitialize();
+     ZSendNotice(&notice, ZNOAUTH);
+#endif	/* ZEPHYR */
+     (void) puts(announcement);
+
      if (dsc_public.current == 0)
-	  dsc_public.current = txn_no;
+	 dsc_public.current = txn_no;
 
      /* and now a pragmatic definition of 'seen':  If you are up-to-date
 	in a meeting, then you see transactions you enter. */
