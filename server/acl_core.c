@@ -7,12 +7,18 @@
  */
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v 1.16 1996-05-23 22:17:12 ghudson Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v 1.17 1996-05-23 22:17:36 ghudson Exp $
  *
  *	Routines for use in a server to edit access control lists remotely.
  *	Originally written for the discuss system by Bill Sommerfeld
  *
  *	$Log: not supported by cvs2svn $
+ *	Revision 1.16  1996/05/23 22:17:12  ghudson
+ *	Lock the acl file instead of the directory; locking a directory
+ *	appears to be impossible under Solaris and some other operating
+ *	systems.  This also simplifies things a lot, since we don't have to
+ *	separately open the acl file.
+ *
  *	Revision 1.15  1996/05/23 22:05:04  ghudson
  *	You can't open a directory read-write.
  *
@@ -79,7 +85,7 @@
 #endif
 #ifndef lint
 static const char rcsid_acl_core_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v 1.16 1996-05-23 22:17:12 ghudson Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v 1.17 1996-05-23 22:17:36 ghudson Exp $";
 #endif lint
 
 extern dsc_acl *mtg_acl;
@@ -293,7 +299,6 @@ locked_open_mtg(mtg_name, lockfd, acl_name, acl)
 {
 	int mtg_name_len = strlen (mtg_name);
 	int result;
-	int u_acl_f;
 #ifdef SOLARIS
     struct flock lock;
 #endif
