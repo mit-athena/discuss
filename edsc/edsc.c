@@ -8,7 +8,7 @@
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/edsc.c,v 1.2 1988-10-26 15:04:59 srz Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/edsc.c,v 1.3 1988-10-26 18:31:54 srz Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -106,6 +106,8 @@ bad_syntax:
 	       do_ss(args);
 	  else if (!strcmp(op, "at"))
 	       do_at(args);
+	  else if (!strcmp(op, "nut"))
+	       do_nut(args);
 	  else
 	       printf("; Unimplemented operation\n");
      }
