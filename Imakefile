@@ -1,5 +1,5 @@
 #
-# $Id: Imakefile,v 1.1 1991-07-28 08:48:01 lwvanels Exp $
+# $Id: Imakefile,v 1.2 1991-07-28 08:50:28 lwvanels Exp $
 #
 
 do_subdirs_imakefile(ets include utils libds lib server client mclient edsc dsgrep)
@@ -8,3 +8,5 @@ foreach_subdirs_flags(all,ets utils include libds lib server client mclient edsc
 foreach_subdirs_flags(clean,ets include utils libds lib server client mclient edsc dsgrep,FLAGS="$(FLAGS)" $(FLAGS))
 foreach_subdirs_flags(depend,ets include utils libds lib server client mclient edsc dsgrep,FLAGS="$(FLAGS)" $(FLAGS) DEFINES="-I../include -DUSPRPC -DZEPHYR $(CADDS)")
 foreach_subdirs_flags(install,include utils libds server client mclient edsc dsgrep,FLAGS="$(FLAGS)" $(FLAGS))
+
+install_man(discuss.1,discuss.1)
