@@ -1,11 +1,11 @@
 LIBS=	../lib/libdsk.a ../lib/libusp.a ../lib/libkrb.a ../lib/libdes.a ../lib/libcom_err.a
 CFLAGS=	-g -I../include
 
-SRCS=	pmtg.c dspipe.c mkds.c flsm.c disrc2meetings.sh
+SRCS=	pmtg.c dspipe.c mkds.c dlsm.c crmtgs.c disrc2meetings.sh dsc_setup.sh
 
-PROGS=	pmtg dspipe mkds flsm crmtgs
+PROGS=	pmtg dspipe mkds dlsm crmtgs
 
-SCRIPTS= disrc2meetings
+SCRIPTS= disrc2meetings dsc_setup
 
 .c.o:	
 	rm -f $*.o
@@ -18,17 +18,17 @@ clean:
 
 install: all
 	for prog in $(PROGS); do \
-		install -d -s $$prog $(DESTDIR)/bin ; done
+		install -c -s $$prog $(DESTDIR)/bin/ ; done
 	for prog in $(SCRIPTS); do \
-		install -d $$prog.sh $(DESTDIR)/bin ; done
+		install -c $$prog.sh $(DESTDIR)/bin/$$prog ; done
 
 pmtg:	pmtg.o $(LIBS) ../ets/dsc_et.o
 	rm -f pmtg
 	cc $(CFLAGS) -o pmtg pmtg.o ../ets/dsc_et.o $(LIBS)
 
-flsm:	flsm.o
-	rm -f flsm
-	cc $(CFLAGS) -o flsm flsm.o
+dlsm:	dlsm.o
+	rm -f dlsm
+	cc $(CFLAGS) -o dlsm dlsm.o
 
 dspipe:	dspipe.o $(LIBS) ../ets/dsc_et.o
 	rm -f dspipe
@@ -57,7 +57,7 @@ dist: $(SRCS) Makefile
 	cp -p Makefile ../dist/mclient/
 
 # 'make depend' code
-CFILES=	pmtg.c dspipe.c mkds.c flsm.c
+CFILES=	pmtg.c dspipe.c mkds.c dlsm.c crmtgs.c
 depend: 
 	${CC} -M -I../include ${COPTS} ${CFILES} | \
 	sed -e ':loop' \
