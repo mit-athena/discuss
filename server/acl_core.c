@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v 1.5 1987-03-25 15:03:51 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v 1.6 1987-04-06 02:18:19 wesommer Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
@@ -8,6 +8,10 @@
  *	Originally written for the discuss system by Bill Sommerfeld
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.5  87/03/25  15:03:51  srz
+ * toma change:  Can look at own access control list entry without 's' to
+ * the meeting.
+ * 
  * Revision 1.4  87/03/17  02:26:11  srz
  * Changed set_acl not to return static storage.  Also, let has_privs
  * bypass access checks (in case of linked in programs)
@@ -33,7 +37,7 @@
 #include <strings.h>
 
 #ifndef lint
-static char *rcsid_acl_core_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v 1.5 1987-03-25 15:03:51 srz Exp $";
+static char *rcsid_acl_core_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v 1.6 1987-04-06 02:18:19 wesommer Exp $";
 #endif lint
 
 extern Acl *mtg_acl;
@@ -295,6 +299,11 @@ locked_close_mtg(mtg_name, lockfd, acl_name, acl)
 	int result;
 	char acl_nname[MAXPATHLEN];
 
+	/* Check for stupidity */
+	if (!has_privs && !acl_check(acl,rpc_caller,"c")) {
+		result = YOU_TWIT;
+		goto punt;
+	}
 	/*
 	 * 4: Open up acl file for writing and write new acl.
 	 */
