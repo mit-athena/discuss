@@ -11,7 +11,7 @@
 /*
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.24 1989-01-04 23:32:51 raeburn Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.25 1989-01-29 17:17:12 srz Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
@@ -21,6 +21,9 @@
  *		callable routines.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.24  89/01/04  23:32:51  raeburn
+ * fixed include paths
+ * 
  * Revision 1.23  88/10/08  01:27:54  srz
  * Changes for new expunge.
  * 
@@ -66,7 +69,7 @@
  */
 #ifndef lint
 static char rcsid_core_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.24 1989-01-04 23:32:51 raeburn Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.25 1989-01-29 17:17:12 srz Exp $";
 #endif lint
 
 
@@ -507,6 +510,170 @@ int *result;
 null_info:
      return;
 }
+
+/*
+ *
+ * get_trn_info2 () --
+ * returns information about the given transaction in info, with an error
+ * code as its return argument.  This call returns expanded information,
+ * such as the flags.
+ *
+ */
+get_trn_info2 (mtg_name, trn, info, result)
+char *mtg_name;
+trn_nums trn;
+trn_info2 *info;
+int *result;
+{
+     chain_blk cb,spare_cb;
+     trn_hdr th;
+     char *th_subject,*th_author;
+
+/*   printf ("get_trn_info: mtg %s, trn %d\n",
+	     mtg_name, trn);*/
+
+     /* safety -- set info up right */
+     info -> version = 0;
+     info -> current = 0;
+     info -> prev = 0;
+     info -> next = 0;
+     info -> pref = 0;
+     info -> nref = 0;
+     info -> fref = 0;
+     info -> lref = 0;
+     info -> chain_index = 0;
+     info -> date_entered = 0;
+     info -> num_lines = 0;
+     info -> num_chars = 0;
+     info -> subject = new_string ("");
+     info -> author = new_string ("");
+     info -> flags = 0;
+
+     *result = open_mtg (mtg_name);
+     if (*result) return;
+
+     start_read();				/* starting to read */
+
+     *result = read_super ();
+     if (*result) { core_abort(); return; }
+
+     *result = read_chain (trn, &cb);
+     if (*result) { core_abort(); return; }
+
+     if (cb.trn_addr == 0) {
+	  *result = DELETED_TRN;
+	  core_abort();
+	  return;
+     }
+
+     *result = read_chain (cb.trn_chain, &spare_cb);
+     if (*result) { core_abort(); return; }
+
+     *result = read_trn (cb.trn_addr, &th, &th_subject, &th_author);
+     if (*result) { core_abort(); return; }
+
+     finish_read();
+
+     if (!has_trn_access(th_author, 'r')) {
+	  *result = NO_ACCESS;
+	  goto null_info;
+     }
+
+     if ((cb.flags & CB_DELETED) && !has_trn_access(th_author, 'd')) {
+	  *result = DELETED_TRN;
+	  goto null_info;
+     }
+
+     info -> version = 1;
+     info -> current = cb.current;
+     info -> prev = cb.prev;
+     info -> next = cb.next;
+     info -> pref = cb.pref;
+     info -> nref = cb.nref;
+     info -> fref = spare_cb.chain_fref;
+     info -> lref = spare_cb.chain_lref;
+     info -> chain_index = cb.trn_chain;
+
+     info -> date_entered = th.date_entered;
+     info -> num_lines = th.num_lines;
+     info -> num_chars = th.num_chars;
+     free (info -> subject);
+     info -> subject = th_subject;
+     free (info -> author);
+     info -> author = th_author;
+     info -> flags = cb.flags;
+
+     forget_super();
+
+     if (cb.flags & CB_DELETED)
+	  *result = DELETED_TRN;
+     else
+	  *result = 0;
+null_info:
+     return;
+}
+
+
+/*
+ *
+ * set_trn_flags () -- Routine to set the flags (except DELETED) on a
+ *		       given transaction.
+ *
+ */
+set_trn_flags (mtg_name, trn, flags, result)
+char *mtg_name;
+trn_nums trn;
+short flags;
+int *result;
+{
+     chain_blk cb;
+     trn_hdr th;
+     char *th_author;
+
+     *result = open_mtg (mtg_name);
+     if (*result) return;
+
+     if (!no_nuke) {
+	  a_control_f = aopen (u_control_f);
+	  nuclear = TRUE;
+     }
+
+     *result = read_super ();
+     if (*result) { core_abort(); return; }
+
+     *result = read_chain (trn, &cb);
+     if (*result) { core_abort(); return; }
+
+     if ((cb.flags & CB_DELETED) || cb.trn_addr == 0) {
+	  *result = DELETED_TRN;
+	  core_abort (); return;
+     }
+
+     *result = read_trn (cb.trn_addr, &th, (char **)0, &th_author);
+     if (*result) { core_abort(); return; }
+
+     if (!has_trn_access(th_author,'d')) {
+	  *result = NO_ACCESS;
+	  free(th_author);
+	  core_abort(); return;
+     }
+
+     free(th_author);
+
+     cb.flags = (cb.flags & CB_DELETED) | (flags & ~CB_DELETED);
+     write_chain (&cb);
+
+     forget_super();
+
+     if (!no_nuke) {
+	  aclose (a_control_f);
+	  nuclear = FALSE;
+     }
+
+     *result = 0;
+     return;
+}
+
 
 
 /*

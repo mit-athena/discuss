@@ -6,10 +6,13 @@
  * dispatch.c  -- Procedure to do the dispatching on an RPC call.
  *		  This contains the procedure table.
  *
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/dispatch.c,v 1.8 1989-01-04 22:18:43 raeburn Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/dispatch.c,v 1.9 1989-01-29 17:16:38 srz Exp $
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/dispatch.c,v $
  *	$Locker:  $
  *	$Log: not supported by cvs2svn $
+ * Revision 1.8  89/01/04  22:18:43  raeburn
+ * Added RCS stuff and copyright, fixed include paths.
+ * 
  */
 
 #include "rpc.h"
@@ -20,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid_dispatch_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/dispatch.c,v 1.8 1989-01-04 22:18:43 raeburn Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/dispatch.c,v 1.9 1989-01-29 17:16:38 srz Exp $";
 #endif
 
 extern bool recvbool();
@@ -45,7 +48,10 @@ struct proc_table procs[] = {
      2, {STRTYPE, STRTYPE, 0, 0, 0, 0, 0, 0}, 				/* get_access */
      3, {STRTYPE, STRTYPE, STRTYPE, 0, 0, 0, 0, 0},			/* set_access */
      2, {STRTYPE, STRTYPE, STRTYPE, 0, 0, 0, 0, 0},			/* delete_access */
-     0, {0, 0, 0, 0, 0, 0, 0, 0}					/* whoami */
+     0, {0, 0, 0, 0, 0, 0, 0, 0},					/* whoami */
+     2, {STRTYPE, INTTYPE, 0, 0, 0, 0, 0, 0},				/* get_trn_info2 */
+     0, {0, 0, 0, 0, 0, 0, 0, 0},					/* get_server_version */
+     3, {STRTYPE, INTTYPE, INTTYPE, 0, 0, 0, 0, 0}			/* set_trn_flags */
 };
 
 int	numprocs = sizeof (procs) / sizeof (procs [0]);
@@ -61,6 +67,7 @@ int procno;
      int result;
      dsc_acl *list;
      trn_info tinfo;
+     trn_info2 tinfo2;
      mtg_info minfo;
 
      switch (procno) {
@@ -253,7 +260,43 @@ int procno;
 	  startreply();
 	  sendstr(rpc_caller);
 	  sendreply();
-	  break;	  
+	  break;
+
+     /* get_trn_info2 (mtg_name, trn, info, result) */	  
+     case GET_TRN_INFO2:
+	  c1 = recvstr();			/* mtg_name */
+	  i1 = recvint();			/* trn */
+	  get_trn_info2 (c1, i1, &tinfo2, &result);
+	  startreply();
+	  send_trn_info2(&tinfo2);
+	  sendint(result);
+	  sendreply();
+
+	  free(tinfo2.subject);
+	  free(tinfo2.author);
+	  free(c1);
+	  break;
+
+     /* get_server_version (version_number, result) */	  
+     case GET_SERVER_VERSION:
+	  startreply();
+	  sendint(SERVER_1);			/* Includes get_trn_info2 */
+	  sendint(0);				/* Success */
+	  sendreply();
+	  break;
+
+     /* set_trn_flags (mtg_name, trn, flags, result) */
+     case SET_TRN_FLAGS:
+	  c1 = recvstr();			/* mtg_name */
+	  i1 = recvint();			/* trn */
+	  i2 = recvint();			/* flags */
+	  set_trn_flags (c1, i1, i2, &result);
+	  startreply();
+	  sendint(result);
+	  sendreply();
+
+	  free(c1);
+	  break;
      }
      return;					/* all done for now */
 }
@@ -280,6 +323,31 @@ trn_info *tinfo;
      sendint (tinfo -> num_chars);
      sendstr (tinfo -> subject);
      sendstr (tinfo -> author);
+}
+
+/*
+ *
+ * send_trn_info2 -- send a trn_info2 struct.
+ *
+ */
+send_trn_info2(tinfo)
+trn_info2 *tinfo;
+{
+     sendint (tinfo -> version);
+     sendint (tinfo -> current);
+     sendint (tinfo -> prev);
+     sendint (tinfo -> next);
+     sendint (tinfo -> pref);
+     sendint (tinfo -> nref);
+     sendint (tinfo -> fref);
+     sendint (tinfo -> lref);
+     sendint (tinfo -> chain_index);
+     sendint (tinfo -> date_entered);
+     sendint (tinfo -> num_lines);
+     sendint (tinfo -> num_chars);
+     sendstr (tinfo -> subject);
+     sendstr (tinfo -> author);
+     sendint (tinfo -> flags);
 }
     
 /*
