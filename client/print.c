@@ -3,12 +3,15 @@
  *	Print-related requests for DISCUSS.
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.6 1986-10-19 10:00:17 spook Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.7 1986-10-29 10:28:59 srz Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
  *
  *      $Log: not supported by cvs2svn $
+ * Revision 1.6  86/10/19  10:00:17  spook
+ * Changed to use dsc_ routines; eliminate refs to rpc.
+ * 
  * Revision 1.5  86/10/15  00:50:23  spook
  * switch to use ss_pager_create
  * 
@@ -30,10 +33,11 @@
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.6 1986-10-19 10:00:17 spook Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.7 1986-10-29 10:28:59 srz Exp $";
 #endif lint
 
 #include <stdio.h>
+#include <errno.h>
 #include <sys/file.h>
 #include <signal.h>
 #include <strings.h>
@@ -51,8 +55,10 @@ static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athe
 #define	USE(var)	;
 #endif	lint
 
+#define max(a, b) ((a) > (b) ? (a) : (b))
+
 extern tfile	unix_tfile();
-static trn_nums	new_trn_no;
+static trn_nums	performed;
 static char *	request_name;
 static trn_info	t_info;
 static tfile	tf;
@@ -63,13 +69,21 @@ display_trans(trn_no)
 {
 	error_code code;
 	output_trans(trn_no, tf, &code);
-	if (code) {
-		fprintf(stderr, "Error printing transaction: %s\n",
-			error_message(code));
+	if (code == 0) {
+	     dsc_public.highest_seen = max(dsc_public.highest_seen,trn_no);
+	     dsc_public.current = trn_no;
+	     performed = TRUE;
+	} else if (code == EPIPE) {
+	     performed = TRUE;
+	     return(code);		/* silently quit */
 	}
-	else if (new_trn_no == -1)
-		new_trn_no = trn_no;
-	return(code);
+	else if (code != DELETED_TRN) {
+	     fprintf(stderr, "Error printing transaction: %s\n",
+		     error_message(code));
+	     return(code);
+	}
+
+	return(0);
 }
 
 prt_trans(sci_idx, argc, argv)
@@ -83,23 +97,35 @@ prt_trans(sci_idx, argc, argv)
 	error_code code;
 	selection_list *trn_list;
 
-	request_name == ss_name(sci_idx);
-	if (cur_mtg == (char *)NULL) {
+	request_name = ss_name(sci_idx);
+	if (!dsc_public.attending) {
 		(void) fprintf(stderr, "No current meeting.\n");
 		return;
 	}
-	dsc_get_mtg_info(cur_mtg, &m_info, &code);
+	dsc_get_mtg_info(dsc_public.mtg_uid, &dsc_public.m_info, &code);
 	if (code != 0) {
 		(void) ss_perror(sci_idx, code, "Can't get meeting info");
 		return;
 	}
-	dsc_get_trn_info(cur_mtg, cur_trans, &t_info, &code);
+
+	dsc_get_trn_info(dsc_public.mtg_uid, dsc_public.current, &t_info, &code);
 	if (code)
-		t_info.current = -1;
+		t_info.current = 0;
+	else {
+	     free(t_info.subject);			/* don't need these */
+	     t_info.subject = NULL;
+	     free(t_info.author);
+	     t_info.author = NULL;
+	}
 
 	if (argc == 1) {
-		(void) fprintf(stderr, "Usage:  %s trn_no\n", argv[0]);
-		return;
+	        trn_list = trn_select(&t_info, "current",
+				      (selection_list *)NULL, &code);
+		if (code) {
+			ss_perror(sci_idx, code, "");
+			free(trn_list);
+			return;
+		}
 	}
 	else if (argc == 2) {
 		trn_list = trn_select(&t_info, argv[1],
@@ -123,7 +149,7 @@ prt_trans(sci_idx, argc, argv)
 		}
 	}
 
-	new_trn_no = -1;
+	performed = FALSE;
 	/*
 	 * Ignore SIGPIPE from the pager
 	 */
@@ -141,10 +167,8 @@ prt_trans(sci_idx, argc, argv)
 	(void) tdestroy(tf);
 	(void) wait((union wait *)0);
 	(void) signal(SIGPIPE, old_sig);
-	if (new_trn_no == -1)
+	if (!performed)
 		(void) fprintf(stderr, "print: No transactions selected\n");
-	else
-		cur_trans = new_trn_no;
 }
 
 write_trans(sci_idx, argc, argv)
@@ -158,11 +182,11 @@ write_trans(sci_idx, argc, argv)
 	int (*old_sig)();
 	int code;
 
-	if (cur_mtg == (char *)NULL) {
+	if (dsc_public.mtg_uid == (char *)NULL) {
 		(void) fprintf(stderr, "No current meeting.\n");
 		return;
 	}
-	dsc_get_mtg_info(cur_mtg, &m_info, &code);
+	dsc_get_mtg_info(dsc_public.mtg_uid, &dsc_public.m_info, &code);
 	if (code != 0) {
 		(void) ss_perror(sci_idx, code, "Can't get meeting info");
 		return;
@@ -180,8 +204,8 @@ write_trans(sci_idx, argc, argv)
 		sl_free(trn_list);
 		return;
 	}
-	new_trn_no = -1;
-	cur_trans = txn_no;
+	performed = FALSE;
+	dsc_public.current = txn_no;
 
 	fd = open(argv[2], O_CREAT|O_APPEND|O_WRONLY, 0666);
 	if (fd < 0) {
@@ -189,12 +213,11 @@ write_trans(sci_idx, argc, argv)
 		return;
 	}
 	tf = unix_tfile(fd);
-	code = sl_map(display_trans, trn_list);
-	if (code) {
-		fprintf(stderr, "Error printing transaction: %s\n",
-			error_message(code));
-	}
+	(void) sl_map(display_trans, trn_list);
 	tclose(tf, &code);
 	(void) close(fd);
 	(void) tdestroy(tf);
+	if (!performed)
+		(void) fprintf(stderr, "print: No transactions selected\n");
+	return;
 }
