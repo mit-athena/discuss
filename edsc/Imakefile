@@ -1,4 +1,4 @@
-OBJS	= edsc.o parse.o time.o do_quote.o do_trn.o do_mtg.o do_misc.o\ 
+OBJS	= edsc.o parse.o time.o do_quote.o do_trn.o do_mtg.o do_misc.o\
 	do_cache.o version.o $(MACHOBJS)
 
 SRCS	= edsc.c parse.c time.c do_quote.c do_trn.c do_mtg.c do_misc.c\
@@ -7,6 +7,7 @@ SRCS	= edsc.c parse.c time.c do_quote.c do_trn.c do_mtg.c do_misc.c\
 LIBS	= ../server/acl.o -ldsk -lusp -lkrb -ldes -lcom_err
 LFLAGS	= -L../lib
 DEFINES = $(FLAGS)
+LISPDIR = $(ATHSHAREDIR)/emacs/site-lisp
 
 #ifdef ultrix
 MACHOBJS=mktemp.o
@@ -23,15 +24,10 @@ edsc:: newvers.sh
 build_program(edsc,$(OBJS),$(LFLAGS),$(LIBS))
 install_program(edsc,,$(ATHETCDIR))
 
-create_dir($(ATHLIBDIR)/elisp)
-install_file(discuss-acl.el,$(ATHLIBDIR)/elisp)
-install_file(discuss-enter.el,$(ATHLIBDIR)/elisp)
-install_file(discuss-ls.el,$(ATHLIBDIR)/elisp)
-install_file(discuss-misc.el,$(ATHLIBDIR)/elisp)
-install_file(discuss.el,$(ATHLIBDIR)/elisp)
+create_dir($(LISPDIR))
+install_file(discuss-acl.el,$(LISPDIR))
+install_file(discuss-enter.el,$(LISPDIR))
+install_file(discuss-ls.el,$(LISPDIR))
+install_file(discuss-misc.el,$(LISPDIR))
+install_file(discuss.el,$(LISPDIR))
 
-install_file(discuss-acl.elc,$(ATHLIBDIR)/elisp)
-install_file(discuss-enter.elc,$(ATHLIBDIR)/elisp)
-install_file(discuss-ls.elc,$(ATHLIBDIR)/elisp)
-install_file(discuss-misc.elc,$(ATHLIBDIR)/elisp)
-install_file(discuss.elc,$(ATHLIBDIR)/elisp)
