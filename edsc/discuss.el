@@ -1,5 +1,5 @@
 ;;;	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v $
-;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.10 1988-12-05 08:18:12 eichin Exp $
+;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.11 1988-12-15 13:50:06 srz Exp $
 ;;;
 ;;;  Emacs lisp code to remote control a "discuss" shell process to
 ;;;  provide an emacs-based interface to the discuss conferencing system.
@@ -8,6 +8,11 @@
 ;;;  Written by Stan Zanarotti and Bill Sommerfeld.
 ;;;
 ;;;  $Log: not supported by cvs2svn $
+; Revision 1.10  88/12/05  08:18:12  eichin
+; added discuss-next-meeting. [previous fix to discuss-goto was
+; harmless, but not a bug. I had loaded a different version of the
+; function, oops...]
+; 
 ; Revision 1.9  88/12/05  08:11:22  eichin
 ; Fixed ^O [discuss-output-last-file wasn't getting set, probably
 ; because discuss-send-cmd doesn't really return...] and tested it.
@@ -423,9 +428,10 @@ a	Add meeting.  Not implemented yet."
 (defun discuss-leave-mtg ()
   "Leave the current discuss meeting"
   (interactive)
-  (discuss-send-cmd (format "(ss %d %s)\n"
+  (if (not (= discuss-highest-seen 0))
+      (discuss-send-cmd (format "(ss %d %s)\n"
 			    discuss-highest-seen
-			    discuss-current-meeting))
+			    discuss-current-meeting)))
   (kill-buffer (buffer-name discuss-cur-mtg-buf))
   (setq discuss-cur-mtg-buf nil)
   (switch-to-buffer discuss-main-buffer))
@@ -536,7 +542,7 @@ a	Add meeting.  Not implemented yet."
 ; run this at each load
 (defun discuss-initialize nil
   (setq discuss-version
-	"$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.10 1988-12-05 08:18:12 eichin Exp $")
+	"$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.11 1988-12-15 13:50:06 srz Exp $")
 
 ;;; Keymaps, here at the end, where the trash belongs..
 
