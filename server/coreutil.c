@@ -7,7 +7,7 @@
  */
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.23 1993-04-29 17:06:50 miki Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.24 1994-03-25 17:22:07 miki Exp $
  *
  *
  * coreutil.c  -- These contain lower-layer, utility type routines to
@@ -15,6 +15,9 @@
  *		  in-memory superblock, and to open & close meetings.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.23  93/04/29  17:06:50  miki
+ *  ported to Solaris2.1
+ * 
  * Revision 1.22  90/02/24  20:05:09  srz
  * Hmmm.  Should not exceed array bounds, should we?
  * 
@@ -93,7 +96,7 @@
 const
 #endif
 static char rcsid_coreutil_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.23 1993-04-29 17:06:50 miki Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.24 1994-03-25 17:22:07 miki Exp $";
 #endif /* lint */
 
 #include <discuss/types.h>
@@ -117,13 +120,6 @@ static char rcsid_coreutil_c[] =
 #else
 #include <string.h>
 #include <fcntl.h>
-/*
- * flock operations.
- */
-#define LOCK_SH               1       /* shared lock */
-#define LOCK_EX               2       /* exclusive lock */
-#define LOCK_NB               4       /* don't block when locking */
-#define LOCK_UN               8       /* unlock */
 #endif
 #define NULL 0
 
@@ -395,8 +391,20 @@ forget_super()
  */
 start_read()
 {
+#ifdef SOLARIS
+     struct flock lock;
+#endif
+
      if (!no_nuke) {
+#ifdef SOLARIS
+          lock.l_type = F_WRLCK;
+          lock.l_start = 0;
+          lock.l_whence = 0;
+          lock.l_len = 0;
+          if (fcntl(u_control_f, F_SETLK, &lock) < 0) 
+#else
 	  if (flock (u_control_f, LOCK_SH) < 0)
+#endif
 	       panic ("Cannot share lock");
 	  read_lock = TRUE;
      }
@@ -410,8 +418,20 @@ start_read()
  */
 finish_read()
 {
+#ifdef SOLARIS
+    struct flock lock;
+#endif
+
      if (!no_nuke) {
+#ifdef SOLARIS
+           lock.l_type = F_UNLCK;
+          lock.l_start = 0;
+          lock.l_whence = 0;
+          lock.l_len = 0;
+          fcntl(u_control_f, F_SETLK, &lock);
+#else
 	  flock(u_control_f,LOCK_UN);
+#endif
 	  read_lock = 0;
      }
 }
@@ -707,7 +727,7 @@ void mtg_znotify(mtg_name, subject, author, signature)
 	}
 
 	/* Set up the notice structure */
-	bzero(&notice, sizeof(notice));
+	memset(&notice, 0, sizeof(notice));
 
 	sprintf(fullpath,"%s:%s", this_host, mtg_name);
 	ZOpenPort(NULL);
