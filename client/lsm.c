@@ -1,8 +1,11 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v 1.6 1987-01-05 11:08:42 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v 1.7 1987-01-06 23:47:21 rfrench Exp $
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.6  87/01/05  11:08:42  srz
+ * Massaged header.
+ * 
  * Revision 1.5  87/01/04  23:13:41  rfrench
  * First major change to lsm command:
  * Alphabetizes by long name and lists all local names together.
@@ -10,7 +13,7 @@
  */
 
 #ifndef lint
-static char *rcsid_lsm_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v 1.6 1987-01-05 11:08:42 srz Exp $";
+static char *rcsid_lsm_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v 1.7 1987-01-06 23:47:21 rfrench Exp $";
 #endif lint
 
 
@@ -51,6 +54,10 @@ do_mtg(mtg_name)
 			if (code)
 				fprintf(stderr, "Error checking meeting %s: %s\n",
 					set[i].unique_id, error_message(code));
+			get_mtg_unique_id("","",set[i].mtg_name,&lng_name[i].nb,&code);
+			if (code)
+				fprintf(stderr, "Error checking meeting %s: %s\n",
+					set[i].unique_id, error_message(code));
 		}
 	}
 /* Yech yech bubble sort -- I'll optimize it later */
@@ -71,10 +78,8 @@ do_mtg(mtg_name)
 	last_id[0] = '\0';
 	for (i = 0; i < n_matches; i++) {
 		if (print_header) {
-			printf("%-7.7s %-30.30s   %s\n",
-			       " Flags",
-			       "Meeting ID",
-			       "Short name");
+			printf("%-7s %-30s   %-30s  %s\n",
+			       " Flags","Meeting ID","Short name","New");
 			print_header = 0;
 		}
 		nbp = &set[i];
@@ -101,11 +106,16 @@ do_mtg(mtg_name)
 			continue;
 		}
 		if (!strcmp(last_id,nbp->unique_id))
-			printf("        %-30.30s   %s\n","",nbp->mtg_name);
+			printf("        %-30s   %s\n","",nbp->mtg_name);
 		else {
-			printf("%c       %-30.30s   %s\n",updated?'c':' ',
+			printf("%c       %-30s   %*s",updated?'c':' ',
 			       lng_name[i].m_info.long_name,
+			       updated?-30:0,
 			       nbp->mtg_name);
+			if (updated)
+				printf(" (%04d)",lng_name[i].m_info.last -
+				       lng_name[i].nb.last);
+			printf("\n");
 			strcpy(last_id,nbp->unique_id);
 		}
 	}
