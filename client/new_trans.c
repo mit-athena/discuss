@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v 1.13 1987-07-17 00:20:53 spook Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v 1.14 1988-02-07 01:13:17 srz Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
@@ -12,7 +12,7 @@
 
 #ifndef lint
 static char rcsid_discuss_c[] =
-     "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v 1.13 1987-07-17 00:20:53 spook Exp $";
+     "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v 1.14 1988-02-07 01:13:17 srz Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -148,7 +148,7 @@ new_trans(argc, argv)
      dsc_add_trn(&dsc_public.nb, tf, subject, 0,
 		 &txn_no, &code);
      if (code != 0) {
-	  ss_perror(sci_idx, errno, "Error adding transaction");
+	  ss_perror(sci_idx, code, "while adding transaction");
 	  goto punt;
      }
 
