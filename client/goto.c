@@ -1,19 +1,17 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/goto.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/goto.c,v 1.2 1987-03-22 04:34:38 spook Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/goto.c,v 1.3 1987-06-27 01:53:42 spook Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
  *
  *	Code for "goto" request in discuss.
  *
- *      $Log: not supported by cvs2svn $
- * 
  */
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/goto.c,v 1.2 1987-03-22 04:34:38 spook Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/goto.c,v 1.3 1987-06-27 01:53:42 spook Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -22,6 +20,7 @@ static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athe
 #include <strings.h>
 #include <sys/wait.h>
 #include <ctype.h>
+#include "discuss_err.h"
 #include "ss.h"
 #include "tfile.h"
 #include "interface.h"
@@ -43,10 +42,8 @@ extern ss_request_table discuss_cmds;
 
 /* EXTERNAL ROUTINES */
 
-char	*malloc(), *getenv(), *gets(), *ctime();
+char	*malloc(), *getenv(), *gets(), *ctime(), *error_message();
 tfile	unix_tfile();
-
-#define DEFAULT_EDITOR "/bin/ed"
 
 goto_mtg(argc, argv)
 	int argc;
@@ -71,10 +68,8 @@ switch_to_mtg(name)
 
 	dsc_get_mtg (user_id, dsc_public.mtg_name, &dsc_public.nb, &code);
 	if (code != 0) {
-		(void) fprintf (stderr,
-				"%s: Meeting not found in search path.\n",
-				name);
-		return;
+	     ss_perror(sci_idx, DISC_MTG_NOT_FOUND, name);
+	     return;
 	}
 
 	dsc_public.host = dsc_public.nb.hostname; /* warning - sharing */
@@ -114,7 +109,7 @@ switch_to_mtg(name)
 		msgbuf[0] = toupper(msgbuf[0]);
 		printf(" (%s.)", msgbuf);
 	}
-	printf("\n\n");
+	printf("\n");
 }
 
 /*

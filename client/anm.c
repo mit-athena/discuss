@@ -1,18 +1,11 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/anm.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/anm.c,v 1.3 1987-04-12 00:12:37 spook Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/anm.c,v 1.4 1987-06-27 01:58:52 spook Exp $
  *
- *	$Log: not supported by cvs2svn $
- * Revision 1.2  87/04/09  05:06:09  spook
- * fixed type problem on unix_tfile
- * 
- * Revision 1.1  87/04/08  23:41:52  rfrench
- * Initial revision
- * 
  */
 
 #ifndef lint
-static char *rcsid_anm_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/anm.c,v 1.3 1987-04-12 00:12:37 spook Exp $";
+static char *rcsid_anm_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/anm.c,v 1.4 1987-06-27 01:58:52 spook Exp $";
 #endif lint
 
 #include "sys/file.h"
@@ -23,6 +16,7 @@ static char *rcsid_anm_c = "$Header: /afs/dev.mit.edu/source/repository/athena/b
 #include "rpc.h"
 #include "globals.h"
 
+extern char *error_message();
 extern tfile unix_tfile();
 
 announce_mtg (argc, argv)

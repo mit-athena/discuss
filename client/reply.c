@@ -1,19 +1,17 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v 1.2 1987-03-22 04:42:06 spook Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v 1.3 1987-06-27 01:55:05 spook Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
  *
  *	Code for "reply" request in discuss.
  *
- *      $Log: not supported by cvs2svn $
- * 
  */
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v 1.2 1987-03-22 04:42:06 spook Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v 1.3 1987-06-27 01:55:05 spook Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -30,7 +28,7 @@ static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athe
 
 /* EXTERNAL ROUTINES */
 
-char	*malloc(), *getenv(), *gets(), *ctime();
+char	*malloc(), *getenv(), *gets(), *ctime(), *error_message();
 tfile	unix_tfile();
 
 #define DEFAULT_EDITOR "/bin/ed"

@@ -1,47 +1,12 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.12 1987-04-19 22:15:21 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.13 1987-06-27 01:51:14 spook Exp $
  *	$Locker:  $
- *
- *	$Log: not supported by cvs2svn $
- * Revision 1.11  87/04/12  07:54:54  wesommer
- * Fixed bug: crashed when deleting meeting that wasn't known.
- * 
- * Revision 1.10  87/04/09  00:11:39  rfrench
- * Fixed to handle new format meeting announcements.
- * 
- * Revision 1.9  87/04/08  03:53:25  wesommer
- * Added del_mtg
- * 
- * Revision 1.8  87/04/06  16:00:56  spook
- * More error-message printing.
- * 
- * Revision 1.7  87/03/22  05:21:50  spook
- * Rewritten for new interfaces and new format.
- * 
- * Revision 1.6  87/02/04  16:10:26  srz
- * Changed fcntl.h -> file.h
- * 
- * Revision 1.5  86/12/07  16:04:09  rfrench
- * Globalized sci_idx
- * 
- * Revision 1.4  86/12/07  00:38:50  rfrench
- * Killed ../include
- * 
- * Revision 1.3  86/12/07  00:20:45  rfrench
- * Made adding a meeting louder and more accurate
- * 
- * Revision 1.2  86/12/03  15:06:02  rfrench
- * Fixed bug in add_mtg when specifying both tran #s and meeting names
- * 
- * Revision 1.1  86/11/24  20:18:55  rfrench
- * Initial revision
- * 
  *
  */
 
 #ifndef lint
-static char *rcsid_addmtg_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.12 1987-04-19 22:15:21 srz Exp $";
+static char *rcsid_addmtg_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.13 1987-06-27 01:51:14 spook Exp $";
 #endif lint
 
 #include <strings.h>
@@ -52,7 +17,7 @@ static char *rcsid_addmtg_c = "$Header: /afs/dev.mit.edu/source/repository/athen
 #include "interface.h"
 #include "globals.h"
 
-extern char *malloc();
+extern char *malloc(), *calloc();
 extern tfile unix_tfile();
 int parse_add_trn();
 
@@ -66,7 +31,7 @@ add_mtg(argc, argv)
 	int i, *used;
 	name_blk nb;
 	int code,have_names;
-	char *user,*realm,long_name[80],cerror[80];
+	char *user,*realm,cerror[80];
 	char auser_id[BUFSIZ];
 	trn_info t_info;
 	selection_list *trn_list,*trn_temp;
@@ -343,7 +308,7 @@ del_mtg(argc, argv)
 	int i, *used;
 	name_blk nb;
 	int code,have_names;
-	char *user,*realm,cerror[80];
+	char *user,*realm;
 	char auser_id[BUFSIZ];
 
 	used = (int *)calloc(argc, sizeof(int));

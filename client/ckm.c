@@ -1,33 +1,11 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v 1.8 1987-06-20 13:36:15 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v 1.9 1987-06-27 01:57:21 spook Exp $
  *
- *	$Log: not supported by cvs2svn $
- * Revision 1.7  87/06/14  21:08:44  srz
- * Added control-C handling.
- * 
- * Revision 1.6  87/06/14  16:28:24  srz
- * White space changes + changed fprintf into ss_perror.
- * 
- * Revision 1.5  87/04/19  22:17:18  srz
- * Reverted definition of 'changed' to include new meetings.
- * 
- * Revision 1.4  87/04/12  00:11:21  spook
- * Removed unused variables.
- * 
- * Revision 1.3  87/04/08  08:32:13  wesommer
- * Fixed the error message once again.
- * 
- * Revision 1.2  87/04/08  03:53:42  wesommer
- * Fixed error message.
- * 
- * Revision 1.1  87/03/24  14:11:09  spook
- * Initial revision
- * 
  */
      
 #ifndef lint
-static char *rcsid_ckm_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v 1.8 1987-06-20 13:36:15 srz Exp $";
+static char *rcsid_ckm_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v 1.9 1987-06-27 01:57:21 spook Exp $";
 #endif lint
 
 #include <strings.h>
@@ -36,7 +14,7 @@ static char *rcsid_ckm_c = "$Header: /afs/dev.mit.edu/source/repository/athena/b
 #include "interface.h"
 #include "globals.h"
 
-extern char *malloc(),*ctime(), *error_message();
+extern char *malloc(),*ctime(), *error_message(), *calloc();
 
 static int print_header, display;
 
