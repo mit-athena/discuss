@@ -10,10 +10,13 @@
  * dispatch.c  -- Procedure to do the dispatching on an RPC call.
  *		  This contains the procedure table.
  *
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/dispatch.c,v 1.10 1989-06-03 00:42:47 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/dispatch.c,v 1.11 1990-02-24 18:59:24 srz Exp $
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/dispatch.c,v $
  *	$Locker:  $
  *	$Log: not supported by cvs2svn $
+ * Revision 1.10  89/06/03  00:42:47  srz
+ * Added standard copyright notice.
+ * 
  * Revision 1.9  89/01/29  17:16:38  srz
  * Added flag routines.
  * 
@@ -30,7 +33,7 @@
 
 #ifndef lint
 static const char rcsid_dispatch_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/dispatch.c,v 1.10 1989-06-03 00:42:47 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/dispatch.c,v 1.11 1990-02-24 18:59:24 srz Exp $";
 #endif
 
 extern bool recvbool();
@@ -58,7 +61,9 @@ struct proc_table procs[] = {
      0, {0, 0, 0, 0, 0, 0, 0, 0},					/* whoami */
      2, {STRTYPE, INTTYPE, 0, 0, 0, 0, 0, 0},				/* get_trn_info2 */
      0, {0, 0, 0, 0, 0, 0, 0, 0},					/* get_server_version */
-     3, {STRTYPE, INTTYPE, INTTYPE, 0, 0, 0, 0, 0}			/* set_trn_flags */
+     3, {STRTYPE, INTTYPE, INTTYPE, 0, 0, 0, 0, 0},			/* set_trn_flags */
+     5, {STRTYPE, TFILETYPE, STRTYPE, STRTYPE, INTTYPE,  0, 0, 0, 0},	/* add_trn2 */
+     2, {STRTYPE, INTTYPE, 0, 0, 0, 0, 0, 0}				/* get_trn_info3 */
 };
 
 int	numprocs = sizeof (procs) / sizeof (procs [0]);
@@ -75,6 +80,7 @@ int procno;
      dsc_acl *list;
      trn_info tinfo;
      trn_info2 tinfo2;
+     trn_info3 tinfo3;
      mtg_info minfo;
 
      switch (procno) {
@@ -253,6 +259,7 @@ int procno;
 	  free(c2);
 	  free(c3);
 	  break;
+
      case DELETE_ACCESS:
           c1 = recvstr();
 	  c2 = recvstr();
@@ -263,6 +270,7 @@ int procno;
 	  free(c1);
 	  free(c2);
 	  break;
+
      case WHO_AM_I:
 	  startreply();
 	  sendstr(rpc_caller);
@@ -287,7 +295,7 @@ int procno;
      /* get_server_version (version_number, result) */	  
      case GET_SERVER_VERSION:
 	  startreply();
-	  sendint(SERVER_1);			/* Includes get_trn_info2 */
+	  sendint(SERVER_2);			/* Includes get_trn_info3 */
 	  sendint(0);				/* Success */
 	  sendreply();
 	  break;
@@ -302,6 +310,41 @@ int procno;
 	  sendint(result);
 	  sendreply();
 
+	  free(c1);
+	  break;
+
+     /* add_trn2 (mtg_name, source_file, subject, signature, reply_trn, result_trn, result) */
+     case ADD_TRN2:
+ 	  c1 = recvstr();			/* mtg_name */
+	  t1 = recvfile();			/* source_file */
+	  c2 = recvstr();			/* subject */
+	  c3 = recvstr();			/* signature */
+	  i1 = recvint();			/* reply_trn */
+	  add_trn2 (c1, t1, c2, c3, i1, &i2, &result);
+	  startreply();
+	  sendint(i2);
+	  sendint(result);
+	  sendreply();
+
+	  tdestroy(t1);
+	  free(c1);
+	  free(c2);
+	  free(c3);
+	  break;
+
+     /* get_trn_info3 (mtg_name, trn, info, result) */	  
+     case GET_TRN_INFO3:
+	  c1 = recvstr();			/* mtg_name */
+	  i1 = recvint();			/* trn */
+	  get_trn_info3 (c1, i1, &tinfo3, &result);
+	  startreply();
+	  send_trn_info3(&tinfo3);
+	  sendint(result);
+	  sendreply();
+
+	  free(tinfo3.subject);
+	  free(tinfo3.author);
+	  free(tinfo3.signature);
 	  free(c1);
 	  break;
      }
@@ -355,6 +398,32 @@ trn_info2 *tinfo;
      sendstr (tinfo -> subject);
      sendstr (tinfo -> author);
      sendint (tinfo -> flags);
+}
+
+/*
+ *
+ * send_trn_info3 -- send a trn_info3 struct.
+ *
+ */
+send_trn_info3(tinfo)
+trn_info3 *tinfo;
+{
+     sendint (tinfo -> version);
+     sendint (tinfo -> current);
+     sendint (tinfo -> prev);
+     sendint (tinfo -> next);
+     sendint (tinfo -> pref);
+     sendint (tinfo -> nref);
+     sendint (tinfo -> fref);
+     sendint (tinfo -> lref);
+     sendint (tinfo -> chain_index);
+     sendint (tinfo -> date_entered);
+     sendint (tinfo -> num_lines);
+     sendint (tinfo -> num_chars);
+     sendstr (tinfo -> subject);
+     sendstr (tinfo -> author);
+     sendint (tinfo -> flags);
+     sendstr (tinfo -> signature);
 }
     
 /*
