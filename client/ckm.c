@@ -1,11 +1,11 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v 1.12 1987-07-17 00:13:45 spook Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v 1.13 1987-08-08 02:44:15 spook Exp $
  *
  */
      
 #ifndef lint
-static char *rcsid_ckm_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v 1.12 1987-07-17 00:13:45 spook Exp $";
+static char *rcsid_ckm_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v 1.13 1987-08-08 02:44:15 spook Exp $";
 #endif lint
 
 #include <strings.h>
@@ -55,7 +55,7 @@ do_mtg(mtg_name)
 	      strcmp(last_path, nbp->pathname)) {
 	       strcpy(last_host,nbp->hostname);
 	       strcpy(last_path,nbp->pathname);
-	       if (updated) 
+	       if (updated && !code)
 		    nbp->status |= DSC_ST_CHANGED;
 	       else {
 		    nbp->status &= ~DSC_ST_CHANGED;
