@@ -7,10 +7,13 @@
  */
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/rn.c,v $
- *	$Author: srz $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/rn.c,v 1.9 1989-06-02 23:38:39 srz Exp $
+ *	$Author: probe $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/rn.c,v 1.10 1991-07-22 01:28:26 probe Exp $
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.9  89/06/02  23:38:39  srz
+ * Added standard copyright notice.
+ * 
  * Revision 1.8  89/05/19  16:58:18  srz
  * Declared static functions in advance.
  * 
@@ -41,7 +44,7 @@
 
 #ifndef lint
 static char rcsid_update_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/rn.c,v 1.9 1989-06-02 23:38:39 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/rn.c,v 1.10 1991-07-22 01:28:26 probe Exp $";
 #endif /* lint */
 
 #include <discuss/discuss.h>
@@ -50,6 +53,10 @@ static char rcsid_update_c[] =
 #include <sys/types.h>
 #include <sys/file.h>
 #include <sys/ioctl.h>
+
+#ifdef POSIX
+#include <termios.h>
+#endif
 
 static unseen_transactions();
 
@@ -229,9 +236,10 @@ more_break(prompt, cmds)
 	char *prompt;
 	char *cmds;
 {
-	struct sgttyb tty, ntty;
 	int arg;
 	char buf[1];
+#ifndef POSIX
+	struct sgttyb tty, ntty;
 
 	arg = FREAD;				/* Flush pending input */
 	ioctl(0, TIOCFLUSH, &arg);
@@ -240,6 +248,18 @@ more_break(prompt, cmds)
 	ntty.sg_flags |= CBREAK;
 	ntty.sg_flags &= ~ECHO;
 	ioctl(0, TIOCSETP, &ntty);		/* go to cbreak, ~echo */
+#else
+	struct termios tty, ntty;
+
+	(void) tcflush(0, TCIFLUSH);
+	(void) tcgetattr(0, &tty);
+	ntty = tty;
+	ntty.c_cc[VMIN] = 1;
+	ntty.c_cc[VTIME] = 0;
+        ntty.c_iflag &= ~(ICRNL);
+        ntty.c_lflag &= ~(ICANON|ISIG|ECHO);
+	(void) tcsetattr(0, TCSANOW, &ntty);
+#endif
 	write(1, prompt, strlen(prompt));
 	for (;;)  {
 		if (read(0, buf, 1) != 1) {
@@ -249,8 +269,12 @@ more_break(prompt, cmds)
 		if (index(cmds, buf[0]))
 			break;
 		write(1, "\7", 1);
-	} 
+	}
+#ifdef POSIX
+	(void) tcsetattr(0, TCSANOW, &tty);
+#else
 	ioctl(0, TIOCSETP, &tty);
+#endif
 	write(1, "\n", 1);
 	return buf[0];
 }
