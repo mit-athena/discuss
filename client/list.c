@@ -9,14 +9,14 @@
  *
  * List request for DISCUSS
  *
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.32 1998-04-02 18:20:19 ghudson Exp $
+ * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.32.2.1 1998-07-30 17:20:21 ghudson Exp $
  * $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v $
  * $Locker:  $
  *
  */
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.32 1998-04-02 18:20:19 ghudson Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.32.2.1 1998-07-30 17:20:21 ghudson Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -24,6 +24,7 @@ static char rcsid_discuss_c[] =
 #include <sys/param.h>		/* for MIN() */
 #include <ss/ss.h>
 #include <sys/ioctl.h>
+#include <termios.h>
 #include "config.h"
 #include <discuss/discuss.h>
 #include "globals.h"
