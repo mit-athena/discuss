@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl.c,v 1.4 1986-12-04 10:18:57 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl.c,v 1.5 1986-12-08 23:30:56 wesommer Exp $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
  *
@@ -8,6 +8,9 @@
  *	along with routines to move them to and from files.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.4  86/12/04  10:18:57  srz
+ * You !#@$% C programmers don't know what negative subscripts are! ;-)
+ * 
  * Revision 1.3  86/11/22  06:17:45  spook
  * Changed to make lint happy; also punted duplicate boolean types.
  * 
@@ -21,7 +24,7 @@
  */
 
 #ifndef lint
-static char *rcsid_acl_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl.c,v 1.4 1986-12-04 10:18:57 srz Exp $";
+static char *rcsid_acl_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl.c,v 1.5 1986-12-08 23:30:56 wesommer Exp $";
 #endif lint
 
 #include "../include/acl.h"
@@ -335,20 +338,21 @@ char *acl_canon(s1, s2, code)
 {
 	register char *cp;
 	register char *out;
-	register int len;
+	register int len, maxlen;
 
 	*code = 0;
 	for (cp = s1; *cp; cp++) {
 		if (!index(s2, *cp)) 
 			*code = BAD_MODES;
 	}
-	out = malloc(1); len = 0;
+	maxlen = strlen(s2);
+	out = malloc(maxlen + 1); len = 0;
 	for (cp = s2; *cp; cp++) {
-		if (index(s1, *cp)) {
-			len++;
-			out = realloc(out, (unsigned)len);
-			out[len-1] = *cp;
-		}
+		len++;
+		if (len > maxlen) /* shouldn't happen, but.. */
+			out = realloc(out, (unsigned)len + 1);
+
+		out[len-1] = (index(s1, *cp) ? *cp : ' ');
 	}
 	out[len]='\0';
 	return(out);
