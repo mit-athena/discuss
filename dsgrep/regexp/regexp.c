@@ -24,6 +24,7 @@
  */
 #include <stdio.h>
 #include <regexp.h>
+#include <string.h>
 #include "regmagic.h"
 
 /*
@@ -703,7 +704,6 @@ register regexp *prog;
 register char *string;
 {
 	register char *s;
-	extern char *strchr();
 
 	/* Be paranoid... */
 	if (prog == NULL || string == NULL) {
@@ -802,7 +802,6 @@ char *prog;
 {
 	register char *scan;	/* Current node. */
 	char *next;		/* Next node. */
-	extern char *strchr();
 
 	scan = prog;
 #ifdef DEBUG
@@ -1063,8 +1062,6 @@ regexp *r;
 	register char *s;
 	register char op = EXACTLY;	/* Arbitrary non-END op. */
 	register char *next;
-	extern char *strchr();
-
 
 	s = r->program + 1;
 	while (op != END) {	/* While that wasn't END last time... */
