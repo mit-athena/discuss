@@ -1,5 +1,5 @@
 ;;;	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss-enter.el,v $
-;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss-enter.el,v 1.9 1992-04-16 18:28:49 lwvanels Exp $
+;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss-enter.el,v 1.10 1996-04-12 21:48:16 ghudson Exp $
 ;;;
 ;;;  Emacs lisp code to enter transaction into discuss.  Part of the
 ;;;  emacs-based interface to the discuss conferencing system.
@@ -8,18 +8,7 @@
 ;;;  Written by Stan Zanarotti, Bill Sommerfeld and Theodore Ts'o.
 ;;;
 ;;; $Log: not supported by cvs2svn $
-; Revision 1.8  1990/10/19  00:42:11  eichin
-; added paragraph-start and paragraph-separate patterns so meta-q works in
-; enter.
 ;
-; Revision 1.7  90/09/19  16:32:40  bjaspan
-; merged my changes (check talk/reply permissions ahead of time), added
-; $Log: not supported by cvs2svn $
-; Revision 1.8  1990/10/19  00:42:11  eichin
-; added paragraph-start and paragraph-separate patterns so meta-q works in
-; enter.
-;
-; 
 
 (require 'discuss)
 
@@ -114,8 +103,9 @@
 (defun discuss-edit-mode ()
   "Major mode for editing Discuss transactions to be entered.
 Like Text Mode but with these additional commands:
-C-c C-c  discuss-send (enter the transaction)
-C-c C-]  discuss-abort-edit (exit without entering)"
+\\[describe-mode]	Display available commands.
+\\[discuss-send]	Enter the transaction.
+\\[discuss-abort-edit]	Exit without entering transaction."
   (interactive)
   (kill-all-local-variables)
   (make-local-variable 'discuss-reply-trn)
@@ -149,6 +139,7 @@ C-c C-]  discuss-abort-edit (exit without entering)"
   "Enter the current Discuss transaction"
   (interactive)
   (save-excursion
+    (run-hooks 'discuss-send-hook)
     ;; Make sure buffer ends with a newline.
     (goto-char (point-max))
     (if (/= (preceding-char) ?\n)
