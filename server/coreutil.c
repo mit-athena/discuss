@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.11 1988-03-06 19:53:28 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.12 1988-09-23 17:07:33 raeburn Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
@@ -11,6 +11,11 @@
  *		  in-memory superblock, and to open & close meetings.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.11  88/03/06  19:53:28  srz
+ * Reversed order of checking magic number and version, so that
+ * INCONSISTENT is returned instead of NEW_VERSION when that
+ * is trully the case.
+ * 
  * Revision 1.10  88/01/05  01:37:54  srz
  * Really ifdef'd zephyr.
  * 
@@ -46,8 +51,12 @@
  */
 
 #ifndef lint
-static char *rcsid_coreutil_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.11 1988-03-06 19:53:28 srz Exp $";
-#endif lint
+#ifdef __STDC__
+const
+#endif
+static char rcsid_coreutil_c[] =
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.12 1988-09-23 17:07:33 raeburn Exp $";
+#endif /* lint */
 
 #include "../include/types.h"
 #include "../include/dsc_et.h"
@@ -55,6 +64,7 @@ static char *rcsid_coreutil_c = "$Header: /afs/dev.mit.edu/source/repository/ath
 #include "mtg.h"
 #include "../include/tfile.h"
 #include "../include/acl.h"
+#include "../include/internal.h"
 #ifdef ZEPHYR
 #include <zephyr/zephyr.h>
 #endif ZEPHYR
@@ -74,7 +84,7 @@ bool nuclear = FALSE;				/* Using atomic reads/writes */
 afile a_control_f = NULL;			/* radioactive file descriptor */
 tfile abort_file = NULL;			/* close this on abort */
 bool  read_lock = FALSE;			/* have lock on u_control_f */
-Acl   *mtg_acl = NULL;				/* current mtg acl */
+dsc_acl   *mtg_acl = NULL;			/* current mtg acl */
 int 	last_acl_mod;				/* last mod to ACL */
 mtg_super super;
 char *super_chairman;
@@ -576,7 +586,7 @@ char *str;
 mtg_znotify(mtg_name, subject, author)
 	char *mtg_name, *subject, *author;
 {
-	register acl_entry *ae;
+	register dsc_acl_entry *ae;
 	register int n;
 	ZNotice_t notice;
 	char *msglst[4],bfr[30],host[100],fullpath[256];
