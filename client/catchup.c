@@ -2,7 +2,7 @@
  *
  * catchup request for DISCUSS
  *
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/catchup.c,v 1.2 1988-09-10 17:54:37 srz Exp $
+ * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/catchup.c,v 1.3 1989-01-05 02:11:06 raeburn Exp $
  * $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/catchup.c,v $
  * $Locker:  $
  *
@@ -10,17 +10,15 @@
  *
  */
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/catchup.c,v 1.2 1988-09-10 17:54:37 srz Exp $";
+static char rcsid_discuss_c[] =
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/catchup.c,v 1.3 1989-01-05 02:11:06 raeburn Exp $";
 #endif lint
 
 #include <stdio.h>
-#include <strings.h>
-#include "discuss_err.h"
+#include <string.h>
+#include <discuss/discuss.h>
 #include "ss.h"
-#include "tfile.h"
-#include "interface.h"
 #include "config.h"
-#include "dsc_et.h"
 #include "globals.h"
 
 catchup(argc, argv)
