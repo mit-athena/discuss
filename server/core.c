@@ -900,7 +900,7 @@ int *result;
      free(info -> access_modes);
      info -> access_modes = new_string (acl_get_access(mtg_acl, rpc_caller));
 
-     if (!has_mtg_access('s')) {
+     if (!has_mtg_access('s') && !has_mtg_access('r')) {
 	  *result = NO_ACCESS;
 	  return;
      }
