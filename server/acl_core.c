@@ -7,21 +7,12 @@
  */
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v 1.17 1996-05-23 22:17:36 ghudson Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v 1.18 1996-06-05 18:26:10 ghudson Exp $
  *
  *	Routines for use in a server to edit access control lists remotely.
  *	Originally written for the discuss system by Bill Sommerfeld
  *
  *	$Log: not supported by cvs2svn $
- *	Revision 1.16  1996/05/23 22:17:12  ghudson
- *	Lock the acl file instead of the directory; locking a directory
- *	appears to be impossible under Solaris and some other operating
- *	systems.  This also simplifies things a lot, since we don't have to
- *	separately open the acl file.
- *
- *	Revision 1.15  1996/05/23 22:05:04  ghudson
- *	You can't open a directory read-write.
- *
  *	Revision 1.14  1994/08/24 03:46:36  cfields
  *	open for RDRW instead of RDONLY when want to lock
  *	Changes by vrt.
@@ -80,12 +71,10 @@
 #include <sys/param.h>
 #include <string.h>
 #include "ansi.h"
-#ifdef SOLARIS
 #include <fcntl.h>
-#endif
 #ifndef lint
 static const char rcsid_acl_core_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v 1.17 1996-05-23 22:17:36 ghudson Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v 1.18 1996-06-05 18:26:10 ghudson Exp $";
 #endif lint
 
 extern dsc_acl *mtg_acl;
@@ -111,12 +100,12 @@ extern char *new_string();
  *	It is assumed that the ACL is in a file in a known directory; 
  *	the following locking protocol is used when modifying ACL's
  *	to ensure consistancy.
- *	1) flock EXCLUSIVE parent directory.
+ *	1) exclusively lock the control file
  *	2) open acl for read, read ACL.
  *	3) modify ACL in core.
  *	4) open #acl for write, write ACL.
  *	5) rename #acl to acl (this is assumed to be atomic)
- *	6) unlock parent directory.
+ *	6) unlock control file.
  *
  *	The directory is locked, rather than the acl, because the file is
  *	recreated and deleted (for atomicity reasons) on every transaction
@@ -299,46 +288,57 @@ locked_open_mtg(mtg_name, lockfd, acl_name, acl)
 {
 	int mtg_name_len = strlen (mtg_name);
 	int result;
-#ifdef SOLARIS
-    struct flock lock;
-#endif
-
+	int u_acl_f;
+	struct flock lock;
+	char control_name[MAXPATHLEN];
+	
 	*lockfd = -1;
+	u_acl_f = -1;
 	/* XXX historical magic number should be MAXPATHLEN */
 	if (mtg_name[0] != '/' || mtg_name_len == 0 || 
 	    mtg_name_len > MAXPATHLEN || mtg_name [mtg_name_len-1] == '/') {
 		result = BAD_PATH;
 		goto punt;
 	}
-	(void) strcpy (acl_name, mtg_name);
-	(void) strcat (acl_name, "/acl");
-	if((*lockfd = open(acl_name, O_RDWR, 0700)) < 0) {
-		result = (errno == ENOENT) ? NO_SUCH_MTG :
-		    (errno == EACCES) ? NO_ACCESS : BAD_PATH;
-		goto punt;
-	}
-#ifdef SOLARIS
-      lock.l_type = F_WRLCK;
-      lock.l_start = 0;
-      lock.l_whence = 0;
-      lock.l_len = 0;
-      if (fcntl(*lockfd, F_SETLK, &lock) != 0)  {
-#else
-	if((flock(*lockfd, LOCK_EX)) != 0) { /* may block... */
-#endif
+	(void) strcpy (control_name, mtg_name);
+	(void) strcat (control_name, "/control");
+	if((*lockfd = open(control_name, O_RDWR, 0700)) < 0) {
 		result = errno;
 		goto punt;
 	}
+	lock.l_type = F_WRLCK;
+	lock.l_start = 0;
+	lock.l_whence = 0;
+	lock.l_len = 0;
+	if (fcntl(*lockfd, F_SETLK, &lock) != 0)  {
+		result = errno;
+		goto punt;
+	}
+	(void) strcpy (acl_name, mtg_name);
+	(void) strcat (acl_name, "/acl");
 
-	if (!fis_owner (*lockfd, (int)geteuid())) {
+	if ((u_acl_f = open(acl_name, O_RDONLY, 0700)) < 0) {
+		if (errno == ENOENT)
+			result = NO_SUCH_MTG;
+		else if (errno == EACCES)
+			result = NO_ACCESS;
+		else
+			result = BAD_PATH;
+		goto punt;
+	}
+	if (!fis_owner (u_acl_f, (int)geteuid())) {
 		result = NO_ACCESS;
 		goto punt;
 	}
 
-	*acl = acl_read (*lockfd);
+	*acl = acl_read (u_acl_f);
+	(void) close(u_acl_f);
+	u_acl_f = 0;
 	return 0;
 punt:
 	if (*lockfd >= 0) (void) close(*lockfd);
+	if (u_acl_f >= 0) (void) close(u_acl_f);
+	if (*acl) acl_destroy(*acl);
 
 	return result;
 }
