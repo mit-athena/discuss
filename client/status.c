@@ -2,13 +2,16 @@
  *
  * Status request for DISCUSS
  *
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/status.c,v 1.7 1987-03-22 04:42:43 spook Exp $
+ * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/status.c,v 1.8 1987-04-10 23:50:25 srz Exp $
  * $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/status.c,v $
  * $Locker:  $
  *
  * Copyright (C) 1986 by the MIT Student Information Processing Board
  *
  * $Log: not supported by cvs2svn $
+ * Revision 1.7  87/03/22  04:42:43  spook
+ * *** empty log message ***
+ * 
  * Revision 1.6  86/12/07  17:49:54  wesommer
  * Lint fixes.
  * 
@@ -30,6 +33,9 @@
  * 
  *
  */
+#ifndef lint
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/status.c,v 1.8 1987-04-10 23:50:25 srz Exp $";
+#endif lint
 
 #include <stdio.h>
 #include "ss.h"

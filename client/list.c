@@ -2,13 +2,16 @@
  *
  * List request for DISCUSS
  *
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.12 1987-03-22 04:35:35 spook Exp $
+ * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.13 1987-04-10 23:50:14 srz Exp $
  * $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v $
  * $Locker:  $
  *
  * Copyright (C) 1986 by the MIT Student Information Processing Board
  *
  * $Log: not supported by cvs2svn $
+ * Revision 1.12  87/03/22  04:35:35  spook
+ * *** empty log message ***
+ * 
  * Revision 1.11  87/01/18  22:39:33  spook
  * Use local_realm() rather than REALM.
  * 
@@ -46,6 +49,9 @@
  * 
  *
  */
+#ifndef lint
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.13 1987-04-10 23:50:14 srz Exp $";
+#endif lint
 
 #include <stdio.h>
 #include <strings.h>

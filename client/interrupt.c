@@ -3,6 +3,9 @@
  *
  * Stan picked the names, not me..
  */
+#ifndef lint
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/interrupt.c,v 1.2 1987-04-10 23:49:22 srz Exp $";
+#endif lint
 
 #include <signal.h>
 

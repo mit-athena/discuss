@@ -2,6 +2,10 @@
  * Pager: Routines to create a "more" running out of a particular file
  * descriptor.
  */
+#ifndef lint
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/pager.c,v 1.2 1987-04-10 23:50:21 srz Exp $";
+#endif lint
+
 #include <stdio.h>
 
 int pager_create() 
