@@ -1,9 +1,12 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.6 1987-02-04 16:10:26 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.7 1987-03-22 05:21:50 spook Exp $
  *	$Locker:  $
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.6  87/02/04  16:10:26  srz
+ * Changed fcntl.h -> file.h
+ * 
  * Revision 1.5  86/12/07  16:04:09  rfrench
  * Globalized sci_idx
  * 
@@ -23,7 +26,7 @@
  */
 
 #ifndef lint
-static char *rcsid_addmtg_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.6 1987-02-04 16:10:26 srz Exp $";
+static char *rcsid_addmtg_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.7 1987-03-22 05:21:50 spook Exp $";
 #endif lint
 
 #include <strings.h>
@@ -49,26 +52,28 @@ add_mtg(argc, argv)
 	name_blk nb;
 	int code,have_names;
 	char *user,*realm,long_name[80],cerror[80];
+	char auser_id[BUFSIZ];
 	trn_info t_info;
 	selection_list *trn_list,*trn_temp;
 
-	used = (int *)malloc(sizeof(int)*argc);
-	bzero(used, sizeof(int)*argc); /* bletch */
+	used = (int *)calloc(argc, sizeof(int));
 	user = "";
 	realm = user;
 
-	expand_mtg_set("","","*",&set,&num);
+	dsc_expand_mtg_set(user_id, "*", &set, &num, &code);
 
 	i = 1;
 	have_names = 0;
 	if (dsc_public.attending) {
-		dsc_get_mtg_info(dsc_public.mtg_uid,&dsc_public.m_info,&code);
+		dsc_get_mtg_info(&dsc_public.nb,
+				 &dsc_public.m_info,&code);
 		if (code) {
-			(void) ss_perror(sci_idx,code,"Can't get meeting info");
+			(void) ss_perror(sci_idx, code,
+					 "Can't get meeting info");
 			return;
 		}
-		dsc_get_trn_info(dsc_public.mtg_uid,dsc_public.current,&t_info,
-				 &code);
+		dsc_get_trn_info(&dsc_public.nb,
+				 dsc_public.current, &t_info, &code);
 		if (code)
 			t_info.current = 0;
 		else
@@ -77,11 +82,11 @@ add_mtg(argc, argv)
 		free(t_info.author);
 		t_info.author = NULL;
 		if (argc == 1) {
-			trn_list = trn_select(&t_info,"current",
-					      (selection_list *)NULL,&code);
+			trn_list = trn_select(&t_info, "current",
+					      (selection_list *)NULL, &code);
 			if (code) {
-				ss_perror(sci_idx,code,"");
-				free(trn_list);
+				ss_perror(sci_idx, code, "");
+				free((char *)trn_list);
 				return;
 			}
 			used[1] = 1;
@@ -89,8 +94,8 @@ add_mtg(argc, argv)
 		else {
 			trn_list = (selection_list *)NULL;
 			for (;i<argc;i++) {
-				trn_temp = trn_select(&t_info,argv[i],
-						      trn_list,&code);
+				trn_temp = trn_select(&t_info, argv[i],
+						      trn_list, &code);
 				if (code)
 					break;
 				trn_list = trn_temp;
@@ -130,7 +135,7 @@ add_mtg(argc, argv)
 			fprintf(stderr,
 				"Unknown control argument %s\n",
 				argv[i]);
-			free(used);
+			free((char *)used);
 			return;
 		}
 		else {
@@ -138,12 +143,22 @@ add_mtg(argc, argv)
 		}
 	}
 
-	if (user[0] == '\0')
-		user = "discuss";
+	strcpy(auser_id, user_id);
+	if (user[0] != '\0')
+		strcpy(auser_id, user);
+	{
+		register char *at = index(auser_id, '@');
+		if (at) *at = '\0';
+	}
+	strcat(auser_id, "@");
+	if (realm[0] != '\0')
+		strcat(auser_id, realm);
+	else
+		strcat(auser_id, index(user_id, '@')+1);
 
 	if (!have_names) {
 		(void) fprintf(stderr,
-			       "Usage:  %s {-user user} {-public} [mtg_names] [transactions]\n",
+			       "Usage:  %s {-user user|-public} [mtg_names]\n",
 			       argv[0]);
 		(void) fprintf(stderr,
 			       "        %s transactions\n", argv[0]);
@@ -152,9 +167,10 @@ add_mtg(argc, argv)
 
 	for (i = 1; i < argc; i++) {
 		if (!used[i]) {
-			get_mtg_unique_id (realm, user, argv[i], &nb, &code);
+			dsc_get_mtg (auser_id, argv[i], &nb, &code);
 			if (code) {
-				sprintf(cerror,"Getting meeting name (%s)",argv[i]);
+				sprintf(cerror, "Getting meeting name (%s)",
+					argv[i]);
 				ss_perror(sci_idx, code, cerror);
 			}
 			else
@@ -163,10 +179,10 @@ add_mtg(argc, argv)
 punt_this_one: ;
 	}
 
-	free(set);
+	free((char *)set);
 
  punt:
-	free(used);
+	free((char *)used);
 	return;
 }
 
@@ -179,12 +195,12 @@ int trn_no;
 	tfile tf;
 	FILE *fp;
 	name_blk nb;
+	mtg_info m_info;
 
 	unlink(temp_file);
 	fd = open(temp_file,O_WRONLY|O_CREAT,0700);
 	tf = unix_tfile(fd);
-	dsc_get_trn(dsc_public.mtg_uid,trn_no,tf,&code);
-
+	dsc_get_trn(&dsc_public.nb,trn_no,tf,&code);
 	close(fd);
 	tclose(tf,&dummy);
 	tdestroy(tf);
@@ -201,24 +217,43 @@ int trn_no;
 		goto not_ann;
 	if (!fgets(tempbfr,256,fp))
 		goto not_ann;
-	if (strncmp(tempbfr,"  ID:            ",17))
+	if (strncmp(tempbfr,"  Host:          ",17))
+		goto not_ann;
+	if (!fgets(tempbfr,256,fp))
+		goto not_ann;
+	if (strncmp(tempbfr,"  Pathname:      ",17))
 		goto not_ann;
 	fclose(fp);
 	tempbfr[strlen(tempbfr)-1] = '\0';
 	nb.date_attended = nb.last = 0;
+	strncpy(host,tempbfr+17,index(tempbfr+17,':')-tempbfr-17);
+	nb.hostname = malloc((unsigned)strlen(tempbfr)-16);
+	strcpy(nb.hostname,tempbfr+17);
+	nb.pathname = malloc((unsigned)strlen(tempbfr)-16);
+	strcpy(nb.pathname, tempbfr+17);
+	nb.user_id = malloc((unsigned)strlen(user_id)+1);
+	strcpy(nb.user_id, user_id);
+	nb.aliases = (char **)NULL;
+	dsc_get_mtg_info(&nb, &m_info, &code);
+	if (code)
+		return(0);
+
 	short_name = rindex(tempbfr,'/');
 	if (!short_name)
 		short_name = rindex(tempbfr,':');
-	strcpy(nb.mtg_name,short_name+1);
-	strncpy(host,tempbfr+17,index(tempbfr+17,':')-tempbfr-17);
-	strcpy(nb.unique_id,tempbfr+17);
-	strcpy(nb.user,"");
+	nb.aliases = (char **)calloc(3, sizeof(char *));
+	nb.aliases[0] = malloc(strlen(m_info.long_name)+1);
+	strcpy(nb.aliases[0], m_info.long_name);
+	nb.aliases[1] = malloc(strlen(short_name));
+	strcpy(nb.aliases[1],short_name+1);
+	nb.aliases[2] = (char *)NULL;
 	add_the_mtg(host,&nb,long_name,trn_no,&code);
 	return (0); /* Ignore errors! */
 
  not_ann:
 
-	sprintf(cerror,"Transaction [%04d] is not a meeting announcement",
+	sprintf(cerror,
+		"Transaction [%04d] is not a properly formatted meeting announcement",
 		trn_no);
 	ss_perror(sci_idx,0,cerror);
 	return (0);
@@ -235,13 +270,14 @@ add_the_mtg(host,nb,long_name,tran,code)
 	name_blk *nbp;
 	int j;
 
-	dsc_get_mtg_info(nb->unique_id,&dsc_temp.m_info,code);
+	dsc_get_mtg_info(nb, &dsc_temp.m_info,code);
 	if (*code) {
 		if (tran)
 			sprintf(cerror,"Transaction [%04d] ",tran);
 		else
 			*cerror = '\0';
-		sprintf(cerror+strlen(cerror),"Meeting name (%s)",nb->mtg_name);
+		sprintf(cerror+strlen(cerror), "Meeting name (%s)",
+			nb->aliases[0]);
 		ss_perror(sci_idx,*code,cerror);
 		return (*code);
 	}
@@ -250,30 +286,32 @@ add_the_mtg(host,nb,long_name,tran,code)
 	nb->last = 0;
 	/* see if we're already attending... */
 	for (j = 0,nbp = set; j < num; j++,nbp++) {
-		if (!strcmp (nbp -> unique_id, nb->unique_id)) {
+		if (!strcmp (nbp ->hostname, nb->hostname) && !strcmp(nbp->pathname, nb->pathname)) {
 			nb->date_attended = nbp -> date_attended;
 			nb->last = nbp -> last;
-			if (!strcmp (nbp -> mtg_name, nb->mtg_name)) {
+			if (!strcmp (nbp->aliases[0], nb->aliases[0])) {
 				if (tran)
-					sprintf(cerror,"Transaction [%04d] ",tran);
+					sprintf(cerror, "Transaction [%04d] ",
+						tran);
 				else
 					*cerror = '\0';
-				sprintf(cerror+strlen(cerror),"Meeting %s (%s) is duplicated",
-					long_name,nb->mtg_name);
+				sprintf(cerror+strlen(cerror),
+					"Meeting %s (%s) is duplicated",
+					long_name,nb->aliases[0]);
 				ss_perror(sci_idx,0,cerror);
 				return (0);
 			}
 		}
 	}
-	update_mtg_set(realm, "", nb, 1, code);
+	dsc_update_mtg_set(user_id, nb, 1, code);
 	if (*code) {
-		sprintf(cerror,"Setting meeting name (%s)",nb->mtg_name);
+		sprintf(cerror,"Setting meeting name (%s)",nb->aliases[0]);
 		ss_perror(sci_idx, *code, cerror);
 	}
 	else {
 		if (tran)
 			printf("Transaction [%04d] ",tran);
-		printf("Meeting %s (%s) added\n",long_name,nb->mtg_name);
+		printf("Meeting %s (%s) added\n",long_name,nb->aliases[0]);
 	}
 	return (0);
 }
