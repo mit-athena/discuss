@@ -1,14 +1,27 @@
 /*
+ * Copyright (C) 1989 by the Student Information Processing Board of
+ * the Massachusetts Institute of Technology.  See
+ * mit-sipb-copyright.h for copyright and other info.
  *
  * dispatch.c  -- Procedure to do the dispatching on an RPC call.
  *		  This contains the procedure table.
  *
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/dispatch.c,v 1.8 1989-01-04 22:18:43 raeburn Exp $
+ *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/dispatch.c,v $
+ *	$Locker:  $
+ *	$Log: not supported by cvs2svn $
  */
 
-#include "../include/rpc.h"
-#include "../include/interface.h"
-#include "../include/tfile.h"
-#include "../include/acl.h"
+#include "rpc.h"
+#include <discuss/interface.h>
+#include <discuss/tfile.h>
+#include <discuss/acl.h>
+#include "ansi.h"
+
+#ifndef lint
+static const char rcsid_dispatch_c[] =
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/dispatch.c,v 1.8 1989-01-04 22:18:43 raeburn Exp $";
+#endif
 
 extern bool recvbool();
 extern char *recvstr();
@@ -334,4 +347,3 @@ send_acl(acl)
 		sendstr(ae->principal);
 	}
 }
-
