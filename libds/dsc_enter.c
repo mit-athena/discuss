@@ -9,8 +9,12 @@
  * dsc_enter.c - enter a transaction from a file into discuss.
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsc_enter.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsc_enter.c,v 1.10 1997-12-17 00:30:37 ghudson Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsc_enter.c,v 1.11 1997-12-17 19:37:36 ghudson Exp $
  *	$Log: not supported by cvs2svn $
+ *	Revision 1.10  1997/12/17 00:30:37  ghudson
+ *	Oops, REG_BASIC isn't universal.  (It's 0 where it is defined, so just
+ *	punt it.)
+ *
  *	Revision 1.9  1997/12/17 00:12:41  ghudson
  *	Use POSIX regexps.
  *
@@ -38,7 +42,7 @@
 
 #ifndef	lint
 static char rcsid[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsc_enter.c,v 1.10 1997-12-17 00:30:37 ghudson Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsc_enter.c,v 1.11 1997-12-17 19:37:36 ghudson Exp $";
 #endif
 
 #include <stdio.h>
@@ -240,7 +244,7 @@ dsc_enter_filter(source, mtg_host, mtg_path, accept_headers,
 
 	/* back to the beginning */
 	(void) rewind(f);
-	(void) lseek(fileno(f), (long)0, L_SET);
+	(void) lseek(fileno(f), (long)0, SEEK_SET);
 	/* create transaction stream */
 	transaction = unix_tfile(fileno(f));
 
