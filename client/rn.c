@@ -1,18 +1,23 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/rn.c,v $
  *	$Author: srz $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/rn.c,v 1.2 1987-11-07 02:50:38 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/rn.c,v 1.3 1988-01-15 23:11:33 srz Exp $
  *
  *	Copyright (C) 1987 by the Massachusetts Institute of Technology
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.2  87/11/07  02:50:38  srz
+ * Added new commands ('r', 't', 'p', '?'), and fixed bug that Mark reported
+ * about trying to reprint the same transaction over and over again when
+ * quitting out of 'more'.
+ * 
  * Revision 1.1  87/10/24  19:48:02  srz
  * Initial revision
  * 
  */
 
 #ifndef lint
-static char *rcsid_update_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/rn.c,v 1.2 1987-11-07 02:50:38 srz Exp $";
+static char *rcsid_update_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/rn.c,v 1.3 1988-01-15 23:11:33 srz Exp $";
 #endif lint
 
 #include "types.h"
@@ -97,7 +102,10 @@ rn(argc, argv, ss_idx)
 				goto punt;
 			case ' ':
 			case 'n':
-				ss_execute_line(ss_idx, "next", &code);
+				if (dsc_public.current == 0)
+					ss_execute_line(ss_idx, "pr first", &code);
+				else
+					ss_execute_line(ss_idx, "next", &code);
 				if (code != 0) goto punt;
 				break;
 			case 'p':
