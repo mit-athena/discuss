@@ -7,12 +7,15 @@
  */
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl.c,v 1.12 1989-06-03 00:41:20 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl.c,v 1.13 1994-03-25 17:21:04 miki Exp $
  *
  * 	Routines for the manipulation of access control lists in core,
  *	along with routines to move them to and from files.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.12  89/06/03  00:41:20  srz
+ * Added standard copyright notice.
+ * 
  * Revision 1.11  89/01/04  22:20:45  raeburn
  * Fixed include path: internal.h doesn't need to be in the discuss
  * subdirectory.
@@ -60,7 +63,7 @@
 
 #ifndef lint
 static const char rcsid_acl_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl.c,v 1.12 1989-06-03 00:41:20 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl.c,v 1.13 1994-03-25 17:21:04 miki Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -119,8 +122,8 @@ dsc_acl *acl_read(fd)
 	for (ae=list->acl_entries; n; --n)  {
 		buf[0]=0;
 		if (fgets(buf, 128, f) == NULL) goto punt;
-		if(cp=index(buf, '\n')) *cp='\0';
-		if(cp=index(buf, ':')) {
+		if(cp=strchr(buf, '\n')) *cp='\0';
+		if(cp=strchr(buf, ':')) {
 			*cp='\0';
 			list->acl_length++;
 			ae->principal = NULL;
@@ -365,7 +368,7 @@ bool acl_is_subset(s1, s2)
      register const char *s1, *s2;
 {
 	register char *last;
-	while(*s1 && (last = index(s2, *s1))) s1++;
+	while(*s1 && (last = strchr(s2, *s1))) s1++;
 
 	return(last != NULL);
 }
@@ -382,7 +385,7 @@ char *acl_intersection(s1, s2)
 	register int resp=0;
 
 	while(*s1) {
-		if(index(s2, *s1)) {
+		if(strchr(s2, *s1)) {
 			result[resp++] = *s1;
 			result=realloc(result, (unsigned)(resp+1));
 		}
@@ -399,7 +402,7 @@ char *acl_union(s1, s2)
 	register char *result=malloc((unsigned)(resp+1));
 	strcpy(result, s2);
 	while(*s1) {
-		if (!index(result, *s1)) {
+		if (!strchr(result, *s1)) {
 			result[resp++]= *s1;
 			result=realloc(result, (unsigned)(resp+1));
 		}
@@ -415,7 +418,7 @@ char *acl_subtract(s1, s2)
 	register char *result = malloc(1);
 	register int len=0;
 	for (; *s2; s2++) {
-		if (!index(s1, *s2)) {
+		if (!strchr(s1, *s2)) {
 			result = realloc(result, (unsigned)(len+2));
 			result[len++]= *s2;
 		}
@@ -441,7 +444,7 @@ char *acl_canon(s1, s2, code)
 
 	*code = 0;
 	for (cp = s1; *cp; cp++) {
-		if (*cp != ' ' && !index(s2, *cp)) 
+		if (*cp != ' ' && !strchr(s2, *cp)) 
 			*code = BAD_MODES;
 	}
 	maxlen = strlen(s2);
@@ -451,7 +454,7 @@ char *acl_canon(s1, s2, code)
 		if (len > maxlen) /* shouldn't happen, but.. */
 			out = realloc(out, (unsigned)len + 1);
 
-		out[len-1] = (index(s1, *cp) ? *cp : ' ');
+		out[len-1] = (strchr(s1, *cp) ? *cp : ' ');
 	}
 	out[len]='\0';
 	return(out);
