@@ -8,13 +8,19 @@
 /*
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.28 1990-02-24 18:58:08 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.29 1990-03-19 13:38:51 srz Exp $
  *
  *
  * core.c --    Routines that are the meat of discuss.  These provide user
  *		callable routines.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.28  90/02/24  18:58:08  srz
+ * Added signatures to meetings.  This involves adding two routines,
+ * add_trn2 and get_trn_info3, for storing and saving this information.
+ * Signatures are glommed onto the end of the author, so we don't
+ * have to change the meeting format.
+ * 
  * Revision 1.27  89/08/09  22:39:05  srz
  * Added meeting forwarding.
  * 
@@ -72,7 +78,7 @@
  */
 #ifndef lint
 static char rcsid_core_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.28 1990-02-24 18:58:08 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.29 1990-03-19 13:38:51 srz Exp $";
 #endif lint
 
 
@@ -1540,7 +1546,8 @@ int *result;
 
      close (u_trn_f);				/* bombs away */
      close (u_control_f);
-     close (u_acl_f);
+     if (u_acl_f)
+	  close (u_acl_f);
      acl_destroy(mtg_acl);
      mtg_acl = NULL;
      current_mtg [0] = '\0';
