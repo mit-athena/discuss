@@ -1,10 +1,13 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list_acl.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list_acl.c,v 1.7 1988-02-15 00:58:51 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list_acl.c,v 1.8 1988-08-10 21:15:03 raeburn Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.7  88/02/15  00:58:51  wesommer
+ * Saber/lint fixes.
+ * 
  * Revision 1.6  87/03/24  14:02:47  spook
  * Changes for new interfaces..
  * 
@@ -31,7 +34,8 @@
  */
 
 #ifndef lint
-static char *rcsid_list_acl_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list_acl.c,v 1.7 1988-02-15 00:58:51 wesommer Exp $";
+static char rcsid_list_acl_c[] =
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list_acl.c,v 1.8 1988-08-10 21:15:03 raeburn Exp $";
 #endif lint
 
 #include <strings.h>
@@ -47,7 +51,7 @@ list_acl(argc, argv)
 	int argc;
 	char **argv;
 {
-	Acl *list;
+	dsc_acl *list;
 	int code;
 	char *modes;
 
@@ -85,9 +89,9 @@ list_acl(argc, argv)
 }
 
 print_acl(list)
-	Acl *list;
+	dsc_acl *list;
 {
-	register acl_entry *ae;
+	register dsc_acl_entry *ae;
 	register int n;
 	for (ae = list->acl_entries, n = list->acl_length; n; --n, ++ae)
 		printf("%-10s %s\n", ae->modes, ae->principal);
