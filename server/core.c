@@ -806,10 +806,14 @@ int *result;
      info -> chairman = new_string ("");
      info -> long_name = new_string ("");
      info -> location = new_string (mtg_name);
+     info -> access_modes = new_string ("");
      info -> public_flag = TRUE;
 
      *result = open_mtg (mtg_name);
      if (*result) return;
+
+     free(info -> access_modes);
+     info -> access_modes = new_string (acl_get_access(mtg_acl, rpc_caller));
 
      if (!has_mtg_access('s')) {
 	  *result = NO_ACCESS;
