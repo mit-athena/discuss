@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.20 1989-01-29 17:19:55 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.21 1989-02-25 18:33:17 raeburn Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
@@ -8,18 +8,18 @@
 
 #ifndef lint
 static char rcsid_interface_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.20 1989-01-29 17:19:55 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.21 1989-02-25 18:33:17 raeburn Exp $";
 #endif lint
 
 #include <stdio.h>
-#include <strings.h>
+#include <string.h>
 #include <errno.h>
 #include <discuss/tfile.h>
 #include <discuss/interface.h>
 #include <discuss/acl.h>
 #include <discuss/dsname.h>
 #include "rpc.h"
-#include "dsc_et.h"
+#include <discuss/dsc_et.h>
 
 /* for linked list of meetings */
 
