@@ -1,5 +1,5 @@
 ;;;	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v $
-;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.4 1988-10-26 23:25:47 srz Exp $
+;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.5 1988-10-29 01:47:34 balamac Exp $
 ;;;
 ;;;  Emacs lisp code to remote control a "discuss" shell process to
 ;;;  provide an emacs-based interface to the discuss conferencing system.
@@ -8,6 +8,9 @@
 ;;;  Written by Stan Zanarotti and Bill Sommerfeld.
 ;;;
 ;;;  $Log: not supported by cvs2svn $
+; Revision 1.4  88/10/26  23:25:47  srz
+; Now goes to next transaction when going to a meeting.
+; 
 ; Revision 1.3  88/10/26  15:23:15  eichin
 ; fix path for non-exl edsc client.
 ; 
@@ -39,6 +42,9 @@
 
 (autoload 'discuss-reply "discuss-enter"
 	  "Reply to an existing discuss transaction." t)
+
+(autoload 'discuss-randrp "discuss-enter"
+	  "Randrp in a meeting." t)
 
 (defvar discuss-mtgs-mode-map nil
   "Keymap used by the meetings-list mode of the discuss subsystem")
@@ -535,6 +541,7 @@ a	Add meeting.  Not implemented yet."
   (define-key discuss-trn-mode-map "\e\C-h" 'discuss-trn-summary)
   (define-key discuss-trn-mode-map "t" 'discuss-talk)
   (define-key discuss-trn-mode-map "r" 'discuss-reply)
+  (define-key discuss-trn-mode-map "\C-c\C-r" 'discuss-randrp)
   (define-key discuss-trn-mode-map "\er" 'discuss-reply-by-mail)
   (define-key discuss-trn-mode-map "\C-o" 'discuss-trn-output)
   (define-key discuss-trn-mode-map "i" 'discuss-trn-input)

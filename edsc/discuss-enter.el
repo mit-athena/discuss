@@ -1,5 +1,5 @@
 ;;;	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss-enter.el,v $
-;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss-enter.el,v 1.3 1988-10-26 20:15:24 eichin Exp $
+;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss-enter.el,v 1.4 1988-10-29 01:50:29 balamac Exp $
 ;;;
 ;;;  Emacs lisp code to enter transaction into discuss.  Part of the
 ;;;  emacs-based interface to the discuss conferencing system.
@@ -19,6 +19,9 @@
 (defvar discuss-edit-mode-map nil
   "Keymap used by the edit mode of the discuss subsystem")
 
+(defvar discuss-randrp-trn-info nil
+  "Randrom transaction information.")
+
 (defun discuss-temp-file ()
   "Return name of temporary buffer to use to transfer transactions."
   (format "/tmp/em.disc%d" 
@@ -34,11 +37,28 @@
   (interactive)
   (let ((subject (nth 11 discuss-current-transaction-info)))
     ;; Add the Re: field
-    (if (equal (substring subject 0 4) "Re: ")
+    (if (and (> (length subject) 3)
+	     (equal (substring subject 0 4) "Re: "))
 	nil
       (setq subject (concat "Re: " subject)))
     (discuss-enter discuss-current-meeting discuss-current-transaction
 		   subject t)))
+
+(defun discuss-randrp ()
+  "Randrp in a meeting."
+  (interactive)
+  (discuss-send-cmd (format "(grtn %s)\n" discuss-current-meeting)
+		    'discuss-randrp-gmi-end 'discuss-read-form))
+
+(defun discuss-randrp-gmi-end () 
+  (setq discuss-randrp-trn-info discuss-form)
+  (let ((subject (nth 11 discuss-randrp-trn-info))
+	(trn-num (nth 0 discuss-randrp-trn-info)))
+    (if (and (> (length subject) 3)
+	     (equal (substring subject 0 4) "Re: "))
+	nil
+      (setq subject (concat "Re: " subject)))
+    (discuss-enter discuss-current-meeting trn-num subject t)))
 
 (defun discuss-enter (mtg-name reply-trn subject &optional reply)
     (setq discuss-new-trn-buf
