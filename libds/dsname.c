@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v 1.19 1989-03-29 00:52:55 raeburn Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v 1.20 1989-03-29 22:32:42 srz Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
@@ -24,7 +24,7 @@
 
 #ifndef lint
 static const char rcsid_dsname_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v 1.19 1989-03-29 00:52:55 raeburn Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v 1.20 1989-03-29 22:32:42 srz Exp $";
 #endif lint
 
 extern char *malloc (), *local_realm (), *getenv ();
@@ -32,7 +32,7 @@ extern int errno;
 
 /*
  * Format of data file:
- *    status:last_time:last_seen:uid:name1:name2:name3:....:nameN:
+ *    status:last_time:last_seen:uid:name1,name2name3,....,nameN:
  */
 
 static FILE *db = (FILE *)NULL;
@@ -283,8 +283,6 @@ static int setdbent(user_id)
 
     if (!user_id)
 	user_id = "";
-    auid = malloc(strlen(user_id)+2);
-    strcpy(auid, user_id);
     if (!db_file)
 	db_file = malloc(MAXPATHLEN);
     if (code = set_rc_filename(user_id, db_file, MAXPATHLEN))
@@ -576,6 +574,7 @@ void dsc_update_mtg_set(user_id, set, num, result)
     new_file = fopen (new_name, "w+");
     if (new_file == NULL) {
 	*result = errno;
+	free(old_name);
 	free (new_name);
 	return;
     }
@@ -585,8 +584,10 @@ void dsc_update_mtg_set(user_id, set, num, result)
 	touched[i] = 0;
 
     while ((r=getdbent()) != 0) {
-	if (r == -1)	/* if bad format, punt it */
-	    continue;
+	if (r == -1) {	/* if bad format, we complain loudly */
+	     *result = BAD_MTGS_FILE;
+	     goto punt;
+	}
 	/* walk through user structures, look for matching entries */
 	for (i = 0, nbp = set;  i < num; i++, nbp++) {
 	    if (!strcmp (current.hostname, nbp -> hostname) &&
@@ -631,16 +632,19 @@ void dsc_update_mtg_set(user_id, set, num, result)
 	    free (temp);
 	}
     }
-    /* do our best to shove stuff out to disk */
-    fflush (new_file);
-    if (fsync (fileno (new_file)) == -1)
-	goto punt;
     enddbent();
-    sync ();
-    if (ferror (new_file))
-	goto punt;
-    if (fclose (new_file))
-	goto punt;
+    /* Fsync the file, just to be sure */
+    fflush(new_file);
+    if (fsync (fileno (new_file)) == -1)
+	 goto punt;
+    if (ferror (new_file)) {
+	 *result = CANT_WRITE_TEMP;
+	 goto punt;
+    }
+    if (fclose (new_file)) {
+	 *result = CANT_WRITE_TEMP;
+	 goto punt;
+    }
     new_file = NULL;
     *result = (rename(new_name, old_name) < 0) ? errno : 0;
     if (*result)
@@ -655,7 +659,6 @@ punt:
     if (new_file)
 	fclose(new_file);
     enddbent();
-    *result = CANT_WRITE_TEMP;
     unlink(new_name);
     free(new_name);
     free(old_name);
