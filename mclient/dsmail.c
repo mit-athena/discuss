@@ -1,4 +1,4 @@
-/*
+ /*
  *
  *	Copyright (C) 1988, 1989 by the Massachusetts Institute of Technology
  *    	Developed by the MIT Student Information Processing Board (SIPB).
@@ -12,6 +12,9 @@
  *        $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/dsmail.c,v $
  *
  *        $Log: not supported by cvs2svn $
+ * Revision 1.1  94/04/08  12:37:12  vrt
+ * Initial revision
+ * 
  * Revision 1.23  93/07/14  02:14:35  srz
  * Check for DELETED_TRN on reply transaction.
  * 
@@ -94,7 +97,7 @@
 #include <ctype.h>
 #include <sys/types.h>
 #include <sys/file.h>
-#ifdef SVR4
+#if defined(SVR4) || defined (SYSV)
 #include "/usr/ucbinclude/sysexits.h"
 #define EX_CONFIG EX_SOFTWARE
 #else
@@ -116,7 +119,7 @@
 
 #ifndef	lint
 static char rcsid[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/dsmail.c,v 1.1 1994-04-08 12:37:12 vrt Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/dsmail.c,v 1.2 1994-08-14 22:21:28 cfields Exp $";
 #endif
 
 char *malloc(), *realloc ();
@@ -128,6 +131,7 @@ int getopt();
 
 extern char *optarg;                /* External variables for getopt */
 extern int optind;
+extern int regerrno;
 
 char *deflist[] = {
 	"^to$","^from$","^cc$",".*-to$",".*-from$","^date$", NULL
@@ -527,7 +531,7 @@ void PRS(argc,argv)
 		goto lusage;
 	usr_mtg=argv[optind];
 	if (have_host) {
-		usr_mtg = index (usr_mtg, ':');
+		usr_mtg = strchr (usr_mtg, ':');
 		if (!usr_mtg)
 			goto lusage;
 		usr_mtg++;
