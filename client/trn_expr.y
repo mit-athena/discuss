@@ -1,9 +1,9 @@
 %token INTEGER NREF PREF FIRST LAST NEXT PREV FREF LREF CUR
 %left '+' '-'
 %{
-#define TRNERR_SYNERR 777
 #include <ctype.h>
 #include "../include/interface.h"
+#include "discuss_err.h"
 
 static trn_info *trnexpr_curtrn;
 static mtg_info *trnexpr_curmtg;
@@ -43,9 +43,13 @@ expr	: trn_no '-' trn_no
 	;
 %%
 
-static yyerror() 
+static yyerror(msg)
+	char *msg;
 {
-	trnexpr_err = TRNERR_SYNERR;
+#ifdef	lint
+	msg = msg;
+#endif	lint
+	trnexpr_err = DISC_INVALID_TRN_SPECS;
 }
 
 static yylex() 
@@ -77,8 +81,6 @@ static yylex()
 		return(NREF);
 	} else if (!strncmp(cp, "pref", 4)) {
 		cp += 4;
-		printf("pref: cur=%d, pref=%d\n", trnexpr_curtrn->current,
-		       trnexpr_curtrn->pref);
 		yylval=trnexpr_curtrn->pref;
 		return(PREF);
  	} else if (!strncmp(cp, "first", 5)) {
@@ -126,7 +128,7 @@ int trnexpr_parse(mtg, trn, string, lorange, highrange)
 	trnexpr_curmtg = mtg;
 	trnexpr_curtrn = trn;
 	trnexpr_err = 0;
-	yyparse();
+	(void) yyparse();
 	if(lorange)
 		*lorange = trnexpr_low;
 	if(highrange)
