@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.4 1987-02-04 15:48:18 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.5 1987-03-11 18:00:27 srz Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
@@ -11,6 +11,10 @@
  *		  in-memory superblock, and to open & close meetings.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.4  87/02/04  15:48:18  srz
+ * When there is a choice between making lint happy or cc happy, I tend
+ * to prefer 'cc'.  uid_t is not in 4.2 BSD.
+ * 
  * Revision 1.3  86/11/22  06:25:42  spook
  * Changed to make lint happy.
  * 
@@ -22,7 +26,7 @@
  */
 
 #ifndef lint
-static char *rcsid_coreutil_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.4 1987-02-04 15:48:18 srz Exp $";
+static char *rcsid_coreutil_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.5 1987-03-11 18:00:27 srz Exp $";
 #endif lint
 
 #include "../include/types.h"
@@ -376,11 +380,14 @@ chain_blk *cb;
      if (cbaddr == 0)
 	  return (NO_SUCH_TRN);
 
-     if (nuclear)
-	  awrite (a_control_f, (char *) cb, sizeof (chain_blk), cbaddr);
+     if (nuclear) {
+	  if (awrite (a_control_f, (char *) cb, sizeof (chain_blk), cbaddr) != sizeof (chain_blk))
+	       return (NO_WRITE);
+     }
      else {
 	  lseek (u_control_f, (long)cbaddr, 0);
-	  write (u_control_f, (char *) cb, sizeof (chain_blk));
+	  if (write (u_control_f, (char *) cb, sizeof (chain_blk)) != sizeof (chain_blk))
+	       return (NO_WRITE);
      }
 
      return (0);

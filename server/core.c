@@ -155,15 +155,17 @@ int *result;
 	  cb.trn_chain = ++super.highest_chain;
      }
 
-     write_chain (&cb);					/* write it out */
+     if (write_chain (&cb) != 0)			/* write it out */
+	  goto werror;
 
      /* update fref & lref of chain */
      read_chain (cb.trn_chain, &spare_cb);
      spare_cb.chain_lref = cb.current;			/* update lref */
      if (cb.pref == 0)
 	  spare_cb.chain_fref = cb.current;
-     write_chain (&spare_cb);
 
+     if (write_chain (&spare_cb) != 0)
+	  goto werror;
 
      /* update nref of pref */
      if (reply_trn != 0) {
@@ -203,10 +205,10 @@ int *result;
      th.text_addr = th.author_addr + th.author_len;
 
      lseek (u_trn_f, (long)0, 2);
-     if (write (u_trn_f, (char *) &th, sizeof (th)) < 0) goto werror;
+     if (write (u_trn_f, (char *) &th, sizeof (th)) != sizeof (th)) goto werror;
 
-     if (write (u_trn_f, subject, th.subject_len) < 0) goto werror;
-     if (write (u_trn_f, author, th.author_len) < 0) goto werror;
+     if (write (u_trn_f, subject, th.subject_len) != th.subject_len) goto werror;
+     if (write (u_trn_f, author, th.author_len) != th.author_len) goto werror;
 
      /* copy transaction from source_file, counting NL's. */
      tfs = th.num_chars;
@@ -217,7 +219,7 @@ int *result;
 	  for (bptr = buffer, i = 0; i < tocopy; bptr++,i++)
 	       if (*bptr == '\n')
 		    th.num_lines++;
-	  if (write (u_trn_f, buffer, tocopy) < 0) goto werror;
+	  if (write (u_trn_f, buffer, tocopy) != tocopy) goto werror;
 	  tfs -= tocopy;
      }
 
@@ -225,7 +227,7 @@ int *result;
      abort_file = NULL;
 
      lseek(u_trn_f, (long)(cb.trn_addr), 0);
-     if (write (u_trn_f, (char *) &th, sizeof (trn_hdr)) < 0) goto werror;	/* update num_lines */
+     if (write (u_trn_f, (char *) &th, sizeof (trn_hdr)) != sizeof (trn_hdr)) goto werror;	/* update num_lines */
 
      super.trn_fsize = fsize (u_trn_f);
 
