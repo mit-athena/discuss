@@ -4,7 +4,7 @@
 ;;;    	For copying information, see the file mit-copyright.h in this release.
 ;;;
 ;;;	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v $
-;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.23 1991-02-19 16:13:50 bjaspan Exp $
+;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.24 1991-02-24 14:46:58 bjaspan Exp $
 ;;;
 ;;;  Emacs lisp code to remote control a "discuss" shell process to
 ;;;  provide an emacs-based interface to the discuss conferencing system.
@@ -13,6 +13,9 @@
 ;;;  Written by Stan Zanarotti, Bill Sommerfeld and Theodore Ts'o.
 ;;;
 ;;;  $Log: not supported by cvs2svn $
+; Revision 1.23  91/02/19  16:13:50  bjaspan
+; removed useless check for machine-type in (edsc-machine-type).
+; 
 ; Revision 1.22  91/02/01  17:45:59  tytso
 ; Removed useless let in mainline discuss entrance point.
 ; 
@@ -727,33 +730,38 @@ the argument or the current transaction and leaves the meeting."
   "Mark all messages in the current meeting as read."
   (interactive
    (list (or discuss-cur-mtg-buf
-	     (if (or current-prefix-arg
-		     (= (point) 1))
+	     (if (or current-prefix-arg (= (point) 1))
 		 (completing-read "Meeting name:  "
 				  discuss-meeting-completion-list
 				  nil t "")))))
 
-  ;; If meeting is nil, we are in the *meetings* buffer.  Use the
+  ;; If meeting is nil or a string, we are in the *meetings* buffer.  Use the
   ;; meeting on the current line.
-  (if (not meeting)
+  (if (or (not meeting) (stringp meeting))
       (let ((curline (- (count-lines 1 (min (1+ (point)) (point-max))) 3)))
-	(if (< curline 0)
-	    (error "Not looking at a meeting."))
-	(setq meeting (cadr (aref discuss-meeting-list curline)))
+	(if meeting
+	    nil
+	  (if (< curline 0)
+	      (error "Not looking at a meeting."))
+	  (setq meeting (cadr (aref discuss-meeting-list curline))))
+	(message "Catching up in %s" meeting)
 	(discuss-send-cmd (format "(gmi %s)\n" meeting)
 			  'discuss-end-of-catchup 'discuss-read-form
 			  'discuss-goto-error))
     ;; Otherwise just set discuss-highest-seen.
     (setq discuss-highest-seen (nth 6 discuss-current-meeting-info))
+    (discuss-mark-read-meeting (nth 1 discuss-current-meeting-info))
+    (discuss-next-meeting t)
     (discuss-leave-mtg)
     ))
 
 (defun discuss-end-of-catchup ()
-  (let ((meeting (nth 1 discuss-current-meeting-info))
-	(highest (nth 6 discuss-current-meeting-info)))
-    (message "(ss %d %s)\n" highest meeting)
+  (let ((meeting (nth 1 discuss-form))
+	(highest (nth 6 discuss-form)))
     (discuss-send-cmd (format "(ss %d %s)\n" highest meeting))
     (discuss-mark-read-meeting meeting)
+    (discuss-next-meeting t)
+    (message "Done.")
     ))
 
 (defun discuss-delete-trn-backwards (trn-num)
@@ -1187,7 +1195,7 @@ discuss server while we spin-block."
 ; run this at each load
 (defun discuss-initialize nil
   (setq discuss-version
-	"$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.23 1991-02-19 16:13:50 bjaspan Exp $")
+	"$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.24 1991-02-24 14:46:58 bjaspan Exp $")
 
 ;;;
 ;;; Lots of autoload stuff....
