@@ -37,6 +37,15 @@
 	request		add_mtg, "Add meeting.",
 			add_mtg, am;
 
+	request		list_acl, "List access control list.",
+			list_acl, la;
+
+	request		set_acl, "Add principal to access control list.",
+			set_acl, sa;
+
+	request		del_acl, "Remove principal from ACL.",
+			delete_acl, da;
+
 	request		ss_list_requests, "List available commands.",
 			list_requests, lr, ?;
 
