@@ -3,7 +3,7 @@ CFLAGS=	-g -I../include
 
 SRCS=	pmtg.c dspipe.c mkds.c flsm.c disrc2meetings.sh
 
-PROGS=	pmtg dspipe mkds flsm
+PROGS=	pmtg dspipe mkds flsm crmtgs
 
 SCRIPTS= disrc2meetings
 
@@ -37,6 +37,10 @@ dspipe:	dspipe.o $(LIBS) ../ets/dsc_et.o
 dsmail:	dsmail.o $(LIBS) ../ets/dsc_et.o
 	rm -f dstmp
 	cc $(CFLAGS) -o dstmp -g dsmail.o ../ets/dsc_et.o $(LIBS)
+
+crmtgs:	crmtgs.o $(LIBS) ../ets/dsc_et.o
+	rm -f crmtgs
+	cc $(CFLAGS) -o crmtgs -g crmtgs.o ../ets/dsc_et.o $(LIBS)
 
 mkds:	mkds.o ../ets/dsc_et.o ../client/edit.o $(LIBS)
 	rm -f mkds
