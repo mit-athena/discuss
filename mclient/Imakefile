@@ -1,5 +1,5 @@
 #
-# $Id: Imakefile,v 1.2 1994-03-25 16:59:46 miki Exp $
+# $Id: Imakefile,v 1.3 1994-07-06 15:47:46 miki Exp $
 #
 
 KLIBS=	-ldsk -lusp -lcom_err -lkrb -ldes
@@ -11,7 +11,7 @@ DSLIB=-lPW -lc
 #endif
 
 #ifdef SOLARIS
-DSLIB=-ladm -lmail
+DSLIB=-lbsd
 #endif
 
 SimpleProgram(create_mtg_dir,create_mtg_dir.o,,$(ATHBINDIR))
