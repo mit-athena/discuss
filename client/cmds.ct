@@ -21,9 +21,6 @@
 	request		write_trans, "Write a transaction into a file.",
 			write, w;
 
-	request		catchup, "Mark all transaction as read.",
-			catch_up, catch, c;
-
 	request		goto_mtg, "Go to specified meeting.",
 			goto, go, g;
 
