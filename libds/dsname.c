@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v 1.16 1988-02-15 01:02:45 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v 1.17 1988-02-18 07:35:44 wesommer Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
@@ -8,7 +8,7 @@
 
 #ifndef lint
 static char rcsid_dsname_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v 1.16 1988-02-15 01:02:45 wesommer Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v 1.17 1988-02-18 07:35:44 wesommer Exp $";
 #endif lint
 
 /*
@@ -583,7 +583,9 @@ dsc_update_mtg_set(user_id, set, num, result)
 				if (current.alias_list != NULL)
 					free (current.alias_list);
 				current.alias_list = compress(nbp -> aliases);
-				current.spare = nbp->spare;
+				if (current.spare)
+					free (current.spare);
+				current.spare = ds(nbp->spare);
 				touched[i] = 1;
 			}
 		}
