@@ -1,24 +1,27 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v 1.3 1986-12-05 20:06:12 rfrench Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v 1.4 1987-02-12 21:40:57 spook Exp $
  *	$Locker:  $
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.3  86/12/05  20:06:12  rfrench
+ * General cleanup; default directory /usr/spool/discuss
+ * 
  * Revision 1.2  86/11/24  20:07:21  rfrench
  * Initial (working) revision
  * 
  */
 
 #ifndef lint
-static char *rcsid_mkds_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v 1.3 1986-12-05 20:06:12 rfrench Exp $";
+static char *rcsid_mkds_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v 1.4 1987-02-12 21:40:57 spook Exp $";
 #endif lint
 
-#include "../include/tfile.h"
-#include "../include/dsc_et.h"
-#include "../include/config.h"
-#include "../include/interface.h"
-#include "../include/rpc.h"
-#include "../client/globals.h"
+#include "tfile.h"
+#include "dsc_et.h"
+#include "config.h"
+#include "interface.h"
+#include "rpc.h"
+#include "globals.h"
 #include <sys/time.h>
 #include <sys/file.h>
 #include <stdio.h>
@@ -26,22 +29,22 @@ static char *rcsid_mkds_c = "$Header: /afs/dev.mit.edu/source/repository/athena/
 #include <strings.h>
 #include <netdb.h>
 
-struct _dsc_pub dsc_public;
-
 #define cupper(x) (islower(x)?toupper(x):(x))
+#define clower(x) (isupper(x)?tolower(x):(x))
 
+char *getenv();
 main(argc,argv)
 int argc;
 char *argv[];
 {
 	extern tfile unix_tfile();
 	name_blk nb;
-	char long_name[100],short_name[100],host[50],mtg_path[100];
+	char long_name[100],short_name[100],module[50],mtg_path[100];
 	char temp_file[64],temp_file2[64],tempbfr[256];
 	char ann_mtg[100],subject[100];
 	char *whoami;
 	int public = 0,error = 1,result,remove=0,delmtg=0;
-	int fd,txn_no;
+	int fd,txn_no,fatal_err;
 	tfile tf;
 	FILE *fp,*fp2;
 
@@ -77,18 +80,21 @@ char *argv[];
 	(void) strcat(mtg_path,"/");
 	(void) strcat(mtg_path,short_name);
 
-	make_unique(mtg_path,nb.unique_id,host,nb.realm,&result);
+	(void) strcpy (module, "discuss@");
+	nb.realm[0] = '\0';
+	make_unique(mtg_path,nb.unique_id,&module[8],nb.realm,&result);
 	if (result)
 		goto kaboom;
 
 	init_rpc();
-	if (!open_rpc(host,"discuss",&result)) {
-		(void) fprintf(stderr,"%s\n",error_message(result));
-		exit(1);
+	set_module (module, &fatal_err, &result);
+	if (fatal_err) {
+	     (void) fprintf (stderr, "%s\n", error_message(result));
+	     exit(1);
 	}
-
-	if (result)
-		(void) fprintf(stderr,"Warning: %s\n",error_message(result));
+	if (result) {
+	     (void) fprintf (stderr, "Warning: %s\n", error_message(result));
+	}
 
 	if (remove) {
 		remove_mtg(mtg_path,&result);
@@ -114,7 +120,7 @@ char *argv[];
 	nb.last = 0;
 	(void) strcpy(nb.mtg_name,short_name);
 	(void) strcpy(nb.user,"");
-	update_mtg_set(host,"",&nb,1,&result);
+	update_mtg_set(&module[8],"",&nb,1,&result);
 	if (result) {
 		fprintf(stderr,"Error setting meeting name\n");
 		goto kaboom;
@@ -127,7 +133,7 @@ char *argv[];
 	(void) unlink(temp_file);
 	(void) unlink(temp_file2);
 
-	if (edit(temp_file)) {
+	if (edit(temp_file,getenv("EDITOR"))) {
 		(void) fprintf(stderr,
 		  "Error during edit; transaction not entered.\n");
 		goto kaboom;
@@ -226,11 +232,9 @@ make_unique(path,unique,host,realm,result)
 char *path,*unique,*host,*realm;
 int *result;
 {
-	char *colon,bitbucket[128];
+	char *colon,bitbucket[128],*cp;
 	int host_len;
 	struct hostent *hp;
-	struct timeval *tp;
-	struct timezone *tzp;
 
 	colon = index(path,':');
  
@@ -254,11 +258,12 @@ int *result;
 		return;
 	}
 	(void) strcpy(host,hp->h_name);
-	ExpandHost(hp,bitbucket,realm);
 	(void) strcpy(unique,hp->h_name);
+	/* Upper case unique host name */
+	for (cp = unique; *cp; cp++)
+	     *cp = clower(*cp);
 	(void) strcat(unique,":");
-	(void) gettimeofday(tp,tzp);
-	(void) sprintf(unique+strlen(hp->h_name)+1,"%ld",tp->tv_sec);
+	(void) sprintf(unique+strlen(hp->h_name)+1,"%d",time(0));
 	(void) strcat(unique,path);
 	*result = 0;
 	return;
