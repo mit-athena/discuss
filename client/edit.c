@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/edit.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/edit.c,v 1.3 1986-12-07 21:51:37 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/edit.c,v 1.4 1986-12-08 00:44:09 wesommer Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board.
@@ -8,6 +8,9 @@
  *	Utility routines.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.3  86/12/07  21:51:37  wesommer
+ * Added -editor and -no_editor control args to permit use under emacs.
+ * 
  * Revision 1.2  86/12/07  19:32:06  wesommer
  * [spook] Create file before entering.
  * 
@@ -43,7 +46,7 @@
  */
 
 #ifndef lint
-static char *rcsid_discuss_utils_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/edit.c,v 1.3 1986-12-07 21:51:37 wesommer Exp $";
+static char *rcsid_discuss_utils_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/edit.c,v 1.4 1986-12-08 00:44:09 wesommer Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -57,14 +60,20 @@ static char *rcsid_discuss_utils_c = "$Header: /afs/dev.mit.edu/source/repositor
 #include "discuss_err.h"
 #include "globals.h"
 #include <sys/wait.h>
-
-#define	DEFAULT_EDITOR	"/bin/ed"
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/errno.h>
 
 /*
- * int edit(fn)
+ * int edit(fn, editor)
  *
  * fn: pathname of file to edit
  *
+ * editor:
+ * 	name of editor command to run; if NULL, use the default
+ * (specified on the command line or $EDITOR); if "", use a simple
+ * type-in prompter.
+ * 
  * return value: error_code if error occurs, or child exits with nonzero
  *	status, 0 otherwise
  *
@@ -73,15 +82,17 @@ static char *rcsid_discuss_utils_c = "$Header: /afs/dev.mit.edu/source/repositor
  */
 
 int
-edit(fn)
+edit(fn, edit_path)
 	char *fn;
+	char *edit_path;
 {
 	int pid;
-	char *ed = (char *)getenv("EDITOR");
 	int (*handler)();
+	int code;
 	union wait wbuf;
+	struct stat buf;
 
-	if (!use_editor) {
+	if ((!use_editor && !edit_path) || (edit_path && (*edit_path == '\0'))) {
 		FILE *of = fopen(fn, "w");
 		char buf[BUFSIZ];
 		if (!of) { 
@@ -89,36 +100,49 @@ edit(fn)
 			return(errno);
 		}
 		ftruncate(fileno(of), 0);
+		printf("Enter transaction; end with ^D or '.' on a line by itself.\n");
 		while(gets(buf) != NULL && strcmp(buf, ".")) {
 			fputs(buf, of);
 			fputc('\n', of);
 		}
+		clearerr(stdin);
 		fclose(of);
-		return(0);
-	}
-	if (!ed)
-		ed = DEFAULT_EDITOR;
+	} else {
+		if (!edit_path) edit_path = editor_path;
+		if(code = touch(fn)) return(code);
 
-	creat(fn, 0600);
-	switch ((pid = fork())) {
-	case -1:
-		perror("couldn't fork");
-		return(errno);
-	case 0:
-		(void) execlp(ed, ed, fn, 0);
-		(void) perror(ed);
-		exit(1);
-		break;
-	default:
-		break;
+		switch ((pid = fork())) {
+		case -1:
+			perror("couldn't fork");
+			return(errno);
+		case 0:
+			(void) execlp(edit_path, edit_path, fn, 0);
+			(void) perror(edit_path);
+			exit(1);
+		default:
+			break;
+		}
+		handler = signal(SIGINT, SIG_IGN);
+		while (wait(&wbuf) != pid)
+			;
+		(void) signal(SIGINT, handler);
+		if (WIFSIGNALED(wbuf))
+			return(ET_CHILD_DIED);
+		if (wbuf.w_retcode != 0)
+			return(ET_CHILD_ERR);
 	}
-	handler = signal(SIGINT, SIG_IGN);
-	while (wait(&wbuf) != pid)
-		;
-	(void) signal(SIGINT, handler);
-	if (WIFSIGNALED(wbuf))
-		return(ET_CHILD_DIED);
-	if (wbuf.w_retcode != 0)
-		return(ET_CHILD_ERR);
+	if (stat (fn, &buf) != 0 || buf.st_size == 0) {
+		unlink(fn);
+	}
+	return(0);
+}
+
+touch(fn)
+	char *fn;
+{
+	int fd;
+	if ((fd=creat(fn, 0600)) < 0) 
+		return(errno);
+	else close(fd);
 	return(0);
 }
