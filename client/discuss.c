@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.24 1986-12-07 21:51:10 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.25 1986-12-08 00:43:30 wesommer Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
@@ -9,6 +9,9 @@
  *	ss library for the command interpreter.
  *
  *      $Log: not supported by cvs2svn $
+ * Revision 1.24  86/12/07  21:51:10  wesommer
+ * Added -editor and -no_editor control args to permit use under emacs.
+ * 
  * Revision 1.23  86/12/07  17:49:30  wesommer
  * Lint fixes.
  * 
@@ -53,7 +56,6 @@
  * 
  * Revision 1.11  86/09/10  18:57:03  wesommer
  * Made to work with kerberos; meeting names are now longer.
- * ./
  * 
  * Revision 1.10  86/09/10  17:20:11  wesommer
  * Ken, please use RCS..
@@ -86,7 +88,7 @@
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.24 1986-12-07 21:51:10 wesommer Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.25 1986-12-08 00:43:30 wesommer Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -123,11 +125,14 @@ char	buf[BUFSIZ];
 char	*buffer = &buf[0];
 int	sci_idx;
 bool	use_editor = TRUE;
+char 	*editor_path = NULL;
 
 /* EXTERNAL ROUTINES */
 
 char	*malloc(), *getenv(), *gets(), *ctime();
 tfile	unix_tfile();
+
+#define DEFAULT_EDITOR "/bin/ed"
 
 main(argc, argv)
 	int argc;
@@ -137,7 +142,11 @@ main(argc, argv)
 	char *initial_meeting = (char *)NULL;
 	char *subsystem_name = "discuss";
 	char *initial_request = (char *)NULL;
-	int quit = 0;		/* quit after processing request */
+	bool quit = FALSE;		/* quit after processing request */
+	bool flame = FALSE;	/* Have we flamed them for multiple  */
+
+	editor_path = getenv ("EDITOR");
+	if (!editor_path) editor_path = DEFAULT_EDITOR;
 
 	while (++argv, --argc) {
 		if (!strcmp(*argv, "-subsystem_name") || !strcmp(*argv, "-ssn")) {
@@ -157,20 +166,39 @@ main(argc, argv)
 			initial_request = *argv;
 		}
 		else if (!strcmp(*argv, "-quit"))
-			quit = 1;
+			quit = TRUE;
 		else if (!strcmp(*argv, "-no_quit"))
-			quit = 0;
-		else if (!strcmp(*argv, "-editor"))
-			use_editor = TRUE;
+			quit = FALSE;
+		else if (!strcmp(*argv, "-editor")) {
+			if (argc == 1) {
+				fprintf(stderr, "No editor name supplied with -editor\n");
+				exit(1);
+			}
+			if (!use_editor) { 
+				fprintf(stderr, "Both -editor and -no_editor specified\n");
+				exit(1);
+			}
+			--argc;
+			editor_path = *(++argv);
+		}
 		else if (!strcmp(*argv, "-no_editor"))
 			use_editor = FALSE;
 		else if (**argv == '-') {
 			fprintf(stderr, "Unknown control argument %s\n",
 				*argv);
+			fprintf(stderr, "Usage: %s [ -ssn name ] [ -request name ] [ -quit ] [ -editor editor_path ]\n [ -no_editor ]\n");
 			exit(1);
 		}
-		else
-			initial_meeting = *argv;
+		else {
+			if (initial_meeting) {
+				if(!flame) {
+					fprintf(stderr, 
+"More than one meeting name supplied on command line; using %s\n", 
+						initial_meeting);
+					flame = TRUE;
+				}
+			} else initial_meeting = *argv;
+		}
 	}
 
 	sci_idx = ss_create_invocation(subsystem_name, CURRENT_VERSION,
@@ -220,16 +248,59 @@ repl(argc, argv)
 	selection_list *trn_list;
 	trn_info t_info;
 	int code;
+	char *editor = NULL;
+	char *whoami = argv[0];
+	char *trans = NULL;
+	char *mtg = NULL;
+
+	while (++argv, --argc) {
+		if (!strcmp (*argv, "-meeting") || !strcmp (*argv, "-mtg")) {
+			if (argc==1) {
+				(void) fprintf(stderr, 
+					       "No argument to %s.\n", *argv);
+				return;
+			} else {
+				--argc;
+				mtg = *(++argv);
+			}
+		} else if (!strcmp (*argv, "-editor") || !strcmp(*argv, "-ed")) {
+			if (argc==1) {
+				(void) fprintf(stderr, 
+					       "No argument to %s.\n", *argv);
+				return;
+			} else {
+				--argc;
+				editor = *(++argv);
+			}
+		} else if (!strcmp(*argv, "-no_editor")) {
+			editor = "";
+		} else {
+			if (!trans) trans = *argv; 
+			else {
+				ss_perror(sci_idx, 0, "Cannot reply to multiple transactions");
+				return; 
+			}
+		}
+	}
+	if (mtg && !trans) { 
+		fprintf(stderr, "Must have transaction specifier if using -mtg.\n");
+		return;
+	}
+	if(mtg) {
+		(void) sprintf(buffer, "goto %s", mtg);
+		ss_execute_line(sci_idx, buffer, &code);
+		if (code != 0) {
+			ss_perror(sci_idx, code, buffer);
+			return;
+		}
+	}
 
 	if (!dsc_public.attending) {
 		ss_perror(sci_idx, 0, "No current meeting.\n");
 		return;
 	}
 
-	if (argc > 2) {
-		(void) fprintf(stderr, "Usage:  %s\n", argv[0]);
-		return;
-	}
+
 	dsc_get_trn_info(dsc_public.mtg_uid, dsc_public.current, &t_info, &code);
 	if (code != 0)
 		t_info.current = 0;
@@ -240,7 +311,7 @@ repl(argc, argv)
 	     t_info.author = NULL;
 	}
 
-	trn_list = trn_select(&t_info, (argc == 1) ? "current" : argv[1],
+	trn_list = trn_select(&t_info, trans ? trans : "current" ,
 			      (selection_list *)NULL, &code);
 	if (code) {
 	     ss_perror(sci_idx, code, "");
@@ -275,7 +346,7 @@ repl(argc, argv)
 	}
 
 	(void) unlink(temp_file);
-	if (edit(temp_file) != 0) {
+	if (edit(temp_file, editor) != 0) {
 		(void) fprintf(stderr,
 			       "Error during edit; transaction not entered\n");
 		unlink(temp_file);
