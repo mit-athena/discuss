@@ -1,7 +1,7 @@
 LIBS=	../lib/libdsk.a ../lib/libusp.a ../lib/libkrb.a ../lib/libdes.a ../lib/libcom_err.a
 CFLAGS=	-g -I../include
 
-SRCS=	pmtg.c dspipe.c mkds.c flsm.c disrc2meetings
+SRCS=	pmtg.c dspipe.c mkds.c flsm.c disrc2meetings.sh
 
 PROGS=	pmtg dspipe mkds flsm
 
