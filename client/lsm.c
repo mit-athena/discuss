@@ -1,21 +1,18 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v 1.20 1988-12-05 14:06:08 raeburn Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v 1.21 1989-01-05 01:07:34 raeburn Exp $
  *
  */
 
 #ifndef lint
 static char rcsid_lsm_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v 1.20 1988-12-05 14:06:08 raeburn Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v 1.21 1989-01-05 01:07:34 raeburn Exp $";
 #endif lint
 
 #include <string.h>
 #include <stdio.h>
-#include "types.h"
-#include "interface.h"
+#include <discuss/discuss.h>
 #include "globals.h"
-#include "dsc_et.h"
-#include "rpc_et.h"
 #include <errno.h>
 #include "ss.h"
 
