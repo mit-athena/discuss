@@ -142,18 +142,22 @@ USPString    str;
     stptr = sptr;
     while((c = *sptr) != '\0') {
 	if (c == '\n') {
-	    if (put_into_sub_block (us, stptr, sptr-stptr-1) == ERROR) {
-		return (ERROR);
+	    if (sptr > stptr) {
+		 if (put_into_sub_block (us, stptr, sptr-stptr) == ERROR) {
+		      return (ERROR);
+		 }
 	    }
-	    if(put_into_sub_block(us, crlf, sizeof (crnul)) == ERROR) { 
+	    if(put_into_sub_block(us, crlf, 2) == ERROR) { 
 		return(ERROR);
 	    }
 	    stptr = sptr+1;
 	} else if (c == '\r') {
-	    if (put_into_sub_block (us, stptr, sptr-stptr-1) == ERROR) {
-		return (ERROR);
-	    }
-	    if(put_into_sub_block(us, crnul, sizeof (crnul)) == ERROR) { 
+	     if (sptr > stptr) {
+		  if (put_into_sub_block (us, stptr, sptr-stptr) == ERROR) {
+		       return (ERROR);
+		  }
+	     }
+	    if(put_into_sub_block(us, crnul, 2) == ERROR) { 
 		return(ERROR);
 	    }
 	    stptr = sptr+1;
