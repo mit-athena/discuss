@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/goto.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/goto.c,v 1.3 1987-06-27 01:53:42 spook Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/goto.c,v 1.4 1987-07-07 21:33:13 srz Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
@@ -11,7 +11,7 @@
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/goto.c,v 1.3 1987-06-27 01:53:42 spook Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/goto.c,v 1.4 1987-07-07 21:33:13 srz Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -28,6 +28,7 @@ static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athe
 #include "rpc.h"
 #include "globals.h"
 #include "acl.h"
+#include "dsc_et.h"
 
 #ifdef	lint
 #define	DONT_USE(var)	var=var;
@@ -77,8 +78,10 @@ switch_to_mtg(name)
 	dsc_get_mtg_info(&dsc_public.nb,
 			 &dsc_public.m_info, &code);
 	if (code != 0) {
+	        if (code == NO_ACCESS)
+		     code = CANT_ATTEND;
 		(void) fprintf(stderr,
-			       "Error getting meeting info for %s: %s\n", 
+			       "Error going to %s: %s\n", 
 			       dsc_public.mtg_name, error_message(code));
 		dsc_public.host = (char *)NULL;
 		return;
