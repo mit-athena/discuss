@@ -4,7 +4,7 @@
 ;;;    	For copying information, see the file mit-copyright.h in this release.
 ;;;
 ;;;	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v $
-;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.13 1989-11-12 20:54:04 raeburn Exp $
+;;;	$Id: discuss.el,v 1.14 1989-12-07 22:12:12 raeburn Exp $
 ;;;
 ;;;  Emacs lisp code to remote control a "discuss" shell process to
 ;;;  provide an emacs-based interface to the discuss conferencing system.
@@ -12,6 +12,10 @@
 ;;;  Written by Stan Zanarotti and Bill Sommerfeld.
 ;;;
 ;;;  $Log: not supported by cvs2svn $
+; Revision 1.13  89/11/12  20:54:04  raeburn
+; Pointed `edsc' to /mit/discuss/exl, where a pmax version exists also,
+; and checked to see if we're on a pmax.
+; 
 ; Revision 1.12  89/06/02  23:45:11  srz
 ; Added standard copyright notice.
 ; 
@@ -115,16 +119,24 @@ meetings")
 Currently ignored (always async).")
 
 ;;
-;;  Determine pathname for subprocess.  Pretty gross, if you ask me.
-(defvar discuss-pathname (concat "/mit/discuss/exl/edsc."
-				 (cdr (assoc emacs-build-system
-					     '(("paris" . "vax")
-					       ("minos" . "rt")
-					       ("quicksilver" . "decmips")))))
-;				 (cond ((equal emacs-build-system
-;				 (if (equal emacs-build-system "paris")
-;				     "vax"
-;				   "rt"))
+;;  Determine pathname for subprocess.  Pretty gross.
+(defun edsc-machine-type nil
+  (let ((foo nil)
+	(buf (get-buffer-create " *edsc-xyzzy*")))
+    (save-excursion
+      (set-buffer buf)
+      (erase-buffer)
+      (call-process-region (point) (point) "/bin/athena/machtype" nil t nil)
+      (goto-char (point-max))
+      (delete-backward-char 1)
+      (setq foo (buffer-string))
+      (kill-buffer buf)
+      (if (memq (intern foo) '(vax rt decmips))
+	  foo
+	(error "Can't determine machine type.")))))
+
+(defvar discuss-pathname
+  (concat "/mit/discuss/exl/edsc." (edsc-machine-type))
   "*Name of program to run as slave process for discuss.")
 
 
@@ -557,7 +569,7 @@ a	Add meeting.  Not implemented yet."
 ; run this at each load
 (defun discuss-initialize nil
   (setq discuss-version
-	"$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.13 1989-11-12 20:54:04 raeburn Exp $")
+	"$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.14 1989-12-07 22:12:12 raeburn Exp $")
 
 ;;; Keymaps, here at the end, where the trash belongs..
 
