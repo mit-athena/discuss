@@ -2,13 +2,16 @@
  *
  * List request for DISCUSS
  *
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.13 1987-04-10 23:50:14 srz Exp $
+ * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.14 1987-04-12 00:06:34 spook Exp $
  * $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v $
  * $Locker:  $
  *
  * Copyright (C) 1986 by the MIT Student Information Processing Board
  *
  * $Log: not supported by cvs2svn $
+ * Revision 1.13  87/04/10  23:50:14  srz
+ * Added static RCS id.
+ * 
  * Revision 1.12  87/03/22  04:35:35  spook
  * *** empty log message ***
  * 
@@ -50,7 +53,7 @@
  *
  */
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.13 1987-04-10 23:50:14 srz Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.14 1987-04-12 00:06:34 spook Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -215,9 +218,7 @@ map_trns(argc, argv, defalt, proc)
 	char *defalt;
 	int (*proc)();
 {
-	int txn_no;
 	int code;
-	int i;
 	selection_list *trn_list;
 
 	if (!dsc_public.attending) {
@@ -230,7 +231,6 @@ map_trns(argc, argv, defalt, proc)
 		(void) ss_perror(sci_idx, code, "Can't get meeting info");
 		return;
 	}
-	txn_no = dsc_public.m_info.first;
 
 	dsc_get_trn_info(&dsc_public.nb, dsc_public.current,
 			 &t_info, &code);

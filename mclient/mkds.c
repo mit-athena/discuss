@@ -1,9 +1,12 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v 1.9 1987-04-10 23:18:01 spook Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v 1.10 1987-04-12 00:13:47 spook Exp $
  *	$Locker:  $
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.9  87/04/10  23:18:01  spook
+ * Added checks for EOF on input.
+ * 
  * Revision 1.8  87/04/09  00:12:43  rfrench
  * Fixed small bug in new interface.
  * 
@@ -25,7 +28,7 @@
  */
 
 #ifndef lint
-static char rcsid_mkds_c[] = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v 1.9 1987-04-10 23:18:01 spook Exp $";
+static char rcsid_mkds_c[] = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v 1.10 1987-04-12 00:13:47 spook Exp $";
 #endif lint
 
 #include "tfile.h"
@@ -57,13 +60,12 @@ char *argv[];
 	extern tfile unix_tfile();
 	name_blk nbsrc,nbdest;
 	char long_name[100],short_name[100],module[50],mtg_path[100];
-	char temp_file[64],tempbfr[256];
-	char ann_mtg[100],subject[100];
+	char temp_file[64];
+	char ann_mtg[100];
 	int public = 0,error = 1,result,remove=0,delmtg=0;
 	int fd,txn_no,fatal_err;
 	tfile tf;
 	char hostname[256];
-	FILE *fp,*fp2;
 
 	init_dsc_err_tbl();
 
