@@ -4,7 +4,7 @@
 ;;;    	For copying information, see the file mit-copyright.h in this release.
 ;;;
 ;;;	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss-misc.el,v $
-;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss-misc.el,v 1.1 1990-09-19 16:26:15 bjaspan Exp $
+;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss-misc.el,v 1.2 1990-09-19 16:34:39 bjaspan Exp $
 ;;;
 ;;;  Emacs lisp code with random parts of the emacs discuss user interface
 ;;;  We may want to split out the mail functions into a separate file if
@@ -12,6 +12,9 @@
 ;;;  Written by Theodore Ts'o, Barry Jaspan, and Mark Eichin
 ;;;
 ;;; $Log: not supported by cvs2svn $
+; Revision 1.1  90/09/19  16:26:15  bjaspan
+; Initial revision
+; 
 
 ;;
 ;; Here is the add and delete meetings code....
@@ -71,7 +74,9 @@
 		       (if (or current-prefix-arg
 			       (not (equal (buffer-name) discuss-main-buffer))
 			       (= (point) 1))
-			   (read-string "Meeting name:  ")))))
+			 (completing-read "Meeting name:  "
+					  discuss-meeting-completion-list
+					  nil t "")))))
   (if (not meeting)
       (let ((curline (- (count-lines 1 (min (1+ (point)) (point-max))) 3)))
 	(if (< curline 0)
