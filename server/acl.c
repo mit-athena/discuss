@@ -1,13 +1,17 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl.c,v 1.1 1986-11-10 21:16:00 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl.c,v 1.2 1986-11-16 06:01:47 wesommer Exp $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
  *
+ * 	Routines for the manipulation of access control lists in core,
+ *	along with routines to move them to and from files.
+ *
+ *	$Log: not supported by cvs2svn $
  */
 
 #ifndef lint
-static char *rcsid_acl_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl.c,v 1.1 1986-11-10 21:16:00 wesommer Exp $";
+static char *rcsid_acl_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl.c,v 1.2 1986-11-16 06:01:47 wesommer Exp $";
 #endif lint
 
 #include "../include/acl.h"
@@ -62,6 +66,7 @@ Acl *acl_read(fd)
 			--ae;
 		}
 	}
+	fdclose(f); /*XXX*/
 	return(list);
 }
 
@@ -76,8 +81,8 @@ Bool acl_write(fd, list)
 	for (ae=list->acl_entries, n=list->acl_length;
 	     n;
 	     --n, ++ae) fprintf(f, "%s:%s\n", ae->modes, ae->principal);
-	fflush(f);
-	/* should really free "f", but life sucks, doesn't it? */
+	fdclose(f); /*XXX*/
+	return(TRUE);
 }
 
 acl_add_access(list, principal, modes)
@@ -120,7 +125,8 @@ acl_add_access(list, principal, modes)
 	strcpy(ae->modes, modes);
 }
 
-acl_delete_access(list, principal, modes)
+#ifdef notdef
+acl_delete_modes(list, principal, modes)
      Acl *list;
      char *principal;
      char *modes;
@@ -150,15 +156,46 @@ cleanup:
 	}
 
 }	       
-
+#endif notdef
 acl_replace_access(list, principal, modes)
      Acl *list;
      char *principal;
      char *modes;
 {
-
+	register acl_entry *ae;
+	register int n;
+	for(ae=list->acl_entries, n=list->acl_length; n; --n, ++ae) {
+		if (!strcmp(ae->principal, principal)) {
+			free(ae->modes);
+			ae->modes = malloc(strlen(modes)+1);
+			strcpy(ae->modes, modes);
+			return;
+		}
+	}
+	/* Didn't find it.  Insert it.. the easy way. */
+	acl_add_access(list, principal, modes);
 }
 
+Bool
+acl_delete_access(list, principal)
+	Acl *list;
+	char *principal;
+{
+	register acl_entry *ae;
+	register int n;
+	for(ae=list->acl_entries, n=list->acl_length; n; --n, ++ae) {
+		if (!strcmp(ae->principal, principal)) {
+			/* gotcha! */
+			list->acl_length--;
+			while (--n) {
+				*ae= *(ae+1);
+				ae++;
+			}
+			return TRUE;
+		}
+	}
+	return FALSE;
+}
 /*
  * Return empty ACL
  */
@@ -273,6 +310,40 @@ char *acl_subtract(s1, s2)
 	return(result);
 }
 
+/*
+ * Canonicalize an acl string; sort the characters of s1 into 
+ * the order found in s2, removing duplicates, and returning an error code if 
+ * any of them are not in s2.
+ * This is a sucky algorithm, but who really gives?
+ */
+
+char *acl_canon(s1, s2, code)
+	register char *s1, *s2;
+	int *code;
+{
+	register char *cp;
+	register char *out;
+	register int len;
+
+	*code = 0;
+	for (cp = s1; *cp; cp++) {
+		if (!index(s2, *cp)) 
+			*code = BAD_MODES;
+	}
+	out = malloc(1); len = 0;
+	for (cp = s2; *cp; cp++) {
+		if (index(s1, *cp)) {
+			len++;
+			out = realloc(out, len);
+			out[len-1] = *cp;
+		}
+	}
+	out[len]='\0';
+	return(out);
+}
+
+	
+
 
 #ifdef TESTS
 #include <sys/file.h>
@@ -314,3 +385,27 @@ panic(s)
 }
 
 #endif TESTS
+/*
+ *	Can you say "modularity violation??":  This does an fclose 
+ *	without close(2)'ing the file descriptor behind it.
+ */
+
+#include <stdio.h>
+
+fdclose(iop)
+	register FILE *iop;
+{
+	register int r;
+
+	r = EOF;
+	if (iop->_flag&(_IOREAD|_IOWRT|_IORW) && (iop->_flag&_IOSTRG)==0) {
+		r = fflush(iop);
+		if (iop->_flag&_IOMYBUF)
+			free(iop->_base);
+	}
+	iop->_cnt = 0;
+	iop->_base = (char *)NULL;
+	iop->_ptr = (char *)NULL;
+	iop->_bufsiz = iop->_flag = iop->_file = 0;
+	return(r);
+}
