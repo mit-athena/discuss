@@ -1,5 +1,5 @@
 ;;;	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss-enter.el,v $
-;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss-enter.el,v 1.2 1988-10-26 15:17:35 eichin Exp $
+;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss-enter.el,v 1.3 1988-10-26 20:15:24 eichin Exp $
 ;;;
 ;;;  Emacs lisp code to enter transaction into discuss.  Part of the
 ;;;  emacs-based interface to the discuss conferencing system.
@@ -126,12 +126,12 @@ C-c C-]  discuss-abort-edit (exit without enterring)"
   (message (format "Transaction %s entered in %s meeting."
 		   (discuss-format-trn-num (car discuss-form))
 		   discuss-enter-mtg))
-  (delete-window)
+  (if (not (one-window-p)) (delete-window))
   (kill-buffer discuss-trn-buffer)
   (discuss-update))
 
 (defun discuss-abort-edit ()
   "Aborts entering a transaction."
   (interactive)
-  (delete-window)
+  (if (not (one-window-p)) (delete-window))
   (kill-buffer discuss-trn-buffer))
