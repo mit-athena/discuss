@@ -55,12 +55,16 @@ typedef struct {
 	faddr chairman_addr;		/* location of chairman string */
 	slen long_name_len;		/* len of long name */
 	slen chairman_len;		/* len of chairman */
-	bool public_flag;		/* meeting is public */
+	short flags;			/* meeting flag (low-bit is public) */
 	faddr chain_start;		/* starting address for chain structure */
 	faddr high_water;		/* next byte to be used in control file */
 	faddr trn_fsize;		/* next byte to be used in trn file */
 	faddr highest_trn_addr;		/* address of highest trn addr */
 } mtg_super;
+
+/* Masks for meeting flags */
+#define MTG_PUBLIC	0x01
+#define MTG_NOZEPHYR	0x02
 
 /* version number */
 #define MTG_SUPER_1 1

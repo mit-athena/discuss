@@ -8,13 +8,16 @@
 /*
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.29 1990-03-19 13:38:51 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.30 1990-09-11 19:02:59 srz Exp $
  *
  *
  * core.c --    Routines that are the meat of discuss.  These provide user
  *		callable routines.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.29  90/03/19  13:38:51  srz
+ * Fixed bug where rmds would cause reset connections as a sub-process.
+ * 
  * Revision 1.28  90/02/24  18:58:08  srz
  * Added signatures to meetings.  This involves adding two routines,
  * add_trn2 and get_trn_info3, for storing and saving this information.
@@ -78,7 +81,7 @@
  */
 #ifndef lint
 static char rcsid_core_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.29 1990-03-19 13:38:51 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.30 1990-09-11 19:02:59 srz Exp $";
 #endif lint
 
 
@@ -361,10 +364,12 @@ int *result;
      super.trn_fsize = fsize (u_trn_f);
 
 #ifdef ZEPHYR
+
      /* Send this out...we want to do this BEFORE calling write_super
       * because things get freed...
       */
-     mtg_znotify(mtg_name, subject, author, signature);
+     if (!(super.flags & MTG_NOZEPHYR))
+	  mtg_znotify(mtg_name, subject, author, signature);
 #endif ZEPHYR
      
      /* all done, start winding down */
@@ -1263,7 +1268,7 @@ int *result;
 
      super_long_name = new_string (long_mtg_name);
      super_chairman = new_string (chairman);
-     super.public_flag = public;
+     super.flags = public ? MTG_PUBLIC : 0;
      super.chain_start = 1024;
      super.high_water = super.chain_start;
      super.trn_fsize = 0;
@@ -1294,7 +1299,7 @@ int *result;
      if (new_acl == NULL) {
 	  mtg_acl = acl_create ();
 	  acl_add_access(mtg_acl, chairman, "acdorsw");	/* add chairman */
-	  if (public)
+	  if (public == 1)
 	       acl_add_access(mtg_acl, "*", "a  orsw");	/* public mtg */
      } else 
 	  mtg_acl = acl_copy(new_acl);
@@ -1403,7 +1408,7 @@ int *result;
      info -> highest = super.highest;
      info -> date_created = super.date_created;
      info -> date_modified = super.date_modified;
-     info -> public_flag = super.public_flag;
+     info -> public_flag = (super.flags & MTG_PUBLIC);
 
      forget_super();
 
