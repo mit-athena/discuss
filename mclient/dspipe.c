@@ -4,10 +4,10 @@
  *
  */
 
-#include "tfile.h"
-#include "interface.h"
-#include "dsc_et.h"
-#include "rpc.h"
+#include <discuss/tfile.h>
+#include <discuss/interface.h>
+#include <discuss/dsc_et.h>
+#include <discuss/rpc.h>
 #include <sys/file.h>
 #include <stdio.h>
 #include <strings.h>
@@ -16,7 +16,7 @@ tfile unix_tfile();
 char *mktemp();
 
 #ifndef	lint
-static char rcsid[] = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/dspipe.c,v 1.1 1989-05-19 00:47:05 srz Exp $";
+static char rcsid[] = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/dspipe.c,v 1.2 1989-05-19 00:50:21 srz Exp $";
 #endif
 
 main (argc,argv)
