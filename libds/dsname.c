@@ -7,7 +7,7 @@
  */
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v $
- *	$Id: dsname.c,v 1.22 1989-11-28 14:56:41 raeburn Exp $
+ *	$Id: dsname.c,v 1.23 1993-04-28 11:46:34 miki Exp $
  *
  */
 
@@ -17,7 +17,12 @@
  */
 
 #include <stdio.h>
+#ifndef SOLARIS
 #include <strings.h>
+#else
+#include <string.h>
+#include <unistd.h>
+#endif
 #include <pwd.h>
 #include <sys/file.h>
 #include <sys/param.h>
@@ -29,7 +34,7 @@
 
 #ifndef lint
 static const char rcsid_dsname_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v 1.22 1989-11-28 14:56:41 raeburn Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v 1.23 1993-04-28 11:46:34 miki Exp $";
 #endif
 
 extern char *malloc (), *local_realm (), *getenv ();
@@ -54,6 +59,7 @@ static char *me = NULL;		/* user's own user_id field */
 
 static char mtgs[] = "/.meetings";
 
+
 #ifdef __GNUC__
 #define INLINE inline
 #else
@@ -64,7 +70,11 @@ static char mtgs[] = "/.meetings";
  * ds() -- duplicate a string.  a useful utility routine...
  */
 
+#ifdef SOLARIS
+static char * ds(s)
+#else
 INLINE static char * ds(s)
+#endif
     const char *s;
 {
     register int len = strlen (s) + 1;

@@ -9,8 +9,11 @@
  * dsc_enter.c - enter a transaction from a file into discuss.
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsc_enter.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsc_enter.c,v 1.4 1989-06-03 00:20:45 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsc_enter.c,v 1.5 1993-04-28 11:46:55 miki Exp $
  *	$Log: not supported by cvs2svn $
+ * Revision 1.4  89/06/03  00:20:45  srz
+ * Added standard copyright notice.
+ * 
  * Revision 1.3  88/10/16  13:56:18  raeburn
  * Changed include format.
  * 
@@ -18,10 +21,16 @@
 
 #ifndef	lint
 static char rcsid[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsc_enter.c,v 1.4 1989-06-03 00:20:45 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsc_enter.c,v 1.5 1993-04-28 11:46:55 miki Exp $";
 #endif
 
 #include <stdio.h>
+#ifdef SOLARIS
+#include <string.h>
+#include <sys/fcntl.h>
+#else
+#include <strings.h>
+#endif
 #include <strings.h>
 #include <ctype.h>
 #include <sys/file.h>
