@@ -7,7 +7,7 @@
  */
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.51 1989-07-29 18:29:11 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.52 1990-02-24 18:47:30 srz Exp $
  *	$Locker:  $
  *
  *	A simple shell-type user interface to discuss; uses Ken Raeburn's
@@ -18,7 +18,7 @@
 
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.51 1989-07-29 18:29:11 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.52 1990-02-24 18:47:30 srz Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -44,7 +44,7 @@ static char rcsid_discuss_c[] =
 
 extern ss_request_table discuss_cmds;
 
-char	dsc_version[] = "1.5a";
+char	dsc_version[] = "1.6EXL";
 int	sci_idx;
 
 extern char *temp_file, *pgm, *user_id;
