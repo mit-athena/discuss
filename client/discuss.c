@@ -7,7 +7,7 @@
  */
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.55 1998-11-05 14:40:17 danw Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.56 1998-12-31 21:35:44 ghudson Exp $
  *	$Locker:  $
  *
  *	A simple shell-type user interface to discuss; uses Ken Raeburn's
@@ -18,7 +18,7 @@
 
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.55 1998-11-05 14:40:17 danw Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.56 1998-12-31 21:35:44 ghudson Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -167,8 +167,7 @@ int main (argc, argv)
 	     register char *prompt;
 	     ss_perror(sci_idx, code, "");
 	     fprintf(stderr, "\n\
-If you are using discuss for the first time, or if you have only used the\n\
-experimental version of discuss, you need to run the 'dsc_setup'\n\
+If you are using discuss for the first time, you need to run the 'dsc_setup'\n\
 command from the shell.\n\n");
 	     fflush(stderr);
 	     prompt = "Run dsc_setup now? (y or n) ";
