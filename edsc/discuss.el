@@ -1,13 +1,20 @@
+;;;
+;;;	Copyright (C) 1989 by the Massachusetts Institute of Technology
+;;;    	Developed by the MIT Student Information Processing Board (SIPB).
+;;;    	For copying information, see the file mit-copyright.h in this release.
+;;;
 ;;;	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v $
-;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.11 1988-12-15 13:50:06 srz Exp $
+;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.12 1989-06-02 23:45:11 srz Exp $
 ;;;
 ;;;  Emacs lisp code to remote control a "discuss" shell process to
 ;;;  provide an emacs-based interface to the discuss conferencing system.
 ;;;
-;;;  Copyright (c) 1986 by the Massachusetts Institute of Technology.
 ;;;  Written by Stan Zanarotti and Bill Sommerfeld.
 ;;;
 ;;;  $Log: not supported by cvs2svn $
+; Revision 1.11  88/12/15  13:50:06  srz
+; Add patch so that broken meetings won't lose information.
+; 
 ; Revision 1.10  88/12/05  08:18:12  eichin
 ; added discuss-next-meeting. [previous fix to discuss-goto was
 ; harmless, but not a bug. I had loaded a different version of the
@@ -542,7 +549,7 @@ a	Add meeting.  Not implemented yet."
 ; run this at each load
 (defun discuss-initialize nil
   (setq discuss-version
-	"$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.11 1988-12-15 13:50:06 srz Exp $")
+	"$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.12 1989-06-02 23:45:11 srz Exp $")
 
 ;;; Keymaps, here at the end, where the trash belongs..
 

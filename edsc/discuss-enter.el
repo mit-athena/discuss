@@ -1,10 +1,14 @@
+;;;
+;;;	Copyright (C) 1989 by the Massachusetts Institute of Technology
+;;;    	Developed by the MIT Student Information Processing Board (SIPB).
+;;;    	For copying information, see the file mit-copyright.h in this release.
+;;;
 ;;;	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss-enter.el,v $
-;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss-enter.el,v 1.5 1988-11-01 15:57:21 eichin Exp $
+;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss-enter.el,v 1.6 1989-06-02 23:44:54 srz Exp $
 ;;;
 ;;;  Emacs lisp code to enter transaction into discuss.  Part of the
 ;;;  emacs-based interface to the discuss conferencing system.
 ;;;
-;;;  Copyright (c) 1988 by the Massachusetts Institute of Technology.
 ;;;  Written by Stan Zanarotti and Bill Sommerfeld.
 ;;;
 

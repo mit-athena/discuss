@@ -1,14 +1,19 @@
 /*
  *
+ *	Copyright (C) 1989 by the Massachusetts Institute of Technology
+ *    	Developed by the MIT Student Information Processing Board (SIPB).
+ *    	For copying information, see the file mit-copyright.h in this release.
+ *
+ */
+/*
+ *
  * edsc () -- A subprocess to make implement emacs discuss mode easier.
  *
- *	Copyright (C) 1988 by the Student Information Processing Board
- * 
  */
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/edsc.c,v 1.6 1989-05-19 20:02:27 srz Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/edsc.c,v 1.7 1989-06-02 23:45:54 srz Exp $";
 #endif lint
 
 #include <stdio.h>
