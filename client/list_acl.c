@@ -1,24 +1,28 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list_acl.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list_acl.c,v 1.2 1986-11-17 01:50:36 spook Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list_acl.c,v 1.3 1986-12-07 00:39:15 rfrench Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.2  86/11/17  01:50:36  spook
+ * Allow listing acl on meetings specified on command line even when
+ * there is no current meeting.
+ * 
  * Revision 1.1  86/11/16  06:16:59  wesommer
  * Initial revision
  * 
  */
 
 #ifndef lint
-static char *rcsid_list_acl_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list_acl.c,v 1.2 1986-11-17 01:50:36 spook Exp $";
+static char *rcsid_list_acl_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list_acl.c,v 1.3 1986-12-07 00:39:15 rfrench Exp $";
 #endif lint
 
 #include <strings.h>
 #include <stdio.h>
-#include "../include/types.h"
-#include "../include/interface.h"
-#include "../include/acl.h"
+#include "types.h"
+#include "interface.h"
+#include "acl.h"
 #include "globals.h"
 
 extern char *malloc();

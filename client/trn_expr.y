@@ -2,8 +2,8 @@
 %left '+' '-'
 %{
 #include <ctype.h>
-#include "../include/interface.h"
-#include "../include/discuss_err.h"
+#include "interface.h"
+#include "discuss_err.h"
 #include "globals.h"
 
 static trn_info *trnexpr_curtrn;

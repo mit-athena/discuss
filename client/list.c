@@ -2,13 +2,16 @@
  *
  * List request for DISCUSS
  *
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.8 1986-11-11 16:33:09 spook Exp $
+ * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.9 1986-12-07 00:39:08 rfrench Exp $
  * $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v $
  * $Locker:  $
  *
  * Copyright (C) 1986 by the MIT Student Information Processing Board
  *
  * $Log: not supported by cvs2svn $
+ * Revision 1.8  86/11/11  16:33:09  spook
+ * Fixed to work with changes in et stuff
+ * 
  * Revision 1.7  86/10/29  10:26:34  srz
  * Made generic map_trans, added retrieve and delete.
  * Fixed bugs in current handling, etc.
@@ -37,11 +40,11 @@
 
 #include <stdio.h>
 #include <strings.h>
-#include "../include/ss.h"
-#include "../include/tfile.h"
-#include "../include/interface.h"
-#include "../include/config.h"
-#include "../include/dsc_et.h"
+#include "ss.h"
+#include "tfile.h"
+#include "interface.h"
+#include "config.h"
+#include "dsc_et.h"
 #include "globals.h"
 
 char *ctime(), *malloc();

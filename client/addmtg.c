@@ -1,9 +1,12 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.3 1986-12-07 00:20:45 rfrench Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.4 1986-12-07 00:38:50 rfrench Exp $
  *	$Locker:  $
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.3  86/12/07  00:20:45  rfrench
+ * Made adding a meeting louder and more accurate
+ * 
  * Revision 1.2  86/12/03  15:06:02  rfrench
  * Fixed bug in add_mtg when specifying both tran #s and meeting names
  * 
@@ -14,15 +17,15 @@
  */
 
 #ifndef lint
-static char *rcsid_addmtg_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.3 1986-12-07 00:20:45 rfrench Exp $";
+static char *rcsid_addmtg_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.4 1986-12-07 00:38:50 rfrench Exp $";
 #endif lint
 
 #include <strings.h>
 #include <stdio.h>
 #include <fcntl.h>
-#include "../include/tfile.h"
-#include "../include/types.h"
-#include "../include/interface.h"
+#include "tfile.h"
+#include "types.h"
+#include "interface.h"
 #include "globals.h"
 
 extern char *malloc();

@@ -1,7 +1,7 @@
 #include <strings.h>
 #include <stdio.h>
-#include "../include/types.h"
-#include "../include/interface.h"
+#include "types.h"
+#include "interface.h"
 #include "globals.h"
 
 extern char *malloc(),*ctime();

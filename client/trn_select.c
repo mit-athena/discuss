@@ -1,6 +1,6 @@
 /*
  *
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/trn_select.c,v 1.6 1986-11-11 16:33:17 spook Exp $
+ * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/trn_select.c,v 1.7 1986-12-07 00:40:13 rfrench Exp $
  * $Locker:  $
  *
  */
@@ -8,8 +8,8 @@
 #define	MIN(a,b)	((a)<(b)?(a):(b))
 #define	MAX(a,b)	((a)>(b)?(a):(b))
 #include <stdio.h>
-#include "../include/interface.h"
-#include "../include/discuss_err.h"
+#include "interface.h"
+#include "discuss_err.h"
 #include "globals.h"
 
 extern char *malloc();

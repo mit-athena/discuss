@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss_utils.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss_utils.c,v 1.9 1986-11-11 16:32:44 spook Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss_utils.c,v 1.10 1986-12-07 00:39:01 rfrench Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board.
@@ -8,6 +8,9 @@
  *	Utility routines.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.9  86/11/11  16:32:44  spook
+ * Fixed to work with changes in et stuff
+ * 
  * Revision 1.8  86/10/27  16:48:15  wesommer
  * Added form-feeds after each transaction.
  * 
@@ -31,18 +34,18 @@
  */
 
 #ifndef lint
-static char *rcsid_discuss_utils_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss_utils.c,v 1.9 1986-11-11 16:32:44 spook Exp $";
+static char *rcsid_discuss_utils_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss_utils.c,v 1.10 1986-12-07 00:39:01 rfrench Exp $";
 #endif lint
 
 #include <stdio.h>
 #include <sys/file.h>
 #include <strings.h>
 #include <signal.h>
-#include "../include/ss.h"
-#include "../include/tfile.h"
-#include "../include/interface.h"
-#include "../include/config.h"
-#include "../include/discuss_err.h"
+#include "ss.h"
+#include "tfile.h"
+#include "interface.h"
+#include "config.h"
+#include "discuss_err.h"
 #include "globals.h"
 
 extern ss_request_table discuss_cmds;

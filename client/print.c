@@ -3,12 +3,15 @@
  *	Print-related requests for DISCUSS.
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.9 1986-11-20 10:27:54 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.10 1986-12-07 00:39:33 rfrench Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
  *
  *      $Log: not supported by cvs2svn $
+ * Revision 1.9  86/11/20  10:27:54  srz
+ * Fixed bug dealing with current
+ * 
  * Revision 1.8  86/11/11  16:33:21  spook
  * Fixed to work with changes in et stuff
  * 
@@ -39,7 +42,7 @@
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.9 1986-11-20 10:27:54 srz Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.10 1986-12-07 00:39:33 rfrench Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -48,11 +51,11 @@ static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athe
 #include <signal.h>
 #include <strings.h>
 #include <sys/wait.h>
-#include "../include/ss.h"
-#include "../include/tfile.h"
-#include "../include/interface.h"
-#include "../include/config.h"
-#include "../include/dsc_et.h"
+#include "ss.h"
+#include "tfile.h"
+#include "interface.h"
+#include "config.h"
+#include "dsc_et.h"
 #include "globals.h"
 
 #ifdef	lint
