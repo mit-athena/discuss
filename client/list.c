@@ -9,20 +9,21 @@
  *
  * List request for DISCUSS
  *
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.31 1994-03-25 16:26:09 miki Exp $
+ * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.32 1998-04-02 18:20:19 ghudson Exp $
  * $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v $
  * $Locker:  $
  *
  */
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.31 1994-03-25 16:26:09 miki Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.32 1998-04-02 18:20:19 ghudson Exp $";
 #endif lint
 
 #include <stdio.h>
 #include <string.h>
 #include <sys/param.h>		/* for MIN() */
 #include <ss/ss.h>
+#include <sys/ioctl.h>
 #include "config.h"
 #include <discuss/discuss.h>
 #include "globals.h"
@@ -33,6 +34,7 @@ static list_it(),delete_it(),retrieve_it();
 static int performed;		/* true if trn was acted upon */
 static int barred;		/* true if access was denied sometime */
 static int long_subjects;
+static int screen_width = 80;
 static int setting;		/* Whether we are turning flag on or off */
 
 void map_trns();
@@ -91,9 +93,9 @@ int *codep;
 
 	(void) sprintf (buffer + strlen (buffer), "%s %s %-15s ",
 			nlines, newtime, author);
-	len = 79 - strlen (buffer);
+	len = screen_width - 1 - strlen (buffer);
 
-	if (!long_subjects && strlen (t_infop->subject) > len)
+	if (!long_subjects && strlen (t_infop->subject) > len && len >= 3)
 	    (void) strcpy (&t_infop->subject [len - 3], "...");
 
 	(void) printf ("%s%s\n", buffer, t_infop->subject);
@@ -108,8 +110,15 @@ list (argc, argv, sci_idx)
 {
 	char **ap, **ap2, **nargv;
 	int ac;
-	long_subjects = 0;
+#ifdef TIOCGWINSZ
+	struct winsize wsz;
 
+	/* Determine screen width. */
+	if (ioctl(0, TIOCGWINSZ, &wsz) == 0 && wsz.ws_col > 0)
+	    screen_width = wsz.ws_col;
+#endif
+
+	long_subjects = 0;
 	for (ap = argv; *ap; ap++)
 	    ;
 	nargv = (char **) calloc (ap - argv + 1, sizeof (char *));
