@@ -20,13 +20,6 @@
 #else
 #include <string.h>
 #include <fcntl.h>
-/*
- * flock operations.
- */
-#define LOCK_SH               1       /* shared lock */
-#define LOCK_EX               2       /* exclusive lock */
-#define LOCK_NB               4       /* don't block when locking */
-#define LOCK_UN               8       /* unlock */
 #endif
 #include <ctype.h>
 #include <sys/types.h>
@@ -77,6 +70,10 @@ char **argv;
      tfile tf;
      char control_name[256];
      int control_fd;
+#ifdef SOLARIS
+     static struct flock lock;
+#endif
+
 
      init_dsc_err_tbl();
 
@@ -207,7 +204,11 @@ expunge_range:
 
 	       signature = old_trn_info.signature;
 	       if (daemon_flag && old_trn_info.signature != NULL) {
+#ifdef POSIX
+		    memmove(dtest, old_trn_info.signature,  7);
+#else
 		    bcopy(old_trn_info.signature, dtest, 7);
+#endif
 		    dtest[7] = '\0';
 		    if (!strcmp(dtest,"daemon@")) {
 			 if (get_from_signature(tempf, new_signature, sizeof(new_signature)))
@@ -255,7 +256,15 @@ expunge_range:
      if ((control_fd = open (control_name, O_RDWR, 0700)) < 0) {
 	  error_occurred = TRUE;
      } else {
+#ifdef SOLARIS
+          lock.l_type = F_WRLCK;
+          lock.l_start = 0;
+          lock.l_whence = 0;
+          lock.l_len = 0;
+          fcntl(control_fd, F_SETLK, &lock);
+#else
 	  flock(control_fd, LOCK_EX);		/* Hold meeting by the balls */
+#endif
 	  free(old_mtg_info.long_name);
 	  free(old_mtg_info.chairman);
 	  free(old_mtg_info.location);
@@ -265,12 +274,28 @@ expunge_range:
 	  if (result != 0) {	       
 	       fprintf(stderr, "%s: %s while getting mtg info\n", location, error_message(result));
 	       error_occurred = TRUE;
+#ifdef SOLARIS
+             lock.l_type = F_UNLCK;
+             lock.l_start = 0;
+             lock.l_whence = 0;
+             lock.l_len = 0;
+             fcntl(control_fd, F_SETLK, &lock);
+#else
 	       flock(control_fd,LOCK_UN);
+#endif
 	       close(control_fd);
 	  } else if (old_mtg_info.highest > high) {		/* New transactions added */
 	       low = high + 1;
 	       high = old_mtg_info.highest;
+#ifdef POSIX
+               lock.l_type = F_UNLCK;
+               lock.l_start = 0;
+               lock.l_whence = 0;
+               lock.l_len = 0;
+               fcntl(control_fd, F_SETLK, &lock);
+#else
 	       flock(control_fd,LOCK_UN);
+#endif
 	       close(control_fd);
 	       goto expunge_range;
 	  }
@@ -349,7 +374,7 @@ int sign_len;
      if (hp == NULL)
 	  return(0);
 
-     cp = index(hp, ':');
+     cp = strchr(hp, ':');
      if (cp == NULL)
 	  return(0);
 
@@ -585,8 +610,8 @@ char *hstring, *hname;
      name_len = strlen(hname);
 
      while (*cp != '\0') {
-	  eolp = index(cp, '\n');
-	  colonp = index(cp, ':');
+	  eolp = strchr(cp, '\n');
+	  colonp = strchr(cp, ':');
 
 	  if (eolp == NULL || colonp == NULL || eolp == cp)
 	       return(0);
@@ -597,7 +622,11 @@ char *hstring, *hname;
 	  }
 
 	  /* Chance of a match, copy header over to name, and lower it */
+#ifdef POSIX
+	  memmove(field,cp,  colonp - cp);
+#else
 	  bcopy(cp, field, colonp - cp);
+#endif
 	  field[colonp - cp] = '\0';
 	  lower(field);
 	  if (!strcmp(field,hname))
