@@ -1,9 +1,12 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.10 1987-04-09 00:11:39 rfrench Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.11 1987-04-12 07:54:54 wesommer Exp $
  *	$Locker:  $
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.10  87/04/09  00:11:39  rfrench
+ * Fixed to handle new format meeting announcements.
+ * 
  * Revision 1.9  87/04/08  03:53:25  wesommer
  * Added del_mtg
  * 
@@ -35,7 +38,7 @@
  */
 
 #ifndef lint
-static char *rcsid_addmtg_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.10 1987-04-09 00:11:39 rfrench Exp $";
+static char *rcsid_addmtg_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.11 1987-04-12 07:54:54 wesommer Exp $";
 #endif lint
 
 #include <strings.h>
@@ -383,17 +386,13 @@ del_mtg(argc, argv)
 		if (!used[i]) {
 			dsc_get_mtg (auser_id, argv[i], &nb, &code);
 			if (code) {
-				sprintf(cerror, 
-					"while getting meeting name (%s)",
-					argv[i]);
-				ss_perror(sci_idx, code, cerror);
+				ss_perror(sci_idx, code, argv[i]);
+				continue;
 			}
 			nb.status |= DSC_ST_DELETED;
 			dsc_update_mtg_set(auser_id, &nb, 1, &code);
 			if (code) {
-				sprintf(cerror, "while deleting meeting %s\n",
-					argv[i]);
-				ss_perror(sci_idx, code, cerror);
+				ss_perror(sci_idx, code, argv[i]);
 			}
 		}
 	}
