@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.27 1987-03-22 04:32:27 spook Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.28 1987-03-22 04:33:23 spook Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
@@ -96,7 +96,7 @@
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.27 1987-03-22 04:32:27 spook Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.28 1987-03-22 04:33:23 spook Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -159,9 +159,10 @@ main(argc, argv)
 		editor_path = DEFAULT_EDITOR;
 
 	while (++argv, --argc) {
-		if (!strcmp(*argv, "-subsystem_name") || !strcmp(*argv, "-ssn")) {
+		if (!strcmp(*argv, "-prompt")) {
 			if (argc == 1) {
-				fprintf(stderr, "No argument supplied with -subsystem_name\n");
+				fprintf(stderr,
+					"No argument supplied with -prompt\n");
 				exit(1);
 			}
 			argc--; argv++;
@@ -197,7 +198,7 @@ main(argc, argv)
 		else if (**argv == '-') {
 			fprintf(stderr, "Unknown control argument %s\n",
 				*argv);
-			fprintf(stderr, "Usage: %s [ -ssn name ] [ -request name ] [ -quit ] [ -editor editor_path ]\n [ -no_editor ]\n",
+			fprintf(stderr, "Usage: %s [ -prompt name ] [ -request name ] [ -quit ]\n\t\t[ -editor editor_path ] [ -no_editor ]\n",
 				*argv);
 			exit(1);
 		}

@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v 1.9 1986-12-08 00:44:32 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v 1.10 1987-03-22 04:39:17 spook Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
@@ -8,6 +8,9 @@
  *	New-transaction routine for DISCUSS.  (Request 'talk'.)
  *
  *      $Log: not supported by cvs2svn $
+ * Revision 1.9  86/12/08  00:44:32  wesommer
+ * Implemented -editor, -no_editor, -mtg control args for program.
+ * 
  * Revision 1.8  86/12/07  17:49:44  wesommer
  * Lint fixes.
  * 
@@ -37,7 +40,7 @@
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v 1.9 1986-12-08 00:44:32 wesommer Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v 1.10 1987-03-22 04:39:17 spook Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -59,7 +62,7 @@ static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athe
 #endif	lint
 
 extern tfile	unix_tfile();
-extern char *gets();
+extern char *gets(), *error_message();
 
 new_trans(argc, argv)
 	int argc;
@@ -142,7 +145,8 @@ new_trans(argc, argv)
 		return;
 	}
 	tf = unix_tfile(fd);
-	dsc_add_trn(dsc_public.mtg_uid, tf, subject, 0, &txn_no, &code);
+	dsc_add_trn(&dsc_public.nb, tf, subject, 0,
+		    &txn_no, &code);
 	if (code != 0) {
 		(void) fprintf(stderr, "Error adding transaction: %s\n", 
 			       error_message(code));

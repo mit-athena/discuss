@@ -2,13 +2,16 @@
  *
  * Status request for DISCUSS
  *
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/status.c,v 1.6 1986-12-07 17:49:54 wesommer Exp $
+ * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/status.c,v 1.7 1987-03-22 04:42:43 spook Exp $
  * $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/status.c,v $
  * $Locker:  $
  *
  * Copyright (C) 1986 by the MIT Student Information Processing Board
  *
  * $Log: not supported by cvs2svn $
+ * Revision 1.6  86/12/07  17:49:54  wesommer
+ * Lint fixes.
+ * 
  * Revision 1.5  86/12/07  16:05:19  rfrench
  * Globalized sci_idx
  * 
@@ -35,6 +38,8 @@
 #include "globals.h"
 #include "acl.h"
 
+extern char *rindex();
+
 status(argc, argv)
 	int argc;
 	char **argv;
@@ -45,7 +50,8 @@ status(argc, argv)
 		return;
 	}
 	printf("Attending %s (%s) meeting",
-		       dsc_public.m_info.long_name, rindex(dsc_public.m_info.location, '/')+1);
+	       dsc_public.m_info.long_name,
+	       rindex(dsc_public.m_info.location, '/')+1);
 	if (dsc_public.m_info.public_flag) printf(" (public)");
 	if (acl_is_subset("c", dsc_public.m_info.access_modes)) 
 		printf(" (You are a chairman)");

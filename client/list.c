@@ -2,13 +2,16 @@
  *
  * List request for DISCUSS
  *
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.11 1987-01-18 22:39:33 spook Exp $
+ * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.12 1987-03-22 04:35:35 spook Exp $
  * $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v $
  * $Locker:  $
  *
  * Copyright (C) 1986 by the MIT Student Information Processing Board
  *
  * $Log: not supported by cvs2svn $
+ * Revision 1.11  87/01/18  22:39:33  spook
+ * Use local_realm() rather than REALM.
+ * 
  * Revision 1.10  86/12/07  16:04:34  rfrench
  * Globalized sci_idx
  * 
@@ -53,13 +56,14 @@
 #include "dsc_et.h"
 #include "globals.h"
 
-char *ctime(), *malloc();
+char *ctime(), *malloc(), *local_realm(), *error_message();
 static int	time_now, time_sixmonthsago, time_plusthreemonths;
 static trn_info t_info;
 static list_it(),delete_it(),retrieve_it();
-static int performed;				/* true if trn was acted upon */
-static int barred;				/* true if access was denied
-						   sometime */
+static int performed;		/* true if trn was acted upon */
+static int barred;		/* true if access was denied sometime */
+
+void map_trns();
 
 static
 list_it(i)
@@ -69,7 +73,7 @@ list_it(i)
 	char *cp;
 	int code;
 
-	dsc_get_trn_info(dsc_public.mtg_uid, i, &t_info, &code);
+	dsc_get_trn_info(&dsc_public.nb, i, &t_info, &code);
 	if (code == DELETED_TRN) {
 		code = 0;
 		goto punt;
@@ -143,7 +147,7 @@ int i;
 {
      int code;
 
-     dsc_delete_trn(dsc_public.mtg_uid, i, &code);
+     dsc_delete_trn(&dsc_public.nb, i, &code);
      if (code == NO_ACCESS) {
 	  barred = TRUE;
      } else if (code == 0) {
@@ -174,7 +178,7 @@ int i;
 {
      int code;
 
-     dsc_retrieve_trn(dsc_public.mtg_uid, i, &code);
+     dsc_retrieve_trn(&dsc_public.nb, i, &code);
      if (code == NO_ACCESS) {
 	  barred = TRUE;
      } else if (code == 0) {
@@ -198,11 +202,12 @@ ret_trans(argc, argv)
 	return;
 }
 
+void
 map_trns(argc, argv, defalt, proc)
 	int argc;
 	char **argv;
 	char *defalt;
-	void (*proc)();
+	int (*proc)();
 {
 	int txn_no;
 	int code;
@@ -213,14 +218,16 @@ map_trns(argc, argv, defalt, proc)
 		ss_perror(sci_idx, 0, "No current meeting.\n");
 		return;
 	}
-	dsc_get_mtg_info(dsc_public.mtg_uid, &dsc_public.m_info, &code);
+	dsc_get_mtg_info(&dsc_public.nb,
+			 &dsc_public.m_info, &code);
 	if (code != 0) {
 		(void) ss_perror(sci_idx, code, "Can't get meeting info");
 		return;
 	}
 	txn_no = dsc_public.m_info.first;
 
-	dsc_get_trn_info(dsc_public.mtg_uid, dsc_public.current, &t_info, &code);
+	dsc_get_trn_info(&dsc_public.nb, dsc_public.current,
+			 &t_info, &code);
 	if (code != 0)
 		t_info.current = 0;
 	else {
@@ -255,7 +262,7 @@ map_trns(argc, argv, defalt, proc)
 	performed = FALSE;
 	barred = FALSE;
 
-	sl_map(proc, trn_list);
+	(void) sl_map(proc, trn_list);
 	if (!performed)
 	     if (barred)
 		  ss_perror(sci_idx, NO_ACCESS, "");
