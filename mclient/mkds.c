@@ -7,10 +7,13 @@
  */
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v 1.15 1989-06-03 00:31:10 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v 1.16 1990-12-01 22:41:38 eichin Exp $
  *	$Locker:  $
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.15  89/06/03  00:31:10  srz
+ * Added standard copyright notice.
+ * 
  * Revision 1.14  89/06/03  00:27:03  srz
  * Ken's include file changes.
  * 
@@ -53,7 +56,7 @@
 
 #ifndef lint
 static char rcsid_mkds_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v 1.15 1989-06-03 00:31:10 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v 1.16 1990-12-01 22:41:38 eichin Exp $";
 #endif lint
 
 #include <discuss/discuss.h>
@@ -140,8 +143,9 @@ char *argv[];
 	strcpy(mtg_host, strtrim(mtg_host));
 	if (mtg_host[0] == '\0')
 		strcpy(mtg_host, default_host);
-	
-	{
+	if (mtg_host[0] == '%')
+		strcpy(mtg_host, "");
+	else {
 		struct hostent *hp;
 		hp = gethostbyname(mtg_host);
 		if (!hp) {
@@ -247,6 +251,8 @@ End with . on a line by itself\n\n");
 	strcpy(nbsrc.aliases[1], short_name);
 	nbsrc.aliases[2] = (char *)NULL;
 
+	nbsrc.spare = "";
+		
 	dsc_update_mtg_set(username,&nbsrc,1,&result);
 	if (result) {
 		fprintf(stderr, "mkds: Can't set meeting name: %s",
