@@ -1,21 +1,22 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/output.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/output.c,v 1.6 1988-12-02 23:37:54 raeburn Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/output.c,v 1.7 1988-12-05 14:10:14 raeburn Exp $
  *	$Locker:  $
  *
- *	Copyright (C) 1986 by the Student Information Processing Board.
+ *	Copyright (C) 1986, 1988 by the Student Information Processing Board.
  *	
  *	Utility routines.
  *
  */
 
 #ifndef lint
-static char *rcsid_discuss_utils_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/output.c,v 1.6 1988-12-02 23:37:54 raeburn Exp $";
+static char rcsid_discuss_utils_c[] =
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/output.c,v 1.7 1988-12-05 14:10:14 raeburn Exp $";
 #endif lint
 
 #include <stdio.h>
 #include <sys/file.h>
-#include <strings.h>
+#include <string.h>
 #include <signal.h>
 #include "ss.h"
 #include "tfile.h"
@@ -71,16 +72,16 @@ output_trans(txn_no, tf, code)
 	tcontrol(tf, TFC_FORCE_NL, 0, code);
 
 	if (tinfo.pref == 0 && tinfo.nref == 0)
-		(void) sprintf (line, "--[%04d]--\f\n", tinfo.current);
+		(void) sprintf (line, "--[%04d]--\n\f\n", tinfo.current);
 	else if (tinfo.pref == 0)
-		(void) sprintf (line, "--[%04d]-- (nref = [%04d])\f\n",
+		(void) sprintf (line, "--[%04d]-- (nref = [%04d])\n\f\n",
 				tinfo.current, tinfo.nref);
 	else if (tinfo.nref == 0)
-		(void) sprintf (line, "--[%04d]-- (pref = [%04d])\f\n",
+		(void) sprintf (line, "--[%04d]-- (pref = [%04d])\n\f\n",
 				tinfo.current, tinfo.pref);
 	else
 	     (void) sprintf (line,
-			     "--[%04d]-- (pref = [%04d], nref = [%04d])\f\n",
+			     "--[%04d]-- (pref = [%04d], nref = [%04d])\n\f\n",
 			     tinfo.current, tinfo.pref, tinfo.nref);
 	twrite (tf, line, strlen (line), code);
 }
