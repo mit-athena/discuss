@@ -4,7 +4,7 @@
 ;;;    	For copying information, see the file mit-copyright.h in this release.
 ;;;
 ;;;	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v $
-;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.12 1989-06-02 23:45:11 srz Exp $
+;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.13 1989-11-12 20:54:04 raeburn Exp $
 ;;;
 ;;;  Emacs lisp code to remote control a "discuss" shell process to
 ;;;  provide an emacs-based interface to the discuss conferencing system.
@@ -12,6 +12,9 @@
 ;;;  Written by Stan Zanarotti and Bill Sommerfeld.
 ;;;
 ;;;  $Log: not supported by cvs2svn $
+; Revision 1.12  89/06/02  23:45:11  srz
+; Added standard copyright notice.
+; 
 ; Revision 1.11  88/12/15  13:50:06  srz
 ; Add patch so that broken meetings won't lose information.
 ; 
@@ -113,10 +116,15 @@ Currently ignored (always async).")
 
 ;;
 ;;  Determine pathname for subprocess.  Pretty gross, if you ask me.
-(defvar discuss-pathname (format "/mit/discuss/%s/edsc/edsc"
-				 (if (equal emacs-build-system "paris")
-				     "vax"
-				   "rt"))
+(defvar discuss-pathname (concat "/mit/discuss/exl/edsc."
+				 (cdr (assoc emacs-build-system
+					     '(("paris" . "vax")
+					       ("minos" . "rt")
+					       ("quicksilver" . "decmips")))))
+;				 (cond ((equal emacs-build-system
+;				 (if (equal emacs-build-system "paris")
+;				     "vax"
+;				   "rt"))
   "*Name of program to run as slave process for discuss.")
 
 
@@ -549,7 +557,7 @@ a	Add meeting.  Not implemented yet."
 ; run this at each load
 (defun discuss-initialize nil
   (setq discuss-version
-	"$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.12 1989-06-02 23:45:11 srz Exp $")
+	"$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.13 1989-11-12 20:54:04 raeburn Exp $")
 
 ;;; Keymaps, here at the end, where the trash belongs..
 
