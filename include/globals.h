@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/include/globals.h,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/include/globals.h,v 1.8 1987-01-18 22:45:13 spook Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/include/globals.h,v 1.9 1987-02-08 04:11:59 spook Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
@@ -44,6 +44,8 @@ extern int	errno;		/* lusing UNIX method to pass error values */
 extern bool 	use_editor;	/* Should we snarf input from stdin, or 
 				 * use an editor instead? */
 extern char	*editor_path;	/* Pathname of editor to use */
+
+extern	char	*user_id;	/* user.instance@realm identifier for user */
 
 #define	CURRENT_VERSION	"1.0"
 
