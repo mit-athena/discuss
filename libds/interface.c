@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.21 1989-02-25 18:33:17 raeburn Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.22 1989-03-25 11:22:58 srz Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
@@ -8,7 +8,7 @@
 
 #ifndef lint
 static char rcsid_interface_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.21 1989-02-25 18:33:17 raeburn Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.22 1989-03-25 11:22:58 srz Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -91,7 +91,7 @@ out:
 	*code_ptr = errno;
 	if (mp->host) free(mp->host);
 	if (mp->path) free(mp->path);
-	if (mp->module) free(mp->path);
+	if (mp->module) free(mp->module);
 	free(mp);
 	return NULL;
 }
