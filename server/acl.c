@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl.c,v 1.2 1986-11-16 06:01:47 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl.c,v 1.3 1986-11-22 06:17:45 spook Exp $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
  *
@@ -8,20 +8,28 @@
  *	along with routines to move them to and from files.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.2  86/11/16  06:01:47  wesommer
+ * Implemented acl_replace_access.
+ * Redefined acl_delete_access and diked out the old one.
+ * Implemented acl_canon (canonicalizes ACL mode string).
+ * Implemented modularity-violating fdclose (blech) so we can use stdio 
+ * with fdopen in acl_{read,write} and not lose FILE *'s to a storage leak.
+ * 
  */
 
 #ifndef lint
-static char *rcsid_acl_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl.c,v 1.2 1986-11-16 06:01:47 wesommer Exp $";
+static char *rcsid_acl_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl.c,v 1.3 1986-11-22 06:17:45 spook Exp $";
 #endif lint
 
 #include "../include/acl.h"
+#include "../include/dsc_et.h"
 #include <stdio.h>
 #include <strings.h>
 
 char *malloc(), *realloc();
 char *acl_union(), *acl_intersection(), *acl_subtract();
 
-Bool acl_check(list, principal, modes)
+bool acl_check(list, principal, modes)
      Acl *list;
      char *principal;
      char *modes;
@@ -49,7 +57,7 @@ Acl *acl_read(fd)
 	register Acl *list = (Acl *) malloc(sizeof(Acl));
 	fgets(buf, 128, f);
 	n=list->acl_length=atoi(buf);
-	list->acl_entries = (acl_entry *)malloc(n * sizeof(acl_entry));
+	list->acl_entries = (acl_entry *)malloc((unsigned)(n * sizeof(acl_entry)));
 
 	for (ae=list->acl_entries; n; --n, ++ae)  {
 		buf[0]=0;
@@ -57,31 +65,31 @@ Acl *acl_read(fd)
 		if(cp=index(buf, '\n')) *cp='\0';
 		if(cp=index(buf, ':')) {
 			*cp='\0';
-			ae->modes = malloc(strlen(buf)+1);
-			strcpy(ae->modes, buf);
-			ae->principal = malloc(strlen(cp+1)+1);
-			strcpy(ae->principal, cp+1);
+			ae->modes = malloc((unsigned)(strlen(buf)+1));
+			(void) strcpy(ae->modes, buf);
+			ae->principal = malloc((unsigned)(strlen(cp+1)+1));
+			(void) strcpy(ae->principal, cp+1);
 		} else { /* skip line */
 			list->acl_length--;
 			--ae;
 		}
 	}
-	fdclose(f); /*XXX*/
+	(void) fdclose(f); /*XXX*/
 	return(list);
 }
 
-Bool acl_write(fd, list)
+bool acl_write(fd, list)
      int fd;
      Acl *list;
 {
 	FILE *f=fdopen(fd, "w");
 	register int n;
 	register acl_entry *ae;
-	fprintf(f, "%d\n", list->acl_length);
+	(void) fprintf(f, "%d\n", list->acl_length);
 	for (ae=list->acl_entries, n=list->acl_length;
 	     n;
-	     --n, ++ae) fprintf(f, "%s:%s\n", ae->modes, ae->principal);
-	fdclose(f); /*XXX*/
+	     --n, ++ae) (void) fprintf(f, "%s:%s\n", ae->modes, ae->principal);
+	(void) fdclose(f); /*XXX*/
 	return(TRUE);
 }
 
@@ -96,7 +104,7 @@ acl_add_access(list, principal, modes)
 	for(ae=list->acl_entries, n=list->acl_length; n; --n, ++ae) {
 		if (!strcmp(ae->principal, principal)) {
 			new_modes = acl_union(modes, ae->modes);
-			free(ae->modes);
+			(void) free(ae->modes);
 			ae->modes=new_modes;
 			return;
 		}
@@ -106,8 +114,8 @@ acl_add_access(list, principal, modes)
 	 * Realloc the world - or at least the vector.
 	 */
 	list->acl_length++;
-	list->acl_entries = (acl_entry *) realloc(list->acl_entries, 
-				  list->acl_length * sizeof(acl_entry));
+	list->acl_entries = (acl_entry *) realloc((char *)(list->acl_entries),
+						  (unsigned)(list->acl_length * sizeof(acl_entry)));
 	ae = list->acl_entries + list->acl_length - 2;
 	/*
 	 * Is the last entry "*"?  If so, push it back one.
@@ -119,10 +127,10 @@ acl_add_access(list, principal, modes)
 		--ae;
 	}
 	ae++;
-	ae->principal = malloc(strlen(principal)+1);
-	strcpy(ae->principal, principal);
-	ae->modes = malloc(strlen(modes)+1);
-	strcpy(ae->modes, modes);
+	ae->principal = malloc((unsigned)(strlen(principal)+1));
+	(void) strcpy(ae->principal, principal);
+	ae->modes = malloc((unsigned)(strlen(modes)+1));
+	(void) strcpy(ae->modes, modes);
 }
 
 #ifdef notdef
@@ -137,7 +145,7 @@ acl_delete_modes(list, principal, modes)
 	for(ae=list->acl_entries, n=list->acl_length; n; --n, ++ae) {
 		if (!strcmp(ae->principal, principal)) {
 			new_modes = acl_subtract(modes, ae->modes);
-			free(ae->modes);
+			(void) free(ae->modes);
 			ae->modes=new_modes;
 			goto cleanup;
 		}
@@ -147,8 +155,8 @@ cleanup:
 	ae1 = list->acl_entries + list->acl_length - 1;
 	if ((strcmp(ae1->principal, "*")!= 0 && strcmp(ae->modes, "")) ||
 	    (!strcmp(ae1->principal, "*") && !strcmp(ae->modes, ae1->modes))) {
-		free(ae->principal);
-		free(ae->modes);
+		    (void) free(ae->principal);
+		    (void) free(ae->modes);
 		for (; ae <ae1; ae++) *ae= *(ae+1);
 		list->acl_length--;
 		list->acl_entries = (acl_entry *) realloc(list->acl_entries,
@@ -166,9 +174,9 @@ acl_replace_access(list, principal, modes)
 	register int n;
 	for(ae=list->acl_entries, n=list->acl_length; n; --n, ++ae) {
 		if (!strcmp(ae->principal, principal)) {
-			free(ae->modes);
-			ae->modes = malloc(strlen(modes)+1);
-			strcpy(ae->modes, modes);
+			(void) free(ae->modes);
+			ae->modes = malloc((unsigned)(strlen(modes)+1));
+			(void) strcpy(ae->modes, modes);
 			return;
 		}
 	}
@@ -176,7 +184,7 @@ acl_replace_access(list, principal, modes)
 	acl_add_access(list, principal, modes);
 }
 
-Bool
+bool
 acl_delete_access(list, principal)
 	Acl *list;
 	char *principal;
@@ -222,7 +230,6 @@ char *acl_get_access(list, principal)
 		}
 	}
 	return("");
-
 }
 /*
  * Destroy an ACL.     
@@ -237,17 +244,17 @@ acl_destroy(list)
 	for (ae=list->acl_entries, n=list->acl_length;
 	     n;
 	     --n, ++ae) {
-		free(ae->principal);
-		free(ae->modes);
+		     (void) free(ae->principal);
+		     (void) free(ae->modes);
 	}
-	free(list->acl_entries);
-	free(list);
+	(void) free((char *)(list->acl_entries));
+	(void) free((char *)list);
 }
 
 /*
  * Returns true if every character of s1 occurs in s2.
  */
-Bool acl_is_subset(s1, s2)
+bool acl_is_subset(s1, s2)
      register char *s1, *s2;
 {
 	register char *last;
@@ -270,7 +277,7 @@ char *acl_intersection(s1, s2)
 	while(*s1) {
 		if(index(s2, *s1)) {
 			result[resp++] = *s1;
-			result=realloc(result, resp+1);
+			result=realloc(result, (unsigned)(resp+1));
 		}
 		s1++;
 	}
@@ -282,12 +289,12 @@ char *acl_union(s1, s2)
      register char *s1, *s2;
 {
 	register int resp=strlen(s2);
-	register char *result=malloc(resp+1);
+	register char *result=malloc((unsigned)(resp+1));
 	strcpy(result, s2);
 	while(*s1) {
 		if (!index(result, *s1)) {
 			result[resp++]= *s1;
-			result=realloc(result, resp+1);
+			result=realloc(result, (unsigned)(resp+1));
 		}
 		s1++;
 	}
@@ -302,7 +309,7 @@ char *acl_subtract(s1, s2)
 	register int len=0;
 	for (; *s2; s2++) {
 		if (!index(s1, *s2)) {
-			result = realloc(result, len+2);
+			result = realloc(result, (unsigned)(len+2));
 			result[len++]= *s2;
 		}
 	}
@@ -334,7 +341,7 @@ char *acl_canon(s1, s2, code)
 	for (cp = s2; *cp; cp++) {
 		if (index(s1, *cp)) {
 			len++;
-			out = realloc(out, len);
+			out = realloc(out, (unsigned)len);
 			out[len-1] = *cp;
 		}
 	}
@@ -360,7 +367,7 @@ main()
 
 	fd = open ("foo.acl", O_RDONLY);
 	a=acl_read(fd);
-	close(fd);
+	(void) close(fd);
 	printf("a for wesommer: %d\n", acl_check(a, "wesommer", "a"));
 	printf("a for foobar: %d\n", acl_check(a, "foobar", "a"));
 	printf("a for spook: %d\n", acl_check(a, "spook", "a"));
@@ -374,7 +381,7 @@ main()
 	acl_add_access(a, "*", "w");
 	fd = open("bar.acl", O_WRONLY+O_CREAT+O_TRUNC);
 	acl_write(fd, a);
-	close(fd);
+	(void) close(fd);
 }
 panic(s)
 	char *s;
