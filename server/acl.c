@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl.c,v 1.5 1986-12-08 23:30:56 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl.c,v 1.6 1987-03-17 02:25:19 srz Exp $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
  *
@@ -8,6 +8,9 @@
  *	along with routines to move them to and from files.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.5  86/12/08  23:30:56  wesommer
+ * Changed acl_canon() to line up columns.
+ * 
  * Revision 1.4  86/12/04  10:18:57  srz
  * You !#@$% C programmers don't know what negative subscripts are! ;-)
  * 
@@ -24,7 +27,7 @@
  */
 
 #ifndef lint
-static char *rcsid_acl_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl.c,v 1.5 1986-12-08 23:30:56 wesommer Exp $";
+static char *rcsid_acl_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl.c,v 1.6 1987-03-17 02:25:19 srz Exp $";
 #endif lint
 
 #include "../include/acl.h"
@@ -92,9 +95,8 @@ bool acl_write(fd, list)
 	register int n;
 	register acl_entry *ae;
 	(void) fprintf(f, "%d\n", list->acl_length);
-	for (ae=list->acl_entries, n=list->acl_length;
-	     n;
-	     --n, ++ae) (void) fprintf(f, "%s:%s\n", ae->modes, ae->principal);
+	for (ae=list->acl_entries, n=list->acl_length; n; --n, ++ae)
+		(void) fprintf(f, "%s:%s\n", ae->modes, ae->principal);
 	(void) fdclose(f); /*XXX*/
 	return(TRUE);
 }
@@ -129,7 +131,7 @@ acl_add_access(list, principal, modes)
 	if (list -> acl_length > 1) {		/* non-empty acl */
 	     if (!strcmp(ae->principal, "*")) {
 		  if(!strcmp(principal, "*")) 
-		       panic("acl broke");
+			  panic("acl broke");
 		  *(ae+1) = *ae;
 		  --ae;
 	     }
@@ -223,6 +225,30 @@ Acl *acl_create()
 	result->acl_entries=(acl_entry *) malloc(sizeof(acl_entry));
 	return(result);
 }
+
+Acl *acl_copy (old_acl)
+Acl *old_acl;
+{
+     register Acl *new_acl = (Acl *) malloc (sizeof(Acl));
+     register acl_entry *old_ae,*new_ae;
+     register int n;
+
+     new_acl -> acl_length = old_acl -> acl_length;
+     new_acl -> acl_entries = (acl_entry *) malloc ((unsigned)(new_acl -> acl_length * sizeof(acl_entry)));
+
+     for (old_ae = old_acl->acl_entries, new_ae = new_acl->acl_entries, n=new_acl->acl_length;
+	  n;
+	  --n, ++old_ae, ++new_ae) {
+	       new_ae->principal = malloc (strlen(old_ae->principal)+1);
+	       strcpy (new_ae->principal,old_ae->principal);
+	       new_ae->modes = malloc (strlen(old_ae->modes)+1);
+	       strcpy (new_ae->modes,old_ae->modes);
+	  }
+	       
+     return (new_acl);
+}
+
+
 
 char *acl_get_access(list, principal)
 	Acl *list;
@@ -342,7 +368,7 @@ char *acl_canon(s1, s2, code)
 
 	*code = 0;
 	for (cp = s1; *cp; cp++) {
-		if (!index(s2, *cp)) 
+		if (*cp != ' ' && !index(s2, *cp)) 
 			*code = BAD_MODES;
 	}
 	maxlen = strlen(s2);
@@ -392,15 +418,17 @@ main()
 	acl_write(fd, a);
 	(void) close(fd);
 }
+#endif TESTS
+
+static
 panic(s)
 	char *s;
 {
-	printf(*s);
+	printf(s);
 	fflush(stdout);
 	abort();
 }
 
-#endif TESTS
 /*
  *	Can you say "modularity violation??":  This does an fclose 
  *	without close(2)'ing the file descriptor behind it.
