@@ -4,7 +4,7 @@ OBJS	= edsc.o parse.o time.o do_quote.o do_trn.o do_mtg.o do_misc.o\
 SRCS	= edsc.c parse.c time.c do_quote.c do_trn.c do_mtg.c do_misc.c\
 	do_cache.c $(MACHSRCS)
 
-LIBS	= ../server/acl.o -ldsk -lusp -lkrb -ldes -lcom_err
+LIBS	= ../server/acl.o -ldsk -lusp -lkrb4 -ldes425 -lkrb5 -lcrypto -lcom_err
 LFLAGS	= -L../lib
 DEFINES = $(FLAGS)
 LISPDIR = $(ATHSHAREDIR)/emacs/site-lisp

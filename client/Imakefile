@@ -1,5 +1,5 @@
 #
-# $Id: Imakefile,v 1.3 1996-09-08 20:26:35 ghudson Exp $
+# $Id: Imakefile,v 1.4 1997-10-13 22:43:41 ghudson Exp $
 #
 
 # libzephyr.a needed only for Zephyr notifications
@@ -7,9 +7,11 @@
 
 INFODIR=/usr/athena/lib/discuss/info
 #ifdef SOLARIS
-LIBS=	../server/acl.o -ldsk -lkrb -ldes -lusp -lss -lcom_err /lib/libbsdmalloc.a
+LIBS=	../server/acl.o -ldsk -lkrb4 -ldes425 -lkrb5 -lcrypto -lusp -lss \
+	-lcom_err /lib/libbsdmalloc.a
 #else
-LIBS=	../server/acl.o -ldsk -lkrb -ldes -lusp -lss -lcom_err 
+LIBS=	../server/acl.o -ldsk -lkrb4 -ldes425 -lkrb5 -lcrypto -lusp -lss \
+	-lcom_err 
 #endif
 OBJS=	discuss.o edit.o output.o trn_expr.o list.o trn_select.o \
 	status.o new_trans.o print.o lsm.o addmtg.o list_acl.o \

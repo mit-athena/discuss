@@ -1,4 +1,5 @@
-LIBS = -lregexp ../lib/libdsk.a ../lib/libusp.a -lcom_err -lkrb -ldes
+LIBS = -lregexp ../lib/libdsk.a ../lib/libusp.a -lcom_err -lkrb4 -ldes425 \
+	-lkrb5 -lcrypto -lcom_err
 LFLAGS = -Lregexp
 
 #define ISUBDIRS regexp
