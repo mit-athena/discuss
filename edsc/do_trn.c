@@ -21,7 +21,7 @@
 #include <ctype.h>
 #include <sys/time.h>
 #include <netdb.h>
-#ifdef SVR4
+#ifdef SOLARIS
 #include <string.h>
 #include <fcntl.h>
 #else
