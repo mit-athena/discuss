@@ -11,7 +11,7 @@
 /*
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.12 1987-04-11 23:48:31 spook Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.13 1987-07-16 19:30:46 srz Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
@@ -21,13 +21,16 @@
  *		callable routines.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.12  87/04/11  23:48:31  spook
+ * Removed unused variable.
+ * 
  * Revision 1.11  87/04/11  00:10:00  srz
  * Added RCS junk
  * 
  *
  */
 #ifndef lint
-static char *rcsid_core_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.12 1987-04-11 23:48:31 spook Exp $";
+static char *rcsid_core_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.13 1987-07-16 19:30:46 srz Exp $";
 #endif lint
 
 
@@ -137,7 +140,7 @@ int *result;
      if (reply_trn != 0) {
 	  *result = read_chain (reply_trn, &reply_cb);
 	  if (*result) { core_abort(); return; }
-	  if (reply_cb.deleted) {
+	  if (reply_cb.flags & CB_DELETED) {
 	       *result = DELETED_TRN;
 	       core_abort (); return;
 	  }
@@ -157,7 +160,7 @@ int *result;
      cb.nref = 0;
      cb.chain_fref = 0;
      cb.chain_lref = 0;
-     cb.deleted = FALSE;
+     cb.flags = 0;
      cb.filler = 0;
      cb.trn_addr = fsize (u_trn_f);
 
@@ -304,7 +307,7 @@ int *result;
      cb.nref = 0;
      cb.chain_fref = 0;
      cb.chain_lref = 0;
-     cb.deleted = TRUE;
+     cb.flags |= CB_DELETED;
      cb.filler = 0;
      cb.trn_addr = 0;
 
@@ -402,7 +405,7 @@ int *result;
 	  goto null_info;
      }
 
-     if (cb.deleted && !has_trn_access(th_author, 'd')) {
+     if ((cb.flags & CB_DELETED) && !has_trn_access(th_author, 'd')) {
 	  *result = DELETED_TRN;
 	  goto null_info;
      }
@@ -427,7 +430,7 @@ int *result;
 
      forget_super();
 
-     if (cb.deleted)
+     if (cb.flags & CB_DELETED)
 	  *result = DELETED_TRN;
      else
 	  *result = 0;
@@ -467,7 +470,7 @@ int *result;
      *result = read_chain (trn, &cb);
      if (*result) { core_abort(); return; }
 
-     if (cb.deleted || cb.trn_addr == 0) {
+     if ((cb.flags & CB_DELETED) || cb.trn_addr == 0) {
 	  *result = DELETED_TRN;
 	  core_abort (); return;
      }
@@ -483,7 +486,7 @@ int *result;
 
      free(th_author);
      
-     cb.deleted = TRUE;
+     cb.flags |= CB_DELETED;
      write_chain (&cb);
 
      /* update next of prev */
@@ -582,7 +585,7 @@ int *result;
      *result = read_chain (trn, &cb);
      if (*result) { core_abort(); return; }
 
-     if (!cb.deleted) {
+     if (!(cb.flags & CB_DELETED)) {
 	  *result = TRN_NOT_DELETED;
 	  core_abort (); return;
      }
@@ -659,7 +662,7 @@ int *result;
 	  *result = read_chain (cb.prev, &spare_cb);
 	  if (*result) { core_abort(); return; }
 
-	  if (!spare_cb.deleted)
+	  if (!(spare_cb.flags & CB_DELETED))
 	       break;
 	  cb.prev--;
      }
@@ -667,13 +670,13 @@ int *result;
 	  *result = read_chain (cb.next, &spare_cb);
 	  if (*result) { core_abort(); return; }
 
-	  if (!spare_cb.deleted)
+	  if (!(spare_cb.flags & CB_DELETED))
 	       break;
 	  cb.next++;
      }
 
      /* invariant -- current_block is all set (except for deleted) */
-     cb.deleted = FALSE;
+     cb.flags &= ~(CB_DELETED);
      write_chain (&cb);
 
      /* update next of prev */
@@ -994,7 +997,7 @@ int *result;
 
      finish_read();
 
-     if (cb.deleted && !has_trn_access(th_author, 'd')) {
+     if ((cb.flags & CB_DELETED) && !has_trn_access(th_author, 'd')) {
 
 	  *result = DELETED_TRN;
 	  free(th_author);
@@ -1020,7 +1023,7 @@ int *result;
      tclose (dest_file,result);
      abort_file = NULL;
 
-     if (cb.deleted)
+     if (cb.flags & CB_DELETED)
 	  *result = DELETED_TRN;
      else
 	  *result = 0;
