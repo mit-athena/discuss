@@ -90,6 +90,10 @@ install: discussd disserve
 	install -c -m 4755 disserve $(SERVERDIR)/disserve
 	-/etc/chown discuss $(SERVERDIR)/disserve
 
+installclient: disserve
+	install -c disserve $(DESTDIR)/disserve-fs
+
+
 dist:	$(SRCS) Makefile mtg.h
 	-mkdir ../../dist/source/server
 	-chmod g+w ../../dist/source/server
@@ -137,66 +141,4 @@ undepend:
 #
 # the last line in the makefile should be...
 # DO NOT DELETE THIS LINE
-
-disserve.o: disserve.c /usr/include/stdio.h /usr/include/syslog.h
-core.o: core.c ../include/discuss/types.h ../include/discuss/dsc_et.h
-core.o: ../include/discuss/interface.h ../include/discuss/types.h ./mtg.h
-core.o: ../include/discuss/types.h ../include/discuss/tfile.h ../include/atom.h
-core.o: ../include/discuss/acl.h ../include/internal.h /usr/include/errno.h
-core.o: /usr/include/sys/file.h /usr/include/sys/types.h
-core.o: /usr/include/sys/stat.h /usr/include/sys/param.h
-core.o: /usr/include/machine/machparam.h /usr/include/signal.h
-core.o: /usr/include/sys/types.h /usr/include/string.h /usr/include/strings.h
-coreutil.o: coreutil.c ../include/discuss/types.h ../include/discuss/dsc_et.h
-coreutil.o: ../include/atom.h ./mtg.h ../include/discuss/types.h
-coreutil.o: ../include/discuss/tfile.h ../include/discuss/acl.h
-coreutil.o: ../include/internal.h ../include/ansi.h
-coreutil.o: /usr/include/zephyr/zephyr.h /usr/include/zephyr/mit-copyright.h
-coreutil.o: /usr/include/zephyr/zephyr_err.h /usr/include/zephyr/zephyr_conf.h
-coreutil.o: /usr/include/zephyr/mit-copyright.h /usr/include/errno.h
-coreutil.o: /usr/include/sys/types.h /usr/include/netinet/in.h
-coreutil.o: /usr/include/sys/time.h /usr/include/time.h /usr/include/stdio.h
-coreutil.o: /usr/include/errno.h /usr/include/sys/types.h /usr/include/netdb.h
-coreutil.o: /usr/include/sys/file.h /usr/include/sys/stat.h
-coreutil.o: /usr/include/strings.h
-atom.o: atom.c ./../include/atom.h /usr/include/sys/types.h
-atom.o: /usr/include/sys/stat.h /usr/include/sys/file.h
-dispatch.o: dispatch.c ../include/rpc.h /usr/include/stdio.h ../include/usp.h
-dispatch.o: ../include/usp_et.h ../include/rpc_et.h
-dispatch.o: ../include/discuss/interface.h ../include/discuss/types.h
-dispatch.o: ../include/discuss/tfile.h ../include/discuss/acl.h
-dispatch.o: ../include/ansi.h
-acl.o: acl.c /usr/include/stdio.h /usr/include/strings.h /usr/include/ctype.h
-acl.o: ../include/discuss/discuss.h ../include/discuss/mit-sipb-copyright.h
-acl.o: ../include/discuss/types.h ../include/discuss/tfile.h
-acl.o: ../include/discuss/dsc_et.h ../include/discuss/acl.h
-acl.o: ../include/discuss/interface.h ../include/discuss/types.h
-acl.o: ../include/discuss/dsname.h ../include/internal.h
-rpproc.o: rpproc.c /usr/include/sys/ioctl.h /usr/include/sys/ttychars.h
-rpproc.o: /usr/include/sys/ttydev.h /usr/include/fcntl.h
-rpproc.o: /usr/include/sys/types.h /usr/include/sys/socket.h
-rpproc.o: /usr/include/stdio.h /usr/include/netinet/in.h
-rpproc.o: /usr/include/sys/stat.h /usr/include/netdb.h /usr/include/errno.h
-rpproc.o: /usr/include/pwd.h /usr/include/string.h /usr/include/strings.h
-rpproc.o: ../include/discuss/tfile.h ../include/rpc.h /usr/include/stdio.h
-rpproc.o: ../include/usp.h ../include/usp_et.h ../include/rpc_et.h
-rpproc.o: ../include/discuss/types.h ./config.h
-acl_core.o: acl_core.c ../include/discuss/types.h ../include/discuss/dsc_et.h
-acl_core.o: ../include/discuss/acl.h ../include/internal.h
-acl_core.o: /usr/include/sys/file.h /usr/include/errno.h /usr/include/stdio.h
-acl_core.o: /usr/include/sys/param.h /usr/include/machine/machparam.h
-acl_core.o: /usr/include/signal.h /usr/include/sys/types.h
-acl_core.o: /usr/include/string.h /usr/include/strings.h ../include/ansi.h
-expunge.o: expunge.c /usr/include/stdio.h /usr/include/strings.h
-expunge.o: /usr/include/sys/types.h /usr/include/sys/file.h
-expunge.o: /usr/include/sys/stat.h ../include/discuss/types.h
-expunge.o: ../include/discuss/dsc_et.h ../include/discuss/tfile.h
-expunge.o: ../include/discuss/interface.h ../include/discuss/types.h
-expunge.o: ../include/discuss/acl.h ./mtg.h ../include/discuss/types.h
-recover.o: recover.c /usr/include/stdio.h /usr/include/strings.h
-recover.o: /usr/include/sys/types.h /usr/include/sys/file.h
-recover.o: /usr/include/sys/stat.h ../include/discuss/types.h
-recover.o: ../include/discuss/dsc_et.h ../include/discuss/tfile.h
-recover.o: ../include/discuss/interface.h ../include/discuss/types.h ./mtg.h
-recover.o: ../include/discuss/types.h
-glue.o: glue.c
+#
