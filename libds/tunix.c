@@ -8,11 +8,14 @@
 /*
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tunix.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tunix.c,v 1.5 1989-06-03 00:22:33 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tunix.c,v 1.6 1998-01-20 23:11:00 ghudson Exp $
  *
  * tunix.c -- procedures to have tfiles work from unix files.
  *
  *	$Log: not supported by cvs2svn $
+ *	Revision 1.5  1989/06/03 00:22:33  srz
+ *	Added standard copyright notice.
+ *
  * Revision 1.4  89/01/04  20:47:00  raeburn
  * Fixed include reference
  * 
@@ -27,7 +30,7 @@
  */
 #ifndef lint
 static char rcsid_tunix_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tunix.c,v 1.5 1989-06-03 00:22:33 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tunix.c,v 1.6 1998-01-20 23:11:00 ghudson Exp $";
 #endif lint
 
 #define min(A, B) ((A) < (B) ? (A) : (B))
@@ -127,5 +130,5 @@ int desc;
      ts = (struct tunix_state *) malloc (sizeof (struct tunix_state));
      ts -> last_char = 0;
 
-     return (tcreate (buf.st_size, (char *) ts, desc, tunix));
+     return (tcreate ((int) buf.st_size, (char *) ts, desc, tunix));
 }
