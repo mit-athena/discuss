@@ -71,6 +71,12 @@ int *fatal_error,*result;
 	  max_convs = 5;
      }
 
+     /* see if there's a real module there */
+     if (!module) {
+	     cur_conv = -1;
+	     return;
+     }
+
      /* check if we're setting our current module */
      if (cur_conv != -1) {
 	  if (!strcmp (module, conv_base[cur_conv].module)) {
@@ -158,7 +164,7 @@ flush_convs ()
 	  /* tromp on future conversations */
 	  for (j = i+1; j < num_convs; j++) {
 	       if (convp -> rc == conv_base[j].rc)
-		    conv_base[j].rc == NULL;
+		    conv_base[j].rc = NULL;
 	  }
 	  convp -> rc = 0;
      }

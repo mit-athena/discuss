@@ -35,8 +35,6 @@ int *result;
      int rem;
 
      static KTEXT_ST ticket;
-     static char phost[MAX_HSTNM];
-
 
      init_krb_err_tbl();
 
@@ -53,7 +51,7 @@ int *result;
      /* look for service instance */
      instancep = index (serv, '.');
      if (instancep == NULL) {
-	  instancep == "";
+	  instancep = "";
      } else {
 	  *instancep++ = '\0';
      }
