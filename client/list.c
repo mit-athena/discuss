@@ -2,62 +2,20 @@
  *
  * List request for DISCUSS
  *
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.14 1987-04-12 00:06:34 spook Exp $
+ * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.15 1987-07-17 00:35:14 spook Exp $
  * $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v $
  * $Locker:  $
  *
  * Copyright (C) 1986 by the MIT Student Information Processing Board
  *
- * $Log: not supported by cvs2svn $
- * Revision 1.13  87/04/10  23:50:14  srz
- * Added static RCS id.
- * 
- * Revision 1.12  87/03/22  04:35:35  spook
- * *** empty log message ***
- * 
- * Revision 1.11  87/01/18  22:39:33  spook
- * Use local_realm() rather than REALM.
- * 
- * Revision 1.10  86/12/07  16:04:34  rfrench
- * Globalized sci_idx
- * 
- * Revision 1.9  86/12/07  00:39:08  rfrench
- * Killed ../include
- * 
- * Revision 1.8  86/11/11  16:33:09  spook
- * Fixed to work with changes in et stuff
- * 
- * Revision 1.7  86/10/29  10:26:34  srz
- * Made generic map_trans, added retrieve and delete.
- * Fixed bugs in current handling, etc.
- * 
- * Revision 1.6  86/10/19  10:00:05  spook
- * Changed to use dsc_ routines; eliminate refs to rpc.
- * 
- * Revision 1.5  86/10/14  22:59:06  spook
- * Checking meeting info on each request.
- * 
- * Revision 1.4  86/09/22  06:18:43  spook
- * changed selected-list manipulation
- * 
- * Revision 1.3  86/09/10  18:57:27  wesommer
- * Made to work with kerberos; meeting names are now longer.
- * ./
- * 
- * Revision 1.2  86/08/23  21:43:09  spook
- * moved timecheck for list into list module
- * 
- * Revision 1.1  86/08/22  00:23:56  spook
- * Initial revision
- * 
- *
  */
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.14 1987-04-12 00:06:34 spook Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.15 1987-07-17 00:35:14 spook Exp $";
 #endif lint
 
 #include <stdio.h>
 #include <strings.h>
+#include "discuss_err.h"
 #include "ss.h"
 #include "tfile.h"
 #include "interface.h"
@@ -65,7 +23,7 @@ static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athe
 #include "dsc_et.h"
 #include "globals.h"
 
-char *ctime(), *malloc(), *local_realm(), *error_message();
+char *ctime(), *malloc(), *local_realm(), *error_message(), *short_time();
 static int	time_now, time_sixmonthsago, time_plusthreemonths;
 static trn_info t_info;
 static list_it(),delete_it(),retrieve_it();
@@ -104,13 +62,7 @@ list_it(i)
 		  dsc_public.current = i;		/* current = first */
 	     }
 	}
-	cp = ctime(&t_info.date_entered);
-	if((t_info.date_entered < time_sixmonthsago) ||
-	   (t_info.date_entered > time_plusthreemonths))
-		(void) sprintf(newtime, "%-7.7s %-4.4s",
-			       cp+4, cp+20);
-	else
-		(void) sprintf(newtime, "%-12.12s", cp+4);
+	strcpy(newtime, short_time(&t_info.date_entered));
 	/*
 	 * If author ends with current realm, punt the realm.
 	 */
@@ -122,8 +74,8 @@ list_it(i)
 		(void) strcpy(&t_info.author[12], "...");
 	}
 	(void) sprintf(buffer, "(%d)", t_info.num_lines);
-	if (strlen(t_info.subject) > 36) {
-		(void) strcpy(&t_info.subject[33], "...");
+	if (strlen(t_info.subject) > 35) {
+	     (void) strcpy(&t_info.subject[32], "...");
 	}
 	(void) printf(" [%04d]%c%5s %s %-15s %-20s\n",
 		      t_info.current,
@@ -270,8 +222,5 @@ map_trns(argc, argv, defalt, proc)
 
 	(void) sl_map(proc, trn_list);
 	if (!performed)
-	     if (barred)
-		  ss_perror(sci_idx, NO_ACCESS, "");
-	     else
-		  (void) fprintf(stderr, "%s: No transactions selected\n", ss_name(sci_idx));
+	     ss_perror(sci_idx, barred ? NO_ACCESS : DISC_NO_TRN, "");
 }
