@@ -6,18 +6,19 @@
  *	      the like.
  *
  */
-#include "../include/types.h"
-#include "../include/dsc_et.h"
-#include "../include/tfile.h"
-#include "../include/interface.h"
-#include "../include/acl.h"
-#include "mtg.h"
 
 #include <stdio.h>
 #include <strings.h>
 #include <sys/types.h>
 #include <sys/file.h>
 #include <sys/stat.h>
+
+#include <discuss/types.h>
+#include <discuss/dsc_et.h>
+#include <discuss/tfile.h>
+#include <discuss/interface.h>
+#include <discuss/acl.h>
+#include "mtg.h"
 
 #define NULL 0
 #define MAX_TRNS 1000
@@ -32,7 +33,7 @@ static int error_occurred = 0;
 tfile unix_tfile ();
 char *malloc();
 
-extern rpc_caller[];
+extern char rpc_caller[];
 extern int has_privs;
 extern int errno;
 
@@ -44,8 +45,8 @@ char **argv;
      mtg_info old_mtg_info,new_mtg_info;
      trn_info old_trn_info;
      int result;
-     Acl *acl_list,*new_acl_list;
-     acl_entry *ae;
+     dsc_acl *acl_list,*new_acl_list;
+     dsc_acl_entry *ae;
      char *new_modes;
      tfile tf;
      
@@ -135,9 +136,12 @@ char **argv;
 	  exit (1);
      }
 
-     create_mtg_priv (location, mtg_name, old_mtg_info.public_flag, old_mtg_info.date_created, chairman, new_acl_list, &result);
+     create_mtg_priv (location, mtg_name, old_mtg_info.public_flag,
+		      old_mtg_info.date_created, chairman,
+		      new_acl_list, &result);
      if (result != 0) {
-	  fprintf (stderr, "%s: %s while creating new meeting\n", location, error_message(result));
+	  fprintf (stderr, "%s: %s while creating new meeting\n",
+		   location, error_message(result));
 	  /* XXX rename back */
 	  exit (1);
      }
@@ -149,13 +153,17 @@ char **argv;
      for (i = old_mtg_info.lowest; i <= old_mtg_info.highest; i++) {
 	  get_trn_info (backup_location, i, &old_trn_info, &result);
 	  if (result != 0 && result != DELETED_TRN && result != EXPUNGED_TRN) {
-	       fprintf(stderr, "Error getting info for transaction [%04d]: %s\n", i, error_message(result));
+	       fprintf(stderr,
+		       "Error getting info for transaction [%04d]: %s\n",
+		       i, error_message(result));
 	       error_occurred = TRUE;
 	  } else if (result != 0) {		/* expunge it */
 	       printf("Expunging transaction [%04d]\n", i);
 	       expunge_trn (location, i, &result);
 	       if (result != 0) {
-		    fprintf(stderr, "Error expunging transaction [%04d]: %s\n", i, error_message(result));
+		    fprintf(stderr,
+			    "Error expunging transaction [%04d]: %s\n",
+			    i, error_message(result));
 		    error_occurred = TRUE;
 	       }
 	  } else if (result == 0) {
@@ -165,7 +173,8 @@ char **argv;
 
 	       get_trn (backup_location, i, tf, &result);
 	       if (result != 0) {
-		    fprintf(stderr, "Error getting transaction [%04d]: %s\n", i, error_message(result));
+		    fprintf(stderr, "Error getting transaction [%04d]: %s\n",
+			    i, error_message(result));
 		    error_occurred = TRUE;
 		    free(old_trn_info. author);
 		    free(old_trn_info.subject);
@@ -176,9 +185,14 @@ char **argv;
 	       lseek(tempf,0,0);
 
 	       tf = unix_tfile (tempf);
-	       add_trn_priv (location, tf, old_trn_info.subject, old_trn_info.pref, old_trn_info.current, old_trn_info.author, old_trn_info.date_entered, &n, &result);
+	       add_trn_priv (location, tf, old_trn_info.subject,
+			     old_trn_info.pref, old_trn_info.current,
+			     old_trn_info.author, old_trn_info.date_entered,
+			     &n, &result);
 	       if (result != 0) {
-		    fprintf(stderr, "Error getting info for transaction %d: %s\n", i, error_message(result));
+		    fprintf(stderr,
+			    "Error getting info for transaction %d: %s\n", i,
+			    error_message(result));
 		    error_occurred = TRUE;
 	       }
 	       free(old_trn_info.author);
@@ -190,7 +204,9 @@ char **argv;
      for (ae = acl_list->acl_entries, n = acl_list->acl_length; n; --n, ++ae) {
 	  set_access(location, ae->principal, ae->modes, &result);
 	  if (result != 0) {
-	       fprintf(stderr, "%s: %s while setting acl entry %s to %s\n", location, ae->principal, ae->modes, error_message(result));
+	       fprintf(stderr, "%s: %s while setting acl entry %s to %s\n",
+		       location, ae->principal, ae->modes,
+		       error_message(result));
 	       exit (1);
 	  }
      }
@@ -198,7 +214,8 @@ char **argv;
      if (!error_occurred) {
 	  remove_mtg (backup_location, &result);
 	  if (result != 0) {
-	       fprintf(stderr, "%s: %s while removing backup meeting.\n", location, error_message(result));
+	       fprintf(stderr, "%s: %s while removing backup meeting.\n",
+		       location, error_message(result));
 	       exit (1);
 	  }
      } else exit (1);				/* error occurred */
