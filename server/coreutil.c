@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.13 1988-10-08 01:28:26 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.14 1988-10-08 03:28:49 srz Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
@@ -11,6 +11,9 @@
  *		  in-memory superblock, and to open & close meetings.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.13  88/10/08  01:28:26  srz
+ * Changes for new expunge.  Fix to Zephyr stuff.
+ * 
  * Revision 1.12  88/09/23  17:07:33  raeburn
  * Changed type names in accordance with acl.h.  Included include/internal.h.
  * 
@@ -58,7 +61,7 @@
 const
 #endif
 static char rcsid_coreutil_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.13 1988-10-08 01:28:26 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.14 1988-10-08 03:28:49 srz Exp $";
 #endif /* lint */
 
 #include "../include/types.h"
@@ -599,6 +602,7 @@ mtg_znotify(mtg_name, subject, author)
 	ZNotice_t notice;
 	char *msglst[4],bfr[30],host[100],fullpath[256];
 	struct hostent *hent;
+	int code;
 	
 	/* Set up the notice structure */
 	bzero(&notice, sizeof(notice));
@@ -611,6 +615,7 @@ mtg_znotify(mtg_name, subject, author)
 		return;
 	sprintf(fullpath,"%s:%s",hent->h_name,mtg_name);
 		
+	ZOpenPort(NULL);
 	notice.z_kind = UNSAFE;
 	notice.z_port = 0;
 	notice.z_class = "DISCUSS";
@@ -641,9 +646,9 @@ mtg_znotify(mtg_name, subject, author)
 			break;
 	}
 	if (n) {
-		notice.z_recipient = "";
+		notice.z_recipient = "*";
 		/* We really don't care if it gets through... */
-		ZSendList(&notice,msglst,4,ZNOAUTH);
+		code = ZSendList(&notice,msglst,4,ZNOAUTH);
 		return;
 	}
 	for (ae = mtg_acl->acl_entries, n=mtg_acl->acl_length;
