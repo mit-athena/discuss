@@ -4,7 +4,7 @@
 ;;;    	For copying information, see the file mit-copyright.h in this release.
 ;;;
 ;;;	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v $
-;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.16 1990-10-29 22:55:04 bjaspan Exp $
+;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.17 1990-11-01 21:32:56 eichin Exp $
 ;;;
 ;;;  Emacs lisp code to remote control a "discuss" shell process to
 ;;;  provide an emacs-based interface to the discuss conferencing system.
@@ -13,6 +13,9 @@
 ;;;  Written by Stan Zanarotti, Bill Sommerfeld and Theodore Ts'o.
 ;;;
 ;;;  $Log: not supported by cvs2svn $
+; Revision 1.16  90/10/29  22:55:04  bjaspan
+; fixed a stupid bug in discuss-delete-trn
+; 
 ; Revision 1.15  90/09/19  16:29:02  bjaspan
 ; merged my changes: meeting name completion, discuss-safe-delete
 ; 
@@ -289,14 +292,17 @@ a	Add meeting."
 
 (fset 'discuss-lsm (symbol-function 'discuss-list-meetings))
 
-(defmacro cadr (x)
-  (list 'car (list 'cdr x)))
+;;(defmacro cadr (x)
+;;  (list 'car (list 'cdr x)))
+(defun cadr (x) (car (cdr x)))
 
-(defmacro caddr (x)
-  (` (car (cdr (cdr (, x))))))
+;;(defmacro caddr (x)
+;;  (` (car (cdr (cdr (, x))))))
+(defun caddr (x) (car (cdr (cdr x))))
 
-(defmacro cddr (x)
-  (` (cdr (cdr (, x)))))
+;;(defmacro cddr (x)
+;;  (` (cdr (cdr (, x)))))
+(defun cddr (x) (cdr (cdr x)))
 
 (defun discuss-lsm-1 (entry)
   (insert (cond ((eq (car entry) 1)
@@ -1110,7 +1116,7 @@ discuss server while we spin-block."
 ; run this at each load
 (defun discuss-initialize nil
   (setq discuss-version
-	"$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.16 1990-10-29 22:55:04 bjaspan Exp $")
+	"$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.17 1990-11-01 21:32:56 eichin Exp $")
 
 ;;;
 ;;; Lots of autoload stuff....
