@@ -34,6 +34,12 @@
 	request		list_meetings, "List meetings.",
 			list_meetings, lsm;
 
+	request		check_meetings, "Check for changed meetings.",
+			check_meetings, ckm;
+
+	request		next_meeting, "Go to next changed meeting.",
+			next_meeting, nm;
+
 	request		add_mtg,
 			"Add a meeting to list of those to be searched.",
 			add_meeting, add_mtg, am;
