@@ -65,6 +65,8 @@ int procno;
 	  sendreply();
 
 	  tdestroy(t1);
+	  free(c1);
+	  free(c2);
 	  break;
 
      /* get_trn_info (mtg_name, trn, info, result) */	  
@@ -79,7 +81,7 @@ int procno;
 
 	  free(tinfo.subject);
 	  free(tinfo.author);
-
+	  free(c1);
 	  break;
 
      /* delete_trn (mtg_name, trn, result) */
@@ -90,7 +92,7 @@ int procno;
 	  startreply();
 	  sendint(result);
 	  sendreply();
-
+	  free(c1);
 	  break;
 
      /* retrieve_trn (mtg_name, trn, result) */
@@ -101,6 +103,7 @@ int procno;
 	  startreply();
 	  sendint(result);
 	  sendreply();
+	  free(c1);
 	  break;
 
      /* create_mtg (location, long_mtg_name, public, result) */
@@ -112,7 +115,8 @@ int procno;
 	  startreply();
 	  sendint(result);
 	  sendreply();
-
+	  free(c1);
+	  free(c2);
 	  break;
 
      /* get_mtg_info (mtg_name, info, result) */
@@ -128,7 +132,7 @@ int procno;
 	  free(minfo.long_name);
 	  free(minfo.chairman);
 	  free(minfo.access_modes);
-
+	  free(c1);
 	  break;
 
      /* old_get_mtg_info (mtg_name, info, result) */
@@ -144,7 +148,7 @@ int procno;
 	  free(minfo.long_name);
 	  free(minfo.chairman);
 	  free(minfo.access_modes);
-
+	  free(c1);
 	  break;
 
      /* get_trn (mtg_name, trn, dest_file, result) */
@@ -157,8 +161,7 @@ int procno;
 	  startreply();
 	  sendint(result);
 	  sendreply();
-
-
+	  free(c1);
 	  break;
 
      /* remove_mtg (mtg_name, result) */
@@ -168,7 +171,7 @@ int procno;
 	  startreply();
 	  sendint(result);
 	  sendreply();
-
+	  free(c1);
 	  break;
 
      /* updated_mtg (mtg_name, date_attended, last, updated, result) */
@@ -181,7 +184,8 @@ int procno;
 	  sendbool(b1);
 	  sendint (result);
 	  sendreply();
-
+	  free(c1);
+	  
 	  break;
      /* get_acl (mtg_name) */
      case GET_ACL:
@@ -192,6 +196,7 @@ int procno;
 	  send_acl(list);
 	  sendreply();
 	  acl_destroy(list);
+	  free(c1);
 	  break;
 
      /* get_access(mtg_name, princ_name) */
@@ -203,6 +208,10 @@ int procno;
 	  sendstr(modes);
 	  sendint(result);
 	  sendreply();
+	  free(modes);
+	  free(c1);
+	  free(c2);
+	  
 	  break;
      /* set_access(mtg_name, princ_name, mode) */
      case SET_ACCESS:
@@ -213,6 +222,9 @@ int procno;
 	  startreply();
 	  sendint(result);
 	  sendreply();
+	  free(c1);
+	  free(c2);
+	  free(c3);
 	  break;
      case DELETE_ACCESS:
           c1 = recvstr();
@@ -221,6 +233,8 @@ int procno;
 	  startreply();
 	  sendint(result);
 	  sendreply();
+	  free(c1);
+	  free(c2);
 	  break;
      case WHO_AM_I:
 	  startreply();
