@@ -7,7 +7,7 @@
  */
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v 1.17 1989-06-02 23:38:30 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v 1.18 1993-04-28 11:22:07 miki Exp $
  *	$Locker:  $
  *
  *	Code for "reply" request in discuss.
@@ -17,12 +17,17 @@
 
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v 1.17 1989-06-02 23:38:30 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v 1.18 1993-04-28 11:22:07 miki Exp $";
 #endif lint
 
 #include <stdio.h>
 #include <sys/file.h>
+#ifndef SOLARIS
 #include <strings.h>
+#else
+#include <string.h>
+#include <fcntl.h>
+#endif
 #include <sys/wait.h>
 #include "ss.h"
 #include <discuss/discuss.h>

@@ -9,7 +9,7 @@
  *	Print-related requests for DISCUSS.
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.20 1990-02-24 18:50:33 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.21 1993-04-28 11:21:08 miki Exp $
  *	$Locker:  $
  *
  */
@@ -17,7 +17,7 @@
 
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.20 1990-02-24 18:50:33 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.21 1993-04-28 11:21:08 miki Exp $";
 #endif /* lint */
 
 #include <stdio.h>
@@ -26,6 +26,9 @@ static char rcsid_discuss_c[] =
 #include <signal.h>
 #include <string.h>
 #include <sys/wait.h>
+#ifdef SOLARIS
+#include <fcntl.h>
+#endif
 #include <discuss/discuss.h>
 #include "ss.h"
 #include "config.h"
@@ -170,7 +173,11 @@ prt_trans(argc, argv)
 	tclose(tf, &code);
 	(void) close(fd);
 	(void) tdestroy(tf);
+#ifdef SOLARIS
+	(void) wait((int  *)0);
+#else
 	(void) wait((union wait *)0);
+#endif
 	(void) signal(SIGPIPE, old_sig);
 	if (!performed)
 	     ss_perror(sci_idx, DISC_NO_TRN, "");

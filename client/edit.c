@@ -7,12 +7,15 @@
  */
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/edit.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/edit.c,v 1.11 1989-06-02 23:37:01 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/edit.c,v 1.12 1993-04-28 11:17:05 miki Exp $
  *	$Locker:  $
  *
  *	Utility routines.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.11  89/06/02  23:37:01  srz
+ * Added standard copyright notice.
+ * 
  * Revision 1.10  89/03/26  23:20:08  raeburn
  * Commented out extra text after #endif directive
  * 
@@ -75,7 +78,7 @@
 
 #ifndef lint
 static char rcsid_discuss_utils_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/edit.c,v 1.11 1989-06-02 23:37:01 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/edit.c,v 1.12 1993-04-28 11:17:05 miki Exp $";
 #endif /* lint */
 
 #include <stdio.h>
@@ -121,7 +124,11 @@ edit(fn, edit_path)
 	char *editor_path_v;
 	int pid;
 	int (*handler)();
+#ifndef SOLARIS
 	union wait wbuf;
+#else
+	int wbuf;
+#endif
 	struct stat buf;
 	char buffer[BUFSIZ];
 	FILE *the_file = NULL;
@@ -187,7 +194,11 @@ edit(fn, edit_path)
 		(void) signal(SIGINT, handler);
 		if (WIFSIGNALED(wbuf))
 			return(ET_CHILD_DIED);
+#ifndef SOLARIS
 		if (wbuf.w_retcode != 0)
+#else
+		if (wbuf != 0)
+#endif
 			return(ET_CHILD_ERR);
 	} else {
 		clearerr(stdin);

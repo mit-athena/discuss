@@ -9,14 +9,14 @@
  *
  * List request for DISCUSS
  *
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.29 1991-08-07 09:04:27 lwvanels Exp $
+ * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.30 1993-04-28 11:18:12 miki Exp $
  * $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v $
  * $Locker:  $
  *
  */
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.29 1991-08-07 09:04:27 lwvanels Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.30 1993-04-28 11:18:12 miki Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -36,7 +36,9 @@ static int long_subjects;
 static int setting;		/* Whether we are turning flag on or off */
 
 void map_trns();
-
+#ifndef MIN
+#define MIN(a, b)               ((a) > (b) ? (b) : (a))
+#endif
 static list_it(t_infop, codep)
 trn_info3 *t_infop;
 int *codep;

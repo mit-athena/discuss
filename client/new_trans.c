@@ -7,7 +7,7 @@
  */
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v 1.24 1989-06-02 23:37:55 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v 1.25 1993-04-28 11:19:06 miki Exp $
  *	$Locker:  $
  *
  *	New-transaction routine for DISCUSS.  (Request 'talk'.)
@@ -17,7 +17,7 @@
 
 #ifndef lint
 static char rcsid_discuss_c[] =
-     "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v 1.24 1989-06-02 23:37:55 srz Exp $";
+     "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v 1.25 1993-04-28 11:19:06 miki Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -25,6 +25,9 @@ static char rcsid_discuss_c[] =
 #include <signal.h>
 #include <string.h>
 #include <sys/wait.h>
+#ifdef SOLARIS
+#include <fcntl.h>
+#endif
 #include "ss.h"
 #include <discuss/discuss.h>
 #include "config.h"
