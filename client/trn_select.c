@@ -1,13 +1,13 @@
 /*
  *
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/trn_select.c,v 1.12 1989-03-27 02:33:28 srz Exp $
+ * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/trn_select.c,v 1.13 1989-05-02 21:09:45 srz Exp $
  * $Locker:  $
  *
  */
 
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/trn_select.c,v 1.12 1989-03-27 02:33:28 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/trn_select.c,v 1.13 1989-05-02 21:09:45 srz Exp $";
 #endif lint
 
 #define	MIN(a,b)	((a)<(b)?(a):(b))
@@ -76,11 +76,27 @@ sl_free(list)
 	}
 }
 
+int filter_call_func (func, t, r, flags)
+int (*func)();
+trn_info2 *t;
+int *r;
+int flags;
+{
+  if (flags & filter_ONLY_DELETED) if (!(t->flags & TRN_FDELETED)) return (0);
+  if (flags & filter_ONLY_INITIAL) if (t->pref) return (0);
+  if (flags & filter_ONLY_TERMINAL) if (t->nref) return (0);
+  /* note, FLAG_SET and FLAG_RESET are not really opposites.  
+     The default is to map transaction with either flag set or reset */
+  if (flags & filter_FLAG_SET) if (!(t->flags & TRN_FLAG1)) return (0);
+  if (flags & filter_FLAG_RESET) if (t->flags & TRN_FLAG1) return (0);
+  return (func (t, r));
+}
+
 int
-sl_map(func, list, include_deleted)
+sl_map(func, list, filter_flags)
 int (*func)();		/* return 0 -> continue */
 selection_list *list;
-int include_deleted;
+int filter_flags;
 {
      register selection_list *p;
      register int i;
@@ -93,14 +109,13 @@ int include_deleted;
 	       dsc_get_trn_info2 (&dsc_public.nb, p->low, &t_info, &result);
 	       t_info.current = p->low;
 	       if (result != 0) {
-		    func(&t_info, &result);
+		    filter_call_func(func, &t_info, &result, filter_flags);
 		    dsc_destroy_trn_info(&t_info);
 		    if (result != 0) {
 			 return(result);
 		    }
 		    continue;
 	       }
-
 	       if (t_info.fref != t_info.current) {	/* Get fref */
 		    dsc_destroy_trn_info(&t_info);
 		    trn_no = t_info.fref;
@@ -109,7 +124,7 @@ int include_deleted;
 	       }
 
 	       do {
-		    func(&t_info, &result);
+		    filter_call_func(func, &t_info, &result, filter_flags);
 		    dsc_destroy_trn_info(&t_info);
 		    if (result != 0)
 			 return(result);
@@ -123,14 +138,19 @@ int include_deleted;
 			 t_info.current = trn_no;
 		    }
 	       } while (trn_no != 0);
-	  } else if (include_deleted) {			/* Range */
+	  } else if (filter_flags & 
+		     (filter_INCLUDE_DELETED | filter_ONLY_DELETED)) {
+
+	    /* Range */
 	       for (i = p->low; i <= p->high; i++) {
 		    if (i == 0)
 			 continue;
 
 		    dsc_get_trn_info2 (&dsc_public.nb, i, &t_info, &result);
-		    t_info.current = i;
-		    func(&t_info, &result);
+		    if ((result != DELETED_TRN) || (t_info.current != 0)) {
+		      t_info.current = i;
+		      filter_call_func(func, &t_info, &result, filter_flags);
+		    }
 		    dsc_destroy_trn_info(&t_info);
 		    if (result != 0)
 			 return(result);
@@ -156,7 +176,7 @@ int include_deleted;
 			 continue;
 		    }
 
-		    func(&t_info, &result);
+		    filter_call_func(func, &t_info, &result, filter_flags);
 		    dsc_destroy_trn_info(&t_info);
 		    if (result != 0)
 			 return(result);

@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/include/globals.h,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/include/globals.h,v 1.17 1989-05-02 19:15:19 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/include/globals.h,v 1.18 1989-05-02 21:10:11 srz Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
@@ -19,11 +19,16 @@ typedef struct _sle {
 	struct _sle *next;
 } selection_list;
 
-/* flags */
-#define	flag_ONLY_INITIAL	1
-#define	flag_ONLY_DELETED	2
-#define	flag_INCLUDE_DELETED	4
+/* selection flags */
 #define flag_AREF		8
+
+/* filtering flags */
+#define filter_INCLUDE_DELETED 1
+#define filter_ONLY_DELETED    2
+#define filter_ONLY_INITIAL    4
+#define filter_ONLY_TERMINAL   16
+#define filter_FLAG_SET        32
+#define filter_FLAG_RESET      64
 
 struct _dsc_pub {
      trn_nums current;

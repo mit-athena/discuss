@@ -2,7 +2,7 @@
  *
  * List request for DISCUSS
  *
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.24 1989-05-02 18:34:23 raeburn Exp $
+ * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.25 1989-05-02 21:09:05 srz Exp $
  * $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v $
  * $Locker:  $
  *
@@ -11,7 +11,7 @@
  */
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.24 1989-05-02 18:34:23 raeburn Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.25 1989-05-02 21:09:05 srz Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -27,9 +27,7 @@ static trn_info2 t_info;
 static list_it(),delete_it(),retrieve_it();
 static int performed;		/* true if trn was acted upon */
 static int barred;		/* true if access was denied sometime */
-static int only_initial;	/* kludges... */
 static int long_subjects;
-static int flag_set, flag_reset;
 static int setting;		/* Whether we are turning flag on or off */
 
 void map_trns();
@@ -42,31 +40,18 @@ int *codep;
 	char *cp;
 	int max_len;
 
-	if (*codep == DELETED_TRN) {
-		*codep = 0;
-		goto punt;
-		/* should check -idl flag */
-	}
-	else if (*codep == NO_ACCESS) {
+	if (*codep == NO_ACCESS) {
 	        *codep = 0;
 	        barred = TRUE;
 		goto punt;
 	}
-	else if (*codep != 0) {
+	else if ((*codep != 0) && (*codep != DELETED_TRN)) {
 		ss_perror(sci_idx, *codep,
 			  "Can't read transaction info");
 		goto punt;
 	}
 
 	*codep = 0;
-	if (t_infop->pref && only_initial) {
-		goto punt;
-	}
-
-	if (flag_set && !flag_reset && (t_infop->flags & TRN_FLAG1) == 0)
-		goto punt;
-	if (!flag_set && flag_reset && (t_infop->flags & TRN_FLAG1) != 0)
-		goto punt;
 
 	if (!performed) {
 	    performed = TRUE;
@@ -111,8 +96,7 @@ list (argc, argv, sci_idx)
 {
 	char **ap, **ap2, **nargv;
 	int ac;
-
-	long_subjects = flag_set = flag_reset = 0;
+	long_subjects = 0;
 
 	for (ap = argv; *ap; ap++)
 	    ;
@@ -121,10 +105,6 @@ list (argc, argv, sci_idx)
 	for (ap = argv, ap2 = nargv; *ap; ap++) {
 	    if (!strcmp (*ap, "-long_subjects") || !strcmp (*ap, "-lsj"))
 		long_subjects = 1;
-	    else if (!strcmp (*ap, "-flag_set"))
-		flag_set = 1;
-	    else if (!strcmp (*ap, "-flag_reset"))
-		flag_reset = 1;
 	    else
 		*ap2++ = *ap, ac++;
 	}
@@ -138,12 +118,6 @@ static delete_it (t_infop, codep)
 trn_info2 *t_infop;
 int *codep;
 {
-     if (only_initial) {
-	  ss_perror(sci_idx, 0, "flag '-initial' not accepted");
-	  *codep = 1;
-	  return;
-     }
-
      if (*codep == DELETED_TRN) {		/* Already deleted, done */
 	  *codep = 0;
 	  return;
@@ -179,12 +153,6 @@ static retrieve_it (t_infop, codep)
 trn_info2 *t_infop;
 int *codep;
 {
-     if (only_initial) {
-	  ss_perror(sci_idx, 0, "flag '-initial' not accepted");
-	  *codep = 1;
-	  return;
-     }
-
      if (*codep == 0) {				/* Transaction exists */
 	  return;
      }
@@ -212,12 +180,12 @@ ret_trans(argc, argv)
 	return;
 }
 
-void map_trns(argc, argv, defalt, proc, include_deleted)
+void map_trns(argc, argv, defalt, proc, filter_flags)
 	int argc;
 	char **argv;
 	char *defalt;
 	int (*proc)();
-	int include_deleted;     
+	int filter_flags;     
 {
 	int i, code;
 	selection_list *trn_list;
@@ -241,11 +209,37 @@ void map_trns(argc, argv, defalt, proc, include_deleted)
 
 	dsc_destroy_trn_info(&t_info);		/* Get rid of dynamic stuff */
 
-	only_initial = 0;
 	trn_list = (selection_list *)NULL;
 	for (i = 1; i < argc; i++) {
 		if (!strcmp(argv[i], "-initial"))
-			only_initial = 1;
+		  filter_flags |= filter_ONLY_INITIAL;
+		else if (!strcmp (argv[i], "-terminal"))
+		  filter_flags |= filter_ONLY_TERMINAL;
+		else if ((!strcmp (argv[i], "-include_deleted")) ||
+			 (!strcmp (argv[i], "-idl")))
+		  filter_flags |= filter_INCLUDE_DELETED;
+		else if ((!strcmp (argv[i], "-only_deleted")) ||
+			 (!strcmp (argv[i], "-odl")))
+		  filter_flags |= filter_ONLY_DELETED;		    
+		else if ((!strcmp (argv[i], "-flag_set")) ||
+			 (!strcmp (argv[i], "-flag")))
+		  filter_flags |= filter_FLAG_SET;		    
+		else if (!strcmp (argv[i], "-flag_reset"))
+		  filter_flags |= filter_FLAG_RESET;		    
+		/* someday we'll have abbrevs */
+		else if (!strcmp (argv[i], "-no_terminal"))
+		  filter_flags &= ~filter_ONLY_TERMINAL;
+		else if ((!strcmp (argv[i], "-no_include_deleted")) ||
+			 (!strcmp (argv[i], "-nidl")))
+		  filter_flags &= ~filter_INCLUDE_DELETED;
+		else if ((!strcmp (argv[i], "-no_only_deleted")) ||
+			 (!strcmp (argv[i], "-nodl")))
+		  filter_flags &= ~filter_ONLY_DELETED;		    
+		else if ((!strcmp (argv[i], "-no_flag_set")) ||
+			 (!strcmp (argv[i], "-no_flag")))
+		  filter_flags &= ~filter_FLAG_SET;		    
+		else if (!strcmp (argv[i], "-no_flag_reset"))
+		  filter_flags &= ~filter_FLAG_RESET;		    
 		else {
 			trn_list = trn_select(&t_info, argv[i],
 					      trn_list, &code);
@@ -270,7 +264,7 @@ void map_trns(argc, argv, defalt, proc, include_deleted)
 	performed = FALSE;
 	barred = FALSE;
 
-	(void) sl_map(proc, trn_list, include_deleted);
+	(void) sl_map(proc, trn_list, filter_flags);
 	sl_free(trn_list);
 	if (!performed)
 	     ss_perror(sci_idx, barred ? NO_ACCESS : DISC_NO_TRN, "");
