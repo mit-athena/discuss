@@ -9,13 +9,13 @@
  *	command line, in which case they are used as meeting announcements.
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.17 1988-02-07 00:37:38 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.18 1988-02-07 01:43:18 srz Exp $
  *	$Locker:  $
  *
  */
 
 #ifndef lint
-static char *rcsid_addmtg_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.17 1988-02-07 00:37:38 srz Exp $";
+static char *rcsid_addmtg_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.18 1988-02-07 01:43:18 srz Exp $";
 #endif lint
 
 #include <strings.h>
@@ -182,9 +182,9 @@ add_mtg(argc, argv)
 		       }
 		  }
 		  add_the_mtg(&nb,&code);
-		  if (code)
+		  if (code && code != DISC_ACTION_NOT_PERFORMED)
 		       ss_perror(sci_idx, code, cerror);
-		 else
+		 else if (code != DISC_ACTION_NOT_PERFORMED)
 		      printf ("Meeting %s (%s) added.\n", nb.aliases[0], nb.aliases[1]);
 		  dsc_destroy_name_blk(&nb);
 	     }
@@ -217,10 +217,10 @@ int trn_no;
      }
      
      add_the_mtg (&nb, &code);
-     if (code != 0) {
+     if (code != 0 && code != DISC_ACTION_NOT_PERFORMED) {
 	  sprintf (cerror, "Error adding meeting in transaction [%04d]", trn_no);
 	  ss_perror(sci_idx, code, cerror);
-     } else
+     } else if (code != DISC_ACTION_NOT_PERFORMED)
 	  printf ("Transaction [%04d] Meeting %s (%s) added.\n", trn_no, nb.aliases[0], nb.aliases[1]);
      
      dsc_destroy_name_blk (&nb);
@@ -356,9 +356,13 @@ add_the_mtg(new_nbp,code)
 	for (j = 0; new_nbp->aliases[j] != NULL; j++) {
 	     dsc_get_mtg (user_id, new_nbp->aliases[j], &temp_nb, code);
 	     if (*code == 0) {				/* already exists */
-		  sprintf (question, "Meeting %s already exists.\nDo you wish to delete the old one? ",new_nbp -> aliases[j]);
-		  if (!command_query (question))
+		  sprintf (question, "Meeting %s already exists.\nDo you wish to delete the old one and add the new one? ",new_nbp -> aliases[j]);
+		  if (!command_query (question)) {
+		       printf ("Meeting not added.\n");
+		       dsc_destroy_name_blk (&temp_nb);
+		       *code = DISC_ACTION_NOT_PERFORMED;
 		       return;
+		  }
 
 		  del_the_mtg (&temp_nb, code);
 		  if (*code != 0) {
@@ -370,7 +374,6 @@ add_the_mtg(new_nbp,code)
 	}
 	     
 	dsc_update_mtg_set(user_id, new_nbp, 1, code);
-	dsc_destroy_name_blk(&new_nbp);
 	if (*code) {
 		return;
 	}
