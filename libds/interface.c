@@ -1,48 +1,14 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.14 1987-12-27 16:01:34 raeburn Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.15 1988-01-15 22:39:20 srz Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
- *	$Log: not supported by cvs2svn $
- * Revision 1.13  87/10/23  23:44:10  wesommer
- * Implemented dsc_create_mtg();
- * Rearranged select_meeting to pull functionality into create_mblock();
- * 
- * Revision 1.12  87/09/17  02:34:28  spook
- * Removed is_fatal flag.
- * 
- * Revision 1.11  87/07/20  20:56:26  srz
- * Changed name of whoami to dwhoami (too generic of a name)
- * 
- * Revision 1.10  87/07/08  01:59:44  wesommer
- * Added whoami(), dsc_whoami() (the server support was always there.
- * 
- * Revision 1.9  87/06/27  01:16:46  spook
- * *** empty log message ***
- * 
- * Revision 1.8  87/03/22  04:21:46  spook
- * *** empty log message ***
- * 
- * Revision 1.7  87/01/12  04:15:47  wesommer
- * Replaced an fprintf(stderr, ...) with a call to log_warning.
- * 
- * Revision 1.6  87/01/09  20:51:00  srz
- * Added modules to rpc mechanism.
- * 
- * Revision 1.5  86/11/22  03:34:52  wesommer
- * Corrected argument mismatch on get_access() call.
- * 
- * Revision 1.4  86/11/16  06:09:04  wesommer
- * Added dsc_get_acl, dsc_get_access, dsc_set_access, and dsc_delete_access.
- * 
- * Revision 1.3  86/11/11  17:00:20  wesommer
- * Replaced version of select_meeting which keeps connections open..
- * 
  */
 
 #ifndef lint
-static char *rcsid_interface_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.14 1987-12-27 16:01:34 raeburn Exp $";
+static char rcsid_interface_c[] =
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.15 1988-01-15 22:39:20 srz Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -134,6 +100,7 @@ select_meeting(nbp, code_ptr)
 	int *code_ptr;
 {
 	register meeting *mp;
+	int fatal;
 
 	*code_ptr = 0;
 
@@ -151,7 +118,13 @@ select_meeting(nbp, code_ptr)
 	} else {
 		/*XXX should move mp to head of list.. but not yet */
 	}
-	set_module (mp->module, code_ptr);
+	set_module (mp->module, &fatal, code_ptr);
+	if (*code_ptr & !fatal) {
+	    char buf[100];
+	    sprintf(buf, "while connecting to %s", mp->module);
+	    log_warning(*code_ptr, buf);
+	    *code_ptr = 0;
+	}
 	cmtg = mp;
 }
 
@@ -204,9 +177,10 @@ dsc_create_mtg(host, location, name, public, hidden, code_ptr)
 	int *code_ptr;
 {
 	register meeting *mp;
+	int fatal;
 	mp = create_mblock(host, location, code_ptr);
 	if (*code_ptr) return;
-	set_module(mp->module, code_ptr);
+	set_module(mp->module, &fatal, code_ptr);
 	if (*code_ptr) return;
 	
 	create_mtg(location, name, public, code_ptr);
