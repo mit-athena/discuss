@@ -4,12 +4,15 @@ NAME
      talk, enter, send, t - Enter a new transaction (message) into a
      meeting.
 
-SYNOPSYS
+SYNOPSIS
      talk
 
 DESCRIPTION
      Talk, enter, and send are all aliases for the same function of
      discuss, which enters a transaction into the current meeting.
+     Note that many modern discuss meetings are archives of mailing
+     lists, and entering a transaction with talk will not send mail
+     to the associated mailing list.
 
      Talk first prompts for the subject of the transaction, which is 
      one line of text.  If the DISCUSS_EDITOR environment variable

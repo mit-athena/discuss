@@ -4,7 +4,7 @@ NAME
      delete_acl, da - Delete entries from the current meeting's
 		      access control list.
 
-SYNOPSYS
+SYNOPSIS
      delete_acl principal ...
 
 DESCRIPTION

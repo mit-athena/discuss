@@ -3,7 +3,7 @@ HELP(DISCUSS)					    HELP(DISCUSS)
 NAME
      help - Get help on a command or topic
 
-SYNOPSYS
+SYNOPSIS
      help <topic|command>
 
 DESCRIPTION
@@ -12,7 +12,7 @@ DESCRIPTION
      list_requests command (which can be abbreviated to just "?").
      Other topics available include:
 
-	access - help on access control lists for discuss meetings.
+	access - Help on access control lists for discuss meetings.
 	specifiers, spec - Help on specifying transactions to commands.
 
 SEE ALSO

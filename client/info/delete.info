@@ -3,7 +3,7 @@ DELETE(DISCUSS)					  DELETE(DISCUSS)
 NAME
      delete, dl, d - Delete a transaction
 
-SYNOPSYS
+SYNOPSIS
      delete transaction_specifiers ...
 
 DESCRIPTION
@@ -11,8 +11,10 @@ DESCRIPTION
      Delete deletes the specified transaction(s) of the current
      meeting.  The transactions are only logically deleted;  they can be
      subsequently retrieved using the retrieve command.  The expunge command
-     will physically reclaim space used by deleted transactions.  If no
-     transactions are specified, the current transaction is deleted.
+     will physically reclaim space used by deleted transactions; expunging
+     is a server-side operation and expunged transactions can no longer
+     be retrieved.  If no transactions are specified, the current 
+     transaction is deleted.
 
 SEE ALSO
      discuss(1),retrieve(discuss),specifiers(discuss)

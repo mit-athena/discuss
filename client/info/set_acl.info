@@ -4,7 +4,7 @@ NAME
      set_acl, sa - Set access to the current meeting by adding a principal
 		   to the meeting's access control list (acl).
 		   
-SYNOPSYS
+SYNOPSIS
      set_acl [ modes | null ] principal 
 
 DESCRIPTION

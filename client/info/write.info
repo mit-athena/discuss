@@ -3,7 +3,7 @@ WRITE(DISCUSS)					   WRITE(DISCUSS)
 NAME
      write, w - write transactions to a file
 
-SYNOPSYS
+SYNOPSIS
      write transaction_specifiers ... file
 
 DESCRIPTION

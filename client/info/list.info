@@ -3,7 +3,7 @@ LIST(DISCUSS)					    LIST(DISCUSS)
 NAME
      list, ls - List transactions in current meeting.
 
-SYNOPSYS
+SYNOPSIS
      list [-long_subjects] transaction_specifiers ...
 
 DESCRIPTION
@@ -11,7 +11,8 @@ DESCRIPTION
      transactions in the current meeting.  The transaction number,
      flags, number of lines, date posted, author, and subject are displayed.
      If no transactions are specified, all non-deleted transactions
-     in the meeting are listed.
+     in the meeting are listed.  See specifiers(discuss) for an explanation
+     of the different transaction specifiers avaialable.
 
 OPTIONS
      -long_subjects (-lsj) causes subjects to be listed without any

@@ -3,7 +3,7 @@ RETRIEVE(DISCUSS)				RETRIEVE(DISCUSS)
 NAME
      retrieve, rt - Retrieve a deleted transaction
 
-SYNOPSYS
+SYNOPSIS
      retrieve transaction_number ...
 
 DESCRIPTION

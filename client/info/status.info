@@ -3,7 +3,7 @@ STATUS(DISCUSS)					  STATUS(DISCUSS)
 NAME
      status, st, . - Print out current status of discuss
 
-SYNOPSYS
+SYNOPSIS
      .
 
 DESCRIPTION

@@ -3,7 +3,7 @@ RN(DISCUSS)					         RN(DISCUSS)
 NAME
      read_new, rn - Print new transactions in all changed meetings.
 
-SYNOPSYS
+SYNOPSIS
      rn
 
 DESCRIPTION

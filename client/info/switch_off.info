@@ -3,7 +3,7 @@ SWITCH_OFF(DISCUSS)				   SWITCH_OFF(DISCUSS)
 NAME
      switch_off, swf - Switch off a flag for a transaction
 
-SYNOPSYS
+SYNOPSIS
      switch_off flag transaction_specifiers ...
 
 DESCRIPTION

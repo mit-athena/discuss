@@ -3,12 +3,12 @@ GOTO(DISCUSS)						GOTO(DISCUSS)
 NAME
      goto, go, g - Go to specified meeting.
 
-SYNOPSYS
+SYNOPSIS
      goto meeting_name
 
 DESCRIPTION
      Goto selects meeting_name as the current meeting.  When you go
-     to a meeting, you are considered "attending" it
+     to a meeting, you are considered "attending" it.
      
 FILES
      ~/.meetings		list of user's meetings

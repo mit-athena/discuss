@@ -3,7 +3,7 @@ SWITCH_ON(DISCUSS)				    SWITCH_ON(DISCUSS)
 NAME
      switch_on, swn - Switch on a flag for a transaction
 
-SYNOPSYS
+SYNOPSIS
      switch_on flag transaction_specifiers ...
 
 DESCRIPTION

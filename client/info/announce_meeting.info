@@ -4,7 +4,7 @@ NAME
      announce_meeting, ann_mtg, anm -
 	Announce a meeting in another meeting
 
-SYNOPSYS
+SYNOPSIS
      anm {-private | -public} mtg_to_announce mtg_to_announce_in
 
 DESCRIPTION

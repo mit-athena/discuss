@@ -3,7 +3,7 @@ NM(DISCUSS)						NM(DISCUSS)
 NAME
      next_meeting, nm - Advanced to next changed meeting
 
-SYNOPSYS
+SYNOPSIS
      nm [-ls]
 
 DESCRIPTION

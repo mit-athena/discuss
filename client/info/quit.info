@@ -3,7 +3,7 @@ QUIT(DISCUSS)					    QUIT(DISCUSS)
 NAME
      quit, exit, q - Quit out of discuss
 
-SYNOPSYS
+SYNOPSIS
      quit
 
 DESCRIPTION

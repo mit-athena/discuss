@@ -3,16 +3,18 @@ CKM(DISCUSS)						CKM(DISCUSS)
 NAME
      check_meetings, ckm - Check for changed meetings
 
-SYNOPSYS
+SYNOPSIS
      ckm {meeting_names} [-no_list]
 
 DESCRIPTION
      Check_meetings is used to check what meetings have changed, so that
      next_meeting can be used to advance from one meeting to another.
+     Check_meetings only checks meetings which the user has in his 
+     ~/.meetings file.
 
      Typically, a user wants to attend all changed meetings so he can
      read the new transactions.  To do this, he can use check_meetings
-     to find out what meetings have changed,  and then issue
+     to find out what meetings have changed, and then issue
      next_meeting to goto the first changed meeting.  He can then
      print out the new transactions, and then issue next_meeting to
      visit the second changed meeting, and so on until no more

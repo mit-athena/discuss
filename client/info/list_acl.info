@@ -3,7 +3,7 @@ LIST_ACL(DISCUSS)				LIST_ACL(DISCUSS)
 NAME
      list_acl, la - List the access control list of this meeting.
 
-SYNOPSYS
+SYNOPSIS
      list_acl [principal ... ]
 
 DESCRIPTION

@@ -4,14 +4,19 @@ NAME
      reply, repl, rp - Enter a reply to an existing transaction
 	(message) into a meeting.
 
-SYNOPSYS
+SYNOPSIS
      reply transaction_specifier [-editor name] [-meeting name]
 	[-no_editor] [-subject]
 
 DESCRIPTION
      Reply allows one to enter a reply to an existing transaction.  If
      no transaction specifier is given, the transaction replied to is
-     the current transaction (the last one printed).
+     the current transaction (the last one printed).  Note that many
+     modern discuss meetings are archives of mailing lists, and 
+     replying within discuss will not reply to the mailing list.
+     This means that readers of the mailing list who do not check
+     the discuss meeting (probably most of them) will not receive
+     a reply posted with this method.
 
      If the DISCUSS_EDITOR environment variable is set, then it will
      fork a subprocess to run the program named in the environment

@@ -28,7 +28,7 @@ DESCRIPTION
 	   edit the access control list.  Note that a chairman who does not
 	   watch what he is doing can delete his own access from the
 	   meeting.  Also, having chairman access does not
-	   automatically imply any other form of access
+	   automatically imply any other form of access.
 
 	d (Delete):
 	   Indicates that the principal may delete or retrieve from deletion

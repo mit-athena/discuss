@@ -4,7 +4,7 @@ NAME
      delete_meeting, delete_mtg, dm - Delete a meeting from the list 
 				      you normally attend.
 
-SYNOPSYS
+SYNOPSIS
      delete_meeting meeting_name ...
 
 DESCRIPTION

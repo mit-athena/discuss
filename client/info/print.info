@@ -4,7 +4,7 @@ NAME
      print, pr, p - print transactions
      next, prev, nref, pref - print related transaction.
 
-SYNOPSYS
+SYNOPSIS
      print transaction_specifiers ...
      next
      prev

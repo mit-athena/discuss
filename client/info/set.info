@@ -3,7 +3,7 @@ SET(DISCUSS)					 SET(DISCUSS)
 NAME
      set -  Set different discuss variables.
 		   
-SYNOPSYS
+SYNOPSIS
      set seen transaction_specifier
 
 DESCRIPTION
