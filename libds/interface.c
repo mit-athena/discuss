@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.22 1989-03-25 11:22:58 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.23 1989-03-31 01:44:09 srz Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
@@ -8,7 +8,7 @@
 
 #ifndef lint
 static char rcsid_interface_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.22 1989-03-25 11:22:58 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.23 1989-03-31 01:44:09 srz Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -323,6 +323,14 @@ void dsc_destroy_mtg_info (info)
 	if (info->access_modes) {
 		free (info->access_modes);
 		info->access_modes = NULL;
+	}
+	if (info->location) {
+		free(info->location);
+		info->location = NULL;
+	}
+	if (info->long_name) {
+		free(info->long_name);
+		info->long_name = NULL;
 	}
 }
 
