@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v 1.21 1989-03-29 00:33:30 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v 1.22 1989-05-06 01:29:59 srz Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
@@ -12,7 +12,7 @@
 
 #ifndef lint
 static char rcsid_discuss_c[] =
-     "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v 1.21 1989-03-29 00:33:30 srz Exp $";
+     "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v 1.22 1989-05-06 01:29:59 srz Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -126,7 +126,6 @@ new_trans(argc, argv)
      if ((code = edit(temp_file, editor)) != 0) {
 	  ss_perror(sci_idx, code,
 		    "Error during edit; transaction not entered.");
-	  unlink(temp_file);
 	  goto punt;
      }
      if (interrupt) goto punt;

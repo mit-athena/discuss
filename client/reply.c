@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v 1.14 1989-05-04 02:57:54 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v 1.15 1989-05-06 01:29:26 srz Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
@@ -12,7 +12,7 @@
 
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v 1.14 1989-05-04 02:57:54 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v 1.15 1989-05-06 01:29:26 srz Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -175,7 +175,6 @@ repl(argc, argv)
 	if (edit(temp_file, editor) != 0) {
 		(void) fprintf(stderr,
 			       "Error during edit; transaction not entered\n");
-		(void) unlink(temp_file);
 		goto abort;
 	}
 	if (interrupt) goto abort;
