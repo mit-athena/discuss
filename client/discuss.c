@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.5 1986-08-01 02:41:35 spook Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.6 1986-08-02 14:01:11 wesommer Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
@@ -9,6 +9,9 @@
  *	ss library for the command interpreter.
  *
  *      $Log: not supported by cvs2svn $
+ * Revision 1.5  86/08/01  02:41:35  spook
+ * Moved edit() to discuss_utils.c.
+ * 
  * Revision 1.4  86/07/31  15:56:08  wesommer
  * Fixed up some brain-damage surrounding the prt_trans/write_trans
  * interactions.
@@ -22,11 +25,12 @@
 #include <X/mit-copyright.h>
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.5 1986-08-01 02:41:35 spook Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.6 1986-08-02 14:01:11 wesommer Exp $";
 #endif lint
 
 #include <stdio.h>
 #include <sys/file.h>
+#include <signal.h>
 #include <strings.h>
 #include "../include/ss.h"
 #include "../include/tfile.h"
@@ -222,6 +226,7 @@ prt_trans(sci_idx, argc, argv)
 	int txn_no;
 	tfile tf;
 	int fd, pid;
+	int (*old_sig)();
 
 	if (cur_mtg == (char *)NULL) {
 		printf("No current meeting.\n");
@@ -233,6 +238,10 @@ prt_trans(sci_idx, argc, argv)
 	}
 	txn_no = atoi(argv[1]);
 	current_trans = txn_no;
+	/*
+	 * Ignore SIGPIPE from the pager
+	 */
+	old_sig = signal(SIGPIPE, SIG_IGN);
 	fd = pager_create();
 	if (fd < 0) {
 		ss_perror(sci_idx, ERRNO, "Can't start pager");
@@ -252,6 +261,7 @@ prt_trans(sci_idx, argc, argv)
 	close(fd);
 	tdestroy(tf);
 	wait(0);
+	signal(SIGPIPE, old_sig);
 }
 
 goto_mtg(sci_idx, argc, argv)
