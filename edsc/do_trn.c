@@ -21,10 +21,12 @@
 #include <ctype.h>
 #include <sys/time.h>
 #include <netdb.h>
+#if HAVE_FCNTL_H
 #include <fcntl.h>
+#endif
 #include <string.h>
 #include "edsc.h"
-#ifdef SOLARIS
+#if HAVE_SRAND48
 #define random lrand48
 #define srandom srand48
 #endif

@@ -1,0 +1,80 @@
+#
+# $Id: Makefile.in,v 1.1 1999-02-02 20:40:18 kcr Exp $
+#
+
+SHELL=/bin/sh
+VPATH=@srcdir@
+INSTALL=@INSTALL@
+INSTALL_PROGRAM=@INSTALL_PROGRAM@
+srcdir=@srcdir@
+top_srcdir=@top_srcdir@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+bindir=@bindir@
+sbindir=@sbindir@
+includedir=${prefix}/include
+
+datadir=@datadir@
+infodir=${datadir}/discuss/info
+
+LINKS=	usp/usp.h usp/usp_et.h rpc_et.h discuss/dsc_et.h usp.h usp_et.h \
+	discuss_err.h
+FILES=	ansi.h atom.h globals.h internal.h mit-copyright.h \
+	rpc.h trn_spec.h \
+	discuss/acl.h discuss/discuss.h discuss/dsname.h discuss/interface.h \
+	discuss/mit-sipb-copyright.h discuss/tfile.h discuss/types.h
+
+all: $(LINKS) config.h
+
+clean:
+	rm -rf ss usp $(LINKS) *~ discuss/?*~ config.h
+
+depend: $(LINKS) config.h
+
+install:
+	${top_srcdir}/mkinstalldirs ${DESTDIR}${includedir}/discuss
+	${top_srcdir}/mkinstalldirs ${DESTDIR}${includedir}/usp
+	-for i in discuss/?*.h usp/?*.h; do \
+		$(INSTALL) -m 0444 ${srcdir}/$$i ${DESTDIR}${includedir}/$$i; \
+	done
+
+config.h: config.h.sed
+	rm -f config.h
+	sed     -e s:SERVERDIR:${sbindir}: \
+		-e s:INFODIR:${infodir}: \
+		-e s:BINDIR:${bindir}: < config.h.sed > config.h
+
+usp:
+	-mkdir usp
+
+usp/usp.h: usp ../usp/usp.h
+	rm -f usp/usp.h
+	ln -s ../../usp/usp.h usp/
+
+usp.h:	usp/usp.h
+	rm -f usp.h
+	ln -s usp/usp.h .
+
+usp/usp_et.h: usp ../ets/usp_et.h
+	rm -f usp/usp_et.h
+	ln -s ../../ets/usp_et.h usp/
+
+usp_et.h: usp/usp_et.h
+	rm -f usp_et.h
+	ln -s usp/usp_et.h .
+
+rpc_et.h: ../ets/rpc_et.h
+	rm -f rpc_et.h
+	ln -s ../ets/rpc_et.h .
+
+discuss/dsc_et.h: ../ets/dsc_et.h
+	rm -f discuss/dsc_et.h
+	ln -s ../../ets/dsc_et.h discuss/
+
+discuss_err.h:	../ets/discuss_err.h
+	rm -f discuss_err.h
+	ln -s ../ets/discuss_err.h .
+
+regexp.h: ../dsgrep/regexp/regexp.h
+	rm -f regexp.h
+	ln -s ../dsgrep/regexp/regexp.h .

@@ -1,0 +1,67 @@
+#
+# $Id: Makefile.in,v 1.1 1999-02-02 20:40:31 kcr Exp $
+#
+
+SHELL=/bin/sh
+VPATH=@srcdir@
+INSTALL=@INSTALL@
+INSTALL_PROGRAM=@INSTALL_PROGRAM@
+srcdir=@srcdir@
+top_srcdir=@top_srcdir@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+bindir=@bindir@
+mandir=@mandir@
+
+CC=@CC@
+DEFS=@DEFS@
+CPPFLAGS=@CPPFLAGS@
+CFLAGS=@CFLAGS@
+LDFLAGS=@LDFLAGS@
+LIBS=@LIBS@
+ALL_CFLAGS=-I../include ${CPPFLAGS} ${CFLAGS} ${DEFS}
+
+KLIBS=	../libds/libdsk.a ../usp/libusp.a @KRB4_LIBS@ ${LIBS}
+NKLIBS=	../libds/libds.a ../usp/libusp.a -lcom_err ${LIBS}
+
+.c.o:
+	${CC} -c ${ALL_CFLAGS} $<
+
+all: create_mtg_dir crmtgs mkds pmtg dsmail dspipe
+
+clean:
+	rm -f create_mtg_dir crmtgs mkds pmtg dsmail dspipe *.o
+
+depend:
+
+install:
+	${top_srcdir}/mkinstalldirs ${DESTDIR}${bindir}
+	${top_srcdir}/mkinstalldirs ${DESTDIR}${mandir}/man1
+	${INSTALL_PROGRAM} create_mtg_dir ${DESTDIR}${bindir}
+	${INSTALL_PROGRAM} crmtgs ${DESTDIR}${bindir}
+	${INSTALL_PROGRAM} mkds ${DESTDIR}${bindir}
+	${INSTALL_PROGRAM} pmtg ${DESTDIR}${bindir}
+	${INSTALL_PROGRAM} dsmail ${DESTDIR}${bindir}
+	${INSTALL_PROGRAM} dspipe ${DESTDIR}${bindir}
+	-rm -f $(DESTDIR)${bindir}/rmds
+	-ln -s mkds $(DESTDIR)$(bindir)/rmds
+	${INSTALL} -m 755 dsc_setup.sh ${DESTDIR}${bindir}/dsc_setup
+	${INSTALL} -m 444 dsmail.1 ${DESTDIR}${mandir}/man1
+
+create_mtg_dir: create_mtg_dir.o
+	${CC} ${LDFLAGS} -o create_mtg_dir create_mtg_dir.o
+
+crmtgs: crmtgs.o ../ets/dsc_et.o
+	${CC} ${LDFLAGS} -o crmtgs crmtgs.o ../ets/dsc_et.o ${KLIBS}
+
+mkds: mkds.o ../ets/dsc_et.o ../client/edit.o
+	${CC} ${LDFLAGS} -o mkds mkds.o ../ets/dsc_et.o ../client/edit.o ${KLIBS}
+
+pmtg: pmtg.o ../ets/dsc_et.o
+	${CC} ${LDFLAGS} -o pmtg pmtg.o ../ets/dsc_et.o ${KLIBS}
+
+dsmail: dsmail.o ../ets/dsc_et.o
+	${CC} ${LDFLAGS} -o dsmail dsmail.o ../ets/dsc_et.o ${NKLIBS}
+
+dspipe: dspipe.o ../ets/dsc_et.o
+	${CC} ${LDFLAGS} -o dspipe dspipe.o ../ets/dsc_et.o ${KLIBS}

@@ -24,7 +24,7 @@ tfile unix_tfile();
 char *mktemp();
 
 #ifndef	lint
-static char rcsid[] = "$Id: dspipe.c,v 1.9 1999-01-22 23:10:10 ghudson Exp $";
+static char rcsid[] = "$Id: dspipe.c,v 1.10 1999-02-02 20:40:32 kcr Exp $";
 #endif
 
 main (argc,argv)
@@ -162,11 +162,7 @@ char *usr_string,*host,*mtg_name;
 	}
 
 	host_len = colon - usr_string;
-#ifdef POSIX
-      memmove (host, usr_string, host_len);
-#else
-	bcopy (usr_string, host, host_len);
-#endif
+        memmove (host, usr_string, host_len);
 	host [host_len] = '\0';
 	(void) strcpy (mtg_name, colon+1);
 	return;

@@ -28,6 +28,9 @@ extern char	*edsc_protocol_version, *edsc_version_string;
 
 extern const char *local_realm();
 
+static int list_it(trn_info2 *t_infp, FILE *f, int long_subjects);
+
+
 do_gpv(args)
 	char	*args;
 {
@@ -341,9 +344,7 @@ do_ls(args)
 	printf("(%d)\n", num_printed);
 }
 
-
-
-static list_it(t_infop, f, long_subjects)
+static int list_it(t_infop, f, long_subjects)
 	trn_info2 *t_infop;
 	FILE	*f;
 	int	long_subjects;

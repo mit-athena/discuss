@@ -1,0 +1,39 @@
+#
+# $Id: Makefile.in,v 1.1 1999-02-02 20:40:14 kcr Exp $
+#
+
+SHELL=/bin/sh
+VPATH=@srcdir@
+srcdir=@srcdir@
+top_srcdir=@top_srcdir@
+
+CC=@CC@
+DEFS=@DEFS@
+CPPFLAGS=@CPPFLAGS@
+CFLAGS=@CFLAGS@
+ALL_CFLAGS=${CPPFLAGS} ${CFLAGS} ${DEFS}
+
+OBJS=discuss_err.o dsc_et.o rpc_et.o usp_et.o krb_et.o
+
+EXTRA_CLEAN=discuss_err.c dsc_et.c rpc_et.c usp_et.c \
+            discuss_err.h dsc_et.h rpc_et.h usp_et.h
+
+
+.SUFFIXES: .et .o .c
+
+.et.o:
+	compile_et $<
+	$(CC) -c ${ALL_CFLAGS} $*.c
+
+.c.o:
+	$(CC) -c ${ALL_CFLAGS} $<
+
+all: $(OBJS)
+
+clean:
+	rm -f ${OBJS} ${EXTRA_CLEAN}
+
+depend:
+
+install:
+

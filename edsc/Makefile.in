@@ -1,0 +1,55 @@
+#
+# $Id: Makefile.in,v 1.1 1999-02-02 20:40:04 kcr Exp $
+#
+
+SHELL=/bin/sh
+VPATH=@srcdir@
+INSTALL=@INSTALL@
+INSTALL_PROGRAM=@INSTALL_PROGRAM@
+srcdir=@srcdir@
+top_srcdir=@top_srcdir@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+bindir=@bindir@
+datadir=@datadir@
+# XXX
+lispdir=${prefix}/share/emacs/site-lisp
+libexecdir=@libexecdir@
+
+CC=@CC@
+DEFS=@DEFS@
+CPPFLAGS=@CPPFLAGS@
+CFLAGS=@CFLAGS@
+LDFLAGS=@LDFLAGS@
+LIBS=../server/acl.o ../libds/libdsk.a ../usp/libusp.a @KRB4_LIBS@ @LIBS@
+ALL_CFLAGS=-I../include ${CPPFLAGS} ${CFLAGS} ${DEFS}
+
+OBJS	= edsc.o parse.o time.o do_quote.o do_trn.o do_mtg.o do_misc.o\
+	do_cache.o version.o $(MACHOBJS)
+
+SRCS	= edsc.c parse.c time.c do_quote.c do_trn.c do_mtg.c do_misc.c\
+	do_cache.c $(MACHSRCS)
+
+.c.o:
+	${CC} -c ${ALL_CFLAGS} $<
+
+all: edsc
+
+clean:
+	rm -f edsc *.o
+
+depend:
+
+install:
+	${top_srcdir}/mkinstalldirs ${DESTDIR}${libexecdir}
+	${top_srcdir}/mkinstalldirs ${DESTDIR}${lispdir}
+	${INSTALL_PROGRAM} edsc ${DESTDIR}${sbindir}
+	${INSTALL} -m 444 ${srcdir}/discuss-acl.el ${DESTDIR}${lispdir}
+	${INSTALL} -m 444 ${srcdir}/discuss-enter.el ${DESTDIR}${lispdir}
+	${INSTALL} -m 444 ${srcdir}/discuss-ls.el ${DESTDIR}${lispdir}
+	${INSTALL} -m 444 ${srcdir}/discuss-misc.el ${DESTDIR}${lispdir}
+	${INSTALL} -m 444 ${srcdir}/discuss.el ${DESTDIR}${lispdir}
+
+edsc: newvers.sh $(OBJS)
+	sh newvers.sh
+	${CC} ${LDFLAGS} -o edsc ${OBJS} ${LIBS}

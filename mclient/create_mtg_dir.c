@@ -15,12 +15,11 @@
 #include <sys/param.h>
 #include <pwd.h>
 #include <string.h>
-#ifdef SOLARIS
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>
-#include <string.h>
 #endif
 #ifndef	lint
-static char rcsid_create_mtg_dir_c[] = "$Id: create_mtg_dir.c,v 1.7 1999-01-22 23:10:07 ghudson Exp $";
+static char rcsid_create_mtg_dir_c[] = "$Id: create_mtg_dir.c,v 1.8 1999-02-02 20:40:32 kcr Exp $";
 #endif
 
 main(argc, argv)

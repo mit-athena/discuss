@@ -7,7 +7,7 @@
  */
 /*
  *
- *	$Id: res_module.c,v 1.14 1999-01-22 23:09:59 ghudson Exp $
+ *	$Id: res_module.c,v 1.15 1999-02-02 20:40:27 kcr Exp $
  *
  * resolve_module () --
  *	Can you say "Put all the configuration into one file?"  Can you
@@ -22,7 +22,7 @@
 
 #ifndef lint
 static char rcsid_res_module_c[] =
-    "$Id: res_module.c,v 1.14 1999-01-22 23:09:59 ghudson Exp $";
+    "$Id: res_module.c,v 1.15 1999-02-02 20:40:27 kcr Exp $";
 #endif lint
 
 #include "rpc_et.h"
@@ -277,23 +277,7 @@ static void ExpandHost (primary_name, krb_host, krb_realm )
      * could give the command "menel echo foo" and we will resolve
      * it to "menelaus".
      */
-#ifdef OLD_KERBEROS
-    *krb_realm = '\0';		/* null for now */
-    p = strchr( sp, '.' );
-    if (p) {
-	char *p1;
-
-	strncpy(krb_realm,p+1,REALM_SZ);		/* Realm after '.' */
-	krb_realm[REALM_SZ-1] = NULL;
-	p1 = krb_realm;                           /* Upper case this */
-	do {
-	    if (islower(*p1))
-		*p1=toupper(*p1);
-	} while (*p1++);
-    }
-#else
-    (void) strcpy(krb_realm, krb_realmofhost(primary_name));
-#endif /* OLD_KERBEROS */
+    (void) strcpy(krb_realm, (char *)krb_realmofhost(primary_name));
     /* lower case Kerberos host name */
     do {
 	if (isupper(*sp)) *dp=tolower(*sp);

@@ -8,17 +8,19 @@
 /*
  * dsc_enter.c - enter a transaction from a file into discuss.
  *
- *	$Id: dsc_enter.c,v 1.12 1999-01-22 23:09:56 ghudson Exp $
+ *	$Id: dsc_enter.c,v 1.13 1999-02-02 20:40:26 kcr Exp $
  */
 
 #ifndef	lint
 static char rcsid[] =
-    "$Id: dsc_enter.c,v 1.12 1999-01-22 23:09:56 ghudson Exp $";
+    "$Id: dsc_enter.c,v 1.13 1999-02-02 20:40:26 kcr Exp $";
 #endif
 
 #include <stdio.h>
 #include <string.h>
+#if HAVE_FCNTL_H
 #include <fcntl.h>
+#endif
 #include <unistd.h>
 #include <errno.h>
 #include <ctype.h>

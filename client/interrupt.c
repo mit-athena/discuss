@@ -11,17 +11,17 @@
  * Stan picked the names, not me..
  */
 #ifndef lint
-static char *rcsid_discuss_c = "$Id: interrupt.c,v 1.6 1999-01-22 23:09:25 ghudson Exp $";
+static char *rcsid_discuss_c = "$Id: interrupt.c,v 1.7 1999-02-02 20:39:47 kcr Exp $";
 #endif lint
 
 #include <signal.h>
-#ifdef POSIX
+#if HAVE_SIGACTION
 struct sigaction act, oact;
 #endif
 
 int interrupt = 0;
-#ifndef POSIX
-static int (*old_interrupt_handler)() = SIG_DFL;
+#if !HAVE_SIGACTION
+static RETSIGTYPE (*old_interrupt_handler)() = SIG_DFL;
 #endif
 static void
 interrupt_handler(dummy)
@@ -34,7 +34,7 @@ void
 flag_interrupts()
 {
 	interrupt = 0;
-#ifdef POSIX
+#if HAVE_SIGACTION
        sigemptyset(&act.sa_mask);
        act.sa_flags = 0;
        act.sa_handler= (void (*)()) interrupt_handler;
@@ -47,7 +47,7 @@ flag_interrupts()
 void
 dont_flag_interrupts()
 {
-#ifdef POSIX
+#if HAVE_SIGACTION
         (void) sigaction (SIGINT, &oact, (struct sigaction *)0);
 #else
 	(void) signal (SIGINT, old_interrupt_handler);

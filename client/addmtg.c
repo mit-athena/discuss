@@ -15,20 +15,20 @@
  *	Or the user could put some transaction specifiers on the
  *	command line, in which case they are used as meeting announcements.
  *
- *	$Id: addmtg.c,v 1.31 1999-01-22 23:09:20 ghudson Exp $
+ *	$Id: addmtg.c,v 1.32 1999-02-02 20:39:45 kcr Exp $
  *
  */
 
 #ifndef lint
 static char rcsid_addmtg_c[] =
-    "$Id: addmtg.c,v 1.31 1999-01-22 23:09:20 ghudson Exp $";
+    "$Id: addmtg.c,v 1.32 1999-02-02 20:39:45 kcr Exp $";
 #endif lint
 
 #include <string.h>
 #include <stdio.h>
 #include <netdb.h>
 #include <sys/file.h>
-#ifdef SOLARIS
+#if HAVE_FCNTL_H
 #include <fcntl.h>
 #endif
 #include <discuss/discuss.h>
@@ -37,7 +37,7 @@ static char rcsid_addmtg_c[] =
 
 extern char *malloc(), *calloc();
 extern tfile unix_tfile();
-int add_mtg_it();
+static int add_mtg_it();
 
 static int mtgs_added;
 static del_the_mtg();

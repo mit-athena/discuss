@@ -19,7 +19,7 @@
 #include <sys/types.h>
 #include <sys/file.h>
 #include <sys/stat.h>
-#ifdef SOLARIS
+#if HAVE_FCNTL_H
 #include <fcntl.h>
 #endif
 #include <discuss/types.h>
@@ -55,11 +55,7 @@ extern int has_privs, use_zephyr;
 #define inline
 #endif
 
-#ifndef SOLARIS
 static inline short Sshort(P_s)
-#else
-static  short Sshort(P_s)
-#endif
 	short	P_s;
 {
     union {
@@ -72,11 +68,7 @@ static  short Sshort(P_s)
     return x2.s;
 }
 
-#ifndef SOLARIS
 static inline long Slong(P_l)
-#else
-static long Slong(P_l)
-#endif
 	long	P_l;
 {
     union {

@@ -6,18 +6,18 @@
  *
  */
 /*
- *	$Id: anm.c,v 1.9 1999-01-22 23:09:21 ghudson Exp $
+ *	$Id: anm.c,v 1.10 1999-02-02 20:39:46 kcr Exp $
  *
  */
 
 #ifndef lint
 static char rcsid_anm_c[] =
-    "$Id: anm.c,v 1.9 1999-01-22 23:09:21 ghudson Exp $";
+    "$Id: anm.c,v 1.10 1999-02-02 20:39:46 kcr Exp $";
 #endif lint
 
 #include <stdio.h>
 #include <sys/file.h>
-#ifdef SOLARIS
+#if HAVE_FCNTL_H
 #include <fcntl.h>
 #endif
 #include <ss/ss.h>

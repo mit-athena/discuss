@@ -6,7 +6,7 @@
  *
  */
 /*
- *	$Id: acl_core.c,v 1.19 1999-01-22 23:10:14 ghudson Exp $
+ *	$Id: acl_core.c,v 1.20 1999-02-02 20:40:39 kcr Exp $
  *
  *	Routines for use in a server to edit access control lists remotely.
  *	Originally written for the discuss system by Bill Sommerfeld
@@ -23,10 +23,12 @@
 #include <sys/param.h>
 #include <string.h>
 #include "ansi.h"
+#if HAVE_FCNTL_H
 #include <fcntl.h>
+#endif
 #ifndef lint
 static const char rcsid_acl_core_c[] =
-    "$Id: acl_core.c,v 1.19 1999-01-22 23:10:14 ghudson Exp $";
+    "$Id: acl_core.c,v 1.20 1999-02-02 20:40:39 kcr Exp $";
 #endif lint
 
 extern dsc_acl *mtg_acl;

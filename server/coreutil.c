@@ -6,7 +6,7 @@
  *
  */
 /*
- *	$Id: coreutil.c,v 1.30 1999-01-22 23:10:16 ghudson Exp $
+ *	$Id: coreutil.c,v 1.31 1999-02-02 20:40:41 kcr Exp $
  *
  *
  * coreutil.c  -- These contain lower-layer, utility type routines to
@@ -20,7 +20,7 @@
 const
 #endif
 static char rcsid_coreutil_c[] =
-    "$Id: coreutil.c,v 1.30 1999-01-22 23:10:16 ghudson Exp $";
+    "$Id: coreutil.c,v 1.31 1999-02-02 20:40:41 kcr Exp $";
 #endif /* lint */
 
 #include <discuss/types.h>
@@ -31,23 +31,19 @@ static char rcsid_coreutil_c[] =
 #include <discuss/acl.h>
 #include "internal.h"
 #include "ansi.h"
-#ifdef ZEPHYR
+#if HAVE_ZEPHYR
 #include <zephyr/zephyr.h>
-#endif ZEPHYR
+#endif
+#include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
 #include <sys/types.h>
 #include <netdb.h>
 #include <sys/file.h>
 #include <sys/stat.h>
-#ifndef SOLARIS
-#include <strings.h>
-#else
 #include <string.h>
+#if HAVE_FCNTL_H
 #include <fcntl.h>
-#endif
-#ifndef NULL
-#define NULL 0
 #endif
 
 /* global variables */
@@ -65,7 +61,7 @@ char *super_chairman;
 char *super_long_name;
 int has_privs = 0;		/* Has privileges (linked) */
 int no_nuke = 0;		/* Don't be atomic (linked) */
-#ifdef ZEPHYR
+#if HAVE_ZEPHYR
 int use_zephyr = 1;		/* Actually do use Zephyr. */
 #else
 int use_zephyr = 0;
@@ -73,9 +69,6 @@ int use_zephyr = 0;
 
 
 /* EXTERNAL */
-#ifndef ZEPHYR
-extern char *malloc(); /* zephyr.h includes stdlib.h */
-#endif
 extern off_t lseek();
 extern int errno;
 extern char rpc_caller [];
@@ -345,20 +338,14 @@ forget_super()
  */
 start_read()
 {
-#ifdef SOLARIS
      struct flock lock;
-#endif
 
      if (!no_nuke) {
-#ifdef SOLARIS
           lock.l_type = F_RDLCK;
           lock.l_start = 0;
           lock.l_whence = 0;
           lock.l_len = 0;
           if (fcntl(u_control_f, F_SETLKW, &lock) < 0) 
-#else
-	  if (flock (u_control_f, LOCK_SH) < 0)
-#endif
 	       panic ("Cannot share lock");
 	  read_lock = TRUE;
      }
@@ -372,20 +359,14 @@ start_read()
  */
 finish_read()
 {
-#ifdef SOLARIS
     struct flock lock;
-#endif
 
      if (!no_nuke) {
-#ifdef SOLARIS
            lock.l_type = F_UNLCK;
           lock.l_start = 0;
           lock.l_whence = 0;
           lock.l_len = 0;
           fcntl(u_control_f, F_SETLK, &lock);
-#else
-	  flock(u_control_f,LOCK_UN);
-#endif
 	  read_lock = 0;
      }
 }
@@ -658,7 +639,7 @@ char *str;
      exit(1);
 }
 
-#ifdef ZEPHYR
+#if HAVE_ZEPHYR
 /*
  *
  * mtg_znotify -- send off a Zephyr notification as appropriate
@@ -753,7 +734,7 @@ void mtg_znotify(mtg_name, subject, author, signature)
 		}
 	}
 }
-#endif /* ZEPHYR */
+#endif
 
 static unsigned long swap_32(val)
 unsigned long val;

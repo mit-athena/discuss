@@ -6,7 +6,7 @@
  *
  */
 /*
- *	$Id: globals.h,v 1.20 1999-01-22 23:09:48 ghudson Exp $
+ *	$Id: globals.h,v 1.21 1999-02-02 20:40:19 kcr Exp $
  *
  *	Declarations of global variables for discuss.
  */
@@ -69,11 +69,6 @@ extern	char	*user_id;	/* user.instance@realm identifier for user */
 
 extern void	get_trn_map();
 extern selection_list *trn_select();
-
-/* Compiler fudging */
-#if defined(__HIGHC__) && defined(ibm032)
-pragma on(alloca);		/* make High-C seem reasonable */
-#endif
 
 #if defined(__GNUC__)
 #undef alloca

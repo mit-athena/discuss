@@ -6,7 +6,7 @@
  *
  */
 /*
- *	$Id: randrp.c,v 1.13 1999-01-22 23:09:32 ghudson Exp $
+ *	$Id: randrp.c,v 1.14 1999-02-02 20:39:50 kcr Exp $
  *
  *	Code for "randrp" request in discuss.
  *
@@ -14,14 +14,17 @@
 
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Id: randrp.c,v 1.13 1999-01-22 23:09:32 ghudson Exp $";
+    "$Id: randrp.c,v 1.14 1999-02-02 20:39:50 kcr Exp $";
 #endif lint
 
 #include <discuss/discuss.h>
 #include "globals.h"
 #include <stdio.h>
 #include <sys/time.h>
-#ifdef SYSV
+#if HAVE_SRAND48
+/* XXX note that we will just lose if we have neither random or srand48.
+ * this is correctable, but 's sort of an edge case these days.
+ */
 #define random lrand48
 #define srandom srand48
 #endif

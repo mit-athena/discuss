@@ -13,7 +13,7 @@
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Id: edsc.c,v 1.12 1999-01-22 23:09:46 ghudson Exp $";
+static char *rcsid_discuss_c = "$Id: edsc.c,v 1.13 1999-02-02 20:40:06 kcr Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -34,6 +34,7 @@ char *malloc();
 char *local_realm();
 int log_warn();
 tfile unix_tfile();
+RETSIGTYPE sig_do_quit();
 
 static struct edsc_req {
      char *name;				/* Name of request */
@@ -74,7 +75,7 @@ static struct edsc_req {
 /*
  * This is we can cleanup when we have problems
  */
-int crash_handler(sig)
+RETSIGTYPE crash_handler(sig)
 	int	sig;
 {
 	static int	shutting_down_cache = 0;
@@ -104,8 +105,6 @@ int crash_handler(sig)
 		abort();
 	}
 	exit(1);
-	/* NOTREACHED */
-	return(0);
 }
 
 	
@@ -174,9 +173,9 @@ main(argc, argv)
      /*
       * Set up hooks in case we get a graceful die signal
       */
-     signal(SIGHUP, do_quit);
-     signal(SIGINT, do_quit);
-     signal(SIGTERM, do_quit);
+     signal(SIGHUP, sig_do_quit);
+     signal(SIGINT, sig_do_quit);
+     signal(SIGTERM, sig_do_quit);
      
      {
 	  register char *user = getpwuid(getuid())->pw_name;
@@ -248,4 +247,9 @@ do_quit(args)
 	cache_shutdown();
 #endif
 	exit(0);
+}
+
+RETSIGTYPE sig_do_quit()
+{
+	do_quit(NULL);
 }

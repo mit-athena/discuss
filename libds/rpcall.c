@@ -11,12 +11,12 @@
  *	  	protocol over a TCP connection.
  *		This file handles the caller's side of the connection.
  *
- *	$Id: rpcall.c,v 1.20 1999-01-22 23:10:00 ghudson Exp $
+ *	$Id: rpcall.c,v 1.21 1999-02-02 20:40:28 kcr Exp $
  *
  */
 #ifndef lint
 static char rcsid_rpcall_c[] =
-    "$Id: rpcall.c,v 1.20 1999-01-22 23:10:00 ghudson Exp $";
+    "$Id: rpcall.c,v 1.21 1999-02-02 20:40:28 kcr Exp $";
 #endif lint
 
 /* INCLUDES */
@@ -28,7 +28,9 @@ static char rcsid_rpcall_c[] =
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
+#if HAVE_FCNTL_H
 #include <fcntl.h>
+#endif
 #include <discuss/tfile.h>
 #include "rpc.h"
 #include "config.h"

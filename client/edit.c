@@ -6,7 +6,7 @@
  *
  */
 /*
- *	$Id: edit.c,v 1.15 1999-01-22 23:09:24 ghudson Exp $
+ *	$Id: edit.c,v 1.16 1999-02-02 20:39:46 kcr Exp $
  *
  *	Utility routines.
  *
@@ -15,7 +15,7 @@
 
 #ifndef lint
 static char rcsid_discuss_utils_c[] =
-    "$Id: edit.c,v 1.15 1999-01-22 23:09:24 ghudson Exp $";
+    "$Id: edit.c,v 1.16 1999-02-02 20:39:46 kcr Exp $";
 #endif /* lint */
 
 #include <stdio.h>
@@ -25,8 +25,13 @@ static char rcsid_discuss_utils_c[] =
 #include <ss/ss.h>
 #include <discuss/discuss.h>
 #include "globals.h"
-#include <sys/wait.h>
 #include <sys/types.h>
+#if HAVE_SYS_WAIT_H
+#include <sys/wait.h>
+#endif
+#ifndef WEXITSTATUS
+#define WEXITSTATUS(stat_val) ((unsigned)(stat_val) >> 8)
+#endif
 #include <sys/stat.h>
 #include <sys/errno.h>
 
@@ -61,19 +66,15 @@ edit(fn, edit_path)
 	char *editor_path_v;
 	int pid;
 	int (*handler)();
-#ifndef SOLARIS
-	union wait wbuf;
-#else
 	int wbuf;
-#endif
 
 	struct stat buf;
 	char buffer[BUFSIZ];
 	FILE *the_file = NULL;
-#ifdef POSIX
-       struct sigaction act, oact;
-       sigemptyset(&act.sa_mask);
-       act.sa_flags = 0;
+#if HAVE_SIGACTION
+        struct sigaction act, oact;
+        sigemptyset(&act.sa_mask);
+        act.sa_flags = 0;
 #endif
 
 	editor_path_e = getenv("EDITOR");
@@ -131,7 +132,7 @@ edit(fn, edit_path)
 		default:
 			break;
 		}
-#ifdef POSIX
+#if HAVE_SIGACTION
 		act.sa_handler= (void (*)()) SIG_IGN;
 		(void) sigaction(SIGINT, &act, &oact);
 #else
@@ -139,18 +140,14 @@ edit(fn, edit_path)
 #endif
 		while (wait(&wbuf) != pid)
 			;
-#ifdef POSIX
+#if HAVE_SIGACTION
               (void) sigaction(SIGINT, &oact, NULL);
 #else
 		(void) signal(SIGINT, handler);
 #endif
 		if (WIFSIGNALED(wbuf))
 			return(ET_CHILD_DIED);
-#ifndef SOLARIS
-		if (wbuf.w_retcode != 0)
-#else
-		if (wbuf != 0)
-#endif
+		if (WEXITSTATUS(wbuf))
 			return(ET_CHILD_ERR);
 	} else {
 		clearerr(stdin);

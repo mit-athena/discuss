@@ -1,0 +1,92 @@
+#
+# $Id: Makefile.in,v 1.1 1999-02-02 20:40:38 kcr Exp $
+#
+
+SHELL=/bin/sh
+VPATH=@srcdir@
+INSTALL=@INSTALL@
+INSTALL_PROGRAM=@INSTALL_PROGRAM@
+srcdir=@srcdir@
+top_srcdir=@top_srcdir@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+bindir=@bindir@
+sbindir=@sbindir@
+
+CC=@CC@
+DEFS=@DEFS@
+CPPFLAGS=@CPPFLAGS@
+CFLAGS=@CFLAGS@
+LDFLAGS=@LDFLAGS@
+LIBS=../libds/libdsk.a ../usp/libusp.a @ZEPHYR_LIBS@ @KRB4_LIBS@ @LIBS@
+ALL_CFLAGS=-I../include ${CPPFLAGS} ${CFLAGS} ${DEFS}
+
+DISCUSS_UID=discuss
+OBJS=	disserve.o atom.o dispatch.o acl.o acl_core.o \
+	../libds/tfile.o ../libds/tnet.o \
+	../ets/dsc_et.o ../ets/rpc_et.o
+DISCUSSD_OBJS=$(OBJS) rpproc.k.o core.o coreutil.o
+DISSERVE_OBJS=$(OBJS) rpproc.nk.o core.o coreutil.o
+
+.c.o:
+	${CC} -c ${ALL_CFLAGS} $<
+
+all: debug recover expunge discussd disserve
+
+clean:
+	rm -f *.o *~ \#* disserve recover expunge discussd disdebug
+
+depend:
+
+install:
+	${top_srcdir}/mkinstalldirs ${DESTDIR}${sbindir}
+	${INSTALL_PROGRAM} discussd ${DESTDIR}${sbindir}
+	${INSTALL} -m 4755 disserve ${DESTDIR}${sbindir}
+
+discussd: $(DISCUSSD_OBJS)
+	${CC} ${LDFLAGS} -o $@ $(DISCUSSD_OBJS) ${LIBS}
+
+disserve: $(DISSERVE_OBJS)
+	${CC} ${LDFLAGS} -o $@ $(DISSERVE_OBJS) ${LIBS}
+
+servetest: ../client/discuss.o ../client/cmds.o ../client/libss.a \
+		../client/discuss_utils.o core.o coreutil.o atom.o acl.o \
+		../libds/tfile.o glue.o
+	${CC} ${LDFLAGS} -o servetest ../client/discuss.o ../client/cmds.o \
+		../client/libss.a ../client/discuss_utils.o core.o coreutil.o \
+		atom.o acl.o ../libds/tfile.o glue.o $(LDLIBS)
+
+recover: recover.o core.o coreutil.o atom.o acl.o ../libds/tunix.o \
+		../libds/tfile.o glue.o ../ets/dsc_et.o $(COMERR)
+	${CC} ${LDFLAGS} -o recover recover.o core.o coreutil.o atom.o acl.o \
+		glue.o $(LIBS) $(LDLIBS)
+
+expunge: expunge.o core.o coreutil.o atom.o acl.o acl_core.o \
+		../libds/tunix.o ../libds/tfile.o glue.o ../ets/dsc_et.o \
+		$(COMERR)
+	${CC} ${LDFLAGS} -o expunge expunge.o core.o coreutil.o atom.o acl.o \
+		acl_core.o glue.o $(LIBS) $(LDLIBS)
+
+debug:	disdebug
+
+disdebug: $(OBJS) rpproc.debug.o core.o coreutil.o
+	${CC} ${LDFLAGS} -o disdebug $(OBJS) core.o coreutil.o rpproc.debug.o \
+		$(LIBS) $(LDLIBS)
+
+rpproc.k.o: rpproc.c
+	${CC} ${ALL_CFLAGS} -DINETD -DKERBEROS -c rpproc.c
+	mv rpproc.o rpproc.k.o
+
+rpproc.nk.o: rpproc.c
+	${CC} ${ALL_CFLAGS} -DSUBPROC -c rpproc.c
+	mv rpproc.o rpproc.nk.o
+
+rpproc.debug.o: rpproc.c
+	${CC} ${ALL_CFLAGS} -DKERBEROS -c rpproc.c
+	mv rpproc.o rpproc.debug.o
+
+core.o: core.c
+	${CC} ${ALL_CFLAGS} -DKERBEROS -c core.c
+
+coreutil.o: coreutil.c
+	${CC} ${ALL_CFLAGS} -DKERBEROS -c coreutil.c

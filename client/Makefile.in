@@ -1,0 +1,135 @@
+#
+# $Id: Makefile.in,v 1.1 1999-02-02 20:39:45 kcr Exp $
+#
+
+SHELL=/bin/sh
+VPATH=@srcdir@
+INSTALL=@INSTALL@
+INSTALL_PROGRAM=@INSTALL_PROGRAM@
+srcdir=@srcdir@
+top_srcdir=@top_srcdir@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+bindir=@bindir@
+datadir=@datadir@
+infodir=${datadir}/discuss/info
+
+CC=@CC@
+DEFS=@DEFS@
+CPPFLAGS=@CPPFLAGS@
+CFLAGS=@CFLAGS@
+LDFLAGS=@LDFLAGS@
+LIBS=../server/acl.o ../libds/libdsk.a ../usp/libusp.a @KRB4_LIBS@ -lss @LIBS@
+ALL_CFLAGS=-I../include ${CPPFLAGS} ${CFLAGS} ${DEFS}
+
+OBJS=	discuss.o edit.o output.o trn_expr.o list.o trn_select.o \
+	status.o new_trans.o print.o lsm.o addmtg.o list_acl.o \
+	interrupt.o goto.o reply.o ckm.o anm.o time.o data.o \
+	cmds.o rn.o randrp.o catchup.o set.o ../ets/discuss_err.o
+
+# Pairs of symlink source and destination.
+INFOLINKS=	add_mtg.info add_meeting.info \
+		am.info add_meeting.info \
+		anm.info announce_meeting.info \
+		ann_mtg.info announce_meeting.info \
+		ckm.info check_meetings.info \
+		d.info delete.info \
+		da.info delete_acl.info \
+		dl.info delete.info \
+		enter.info talk.info \
+		exit.info quit.info \
+		g.info goto.info \
+		go.info goto.info \
+		la.info list_acl.info \
+		ls.info list.info \
+		lsm.info list_meetings.info \
+		next.info print.info \
+		nm.info next_meeting.info \
+		nref.info print.info \
+		p.info print.info \
+		pr.info print.info \
+		pref.info print.info \
+		prev.info print.info \
+		q.info quit.info \
+		read_new.info rn.info \
+		rp.info reply.info \
+		sa.info set_acl.info \
+		send.info talk.info \
+		spec.info transaction_specifiers.info \
+		specifiers.info transaction_specifiers.info \
+		swf.info switch_off.info \
+		swn.info switch_on.info \
+		w.info write.info
+
+.SUFFIXES: .ct
+
+.c.o:
+	${CC} -c ${ALL_CFLAGS} $<
+
+.y.o:
+	yacc $<
+	mv -f y.tab.c $*.c
+	${CC} -c ${ALL_CFLAGS} $*.c
+
+.ct.o:
+	mk_cmds $<
+	${CC} -c ${ALL_CFLAGS} $*.c
+
+# cmds.o: cmds.ct
+#	mk_cmds cmds.ct
+#	${CC} -c ${ALL_CFLAGS} cmds.c
+
+all: discuss
+
+clean:
+	rm -f *.o *~ \#* *.bak
+	rm -f discuss trn_expr.c y.tab.c TAGS info.tar
+
+depend:
+
+install:
+	${top_srcdir}/mkinstalldirs ${DESTDIR}${infodir}
+	${top_srcdir}/mkinstalldirs ${DESTDIR}${bindir}
+	${INSTALL} -m 444 ${srcdir}/info/access.info ${DESTDIR}${infodir}
+	${INSTALL} -m 444 ${srcdir}/info/add_meeting.info ${DESTDIR}${infodir}
+	${INSTALL} -m 444 ${srcdir}/info/announce_meeting.info \
+		${DESTDIR}${infodir}
+	${INSTALL} -m 444 ${srcdir}/info/check_meetings.info \
+		${DESTDIR}${infodir}
+	${INSTALL} -m 444 ${srcdir}/info/del_mtg.info ${DESTDIR}${infodir}
+	${INSTALL} -m 444 ${srcdir}/info/delete.info ${DESTDIR}${infodir}
+	${INSTALL} -m 444 ${srcdir}/info/delete_acl.info ${DESTDIR}${infodir}
+	${INSTALL} -m 444 ${srcdir}/info/goto.info ${DESTDIR}${infodir}
+	${INSTALL} -m 444 ${srcdir}/info/help.info ${DESTDIR}${infodir}
+	${INSTALL} -m 444 ${srcdir}/info/list.info ${DESTDIR}${infodir}
+	${INSTALL} -m 444 ${srcdir}/info/list_acl.info ${DESTDIR}${infodir}
+	${INSTALL} -m 444 ${srcdir}/info/list_meetings.info \
+		${DESTDIR}${infodir}
+	${INSTALL} -m 444 ${srcdir}/info/next_meeting.info \
+		${DESTDIR}${infodir}
+	${INSTALL} -m 444 ${srcdir}/info/print.info ${DESTDIR}${infodir}
+	${INSTALL} -m 444 ${srcdir}/info/quit.info ${DESTDIR}${infodir}
+	${INSTALL} -m 444 ${srcdir}/info/reply.info ${DESTDIR}${infodir}
+	${INSTALL} -m 444 ${srcdir}/info/retrieve.info ${DESTDIR}${infodir}
+	${INSTALL} -m 444 ${srcdir}/info/rn.info ${DESTDIR}${infodir}
+	${INSTALL} -m 444 ${srcdir}/info/set.info ${DESTDIR}${infodir}
+	${INSTALL} -m 444 ${srcdir}/info/set_acl.info ${DESTDIR}${infodir}
+	${INSTALL} -m 444 ${srcdir}/info/status.info ${DESTDIR}${infodir}
+	${INSTALL} -m 444 ${srcdir}/info/switch_off.info ${DESTDIR}${infodir}
+	${INSTALL} -m 444 ${srcdir}/info/switch_on.info ${DESTDIR}${infodir}
+	${INSTALL} -m 444 ${srcdir}/info/talk.info ${DESTDIR}${infodir}
+	${INSTALL} -m 444 ${srcdir}/info/transaction_specifiers.info \
+		${DESTDIR}${infodir}
+	${INSTALL} -m 444 ${srcdir}/info/write.info ${DESTDIR}${infodir}
+	${INSTALL_PROGRAM} discuss ${DESTDIR}${bindir}
+	@set $(INFOLINKS); \
+	while [ $$# -ge 2 ]; do \
+		rm -f ${DESTDIR}${infodir}/$$1; \
+		echo ln -s $$2 ${DESTDIR}${infodir}/$$1; \
+		ln -s $$2 ${DESTDIR}${infodir}/$$1; \
+		shift 2; \
+	done
+
+discuss: $(OBJS)
+	${CC} ${LDFLAGS} -o discuss ${OBJS} ${LIBS}
+

@@ -8,14 +8,14 @@
 /*
  *	Print-related requests for DISCUSS.
  *
- *	$Id: print.c,v 1.25 1999-01-22 23:09:31 ghudson Exp $
+ *	$Id: print.c,v 1.26 1999-02-02 20:39:49 kcr Exp $
  *
  */
 
 
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Id: print.c,v 1.25 1999-01-22 23:09:31 ghudson Exp $";
+    "$Id: print.c,v 1.26 1999-02-02 20:39:49 kcr Exp $";
 #endif /* lint */
 
 #include <stdio.h>
@@ -23,8 +23,10 @@ static char rcsid_discuss_c[] =
 #include <sys/file.h>
 #include <signal.h>
 #include <string.h>
+#if HAVE_SYS_WAIT_H
 #include <sys/wait.h>
-#ifdef SOLARIS
+#endif
+#if HAVE_FCNTL_H
 #include <fcntl.h>
 #endif
 #include <discuss/discuss.h>
@@ -79,13 +81,13 @@ prt_trans(argc, argv)
 	char **argv;
 {
 	int fd;
-#ifndef POSIX
+#if !HAVE_SIGACTION
 	int (*old_sig)();
 #endif
 	int code;
 	selection_list *trn_list;
-#ifdef POSIX
-      struct sigaction act, oact;
+#if HAVE_SIGACTION
+        struct sigaction act, oact;
 #endif
 
 	request_name = ss_name(sci_idx);
@@ -164,11 +166,11 @@ prt_trans(argc, argv)
 	/*
 	 * Ignore SIGPIPE from the pager
 	 */
-#ifdef POSIX
-      sigemptyset(&act.sa_mask);
-      act.sa_flags = 0;
-      act.sa_handler= (void (*)()) SIG_IGN;
-      (void) sigaction(SIGPIPE, &act, &oact);
+#if HAVE_SIGACTION
+        sigemptyset(&act.sa_mask);
+        act.sa_flags = 0;
+        act.sa_handler= (void (*)()) SIG_IGN;
+        (void) sigaction(SIGPIPE, &act, &oact);
 #else
 	old_sig = signal(SIGPIPE, SIG_IGN);
 #endif
@@ -183,13 +185,9 @@ prt_trans(argc, argv)
 	tclose(tf, &code);
 	(void) close(fd);
 	(void) tdestroy(tf);
-#ifdef SOLARIS
 	(void) wait((int  *)0);
-#else
-	(void) wait((union wait *)0);
-#endif
-#ifdef POSIX
-      (void) sigaction (SIGPIPE, &oact, NULL);
+#if HAVE_SIGACTION
+        (void) sigaction (SIGPIPE, &oact, NULL);
 #else
 	(void) signal(SIGPIPE, old_sig);
 #endif

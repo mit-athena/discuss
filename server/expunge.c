@@ -16,7 +16,7 @@
 
 #include <stdio.h>
 #include <string.h>
-#ifdef POSIX_FLOCK
+#if HAVE_FCNTL_H
 #include <fcntl.h>
 #endif
 #include <ctype.h>
@@ -68,9 +68,7 @@ char **argv;
      tfile tf;
      char control_name[256];
      int control_fd;
-#ifdef POSIX_FLOCK
      static struct flock lock;
-#endif
 
 
      init_dsc_err_tbl();
@@ -202,11 +200,7 @@ expunge_range:
 
 	       signature = old_trn_info.signature;
 	       if (daemon_flag && old_trn_info.signature != NULL) {
-#ifdef POSIX
 		    memmove(dtest, old_trn_info.signature,  7);
-#else
-		    bcopy(old_trn_info.signature, dtest, 7);
-#endif
 		    dtest[7] = '\0';
 		    if (!strcmp(dtest,"daemon@")) {
 			 if (get_from_signature(tempf, new_signature, sizeof(new_signature)))
@@ -254,15 +248,12 @@ expunge_range:
      if ((control_fd = open (control_name, O_RDWR, 0700)) < 0) {
 	  error_occurred = TRUE;
      } else {
-#ifdef POSIX_FLOCK
           lock.l_type = F_WRLCK;
           lock.l_start = 0;
           lock.l_whence = 0;
           lock.l_len = 0;
           fcntl(control_fd, F_SETLKW, &lock);
-#else
-	  flock(control_fd, LOCK_EX);		/* Hold meeting by the balls */
-#endif
+
 	  free(old_mtg_info.long_name);
 	  free(old_mtg_info.chairman);
 	  free(old_mtg_info.location);
@@ -272,28 +263,22 @@ expunge_range:
 	  if (result != 0) {	       
 	       fprintf(stderr, "%s: %s while getting mtg info\n", location, error_message(result));
 	       error_occurred = TRUE;
-#ifdef POSIX_FLOCK
-             lock.l_type = F_UNLCK;
-             lock.l_start = 0;
-             lock.l_whence = 0;
-             lock.l_len = 0;
-             fcntl(control_fd, F_SETLK, &lock);
-#else
-	       flock(control_fd,LOCK_UN);
-#endif
-	       close(control_fd);
-	  } else if (old_mtg_info.highest > high) {		/* New transactions added */
-	       low = high + 1;
-	       high = old_mtg_info.highest;
-#ifdef POSIX_FLOCK
+
                lock.l_type = F_UNLCK;
                lock.l_start = 0;
                lock.l_whence = 0;
                lock.l_len = 0;
                fcntl(control_fd, F_SETLK, &lock);
-#else
-	       flock(control_fd,LOCK_UN);
-#endif
+
+	       close(control_fd);
+	  } else if (old_mtg_info.highest > high) {		/* New transactions added */
+	       low = high + 1;
+	       high = old_mtg_info.highest;
+               lock.l_type = F_UNLCK;
+               lock.l_start = 0;
+               lock.l_whence = 0;
+               lock.l_len = 0;
+               fcntl(control_fd, F_SETLK, &lock);
 	       close(control_fd);
 	       goto expunge_range;
 	  }
@@ -620,11 +605,7 @@ char *hstring, *hname;
 	  }
 
 	  /* Chance of a match, copy header over to name, and lower it */
-#ifdef POSIX
 	  memmove(field,cp,  colonp - cp);
-#else
-	  bcopy(cp, field, colonp - cp);
-#endif
 	  field[colonp - cp] = '\0';
 	  lower(field);
 	  if (!strcmp(field,hname))

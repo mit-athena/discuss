@@ -82,7 +82,7 @@
 */
 
 /*
- * $Id: main.c,v 1.7 1999-01-22 23:10:21 ghudson Exp $
+ * $Id: main.c,v 1.8 1999-02-02 20:40:48 kcr Exp $
  */
 
 #include <stdio.h>
@@ -96,7 +96,7 @@
 #include "usp.h"
 
 static char rcsid[] =
-    "$Id: main.c,v 1.7 1999-01-22 23:10:21 ghudson Exp $";
+    "$Id: main.c,v 1.8 1999-02-02 20:40:48 kcr Exp $";
 
 /* connection operations */
 
@@ -187,7 +187,7 @@ int	s;
 	  return(NULL);
      }
      /* (don't care much if this fails) */
-     (void) setsockopt (s, SOL_SOCKET, SO_KEEPALIVE, &on, sizeof(on));
+     (void) setsockopt (s, SOL_SOCKET, SO_KEEPALIVE, (void *)&on, sizeof(on));
 #if 0
      write_desc = dup(s);
 #else

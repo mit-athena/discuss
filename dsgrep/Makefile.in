@@ -1,0 +1,43 @@
+#
+# $Id: Makefile.in,v 1.1 1999-02-02 20:39:57 kcr Exp $
+#
+
+SHELL=/bin/sh
+VPATH=@srcdir@
+INSTALL=@INSTALL@
+INSTALL_PROGRAM=@INSTALL_PROGRAM@
+srcdir=@srcdir@
+top_srcdir=@top_srcdir@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+bindir=@bindir@
+mandir=@mandir@
+
+CC=@CC@
+DEFS=@DEFS@
+CPPFLAGS=@CPPFLAGS@
+CFLAGS=@CFLAGS@
+LDFLAGS=@LDFLAGS@
+LIBS=../libds/libdsk.a ../usp/libusp.a @REGEX_LIBS@ @KRB4_LIBS@ @LIBS@
+ALL_CFLAGS=${CPPFLAGS} ${CFLAGS} ${DEFS}
+
+OBJS= dsgrep.o regerror.o
+
+.c.o:
+	${CC} -c ${ALL_CFLAGS} $<
+
+all: dsgrep
+
+clean:
+	rm -f dsgrep *.o
+
+depend:
+
+install:
+	${top_srcdir}/mkinstalldirs ${DESTDIR}${bindir}
+	${top_srcdir}/mkinstalldirs ${DESTDIR}${mandir}/man1
+	${INSTALL_PROGRAM} dsgrep ${DESTDIR}${bindir}
+	${INSTALL} -m 444 dsgrep.1 ${DESTDIR}${mandir}/man1
+
+dsgrep: $(OBJS)
+	${CC} ${LDFLAGS} -o dsgrep ${OBJS} ${LIBS}

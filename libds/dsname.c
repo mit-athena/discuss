@@ -6,7 +6,7 @@
  *
  */
 /*
- *	$Id: dsname.c,v 1.26 1999-01-22 23:09:57 ghudson Exp $
+ *	$Id: dsname.c,v 1.27 1999-02-02 20:40:26 kcr Exp $
  *
  */
 
@@ -16,10 +16,8 @@
  */
 
 #include <stdio.h>
-#ifndef SOLARIS
 #include <string.h>
-#else
-#include <string.h>
+#if HAVE_UNISTD_H
 #include <unistd.h>
 #endif
 #include <pwd.h>
@@ -33,7 +31,7 @@
 
 #ifndef lint
 static const char rcsid_dsname_c[] =
-    "$Id: dsname.c,v 1.26 1999-01-22 23:09:57 ghudson Exp $";
+    "$Id: dsname.c,v 1.27 1999-02-02 20:40:26 kcr Exp $";
 #endif
 
 extern char *malloc (), *local_realm (), *getenv ();
@@ -69,11 +67,7 @@ static char mtgs[] = "/.meetings";
  * ds() -- duplicate a string.  a useful utility routine...
  */
 
-#ifdef SOLARIS
-static char * ds(s)
-#else
 INLINE static char * ds(s)
-#endif
     const char *s;
 {
     register int len = strlen (s) + 1;

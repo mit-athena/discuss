@@ -1,0 +1,34 @@
+AC_INIT(client/discuss.c)
+
+AC_PROG_CC
+AC_PROG_INSTALL
+AC_PROG_RANLIB
+
+dnl Checks for libraries.
+ATHENA_KRB4
+ATHENA_REGEXP
+ATHENA_UTIL_COM_ERR
+ATHENA_UTIL_SS
+ATHENA_ZEPHYR
+
+# If we can't find connect, try looking in -lsocket and -lnsl.  The
+# Irix 5 libc.so has connect and gethostbyname, but Irix 5 also has
+# libsocket.so which has a bad implementation of gethostbyname (it
+# only looks in /etc/hosts), so we only look for -lsocket if we need
+# it.
+AC_CHECK_FUNC(connect, :, [AC_CHECK_LIB(socket, socket)
+                           AC_CHECK_LIB(nsl, gethostbyname)])
+
+dnl Checks for header files.
+AC_HEADER_STDC
+AC_HEADER_SYS_WAIT
+AC_CHECK_HEADERS(fcntl.h unistd.h termios.h)
+
+dnl Checks for typedefs, structures, and compiler characteristics.
+AC_TYPE_SIGNAL
+dnl Checks for library functions.
+AC_CHECK_FUNCS(srand48 sigaction)
+
+AC_OUTPUT(Makefile client/Makefile dsgrep/Makefile edsc/Makefile ets/Makefile
+          include/Makefile libds/Makefile mclient/Makefile server/Makefile
+          usp/Makefile)

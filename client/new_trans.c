@@ -6,7 +6,7 @@
  *
  */
 /*
- *	$Id: new_trans.c,v 1.27 1999-01-22 23:09:27 ghudson Exp $
+ *	$Id: new_trans.c,v 1.28 1999-02-02 20:39:48 kcr Exp $
  *
  *	New-transaction routine for DISCUSS.  (Request 'talk'.)
  *
@@ -15,7 +15,7 @@
 
 #ifndef lint
 static char rcsid_discuss_c[] =
-     "$Id: new_trans.c,v 1.27 1999-01-22 23:09:27 ghudson Exp $";
+     "$Id: new_trans.c,v 1.28 1999-02-02 20:39:48 kcr Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -23,7 +23,7 @@ static char rcsid_discuss_c[] =
 #include <signal.h>
 #include <string.h>
 #include <sys/wait.h>
-#ifdef SOLARIS
+#if HAVE_FCNTL_H
 #include <fcntl.h>
 #endif
 #include <ss/ss.h>

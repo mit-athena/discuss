@@ -1,0 +1,64 @@
+#
+# $Id: Makefile.in,v 1.1 1999-02-02 20:40:24 kcr Exp $
+#
+
+SHELL=/bin/sh
+VPATH=@srcdir@
+INSTALL=@INSTALL@
+INSTALL_PROGRAM=@INSTALL_PROGRAM@
+srcdir=@srcdir@
+top_srcdir=@top_srcdir@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+
+CC=@CC@
+DEFS=@DEFS@
+CPPFLAGS=@CPPFLAGS@
+CFLAGS=@CFLAGS@
+ALL_CFLAGS=-I../include ${CPPFLAGS} ${CFLAGS} ${DEFS}
+RANLIB=@RANLIB@
+
+USPET=	../ets/usp_et.o
+RPCET=	../ets/rpc_et.o
+DSCET=	../ets/dsc_et.o
+
+ETS=	$(RPCET) $(USPET) $(DSCET)
+KRBET=	../ets/krb_et.o
+
+OBJS=	tfile.o tunix.o tnet.o stubs.o dsname.o interface.o rpcall.o \
+	conv_mgr.o host.o announce.o dsc_enter.o tmem.o
+KOBJS=	res_module.k.o auth_krb.o
+NKOBJS=	res_module.nk.o auth_dum.o
+
+LIBS=	libds.a libdsk.a
+
+.c.o:
+	${CC} -c ${ALL_CFLAGS} $<
+
+all:	$(LIBS)
+
+clean:
+	rm -f $(LIBS) $(OBJS) $(KOBJS) $(NKOBJS)
+
+depend:
+
+install:
+	${top_srcdir}/mkinstalldirs ${DESTDIR}${libdir}
+	${INSTALL_PROGRAM} libdsk.a ${DESTDIR}${libdir}
+
+libds.a: $(OBJS) $(NKOBJS) $(ETS)
+	ar cru libds.a $(OBJS) $(NKOBJS) $(ETS)
+	${RANLIB} libds.a
+
+libdsk.a: $(OBJS) $(KOBJS) $(ETS) $(KRBET)
+	ar cru libdsk.a $(OBJS) $(KOBJS) $(ETS) $(KRBET)
+	${RANLIB} libdsk.a
+
+res_module.k.o: res_module.c
+	${CC} ${ALL_CFLAGS} -DKERBEROS -c res_module.c
+	mv res_module.o res_module.k.o
+
+res_module.nk.o: res_module.c
+	${CC} ${ALL_CFLAGS} -c res_module.c
+	mv res_module.o res_module.nk.o

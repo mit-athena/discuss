@@ -7,7 +7,7 @@
  */
 /*
  *
- *	$Id: core.c,v 1.37 1999-01-22 23:10:15 ghudson Exp $
+ *	$Id: core.c,v 1.38 1999-02-02 20:40:40 kcr Exp $
  *
  *
  * core.c --    Routines that are the meat of discuss.  These provide user
@@ -16,7 +16,7 @@
  */
 #ifndef lint
 static char rcsid_core_c[] =
-    "$Id: core.c,v 1.37 1999-01-22 23:10:15 ghudson Exp $";
+    "$Id: core.c,v 1.38 1999-02-02 20:40:40 kcr Exp $";
 #endif lint
 
 
@@ -35,17 +35,14 @@ static char rcsid_core_c[] =
 #include <sys/file.h>
 #include <sys/stat.h>
 #include <sys/param.h>
+#include <stdio.h>
 #include <string.h>
-#include <fcntl.h>
-#ifdef SVR4
+#if HAVE_FCNTL_H
 #include <fcntl.h>
 #endif
 
 #ifndef min
 #define min(a, b) (a < b ? a : b)
-#endif
-#ifndef NULL
-#define NULL 0
 #endif
 extern char *malloc();
 extern char *new_string();
@@ -320,14 +317,14 @@ int *result;
 
      super.trn_fsize = fsize (u_trn_f);
 
-#ifdef ZEPHYR
+#if HAVE_ZEPHYR
 
      /* Send this out...we want to do this BEFORE calling write_super
       * because things get freed...
       */
      if (!(super.flags & MTG_NOZEPHYR))
 	  mtg_znotify(mtg_name, subject, author, signature);
-#endif ZEPHYR
+#endif
      
      /* all done, start winding down */
      write_super();

@@ -1,0 +1,24 @@
+#
+# $Id: Makefile.in,v 1.1 1999-02-02 20:39:39 kcr Exp $
+#
+
+SHELL=/bin/sh
+VPATH=@srcdir@
+INSTALL=@INSTALL@
+srcdir=@srcdir@
+top_srcdir=@top_srcdir@
+prefix=@prefix@
+mandir=@mandir@
+
+SUBDIRS=ets include usp libds server client mclient edsc dsgrep
+
+all clean depend install::
+	for i in ${SUBDIRS}; \
+		do echo making $@ in $$i; \
+		(cd $$i; ${MAKE} $@) || exit 1; \
+	done
+
+install::
+	${top_srcdir}/mkinstalldirs ${DESTDIR}${mandir}/man1
+	${INSTALL} -m 444 ${srcdir}/discuss.1 ${DESTDIR}${mandir}/man1
+

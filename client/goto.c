@@ -6,7 +6,7 @@
  *
  */
 /*
- *	$Id: goto.c,v 1.19 1999-01-22 23:09:24 ghudson Exp $
+ *	$Id: goto.c,v 1.20 1999-02-02 20:39:47 kcr Exp $
  *
  *	Code for "goto" request in discuss.
  *
@@ -14,7 +14,7 @@
 
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Id: goto.c,v 1.19 1999-01-22 23:09:24 ghudson Exp $";
+    "$Id: goto.c,v 1.20 1999-02-02 20:39:47 kcr Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -25,6 +25,7 @@ static char rcsid_discuss_c[] =
 #include <ctype.h>
 #include <ss/ss.h>
 #include <discuss/discuss.h>
+#include <time.h>
 #include "globals.h"
 
 #ifdef	lint
@@ -87,7 +88,7 @@ switch_to_mtg_nb(nbp)
     if (dsc_public.attending 
 	&& !strcmp(dsc_public.path, nbp->pathname)
 	&& !strcmp(dsc_public.host, nbp ->hostname)) {
-	nbp -> date_attended = time((int *) 0);
+	nbp -> date_attended = time((time_t *) 0);
 	nbp -> last = dsc_public.highest_seen;
     }
     
@@ -235,7 +236,7 @@ void leave_mtg()
 	return;
     }
     
-    dsc_public.nb.date_attended = time((int *)0);
+    dsc_public.nb.date_attended = time((time_t *)0);
     dsc_public.nb.last = dsc_public.highest_seen;
     dsc_get_mtg_info (&dsc_public.nb, &minfo, &code);
     if (!code) {

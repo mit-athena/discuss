@@ -12,6 +12,7 @@
  */
 
 #include <discuss/discuss.h>
+#include <sys/types.h>
 #include <sys/file.h>
 #include <stdio.h>
 #include <string.h>
@@ -21,7 +22,7 @@ mtg_info minfo;
 
 #ifndef	lint
 static char rcsid_pmtg_c[] =
-    "$Id: pmtg.c,v 1.6 1999-01-22 23:10:11 ghudson Exp $";
+    "$Id: pmtg.c,v 1.7 1999-02-02 20:40:33 kcr Exp $";
 #endif
 
 int main (argc,argv)
@@ -103,7 +104,7 @@ write_header(info, tf)
 	char *plural;
 	int dummy;
 
-	(void) strcpy (newtime, ctime (&(info -> date_entered)));
+	(void) strcpy (newtime, ctime ((time_t *)&(info -> date_entered)));
 	newtime [24] = '\0';	/* get rid of \n */
 
 	if (info -> num_lines != 1)

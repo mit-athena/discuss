@@ -15,7 +15,7 @@
 
 /*
  *
- *	$Id: rpproc.c,v 1.16 1999-01-22 23:10:18 ghudson Exp $
+ *	$Id: rpproc.c,v 1.17 1999-02-02 20:40:43 kcr Exp $
  *
  */
 
@@ -31,7 +31,9 @@
 /* Includes */
 
 #include <sys/ioctl.h>
+#if HAVE_FCNTL_H
 #include <fcntl.h>
+#endif
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <stdio.h>
@@ -75,10 +77,8 @@ extern tfile net_tfile ();
 
 /* Static variables */
 
-#ifdef USPRPC
 /* connections & socket info */
 static USPStream *us = NULL;
-#endif
 
 /*
  *
@@ -173,12 +173,13 @@ init_rpc (service,code)
 	*code = errno;
 	return;
     }
-    if(bind(s, &sai, sizeof(sai))) {	    /* bind service name */
+    if(bind(s, (struct sockaddr *)&sai, sizeof(sai))) {	 /* bind service name */
 	*code = errno;
 	return;
     }	
     listen(s, SOMAXCONN);		/* listen for connection */
-    if((snew = accept(s, &sai, &sock_len)) < 0) { /* accept connection */
+    if((snew = accept(s, (struct sockaddr *)&sai, &sock_len)) < 0) {
+                                        /* accept connection */
 	*code = errno;
 	return;
     }
@@ -206,7 +207,7 @@ init_rpc (service,code)
 
     strcpy(serv_name, service);
     fromlen = sizeof (from);
-    if (getpeername (snew, &from, &fromlen) < 0) {
+    if (getpeername (snew, (struct sockaddr *)&from, &fromlen) < 0) {
 	*code = errno;
 	return;
     }

@@ -8,11 +8,10 @@
 
 #ifndef lint
 #ifndef SABER
-static char *RCSid = "$Id: dsgrep.c,v 1.12 1999-01-22 23:09:39 ghudson Exp $";
+static char *RCSid = "$Id: dsgrep.c,v 1.13 1999-02-02 20:39:57 kcr Exp $";
 #endif
 #endif
 
-#include "regexp.h"
 
 #define MAX_MEETINGS 128
 
@@ -24,9 +23,10 @@ static char *RCSid = "$Id: dsgrep.c,v 1.12 1999-01-22 23:09:39 ghudson Exp $";
 #include <sys/param.h>
 #include <sys/stat.h>
 #include <discuss/discuss.h>
-#ifdef SOLARIS
-#include <macros.h>
-#define MAX max
+#include <regex.h>
+
+#ifndef MAX
+#define MAX(a, b)	((a) < (b) ? (b) : (a))
 #endif
 
 extern tfile unix_tfile();
@@ -52,7 +52,7 @@ main(argc,argv)
   int print_trans,use_re,search_trans,search_deleted,s_trans();
   int case_insens,trans_num;
   int high,low;
-  regexp *search_re;
+  regex_t *search_re;
   tfile tf;
   trn_info2 ti;
   void s_to_lower();
@@ -96,7 +96,7 @@ main(argc,argv)
       }
       break;
     case 'e':
-      if ((search_re = regcomp(optarg)) == NULL) {
+      if (regcomp(search_re, optarg, REG_NOSUB) != 0) {
 	fprintf(stderr,"dsgrep: Invalid regular expression %s\n",optarg);
 	exit(1);
       }
@@ -210,7 +210,7 @@ main(argc,argv)
 	if (!search_deleted && (ti.flags & TRN_FDELETED))
 	  continue;
 	if (case_insens) s_to_lower(ti.subject);
-	if (!use_re || regexec(search_re,ti.subject) ||
+	if (!use_re || regexec(search_re,ti.subject,0,NULL,0) ||
 	    (search_trans &&
 	     s_trans(meetings[i],j,ti.num_chars,search_re,case_insens)))  {
 	  printf("%s [%d]: %s\n",
@@ -236,7 +236,7 @@ int
 s_trans(nbp,trans_no,n_chars,search_re,case_insens)
      name_blk nbp;
      int trans_no,n_chars;
-     regexp *search_re;
+     regex_t *search_re;
      int case_insens;
 {
   tfile tf;
@@ -261,7 +261,7 @@ s_trans(nbp,trans_no,n_chars,search_re,case_insens)
   tdestroy(tf);
   buffer[n_chars-1] = '\0';
   if (case_insens) s_to_lower(buffer);
-  return(regexec(search_re,buffer));
+  return(regexec(search_re,buffer,0,NULL,0));
 }
 
 void

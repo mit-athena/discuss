@@ -6,13 +6,13 @@
  *
  */
 /*
- *	$Id: mkds.c,v 1.21 1999-01-22 23:10:10 ghudson Exp $
+ *	$Id: mkds.c,v 1.22 1999-02-02 20:40:33 kcr Exp $
  *
  */
 
 #ifndef lint
 static char rcsid_mkds_c[] =
-    "$Id: mkds.c,v 1.21 1999-01-22 23:10:10 ghudson Exp $";
+    "$Id: mkds.c,v 1.22 1999-02-02 20:40:33 kcr Exp $";
 #endif lint
 
 #include <discuss/discuss.h>
@@ -32,7 +32,7 @@ static char rcsid_mkds_c[] =
 #include <netdb.h>
 #include <pwd.h>
 #include <errno.h>
-#ifdef SOLARIS
+#if HAVE_FCNTL_H
 #include <fcntl.h>
 #endif
 

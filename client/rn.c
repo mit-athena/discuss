@@ -6,13 +6,13 @@
  *
  */
 /*
- *	$Id: rn.c,v 1.15 1999-01-22 23:09:33 ghudson Exp $
+ *	$Id: rn.c,v 1.16 1999-02-02 20:39:50 kcr Exp $
  *
  */
 
 #ifndef lint
 static char rcsid_update_c[] =
-    "$Id: rn.c,v 1.15 1999-01-22 23:09:33 ghudson Exp $";
+    "$Id: rn.c,v 1.16 1999-02-02 20:39:50 kcr Exp $";
 #endif /* lint */
 
 #include <discuss/discuss.h>
@@ -22,7 +22,7 @@ static char rcsid_update_c[] =
 #include <sys/file.h>
 #include <sys/ioctl.h>
 
-#ifdef POSIX
+#if HAVE_TERMIOS_H
 #include <termios.h>
 #endif
 
@@ -219,17 +219,7 @@ more_break(prompt, cmds)
 {
 	int arg;
 	char buf[1];
-#ifndef POSIX
-	struct sgttyb tty, ntty;
-
-	arg = FREAD;				/* Flush pending input */
-	ioctl(0, TIOCFLUSH, &arg);
-	ioctl(0, TIOCGETP, &tty);		/* Get parameters.. */
-	ntty = tty;
-	ntty.sg_flags |= CBREAK;
-	ntty.sg_flags &= ~ECHO;
-	ioctl(0, TIOCSETP, &ntty);		/* go to cbreak, ~echo */
-#else
+#if HAVE_TERMIOS_H
 	struct termios tty, ntty;
 
 	(void) tcflush(0, TCIFLUSH);
@@ -240,6 +230,16 @@ more_break(prompt, cmds)
         ntty.c_iflag &= ~(ICRNL);
         ntty.c_lflag &= ~(ICANON|ISIG|ECHO);
 	(void) tcsetattr(0, TCSANOW, &ntty);
+#else
+	struct sgttyb tty, ntty;
+
+	arg = FREAD;				/* Flush pending input */
+	ioctl(0, TIOCFLUSH, &arg);
+	ioctl(0, TIOCGETP, &tty);		/* Get parameters.. */
+	ntty = tty;
+	ntty.sg_flags |= CBREAK;
+	ntty.sg_flags &= ~ECHO;
+	ioctl(0, TIOCSETP, &ntty);		/* go to cbreak, ~echo */
 #endif
 	write(1, prompt, strlen(prompt));
 	for (;;)  {
@@ -251,7 +251,7 @@ more_break(prompt, cmds)
 			break;
 		write(1, "\7", 1);
 	}
-#ifdef POSIX
+#if HAVE_TERMIOS_H
 	(void) tcsetattr(0, TCSANOW, &tty);
 #else
 	ioctl(0, TIOCSETP, &tty);
