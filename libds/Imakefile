@@ -1,5 +1,5 @@
 #
-# $Id: Imakefile,v 1.1 1991-07-30 09:48:09 lwvanels Exp $
+# $Id: Imakefile,v 1.2 1991-07-30 09:58:06 lwvanels Exp $
 #
 
 ProfiledObjectRule()
@@ -17,6 +17,8 @@ KOBJS=	res_module.k.o auth_krb.o
 NKOBJS=	res_module.nk.o auth_dum.o
 
 LIBS=	libds.a libdsk.a libds_p.a libdsk_p.a
+
+install_library(dsk,$(ATHLIBDIR))
 
 all::	$(LIBS)
 clean::
