@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.28 1987-03-22 04:33:23 spook Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.29 1987-04-08 03:54:00 wesommer Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
@@ -9,6 +9,9 @@
  *	ss library for the command interpreter.
  *
  *      $Log: not supported by cvs2svn $
+ * Revision 1.28  87/03/22  04:33:23  spook
+ * *** empty log message ***
+ * 
  * Revision 1.26  86/12/14  12:04:11  spook
  * Fix implementation of -editor, -no_editor that was breaking things
  * elsewhere...
@@ -96,7 +99,7 @@
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.28 1987-03-22 04:33:23 spook Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.29 1987-04-08 03:54:00 wesommer Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -105,6 +108,7 @@ static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athe
 #include <strings.h>
 #include <sys/wait.h>
 #include <pwd.h>
+#include <ctype.h>
 #include "ss.h"
 #include "tfile.h"
 #include "interface.h"
@@ -243,6 +247,27 @@ main(argc, argv)
 	pgm = malloc(64);
 	(void) sprintf(temp_file, "/tmp/mtg%d.%d", (int)getuid(), getpid());
 
+	if (code = find_rc_filename()) {
+		register char *prompt;
+		ss_perror(sci_idx, code, "");
+		fprintf(stderr, "\n\
+If you are using discuss for the first time, or if you have only used the\n\
+experimental version of discuss, you need to run the 'dsc_setup'\n\
+command from the shell.\n\n");
+		fflush(stderr);
+		prompt = "Run dsc_setup now? (y or n) ";
+		while (getyn(prompt, 'y')) {
+			printf("\nRunning setup...\n");
+			system("dsc_setup");
+			if (code = find_rc_filename()) {
+				ss_perror(sci_idx, code, "");
+				prompt = 
+		  "\nThat didn't seem to work; try again? (y or n)";
+			} else break;
+		}
+	}
+	if (code) log_warning(code, "- continuing anyway");
+
 	if (initial_meeting != (char *)NULL) {
 		(void) sprintf(buffer, "goto %s", initial_meeting);
 		ss_execute_line(sci_idx, buffer, &code);
@@ -258,4 +283,21 @@ main(argc, argv)
 		(void) ss_listen (sci_idx, &code);
 	(void) unlink(temp_file);
 	leave_mtg();				/* clean up after ourselves */
+}
+
+int
+getyn(prompt,def)
+char *prompt,def;
+{
+	char yn_inp[128];
+
+	for (;;) {
+		(void) printf("%s ",prompt);
+		(void) gets(yn_inp);
+		if (yn_inp[0] == '\0')
+			yn_inp[0] = def;
+		if (toupper(yn_inp[0]) == 'Y' || toupper(yn_inp[0]) == 'N')
+			return (toupper(yn_inp[0]) == 'Y');
+		printf("Please enter 'Yes' or 'No'\n\n");
+	}
 }
