@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v 1.4 1987-03-17 02:26:11 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v 1.5 1987-03-25 15:03:51 srz Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
@@ -8,6 +8,10 @@
  *	Originally written for the discuss system by Bill Sommerfeld
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.4  87/03/17  02:26:11  srz
+ * Changed set_acl not to return static storage.  Also, let has_privs
+ * bypass access checks (in case of linked in programs)
+ * 
  * Revision 1.3  87/02/04  15:53:41  srz
  * uid_t lossage
  * 
@@ -29,7 +33,7 @@
 #include <strings.h>
 
 #ifndef lint
-static char *rcsid_acl_core_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v 1.4 1987-03-17 02:26:11 srz Exp $";
+static char *rcsid_acl_core_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v 1.5 1987-03-25 15:03:51 srz Exp $";
 #endif lint
 
 extern Acl *mtg_acl;
@@ -108,7 +112,7 @@ get_access(mtg_name, princ_name, modes, code)
 		return;
 	}
 
-	if(!has_mtg_access('s')) {
+	if(!has_mtg_access('s') && strcmp (princ_name, rpc_caller)) {	/* can always check own access */
 		*code = NO_ACCESS;
 		return;
 	}
