@@ -1,9 +1,14 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v 1.12 1987-10-24 02:39:01 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v 1.13 1989-02-25 16:54:47 srz Exp $
  *	$Locker:  $
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.12  87/10/24  02:39:01  wesommer
+ * Robustified.
+ * 
+ * Allowed to work on non-local meetings.
+ * 
  * Revision 1.11  87/04/25  10:12:03  spook
  * Changed not to break if announcement of new meeting fails.
  * 
@@ -34,7 +39,7 @@
  */
 
 #ifndef lint
-static char rcsid_mkds_c[] = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v 1.12 1987-10-24 02:39:01 wesommer Exp $";
+static char rcsid_mkds_c[] = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v 1.13 1989-02-25 16:54:47 srz Exp $";
 #endif lint
 
 #include "tfile.h"
@@ -57,6 +62,7 @@ static char rcsid_mkds_c[] = "$Header: /afs/dev.mit.edu/source/repository/athena
 
 char default_dir[] = "/usr/spool/discuss";
 char *whoami;
+int  interrupt = 0;
 
 char *getenv(), *malloc();
 
