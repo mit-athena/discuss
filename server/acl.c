@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl.c,v 1.9 1987-10-24 07:02:44 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl.c,v 1.10 1988-09-23 17:03:09 raeburn Exp $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
  *
@@ -8,6 +8,9 @@
  *	along with routines to move them to and from files.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.9  87/10/24  07:02:44  wesommer
+ * A bit more robustness.
+ * 
  * Revision 1.8  87/10/24  00:53:39  wesommer
  * Robustify the acl_read routine.
  * 
@@ -37,25 +40,31 @@
  * 
  */
 
+#ifndef __STDC__
+#define const
+#endif
+
 #ifndef lint
-static char *rcsid_acl_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl.c,v 1.9 1987-10-24 07:02:44 wesommer Exp $";
+static const char rcsid_acl_c[] =
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl.c,v 1.10 1988-09-23 17:03:09 raeburn Exp $";
 #endif lint
 
-#include "../include/acl.h"
-#include "../include/dsc_et.h"
 #include <stdio.h>
 #include <strings.h>
 #include <ctype.h>
+#include <discuss/discuss.h>
+#include <discuss/internal.h>
 
 char *malloc(), *realloc();
 char *acl_union(), *acl_intersection(), *acl_subtract();
+static void panic ();
 
 bool acl_check(list, principal, modes)
-     Acl *list;
-     char *principal;
-     char *modes;
+    dsc_acl *list;
+    const char *principal;
+    const char *modes;
 {
-	register acl_entry *ae;
+	register dsc_acl_entry *ae;
 	register int n;
 	for (ae = list->acl_entries, n=list->acl_length;
 	     n;
@@ -67,28 +76,29 @@ bool acl_check(list, principal, modes)
 	return (FALSE);
 }
 
-Acl *acl_read(fd)
-     int fd;
+dsc_acl *acl_read(fd)
+    int fd;
 {
 	static char buf[128];
 	FILE *f=fdopen(dup(fd), "r");
 	register char *cp;
 	register int n;
-	register acl_entry *ae;
-	register Acl *list;
+	register dsc_acl_entry *ae;
+	register dsc_acl *list;
 
 	if (!f) return NULL;	/* oops. */
 	
-	list = (Acl *) malloc(sizeof(Acl));
+	list = (dsc_acl *) malloc(sizeof(dsc_acl));
 	if (!list) goto punt;
-	list->acl_entries = (acl_entry *)NULL;
+	list->acl_entries = (dsc_acl_entry *)NULL;
 	list->acl_length = 0;
 	
 	if (fgets(buf, 128, f) == NULL) goto punt;
 	if (!isdigit((unsigned)buf[0])) goto punt;
 	
 	n=atoi(buf);
-	list->acl_entries = (acl_entry *)malloc((unsigned)(n * sizeof(acl_entry)));
+	list->acl_entries =
+	    (dsc_acl_entry *)malloc((unsigned)(n * sizeof(dsc_acl_entry)));
 	if (!list->acl_entries) goto punt;
 	
 	list->acl_length = 0;
@@ -124,11 +134,11 @@ punt:
 
 bool acl_write(fd, list)
      int fd;
-     Acl *list;
+     dsc_acl *list;
 {
 	FILE *f=fdopen(dup(fd), "w");
 	register int n;
-	register acl_entry *ae;
+	register dsc_acl_entry *ae;
 	char buf[BUFSIZ];
 	int len;
 
@@ -151,12 +161,12 @@ punt:
 }
 
 acl_add_access(list, principal, modes)
-     Acl *list;
-     char *principal;
-     char *modes;
+    dsc_acl *list;
+    const char *principal;
+    const char *modes;
 {
 	register int n;
-	register acl_entry *ae;
+	register dsc_acl_entry *ae;
 	char *new_modes;
 	for(ae=list->acl_entries, n=list->acl_length; n; --n, ++ae) {
 		if (!strcmp(ae->principal, principal)) {
@@ -171,8 +181,10 @@ acl_add_access(list, principal, modes)
 	 * Realloc the world - or at least the vector.
 	 */
 	list->acl_length++;
-	list->acl_entries = (acl_entry *) realloc((char *)(list->acl_entries),
-						  (unsigned)(list->acl_length * sizeof(acl_entry)));
+	list->acl_entries =
+	    (dsc_acl_entry *) realloc((char *)(list->acl_entries),
+				  (unsigned)(list->acl_length
+					     * sizeof(dsc_acl_entry)));
 	ae = list->acl_entries + list->acl_length - 2;
 	/*
 	 * Is the last entry "*"?  If so, push it back one.
@@ -194,11 +206,11 @@ acl_add_access(list, principal, modes)
 
 #ifdef notdef
 acl_delete_modes(list, principal, modes)
-     Acl *list;
+     dsc_acl *list;
      char *principal;
      char *modes;
 {
-	register acl_entry *ae, *ae1;
+	register dsc_acl_entry *ae, *ae1;
 	register int n;
 	char *new_modes;
 	for(ae=list->acl_entries, n=list->acl_length; n; --n, ++ae) {
@@ -219,17 +231,17 @@ cleanup:
 		for (; ae <ae1; ae++) *ae= *(ae+1);
 		list->acl_length--;
 		list->acl_entries = (acl_entry *) realloc(list->acl_entries,
-				       list->acl_length * sizeof(acl_entry));
+				       list->acl_length * sizeof(dsc_acl_entry));
 	}
 
 }	       
 #endif notdef
 acl_replace_access(list, principal, modes)
-     Acl *list;
-     char *principal;
-     char *modes;
+    dsc_acl *list;
+    const char *principal;
+    const char *modes;
 {
-	register acl_entry *ae;
+	register dsc_acl_entry *ae;
 	register int n;
 	for(ae=list->acl_entries, n=list->acl_length; n; --n, ++ae) {
 		if (!strcmp(ae->principal, principal)) {
@@ -245,10 +257,10 @@ acl_replace_access(list, principal, modes)
 
 bool
 acl_delete_access(list, principal)
-	Acl *list;
-	char *principal;
+	dsc_acl *list;
+	const char *principal;
 {
-	register acl_entry *ae;
+	register dsc_acl_entry *ae;
 	register int n;
 	for(ae=list->acl_entries, n=list->acl_length; n; --n, ++ae) {
 		if (!strcmp(ae->principal, principal)) {
@@ -267,23 +279,23 @@ acl_delete_access(list, principal)
  * Return empty ACL
  */
 
-Acl *acl_create()
+dsc_acl *acl_create()
 {
-	register Acl *result = (Acl *) malloc(sizeof(Acl));
+	register dsc_acl *result = (dsc_acl *) malloc(sizeof(dsc_acl));
 	result->acl_length=0;
-	result->acl_entries=(acl_entry *) malloc(sizeof(acl_entry));
+	result->acl_entries=(dsc_acl_entry *) malloc(sizeof(dsc_acl_entry));
 	return(result);
 }
 
-Acl *acl_copy (old_acl)
-Acl *old_acl;
+dsc_acl *acl_copy (old_acl)
+    dsc_acl *old_acl;
 {
-     register Acl *new_acl = (Acl *) malloc (sizeof(Acl));
-     register acl_entry *old_ae,*new_ae;
+     register dsc_acl *new_acl = (dsc_acl *) malloc (sizeof(dsc_acl));
+     register dsc_acl_entry *old_ae,*new_ae;
      register int n;
 
      new_acl -> acl_length = old_acl -> acl_length;
-     new_acl -> acl_entries = (acl_entry *) malloc ((unsigned)(new_acl -> acl_length * sizeof(acl_entry)));
+     new_acl -> acl_entries = (dsc_acl_entry *) malloc ((unsigned)(new_acl -> acl_length * sizeof(dsc_acl_entry)));
 
      for (old_ae = old_acl->acl_entries, new_ae = new_acl->acl_entries, n=new_acl->acl_length;
 	  n;
@@ -297,13 +309,11 @@ Acl *old_acl;
      return (new_acl);
 }
 
-
-
-char *acl_get_access(list, principal)
-	Acl *list;
-	char *principal;
+const char *acl_get_access(list, principal)
+	dsc_acl *list;
+	const char *principal;
 {
-	register acl_entry *ae;
+	register dsc_acl_entry *ae;
 	register int n;
 
 	for(ae=list->acl_entries, n=list->acl_length; n; --n, ++ae) {
@@ -319,9 +329,9 @@ char *acl_get_access(list, principal)
  */
 
 acl_destroy(list)
-     Acl *list;
+     dsc_acl *list;
 {
-	register acl_entry *ae;
+	register dsc_acl_entry *ae;
 	register int n;
 	if(!list) return;
 	for (ae=list->acl_entries, n=list->acl_length;
@@ -338,7 +348,7 @@ acl_destroy(list)
  * Returns true if every character of s1 occurs in s2.
  */
 bool acl_is_subset(s1, s2)
-     register char *s1, *s2;
+     register const char *s1, *s2;
 {
 	register char *last;
 	while(*s1 && (last = index(s2, *s1))) s1++;
@@ -352,7 +362,7 @@ bool acl_is_subset(s1, s2)
  * when not needed.
  */
 char *acl_intersection(s1, s2)
-     register char *s1, *s2;
+     register const char *s1, *s2;
 {
 	register char *result=malloc(1);
 	register int resp=0;
@@ -369,7 +379,7 @@ char *acl_intersection(s1, s2)
 }
 
 char *acl_union(s1, s2)
-     register char *s1, *s2;
+     register const char *s1, *s2;
 {
 	register int resp=strlen(s2);
 	register char *result=malloc((unsigned)(resp+1));
@@ -386,7 +396,7 @@ char *acl_union(s1, s2)
 }
 
 char *acl_subtract(s1, s2)
-     register char *s1, *s2;
+     register const char *s1, *s2;
 {
 	register char *result = malloc(1);
 	register int len=0;
@@ -408,10 +418,10 @@ char *acl_subtract(s1, s2)
  */
 
 char *acl_canon(s1, s2, code)
-	register char *s1, *s2;
+	register const char *s1, *s2;
 	int *code;
 {
-	register char *cp;
+	register const char *cp;
 	register char *out;
 	register int len, maxlen;
 
@@ -441,7 +451,7 @@ char *acl_canon(s1, s2, code)
 main() 
 {
 	int fd;
-	Acl *a;
+	dsc_acl *a;
 
 	printf("%s * %s = %s\n", "eabce", "abcd", 
 	       acl_intersection("eabce", "abcd"));
@@ -469,8 +479,7 @@ main()
 }
 #endif TESTS
 
-static
-panic(s)
+static void panic(s)
 	char *s;
 {
 	printf(s);
