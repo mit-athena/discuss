@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v 1.7 1988-04-22 21:21:03 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v 1.8 1988-05-05 23:11:41 srz Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
@@ -11,7 +11,7 @@
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v 1.7 1988-04-22 21:21:03 srz Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v 1.8 1988-05-05 23:11:41 srz Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -94,12 +94,6 @@ repl(argc, argv)
 
 	if (!dsc_public.attending) {
 		ss_perror(sci_idx, 0, "No current meeting.\n");
-		return;
-	}
-	dsc_get_mtg_info(&dsc_public.nb,
-			 &dsc_public.m_info, &code);
-	if (code != 0) {
-		(void) ss_perror(sci_idx, code, "Can't get meeting info");
 		return;
 	}
 
@@ -196,6 +190,10 @@ repl(argc, argv)
 	if (dsc_public.highest_seen == txn_no -1) {
 		dsc_public.highest_seen = txn_no;
 	}
+
+	/* Update last */
+	dsc_public.m_info.last = txn_no;
+	dsc_public.m_info.highest = txn_no;
 
 abort:
 	free(t_info.subject);
