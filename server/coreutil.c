@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.8 1987-08-22 18:12:30 rfrench Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.9 1988-01-05 01:08:02 rfrench Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
@@ -11,6 +11,9 @@
  *		  in-memory superblock, and to open & close meetings.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.8  87/08/22  18:12:30  rfrench
+ * Added Zephyr notifications
+ * 
  * Revision 1.7  87/03/25  15:04:31  srz
  * toma change:  Expanded has_mtg_access to take more modes as arguments
  * 
@@ -37,7 +40,7 @@
  */
 
 #ifndef lint
-static char *rcsid_coreutil_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.8 1987-08-22 18:12:30 rfrench Exp $";
+static char *rcsid_coreutil_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.9 1988-01-05 01:08:02 rfrench Exp $";
 #endif lint
 
 #include "../include/types.h"
@@ -556,6 +559,7 @@ char *str;
      perror("discuss");
      exit(1);
 }
+#ifdef ZEPHYR
 /*
  *
  * mtg_znotify -- send off a Zephyr notification as appropriate
@@ -625,3 +629,4 @@ mtg_znotify(mtg_name, subject, author)
 		}
 	}
 }
+#endif ZEPHYR

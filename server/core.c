@@ -11,7 +11,7 @@
 /*
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.18 1987-10-24 00:46:31 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.19 1988-01-05 01:08:44 rfrench Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
@@ -21,6 +21,10 @@
  *		callable routines.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.18  87/10/24  00:46:31  wesommer
+ * Change acl name to "acl" instead of ".ds_acl"
+ * Change default (if no acl file there) to be deny permission.
+ * 
  * Revision 1.17  87/10/23  23:49:15  wesommer
  * Implemented access control on meeting creation.
  * 
@@ -45,7 +49,7 @@
  *
  */
 #ifndef lint
-static char *rcsid_core_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.18 1987-10-24 00:46:31 wesommer Exp $";
+static char *rcsid_core_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.19 1988-01-05 01:08:44 rfrench Exp $";
 #endif lint
 
 
@@ -266,10 +270,12 @@ int *result;
 
      super.trn_fsize = fsize (u_trn_f);
 
+#ifdef ZEPHYR
      /* Send this out...we want to do this BEFORE calling write_super
       * because things get freed...
       */
      mtg_znotify(mtg_name, subject, author);
+#endif ZEPHYR
      
      /* all done, start winding down */
      write_super();
