@@ -8,7 +8,7 @@
 
 #ifndef lint
 #ifndef SABER
-static char *RCSid = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/dsgrep/dsgrep.c,v 1.8 1997-10-03 17:44:00 ghudson Exp $";
+static char *RCSid = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/dsgrep/dsgrep.c,v 1.9 1997-12-03 21:52:26 ghudson Exp $";
 #endif
 #endif
 
@@ -20,7 +20,6 @@ static char *RCSid = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/dis
 #include <string.h>
 #include <ctype.h>
 #include <sys/file.h>
-#include <sys/errno.h>
 #include <sys/types.h>
 #include <sys/param.h>
 #include <sys/stat.h>
@@ -33,10 +32,6 @@ static char *RCSid = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/dis
 extern tfile unix_tfile();
 extern tfile mem_tfile();
 extern char *malloc(),*calloc();
-
-extern int errno;
-extern char *sys_errlist[];
-extern int sys_nerr;
 
 int verbose_errors;
 int bsize;
