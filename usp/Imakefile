@@ -1,0 +1,18 @@
+#
+# $Id: Imakefile,v 1.1 1991-07-30 09:54:21 lwvanels Exp $
+#
+
+OBJS=	main.o block.o get.o put.o internal.o
+USPET=	../../ets/usp_et.o
+
+ProfiledObjectRule()
+
+all::	libusp.a libusp_p.a
+
+libusp.a: $(OBJS) $(USPET)
+	ar cru $@ $(OBJS) $(USPET)
+	$(RANLIB) $@
+
+libusp_p.a: $(OBJS) $(USPET)
+	cd profiled; ar cru ../$@ $(OBJS) ../$(USPET)
+	$(RANLIB) $@
