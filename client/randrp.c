@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/randrp.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/randrp.c,v 1.2 1988-01-04 22:40:46 balamac Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/randrp.c,v 1.3 1988-01-18 14:36:13 balamac Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1988 by the Student Information Processing Board
@@ -10,7 +10,7 @@
  */
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/randrp.c,v 1.2 1988-01-04 22:40:46 balamac Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/randrp.c,v 1.3 1988-01-18 14:36:13 balamac Exp $";
 #endif lint
 
 #include "types.h"
@@ -32,6 +32,7 @@ randrp(argc, argv, sci_idx)
 	int rnd_trn;
 	int noeditor = FALSE;
 	trn_info t_info;
+	trn_nums current_transaction;
 
 	while (++argv, --argc) {
 		if (!strcmp (*argv, "-meeting") || !strcmp (*argv, "-mtg")) {
@@ -74,12 +75,20 @@ randrp(argc, argv, sci_idx)
 		return;
 	}
 
+	/* Need to preserve current transaction across the call to reply */
+
+	current_transaction = dsc_public.current;
+
 	do {
 		rnd_num = random();
 		active_transactions =
 			(dsc_public.m_info.last - dsc_public.m_info.first);
-		rnd_trn = (dsc_public.m_info.first +
-			   (rnd_num % active_transactions));
+		if (active_transactions != 0) {
+			rnd_trn = (dsc_public.m_info.first +
+				   (rnd_num % active_transactions));
+		} else {
+			rnd_trn = dsc_public.m_info.first;
+		}
 		dsc_get_trn_info(&dsc_public.nb, rnd_trn, &t_info, &code);
 	} while (code != 0);
 		
@@ -96,6 +105,7 @@ randrp(argc, argv, sci_idx)
 		ss_execute_line(sci_idx, buffer, &code);
 	}
 
+	dsc_public.current = current_transaction;
 	if (code != 0) {
 		ss_perror(sci_idx, code, buffer);
 		return;
