@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.46 1989-01-05 00:11:59 raeburn Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.47 1989-01-05 05:00:36 raeburn Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
@@ -13,7 +13,7 @@
 
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.46 1989-01-05 00:11:59 raeburn Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.47 1989-01-05 05:00:36 raeburn Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -131,7 +131,7 @@ int main (argc, argv)
 
 		if (user_pw == NULL) {
 		     fprintf(stderr,
-			 "You do not appear /etc/passwd.  Cannot continue.\n");
+		 "You do not appear in /etc/passwd.  Cannot continue.\n");
 		     exit(1);
 		}
 		user = user_pw -> pw_name;
@@ -178,7 +178,7 @@ command from the shell.\n\n");
 		  } else break;
 	     }
 	     if (code)
-		 ss_perror (sci_idx, code, "- continuing anyway");
+		 exit (1);
 	}
 	else if (!quit) {
 	     printf("Discuss version %s.  Type '?' for a list of commands.\n",
@@ -212,9 +212,9 @@ int getyn(prompt,def)
 
 	for (;;) {
 		(void) printf("%s ",prompt);
-		if (fgets (inp, stdin, 128) == NULL)
+		if (fgets (inp, 128, stdin) == NULL)
 		    return FALSE;
-		else if (inp[0] = '\n')
+		else if (inp[0] == '\n')
 		    inp[0] = def;
 		if (inp[0] == 'y' || inp[0] == 'Y')
 		    return 1;
