@@ -1,9 +1,10 @@
 #include <strings.h>
 #include <stdio.h>
 #include "../include/types.h"
-#include "../include/dsname.h"
+#include "../include/interface.h"
+#include "globals.h"
 
-extern char *malloc();
+extern char *malloc(),*ctime();
 
 static char *user, *realm;
 static int print_header;
@@ -15,7 +16,7 @@ do_mtg(mtg_name)
 	name_blk *set;
 	register name_blk *nbp;
 	int n_matches, i, code;
-	bool updated;
+	bool updated,this_mtg;
 
 	expand_mtg_set(realm, user, mtg_name, &set, &n_matches);
 	for (i = 0; i < n_matches; i++) {
@@ -28,25 +29,38 @@ do_mtg(mtg_name)
 			print_header = 0;
 		}
 		nbp = &set[i];
-		updated_mtg(nbp -> unique_id,
-			    nbp -> date_attended,
-			    nbp -> last,
-			    &updated,
-			    &code);
-/*		if (code) {
-			fprintf(stderr, "Error checking meeting %s: %s\n",
-				nbp -> unique_id, error_message(code));
+		/* Test to see if we are attending this meeting */
+		if (dsc_public.attending && !strcmp(dsc_public.mtg_uid, nbp -> unique_id)) {
+		     updated = (dsc_public.highest_seen < dsc_public.m_info.last);
+		     this_mtg = TRUE;
+		} else {
+		     this_mtg = FALSE;
+		     dsc_updated_mtg(nbp -> unique_id,
+				     nbp -> date_attended,
+				     nbp -> last,
+				     &updated,
+				     &code);
+		     if (code) {
+			  fprintf(stderr, "Error checking meeting %s: %s\n",
+				  nbp -> unique_id, error_message(code));
+			  continue;
+		     }
 		}
-		else {
-*/
-			printf("%-7.7s %-30.30s   [%04d]    %s",
-			       updated ? "   *   " : "",
-			       nbp -> mtg_name,
-			       nbp -> last,
-			       ctime(&(nbp -> date_attended)));
-/*		}*/
-	}
-}
+		if (updated)
+		     printf("   *    %-30.30s   [%04d]    %s",
+			    nbp -> mtg_name,
+			    nbp -> last,
+			    this_mtg ? "NOW ATTENDING\n" 
+			             : (nbp -> date_attended == 0) ? "\n"
+			    			: ctime(&(nbp -> date_attended)));
+		else
+		     printf("        %-30.30s    *END*    %s",
+			    nbp -> mtg_name,
+			    this_mtg ? "NOW ATTENDING\n" 
+			             : (nbp -> date_attended == 0) ? "\n"
+			    			: ctime(&(nbp -> date_attended)));
+	   }
+   }
 
 list_meetings (sci_idx, argc, argv)
 	int sci_idx, argc;
@@ -69,9 +83,23 @@ list_meetings (sci_idx, argc, argv)
 				free(used);
 				return;
 			}
+			if (user[0] != '\0') {
+			     fprintf(stderr,
+				     "Only one of -user, -public allowed\n");
+			     goto punt;
+			}
 			used[i] = 1;
 			user = argv[++i];
 			used[i] = 1;
+		}
+		else if (!strcmp(argv[i],"-public")) {
+		     if (user[0] != '\0') {
+			  fprintf(stderr,
+				  "Only one of -user, -public allowed\n");
+			  goto punt;
+		     }
+		     user = "discuss";
+		     used[i] = 1;
 		}
 		else if (*argv[i] == '-') {
 			fprintf(stderr,
@@ -92,4 +120,7 @@ list_meetings (sci_idx, argc, argv)
 		if (!used[i])
 			do_mtg(argv[i]);
 	}
+
+punt:
+	free(used);
 }
