@@ -180,7 +180,7 @@ char *krb_host;
 	do {
 	     if (isupper(*sp)) *dp=tolower(*sp);
 	     else *dp = *sp;
-	} while (*dp++,*sp && (*sp++ != '.'));
+	} while (dp++,*sp && (*sp++ != '.'));
 	*(--dp) = NULL;
 
 	/* heuristics */
