@@ -2,7 +2,7 @@
  *
  * List request for DISCUSS
  *
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.23 1989-03-28 23:07:55 srz Exp $
+ * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.24 1989-05-02 18:34:23 raeburn Exp $
  * $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v $
  * $Locker:  $
  *
@@ -11,7 +11,7 @@
  */
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.23 1989-03-28 23:07:55 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.24 1989-05-02 18:34:23 raeburn Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -27,8 +27,9 @@ static trn_info2 t_info;
 static list_it(),delete_it(),retrieve_it();
 static int performed;		/* true if trn was acted upon */
 static int barred;		/* true if access was denied sometime */
-static int only_initial;
+static int only_initial;	/* kludges... */
 static int long_subjects;
+static int flag_set, flag_reset;
 static int setting;		/* Whether we are turning flag on or off */
 
 void map_trns();
@@ -57,10 +58,15 @@ int *codep;
 		goto punt;
 	}
 
+	*codep = 0;
 	if (t_infop->pref && only_initial) {
-		*codep = 0;
 		goto punt;
 	}
+
+	if (flag_set && !flag_reset && (t_infop->flags & TRN_FLAG1) == 0)
+		goto punt;
+	if (!flag_set && flag_reset && (t_infop->flags & TRN_FLAG1) != 0)
+		goto punt;
 
 	if (!performed) {
 	    performed = TRUE;
@@ -105,7 +111,8 @@ list (argc, argv, sci_idx)
 {
 	char **ap, **ap2, **nargv;
 	int ac;
-	long_subjects = 0;
+
+	long_subjects = flag_set = flag_reset = 0;
 
 	for (ap = argv; *ap; ap++)
 	    ;
@@ -114,6 +121,10 @@ list (argc, argv, sci_idx)
 	for (ap = argv, ap2 = nargv; *ap; ap++) {
 	    if (!strcmp (*ap, "-long_subjects") || !strcmp (*ap, "-lsj"))
 		long_subjects = 1;
+	    else if (!strcmp (*ap, "-flag_set"))
+		flag_set = 1;
+	    else if (!strcmp (*ap, "-flag_reset"))
+		flag_reset = 1;
 	    else
 		*ap2++ = *ap, ac++;
 	}
