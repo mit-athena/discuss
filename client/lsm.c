@@ -1,15 +1,15 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v 1.19 1988-06-17 23:17:03 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v 1.20 1988-12-05 14:06:08 raeburn Exp $
  *
  */
 
 #ifndef lint
-static char *rcsid_lsm_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v 1.19 1988-06-17 23:17:03 srz Exp $";
+static char rcsid_lsm_c[] =
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v 1.20 1988-12-05 14:06:08 raeburn Exp $";
 #endif lint
 
-
-#include <strings.h>
+#include <string.h>
 #include <stdio.h>
 #include "types.h"
 #include "interface.h"
@@ -33,48 +33,40 @@ int do_line(nbp, code, updated)
 	register name_blk *nbp;
 	int code, updated;
 {
+	/*
+	 * Output format:  8-char flags field (including trailing
+	 * spaces), followed by a ", "-separated list of meetings
+	 * names, and newline.
+	 *
+	 * If an error occurred, 22+ characters of the first meeting
+	 * name are printed (padded with whitespace), followed by a
+	 * parenthesized error message.
+	 */
+	char **namep;
 	if (print_header) {
 	        char *fmt = "%-7s %-22s   %-22s\n";
 		last_host[0] = '\0';
 		last_path[0] = '\0';
-		printf(fmt, " Flags", "Meeting ID", "Short name");
-		printf(fmt, " -----", "----------", "----------");
+		printf (" Flags  Meeting\n");
+		printf (" -----  -------\n");
 		print_header = 0;
 	}
 	if (code) {
-		printf("        %-22s   %s", nbp->aliases[0],
-		       nbp->aliases[1] ? nbp->aliases[1] : "");
-		printf(" (%s", 
-		       error_message(code));
-		switch (code) {
-		case ECONNREFUSED:
-			printf(" by");
-			goto hostn;
-		case ETIMEDOUT:
-			printf(" with");
-			goto hostn;
-		case RPC_HOST_UNKNOWN:
-		hostn:
-			printf(" %s", nbp->hostname);
-			break;
-				
-		default:
-			;
-		}
-		printf(")\n");
+		printf("        %-22s (%s %s%s)\n", nbp->aliases[0],
+		       error_message (code),
+		       (code == ECONNREFUSED) ? "by "
+		       : ((code == ETIMEDOUT) ? "with " : ""),
+		       nbp->hostname);
 		return 0;
 	}
 	if(!strcmp(last_host,nbp->hostname)&&!strcmp(last_path,nbp->pathname))
-		printf("        %-22s   %s\n","",nbp->aliases[0]);
-	else {
-		printf(" %c      %-22s   %*s",updated?'c':' ',
-		       nbp->aliases[0],
-		       updated?-22:0,
-		       (nbp->aliases[1] ? nbp->aliases[1] : ""));
-		printf("\n");
-		strcpy(last_host,nbp->hostname);
-		strcpy(last_path,nbp->pathname);
-	}
+	    updated = 0;
+	printf (" %c      %s", updated ? 'c' : ' ', nbp->aliases[0]);
+	for (namep = &nbp->aliases[1]; *namep; namep++)
+	    printf (", %s", *namep);
+	printf ("\n");
+	strcpy(last_host,nbp->hostname);
+	strcpy(last_path,nbp->pathname);
 	return 0;
 }
 
