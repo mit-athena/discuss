@@ -8,7 +8,7 @@
 /*
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/res_module.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/res_module.c,v 1.9 1990-06-03 16:44:03 raeburn Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/res_module.c,v 1.10 1990-12-01 22:40:09 eichin Exp $
  *
  * resolve_module () --
  *	Can you say "Put all the configuration into one file?"  Can you
@@ -20,6 +20,9 @@
  *	the remote function is executed as a subprocess.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.9  90/06/03  16:44:03  raeburn
+ * jtkohl's patches to DTRT wrt Kerberos realm determination
+ * 
  * Revision 1.8  89/06/03  00:21:31  srz
  * Added standard copyright notice.
  * 
@@ -33,7 +36,7 @@
 
 #ifndef lint
 static char rcsid_res_module_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/res_module.c,v 1.9 1990-06-03 16:44:03 raeburn Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/res_module.c,v 1.10 1990-12-01 22:40:09 eichin Exp $";
 #endif lint
 
 #include "rpc_et.h"
@@ -92,30 +95,35 @@ void resolve_module (modname, port, hostp, servp, result)
     if (!strncmp (modname, "discuss", 7)) {
 	if (modname [7] == '@') { /* got hostname */
 	    myhnamep = &modname [8];
-	    hp = gethostbyname (myhnamep); /* make it primary */
-	    if (!hp) {
-		extern int h_errno;
-		int h = h_errno;
-		switch (h) {
-		case HOST_NOT_FOUND:
-		    *result = RPC_HOST_UNKNOWN;
-		    break;
-		case TRY_AGAIN:
-		    *result = RPC_NS_TIMEOUT;
-		    break;
-		case NO_RECOVERY:
-		    *result = RPC_NS_ERROR;
-		    break;
-		case NO_ADDRESS:
-		    *result = RPC_NO_ADDR;
-		    break;
-		default:
-		    *result = RPC_NS_ERROR;
+	    /* if the name is blank, use *unprotected* local host and file. */
+	    if(*myhnamep == 0) {
+		myhnamep = "";
+	    } else {
+		hp = gethostbyname (myhnamep); /* make it primary */
+		if (!hp) {
+		    extern int h_errno;
+		    int h = h_errno;
+		    switch (h) {
+		    case HOST_NOT_FOUND:
+			*result = RPC_HOST_UNKNOWN;
+			break;
+		    case TRY_AGAIN:
+			*result = RPC_NS_TIMEOUT;
+			break;
+		    case NO_RECOVERY:
+			*result = RPC_NS_ERROR;
+			break;
+		    case NO_ADDRESS:
+			*result = RPC_NO_ADDR;
+			break;
+			default:
+			*result = RPC_NS_ERROR;
+		    }
+		    return;
 		}
-		return;
+		strcpy (hostname, hp -> h_name);
+		myhnamep = hostname;
 	    }
-	    strcpy (hostname, hp -> h_name);
-	    myhnamep = hostname;
 	} else if (modname [7] == '\0') { /* Just discuss - use current host */
 	    myhnamep = local_host_name ();
 	} else {
@@ -156,7 +164,20 @@ void resolve_module (modname, port, hostp, servp, result)
     }
 
     /* Now we have the host name, and all we have to do is create the
-     * service id & port number.  If this is local, we use the subprocess,
+     * service id & port number. */
+
+    /* If this is in a local file, we use filesystem authentication
+     * and run the non-subsystem subprocess. */
+    if (myhnamep[0] == 0) {
+	*port = 0;
+	*servp = SERVER_LOCAL;
+	*hostp = myhnamep;
+	*result = 0;
+	return;
+    }
+
+    
+    /* If this is local, we use the subprocess,
      * for better authentication */
     if (!namcmp (myhnamep, local_host_name ())) {
 	*port = 0;
