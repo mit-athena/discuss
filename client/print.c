@@ -3,12 +3,15 @@
  *	Print-related requests for DISCUSS.
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.13 1987-04-08 03:54:20 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.14 1987-04-12 00:08:47 spook Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
  *
  *      $Log: not supported by cvs2svn $
+ * Revision 1.13  87/04/08  03:54:20  wesommer
+ * added "next","prev","[np]ref" commands.
+ * 
  * Revision 1.12  87/03/22  04:41:25  spook
  * Changes for new interfaces.
  * 
@@ -51,7 +54,7 @@
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.13 1987-04-08 03:54:20 wesommer Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.14 1987-04-12 00:08:47 spook Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -216,7 +219,6 @@ write_trans(argc, argv)
 {
 	selection_list *trn_list;
 	int fd;
-	int (*old_sig)();
 	int code;
 
 	if (dsc_public.host == (char *)NULL) {
