@@ -12,6 +12,9 @@
  *        $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/dsmail.c.old,v $
  *
  *        $Log: not supported by cvs2svn $
+ * Revision 1.15  93/04/28  15:34:41  miki
+ * ported to Solaris2.1
+ * 
  * Revision 1.14  91/07/09  07:15:12  epeisach
  * Fix the EX_CONFIG problem better
  * 
@@ -72,7 +75,23 @@
 #include <sys/types.h>
 #include <sys/file.h>
 #ifdef SOLARIS
-#include "/usr/ucbinclude/sysexits.h"
+#define EX_OK		0	/* successful termination */
+#define EX__BASE	64	/* base value for error messages */
+#define EX_USAGE	64	/* command line usage error */
+#define EX_DATAERR	65	/* data format error */
+#define EX_NOINPUT	66	/* cannot open input */
+#define EX_NOUSER	67	/* addressee unknown */
+#define EX_NOHOST	68	/* host name unknown */
+#define EX_UNAVAILABLE	69	/* service unavailable */
+#define EX_SOFTWARE	70	/* internal software error */
+#define EX_OSERR	71	/* system error (e.g., can't fork) */
+#define EX_OSFILE	72	/* critical OS file missing */
+#define EX_CANTCREAT	73	/* can't create (user) output file */
+#define EX_IOERR	74	/* input/output error */
+#define EX_TEMPFAIL	75	/* temp failure; user is invited to retry */
+#define EX_PROTOCOL	76	/* remote error in protocol */
+#define EX_NOPERM	77	/* permission denied */
+#include <regexpr.h>
 #else
 #include <sysexits.h>
 #endif
@@ -90,7 +109,7 @@
 
 #ifndef	lint
 static char rcsid[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/dsmail.c.old,v 1.15 1993-04-28 15:34:41 miki Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/dsmail.c.old,v 1.16 1994-03-25 16:52:48 miki Exp $";
 #endif
 
 char *malloc(), *realloc ();
@@ -177,13 +196,13 @@ main(argc,argv)
 					(void) strcpy(subject,line+i);
 				}	
 			} else if (list_compare(key, inreplyto)) {
-				if ((cp = index(line,'[')) != 0
-				    && index(++cp, ']')
+				if ((cp = strchr(line,'[')) != 0
+				    && strchr(++cp, ']')
 				    && isdigit (*cp))
 				    reply_to = atoi(cp);
 			}
 			else if (list_compare(key,fromlist)) {
-				cp = index(line, ':');
+				cp = strchr(line, ':');
 				if (cp != NULL) {
 					cp++;
 					extract_full_name(cp, signature, sizeof(signature));
@@ -361,7 +380,7 @@ void PRS(argc,argv)
 		goto lusage;
 	usr_mtg=argv[optind];
 	if (have_host) {
-		usr_mtg = index (usr_mtg, ':');
+		usr_mtg = strchr (usr_mtg, ':');
 		if (!usr_mtg)
 			goto lusage;
 		usr_mtg++;
@@ -380,17 +399,28 @@ char *re_comp();
 int list_compare(s,list)
 	char *s,**list;
 {
-	char *err;
+	char *retval;
 
 	while (*list!=NULL) {
-		err=re_comp(*list++);
-		if (err) {
+#ifdef POSIX
+                retval = compile(*list++, NULL, NULL);
+              if (regerrno) {
+                      fprintf(stderr,"554-%s - %d\n",
+                              progname, regerrno, list[-1]);
+                      exit(EX_CONFIG);
+                      }
+              if (step(s, retval))
+                      return(1);
+#else
+		retval=re_comp(*list++);
+		if (retval) {
 			fprintf(stderr,"554-%s - %s\n",
-				progname, err, list[-1]);
+				progname, retval, list[-1]);
 			exit(EX_CONFIG);
 			}
 		if (re_exec(s))
 			return(1);
+#endif
 	}
 	return(0);
 }
