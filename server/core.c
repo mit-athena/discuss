@@ -806,6 +806,7 @@ int *result;
      info -> chairman = new_string ("");
      info -> long_name = new_string ("");
      info -> location = new_string (mtg_name);
+     info -> public_flag = TRUE;
 
      *result = open_mtg (mtg_name);
      if (*result) return;
@@ -986,42 +987,41 @@ int date_attended, last;
 bool *updated;
 int *result;
 {
-     struct stat buf;
      char str[256];
      int mtg_name_len;
+     mtg_super mysuper; 
+     int uf;
 
      *updated = 0;
      *result = 0;				/* optimist */
 
      mtg_name_len = strlen (mtg_name);
      if (mtg_name[0] != '/' || mtg_name_len == 0 || mtg_name_len > 168 || mtg_name [mtg_name_len-1] == '/') {
-	  return (BAD_PATH);
+	  *result = BAD_PATH;
+	  return;
      }
 
      strcpy (str, mtg_name);
      strcat (str, "/control");
 
-     if (stat (str, &buf) < 0) {
-	  *result = errno;
-	  return;
+     /* time makes no difference in our books */
+     if ((uf = open(str, O_RDWR, 0700)) < 0) {
+	  if (errno == ENOENT)
+	       *result = NO_SUCH_MTG;
+	  else if (errno == EACCES)
+	       *result = NO_ACCESS;
+	  else
+	       *result = BAD_PATH;
+	  goto punt;
      }
 
-     if (buf.st_mtime < date_attended)
-	  return;				/* not updated */
+     /* forget locking (and stuff) for what we're doing */
+     lseek (uf, 0, 0);
+     read (uf, (char *) &mysuper, sizeof (mysuper));
+     close(uf);
 
-     /* It's been modified, so let's go and open it */
-     *result = open_mtg (mtg_name);
-     if (*result) return;
+     *updated = (mysuper.last > last);
 
-     start_read();
-
-     *result = read_super ();
-     if (*result) { core_abort(); return; }
-
-     finish_read();
-
-     *updated = (super.last > last);
-
-     forget_super();
+punt:
      return;
 }
