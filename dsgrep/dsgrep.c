@@ -8,7 +8,7 @@
 
 #ifndef lint
 #ifndef SABER
-static char *RCSid = "$Id: dsgrep.c,v 1.13 1999-02-02 20:39:57 kcr Exp $";
+static char *RCSid = "$Id: dsgrep.c,v 1.14 1999-04-28 01:51:46 danw Exp $";
 #endif
 #endif
 
@@ -52,7 +52,7 @@ main(argc,argv)
   int print_trans,use_re,search_trans,search_deleted,s_trans();
   int case_insens,trans_num;
   int high,low;
-  regex_t *search_re;
+  regex_t search_re;
   tfile tf;
   trn_info2 ti;
   void s_to_lower();
@@ -96,7 +96,7 @@ main(argc,argv)
       }
       break;
     case 'e':
-      if (regcomp(search_re, optarg, REG_NOSUB) != 0) {
+      if (regcomp(&search_re, optarg, REG_NOSUB) != 0) {
 	fprintf(stderr,"dsgrep: Invalid regular expression %s\n",optarg);
 	exit(1);
       }
@@ -127,24 +127,17 @@ main(argc,argv)
       break;
     }
 
-  if (meetings_file == NULL) {  /* Nothing set, use out of home directory */
-    if ((homedir = getenv("HOME")) == NULL) {
-      fprintf(stderr,"dsgrep: could not get HOME environment variable\n");
+  if (meetings_file) {
+    var = malloc(strlen(meetings_file) + strlen("MEETINGS=") + 1);
+    if (var == NULL) {
+      fprintf(stderr,"dsgrep: could not allocate memory\n");
       exit(1);
     }
-    meetings_file = (char *)malloc(256);
-    strcpy(meetings_file,homedir);
-    strcat(meetings_file,"/.meetings");
-  }
-  var = malloc(strlen(meetings_file) + strlen("MEETINGS=") + 1);
-  if (var == NULL) {
-    fprintf(stderr,"dsgrep: could not allocate memory\n");
-    exit(1);
-  }
-  sprintf(var, "MEETINGS=%s", meetings_file);
-  if (putenv(var) == -1) {
-    fprintf(stderr,"dsgrep: could not add environment variable\n");
-    exit(1);
+    sprintf(var, "MEETINGS=%s", meetings_file);
+    if (putenv(var) == -1) {
+      fprintf(stderr,"dsgrep: could not add environment variable\n");
+      exit(1);
+    }
   }
 
   switch (optind - argc) {
@@ -210,9 +203,9 @@ main(argc,argv)
 	if (!search_deleted && (ti.flags & TRN_FDELETED))
 	  continue;
 	if (case_insens) s_to_lower(ti.subject);
-	if (!use_re || regexec(search_re,ti.subject,0,NULL,0) ||
+	if (!use_re || !regexec(&search_re,ti.subject,0,NULL,0) ||
 	    (search_trans &&
-	     s_trans(meetings[i],j,ti.num_chars,search_re,case_insens)))  {
+	     s_trans(meetings[i],j,ti.num_chars,&search_re,case_insens)))  {
 	  printf("%s [%d]: %s\n",
 		 strrchr(meetings[i].pathname,'/')+1, j, ti.subject);
 	  if (print_trans) {
@@ -261,7 +254,7 @@ s_trans(nbp,trans_no,n_chars,search_re,case_insens)
   tdestroy(tf);
   buffer[n_chars-1] = '\0';
   if (case_insens) s_to_lower(buffer);
-  return(regexec(search_re,buffer,0,NULL,0));
+  return(!regexec(search_re,buffer,0,NULL,0));
 }
 
 void
