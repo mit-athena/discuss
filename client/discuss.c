@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.12 1986-09-13 20:41:42 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.13 1986-09-16 21:33:42 srz Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
@@ -9,6 +9,9 @@
  *	ss library for the command interpreter.
  *
  *      $Log: not supported by cvs2svn $
+ * Revision 1.12  86/09/13  20:41:42  srz
+ * Added name resolving to goto_mtg
+ * 
  * Revision 1.11  86/09/10  18:57:03  wesommer
  * Made to work with kerberos; meeting names are now longer.
  * ./
@@ -44,7 +47,7 @@
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.12 1986-09-13 20:41:42 srz Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.13 1986-09-16 21:33:42 srz Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -94,7 +97,6 @@ main(argc, argv)
 	ss_add_info_dir(sci_idx, INFO_DIR, &code);
 	if (code) {
 		ss_perror(sci_idx, code, INFO_DIR);
-		exit(1);
 	}
 
 	init_disc_err_tbl();
@@ -251,7 +253,7 @@ goto_mtg(sci_idx, argc, argv)
 	}
 	cur_mtg = (char *)NULL;
 
-	get_mtg_unique_id ("", "srz", argv[1], &nb, &code);
+	get_mtg_unique_id ("", "", argv[1], &nb, &code);
 	if (code != 0) {
 		(void) fprintf (stderr, "Meeting not found in search path. %s\n", argv[1]);
 		return;
@@ -283,29 +285,4 @@ goto_mtg(sci_idx, argc, argv)
 	if (cur_mtg) strcpy(cur_mtg, mtg_name);
 	else fprintf(stderr, "malloc failed; could not go to meeting\n");
 }
-/*
- *
- * resolve_mtg:  Procedure to resolve a user meeting name into its host
- * 	         an pathname.
- *
- */
-resolve_mtg (usr_string, machine, mtg_name)
-char *usr_string,*machine,*mtg_name;
-{
-     char *colon;
-     int machine_len;
 
-     colon = index (usr_string, ':');
-
-     if (colon == 0) {
-	  strcpy (mtg_name, usr_string);
-	  gethostname (machine, 50);
-	  return;
-     }
-
-     machine_len = colon - usr_string;
-     bcopy (usr_string, machine, machine_len);
-     machine [machine_len] = '\0';
-     strcpy (mtg_name, colon+1);
-     return;
-}
