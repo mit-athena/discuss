@@ -8,7 +8,7 @@
 
 #ifndef lint
 #ifndef SABER
-static char *RCSid = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/dsgrep/dsgrep.c,v 1.7 1997-06-04 03:58:04 ghudson Exp $";
+static char *RCSid = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/dsgrep/dsgrep.c,v 1.8 1997-10-03 17:44:00 ghudson Exp $";
 #endif
 #endif
 
@@ -49,11 +49,11 @@ main(argc,argv)
   extern int optind;
   extern char *optarg;
 
-  char *meetings_file,*homedir,*getenv();
+  char *meetings_file,*homedir,*getenv(),*var;
   name_blk *meetings,*tmp_mtg;
   mtg_info meeting_info[MAX_MEETINGS];
   char tmp_meeting_file[MAXPATHLEN];
-  int n_meetings,result,setenv(),i,cur_meeting,n_to_look,j,c;
+  int n_meetings,result,i,cur_meeting,n_to_look,j,c;
   int print_trans,use_re,search_trans,search_deleted,s_trans();
   int case_insens,trans_num;
   int high,low;
@@ -141,7 +141,12 @@ main(argc,argv)
     strcpy(meetings_file,homedir);
     strcat(meetings_file,"/.meetings");
   }
-  if (setenv("MEETINGS",meetings_file,1) == -1) {
+  var = malloc(strlen(meetings_file) + strlen("MEETINGS=") + 1);
+  if (var == NULL) {
+    fprintf(stderr,"dsgrep: could not allocate memory\n");
+    exit(1);
+  }
+  if (putenv(var) == -1) {
     fprintf(stderr,"dsgrep: could not add environment variable\n");
     exit(1);
   }
