@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/edit.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/edit.c,v 1.4 1986-12-08 00:44:09 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/edit.c,v 1.5 1986-12-14 12:02:53 spook Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board.
@@ -8,6 +8,9 @@
  *	Utility routines.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.4  86/12/08  00:44:09  wesommer
+ * Added simple "line editor" function; changed calling sequence.
+ * 
  * Revision 1.3  86/12/07  21:51:37  wesommer
  * Added -editor and -no_editor control args to permit use under emacs.
  * 
@@ -46,7 +49,7 @@
  */
 
 #ifndef lint
-static char *rcsid_discuss_utils_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/edit.c,v 1.4 1986-12-08 00:44:09 wesommer Exp $";
+static char *rcsid_discuss_utils_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/edit.c,v 1.5 1986-12-14 12:02:53 spook Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -63,6 +66,9 @@ static char *rcsid_discuss_utils_c = "$Header: /afs/dev.mit.edu/source/repositor
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/errno.h>
+
+bool	use_editor = TRUE;
+char 	*editor_path = NULL;
 
 /*
  * int edit(fn, editor)
