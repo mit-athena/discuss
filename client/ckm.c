@@ -1,8 +1,11 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v 1.6 1987-06-14 16:28:24 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v 1.7 1987-06-14 21:08:44 srz Exp $
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.6  87/06/14  16:28:24  srz
+ * White space changes + changed fprintf into ss_perror.
+ * 
  * Revision 1.5  87/04/19  22:17:18  srz
  * Reverted definition of 'changed' to include new meetings.
  * 
@@ -21,7 +24,7 @@
  */
      
 #ifndef lint
-static char *rcsid_ckm_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v 1.6 1987-06-14 16:28:24 srz Exp $";
+static char *rcsid_ckm_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v 1.7 1987-06-14 21:08:44 srz Exp $";
 #endif lint
 
 #include <strings.h>
@@ -51,6 +54,8 @@ do_mtg(mtg_name)
      last_host[0] = '\0';
      last_path[0] = '\0';
      for (i = 0; i < n_matches; i++) {
+	  if (interrupt)
+	       break;
 	  nbp = &set[i];
 	  /* Test to see if we are attending this meeting */
 	  if (dsc_public.attending && !strcmp(dsc_public.host, nbp ->hostname) && !strcmp(dsc_public.path, nbp->pathname)) {
@@ -70,6 +75,8 @@ do_mtg(mtg_name)
 		       nbp -> aliases[0], error_message(code));
 	       continue;
 	  }
+	  if (interrupt)
+	          break;
 	  if (strcmp(last_host,nbp->hostname) || strcmp(last_path, nbp->pathname)) {
 	       strcpy(last_host,nbp->hostname);
 	       strcpy(last_path,nbp->pathname);
@@ -122,18 +129,22 @@ check_meetings (argc, argv)
 	       have_names = 1;
 	  }
      }
-     
+
+     flag_interrupts();
      if (!have_names) {
 	  do_mtg("*");
      }
      else for (i = 1; i < argc; i++) {
 	  if (!used[i])
 	       do_mtg(argv[i]);
+	  if (interrupt)
+	       break;
      }
-     if (print_header)
+     if (print_header && !interrupt)
 	  ss_perror(sci_idx, 0, "No changed meetings");
      
      free((char *)used);
+     dont_flag_interrupts();
 }
 
 next_meeting(argc, argv)
