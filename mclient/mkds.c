@@ -7,10 +7,13 @@
  */
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v 1.17 1993-05-20 12:54:08 miki Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v 1.18 1994-03-25 16:55:49 miki Exp $
  *	$Locker:  $
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.17  93/05/20  12:54:08  miki
+ * ported to Solaris2.1
+ * 
  * Revision 1.16  90/12/01  22:41:38  eichin
  * initialized nbsrc.spare, added "%" as a local meeting name
  * 
@@ -59,7 +62,7 @@
 
 #ifndef lint
 static char rcsid_mkds_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v 1.17 1993-05-20 12:54:08 miki Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v 1.18 1994-03-25 16:55:49 miki Exp $";
 #endif lint
 
 #include <discuss/discuss.h>
@@ -115,7 +118,7 @@ char *argv[];
 
 	(void) sprintf(temp_file,"/tmp/mtg%d.%d",getuid(),getpid());
 
-	whoami = rindex(argv[0],'/');
+	whoami = strrchr(argv[0],'/');
 	if (whoami)
 		whoami++;
 	else
@@ -232,7 +235,7 @@ End with . on a line by itself\n\n");
 			strcpy(username, strtrim(username));
 			if (strcmp(username, ".") == 0) break;
 			if (strcmp(username,"*") != 0 &&
-			    index(username, '@') == 0) {
+			    strchr(username, '@') == 0) {
 				strcat(username, "@");
 				strcat(username, local_realm());
 			}
