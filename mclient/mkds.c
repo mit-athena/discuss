@@ -1,9 +1,12 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v 1.8 1987-04-09 00:12:43 rfrench Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v 1.9 1987-04-10 23:18:01 spook Exp $
  *	$Locker:  $
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.8  87/04/09  00:12:43  rfrench
+ * Fixed small bug in new interface.
+ * 
  * Revision 1.7  87/04/08  21:40:57  rfrench
  * Changed interface to deal with new dsc_announce_mtg function.
  * 
@@ -22,7 +25,7 @@
  */
 
 #ifndef lint
-static char *rcsid_mkds_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v 1.8 1987-04-09 00:12:43 rfrench Exp $";
+static char rcsid_mkds_c[] = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v 1.9 1987-04-10 23:18:01 spook Exp $";
 #endif lint
 
 #include "tfile.h"
@@ -42,7 +45,7 @@ static char *rcsid_mkds_c = "$Header: /afs/dev.mit.edu/source/repository/athena/
 #define cupper(x) (islower(x)?toupper(x):(x))
 #define clower(x) (isupper(x)?tolower(x):(x))
 
-char *default_dir = "/usr/spool/discuss";
+char default_dir[] = "/usr/spool/discuss";
 char *whoami;
 
 char *getenv(), *malloc();
@@ -98,15 +101,18 @@ char *argv[];
 	}
 
 	printf("Meeting location [default %s]: ", default_dir);
-	(void) gets(mtg_path);
+	if (!gets(mtg_path))
+	        exit(1);
 	if (!mtg_path[0])
 		strcpy(mtg_path, default_dir);
 	if (!remove) {
 		printf("\nLong meeting name: ");
-		(void) gets(long_name);
+		if (!gets(long_name))
+		        exit(1);
 	}
-	printf("\nYour meeting name: ");
-	(void) gets(short_name);
+	printf("\nShort meeting name: ");
+	if (!gets(short_name))
+	        exit(1);
 	(void) strcat(mtg_path,"/");
 	(void) strcat(mtg_path,short_name);
 	nbsrc.pathname = malloc(strlen(mtg_path)+1);
@@ -194,7 +200,8 @@ char *argv[];
 	}
 	tf = unix_tfile(fd);
 
-	dsc_add_trn(&nbsrc, tf, "Reason for this meeting", 0, &txn_no, &result);
+	dsc_add_trn(&nbsrc, tf, "Reason for this meeting", 0, &txn_no,
+		    &result);
 	if (result) {
 		fprintf(stderr, "mkds: Error adding transaction: %s",
 			error_message(result));
@@ -213,7 +220,8 @@ char *argv[];
 
 	for (;;) {
 		printf("\nAnnounce in what meeting? ");
-		(void) gets(ann_mtg);
+		if (!gets(ann_mtg))
+		        exit(1);
 		dsc_get_mtg(nbsrc.user_id,ann_mtg,&nbdest,&result); /* XXX */
 		if (!result)
 			break;
@@ -305,7 +313,8 @@ char *prompt,def;
 
 	for (;;) {
 		(void) printf("%s ",prompt);
-		(void) gets(yn_inp);
+		if (!gets(yn_inp))
+		        exit(1);
 		if (yn_inp[0] == '\0')
 			yn_inp[0] = def;
 		if (cupper(yn_inp[0]) == 'Y' || cupper(yn_inp[0]) == 'N')
