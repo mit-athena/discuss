@@ -768,7 +768,7 @@ int *result;
      if (mtg_acl != NULL)
 	  acl_destroy(mtg_acl);
      mtg_acl = acl_create ();
-     acl_add_access(mtg_acl, chairman, "acdrosw");	/* add chairman */
+     acl_add_access(mtg_acl, chairman, "acdorsw");	/* add chairman */
      if (public)
 	  acl_add_access(mtg_acl, "*", "arosw");	/* public mtg */
 
