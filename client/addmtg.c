@@ -16,14 +16,14 @@
  *	command line, in which case they are used as meeting announcements.
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.26 1990-02-24 18:49:43 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.27 1992-10-27 16:19:01 probe Exp $
  *	$Locker:  $
  *
  */
 
 #ifndef lint
 static char rcsid_addmtg_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.26 1990-02-24 18:49:43 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.27 1992-10-27 16:19:01 probe Exp $";
 #endif lint
 
 #include <string.h>
@@ -56,7 +56,7 @@ add_mtg(argc, argv)
 	trn_info t_info;
 	selection_list *trn_list,*trn_temp;
 
-	used = (int *)calloc(argc, sizeof(int));
+	used = (int *)calloc(argc+1, sizeof(int));
 	user = "";
 	realm = user;
 	set = NULL;
