@@ -1,16 +1,33 @@
 /*
  *
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/include/globals.h,v 1.3 1986-10-19 09:59:48 spook Exp $
+ * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/include/globals.h,v 1.4 1986-10-29 10:27:36 srz Exp $
  * $Locker:  $
  *
  */
 
+#include "../include/dsname.h"
+
+/* Typedefs */
+
+typedef struct _sle {
+	int low;
+	int high;
+	struct _sle *next;
+} selection_list;
+
+struct _dsc_pub {
+     trn_nums current;
+     trn_nums highest_seen;
+     bool attending;
+     char *mtg_uid;				/* meeting uid */
+     char *mtg_name;				/* meeting name (user) */
+     name_blk nb;
+     mtg_info m_info;
+};
+
 /* Variables */
 
-extern trn_nums	cur_trans;	/* which is current transaction */
-extern char	*cur_mtg;	/* current meeting unique identifier */
-extern char	*cur_mtg_name;	/* current meeting name */
-extern mtg_info	m_info;		/* current meeting info */
+extern struct _dsc_pub dsc_public;
 extern char	*buffer;
 extern int	time_now, time_sixmonthsago;
 extern int	dsc_sci_idx;	/* sci_idx for global usage */
@@ -22,13 +39,6 @@ extern int	errno;		/* lusing UNIX method to pass error values */
 
 #define	CURRENT_VERSION	"1.0"
 
-/* Typedefs */
-
-typedef struct _sle {
-	int low;
-	int high;
-	struct _sle *next;
-} selection_list;
 
 /* Subroutine declarations */
 
