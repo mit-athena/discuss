@@ -2,6 +2,8 @@
  *
  * do_stuff () -- Routines to implement the various lisp requests.
  *
+ *	Copyright (C) 1988 by the Student Information Processing Board
+ *
  */
 
 #include <stdio.h>
@@ -16,6 +18,7 @@ extern char *user_id;
 extern tfile stdout_tf;
 extern int bit_bucket();
 extern int errno;
+extern char *do_quote();
 tfile unix_tfile();
 
 do_gmi(args)
@@ -100,6 +103,7 @@ char *args;
 	  return;
      }
 
+     t_info.subject = do_quote(t_info.subject);
      printf("(%d %d %d %d %d %d %d %d \"%s\" %d %d \"%s\" \"%s\")\n",
 	    t_info.current,
 	    t_info.prev,
@@ -441,3 +445,104 @@ punt:
      dsc_destroy_name_blk(&nb);
 }
 
+do_nut(args)
+char *args;
+{
+     char *cp = args, *mtg_name, delim, *trn_string;
+     trn_nums trn_num,cur_trn;
+     name_blk nb;
+     mtg_info m_info;
+     trn_info t_info;
+     char mtime[30];
+     int code,i;
+
+     /* First, we get the transaction number */
+     if (get_word(&cp, &trn_string, " ", &delim) < 0) {
+	  printf("; Missing trn number\n");
+	  return;
+     }
+
+     if (get_word(&cp, &mtg_name, ")", &delim) < 0) {
+	  printf("; Missing meeting name\n");
+	  return;
+     }
+
+     trn_num = atoi(trn_string);
+     dsc_get_mtg (user_id, mtg_name, &nb, &code);
+     if (code != 0) {
+	  printf(";%s\n", error_message(code));
+	  return;
+     }
+
+     dsc_get_mtg_info (&nb, &m_info, &code);
+     if (code != 0) {
+	  printf(";%s\n", error_message(code));
+	  return;
+     }
+
+     if (trn_num < m_info.first) {
+	  printf("(%d)\n", m_info.first);
+	  goto done2;
+     }
+     if (trn_num > m_info.last) {
+	  printf("(0)\n");
+	  goto done2;
+     }
+
+     /* Now we try to find the next transaction.  If the transaction
+	is not deleted, we can do this in one step */
+     dsc_get_trn_info(&nb,trn_num,&t_info,&code);
+     if (code == 0) {
+	  printf("(%d)\n", t_info.next);
+	  goto done;
+     }
+
+     /* Hmm.  Deleted transaction.  Try the next five transactions, hoping
+	to get a non-deleted one */
+     for (i = 1; i <= 5; i++) {
+	  dsc_get_trn_info(&nb,trn_num,&t_info,&code);
+	  if (code == 0) {
+	       printf("(%d)\n", t_info.current);
+	       goto done;
+	  }
+     }
+
+     /* Hmmm.  Try the first 5 transactions in the meeting, in case we
+	hit a big gap after transaction [0001]. */
+     cur_trn = m_info.first;
+     for (i = 0; i < 5; i++) {
+	  dsc_get_trn_info(&nb, cur_trn, &t_info, &code);
+	  if (code != 0) {
+	       printf(";%s\n", error_message(code));
+	       goto done2;
+	  }
+	  if (t_info.next > trn_num) {
+	       printf("(%d)\n", t_info.next);
+	       goto done;
+	  }
+	  cur_trn = t_info.next;
+	  dsc_destroy_trn_info(&t_info);
+     }
+
+     /* Ok.  We bite the bullet and loop until we can find something. */
+     code = DELETED_TRN;
+     trn_num++;
+     while (code == DELETED_TRN) {
+	  dsc_get_trn_info (&nb, trn_num, &t_info, &code);
+	  if (code == 0) {
+	       printf("(%d)\n", trn_num);
+	       goto done;
+	  } else if (code == DELETED_TRN)
+	       trn_num++;
+	  else {
+	       printf(";%s\n", error_message(code));
+	       goto done2;
+	  }
+     }
+
+done:
+     dsc_destroy_mtg_info(&m_info);
+done2:     
+     dsc_destroy_name_blk(&nb);
+     dsc_destroy_trn_info(&t_info);
+}
