@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/edit.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/edit.c,v 1.1 1986-12-07 01:30:14 rfrench Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/edit.c,v 1.2 1986-12-07 19:32:06 wesommer Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board.
@@ -8,6 +8,9 @@
  *	Utility routines.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.1  86/12/07  01:30:14  rfrench
+ * Initial revision
+ * 
  * Revision 1.10  86/12/07  00:39:01  rfrench
  * Killed ../include
  * 
@@ -37,7 +40,7 @@
  */
 
 #ifndef lint
-static char *rcsid_discuss_utils_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/edit.c,v 1.1 1986-12-07 01:30:14 rfrench Exp $";
+static char *rcsid_discuss_utils_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/edit.c,v 1.2 1986-12-07 19:32:06 wesommer Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -78,6 +81,7 @@ edit(fn)
 	if (!ed)
 		ed = DEFAULT_EDITOR;
 
+	creat(fn, 0600);
 	switch ((pid = fork())) {
 	case -1:
 		perror("couldn't fork");
