@@ -8,13 +8,16 @@
 /*
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.33 1993-04-29 17:06:33 miki Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.34 1994-03-25 17:21:46 miki Exp $
  *
  *
  * core.c --    Routines that are the meat of discuss.  These provide user
  *		callable routines.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.33  93/04/29  17:06:33  miki
+ *  ported to Solaris2.1
+ * 
  * Revision 1.32  92/11/08  23:00:49  probe
  * Avoid incompatible redeclarations (AIX 3.2)
  * 
@@ -103,7 +106,7 @@
  */
 #ifndef lint
 static char rcsid_core_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.33 1993-04-29 17:06:33 miki Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.34 1994-03-25 17:21:46 miki Exp $";
 #endif lint
 
 
@@ -347,7 +350,7 @@ int *result;
 
      /* now write out the transaction to the trn file */
      /* First, eliminate NL in subject */
-     cp = index(subject, '\n');
+     cp = strchr(subject, '\n');
      if (cp != NULL)
 	  *cp = '\0';
 
@@ -1400,13 +1403,13 @@ int *result;
 		    return;
 	       }
 	       close(mf);
-	       cp = index(buf, '\n');
+	       cp = strchr(buf, '\n');
 	       if (cp == NULL) {
 		    *result = INCONSISTENT;
 		    return;
 	       }
 	       *cp = '\0';
-	       cp = index(buf, ':');
+	       cp = strchr(buf, ':');
 	       if (cp == NULL) {
 		    *result = INCONSISTENT;
 		    return;
