@@ -5,9 +5,12 @@
  *		This file handles the caller's side of the connection.
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/rpcall.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/rpcall.c,v 1.10 1988-07-28 10:52:12 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/rpcall.c,v 1.11 1988-10-16 14:03:54 raeburn Exp $
  *	$Locker:  $
  *	$Log: not supported by cvs2svn $
+ * Revision 1.10  88/07/28  10:52:12  srz
+ * Added better error message when can't exec subprocess.
+ * 
  * Revision 1.9  87/04/11  00:06:04  srz
  * Added RCS junk
  * 
@@ -23,7 +26,8 @@
  *
  */
 #ifndef lint
-static char *rcsid_rpcall_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/rpcall.c,v 1.10 1988-07-28 10:52:12 srz Exp $";
+static char rcsid_rpcall_c[] =
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/rpcall.c,v 1.11 1988-10-16 14:03:54 raeburn Exp $";
 #endif lint
 
 /* INCLUDES */
@@ -35,9 +39,9 @@ static char *rcsid_rpcall_c = "$Header: /afs/dev.mit.edu/source/repository/athen
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
-#include "tfile.h"
-#include "rpc.h"
-#include "config.h"
+#include <discuss/tfile.h>
+#include <discuss/rpc.h>
+#include <discuss/config.h>
 
 /* DEFINES */
 
