@@ -9,15 +9,16 @@
       ********************************************************************/
 
 /*
- *
  * interface.h -- Include file for core interface.  This file contains
  * definitions for structures and routines that will be used to communicate
  * with the core discuss routines.  The exact protocol between the two 
  * has not been defined, although something ala RPC should be investiaged
  *
+ * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/include/discuss/interface.h,v 1.4 1989-01-29 13:18:38 srz Exp $
+ * $Log: not supported by cvs2svn $
  */
 
-#include "types.h"
+#include <discuss/types.h>
 
 /* this include maybe should be split apart eventually. */
 
