@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.34 1987-07-20 19:21:50 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.35 1987-08-08 00:54:59 spook Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
@@ -12,7 +12,7 @@
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.34 1987-07-20 19:21:50 srz Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.35 1987-08-08 00:54:59 spook Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -42,7 +42,7 @@ static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athe
 
 extern ss_request_table discuss_cmds;
 
-char	dsc_version[] = "1.2";
+char	dsc_version[] = "1.3 EXL";
 int	sci_idx;
 
 extern char *temp_file, *pgm, *user_id;
