@@ -7,18 +7,21 @@
  */
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/announce.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/announce.c,v 1.6 1989-06-03 00:18:57 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/announce.c,v 1.7 1993-04-28 11:34:09 miki Exp $
  *	$Locker:  $
  *
  */
 
 #ifndef lint
 static char rcsid_announce_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/announce.c,v 1.6 1989-06-03 00:18:57 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/announce.c,v 1.7 1993-04-28 11:34:09 miki Exp $";
 #endif lint
 
 #include <stdio.h>
 #include <sys/file.h>
+#ifdef SOLARIS
+#include <fcntl.h>
+#endif
 #include <discuss/tfile.h>
 #include <discuss/interface.h>
 #include <discuss/dsname.h>
