@@ -1,11 +1,14 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/rn.c,v $
  *	$Author: srz $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/rn.c,v 1.7 1989-05-08 02:47:31 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/rn.c,v 1.8 1989-05-19 16:58:18 srz Exp $
  *
  *	Copyright (C) 1987 by the Massachusetts Institute of Technology
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.7  89/05/08  02:47:31  srz
+ * jik's fix to stop printing twice.
+ * 
  * Revision 1.6  89/01/05  01:58:44  raeburn
  * replaced included header files with <discuss/discuss.h>
  * 
@@ -30,7 +33,7 @@
 
 #ifndef lint
 static char rcsid_update_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/rn.c,v 1.7 1989-05-08 02:47:31 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/rn.c,v 1.8 1989-05-19 16:58:18 srz Exp $";
 #endif /* lint */
 
 #include <discuss/discuss.h>
@@ -39,6 +42,8 @@ static char rcsid_update_c[] =
 #include <sys/types.h>
 #include <sys/file.h>
 #include <sys/ioctl.h>
+
+static unseen_transactions();
 
 static changed_meetings()
 {
