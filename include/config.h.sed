@@ -62,7 +62,7 @@ create an initial .meetings file. */
 
 /* Info directory */
 #ifndef INFO_DIR
-#define INFO_DIR "/usr/athena/lib/discuss/info"
+#define INFO_DIR "/usr/athena/share/discuss/info"
 #endif
 
 /* Name server / Kerberos realm */
