@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.13 1986-09-16 21:33:42 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.14 1986-09-16 21:52:10 wesommer Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
@@ -9,6 +9,9 @@
  *	ss library for the command interpreter.
  *
  *      $Log: not supported by cvs2svn $
+ * Revision 1.13  86/09/16  21:33:42  srz
+ * bug fixes of last checkout.
+ * 
  * Revision 1.12  86/09/13  20:41:42  srz
  * Added name resolving to goto_mtg
  * 
@@ -47,7 +50,7 @@
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.13 1986-09-16 21:33:42 srz Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.14 1986-09-16 21:52:10 wesommer Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -60,6 +63,7 @@ static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athe
 #include "../include/interface.h"
 #include "../include/config.h"
 #include "../include/dsname.h"
+#include "../include/rpc.h"
 #include "globals.h"
 
 #ifdef	lint
@@ -71,6 +75,9 @@ static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athe
 extern ss_request_table discuss_cmds;
 trn_nums cur_trans = -1;
 char	*cur_mtg = (char *)NULL;
+rpc_conversation cur_conv;		/* Current conversation; valid if
+					 *  cur_mtg != NULL
+					 */	
 char	*temp_file = (char *)NULL;
 char	*pgm = (char *)NULL;
 char	*malloc(), *getenv(), *gets(), *ctime();
@@ -249,13 +256,13 @@ goto_mtg(sci_idx, argc, argv)
 	}
 	if (cur_mtg != (char *)NULL) {
 		(void) free(cur_mtg);
-		/* XXX Close the current RPC connection */
+		close_rpc(cur_conv);
 	}
 	cur_mtg = (char *)NULL;
 
 	get_mtg_unique_id ("", "", argv[1], &nb, &code);
 	if (code != 0) {
-		(void) fprintf (stderr, "Meeting not found in search path. %s\n", argv[1]);
+		(void) fprintf (stderr, "%s: Meeting not found in search path.\n", argv[1]);
 		return;
 	}
 
@@ -264,8 +271,7 @@ goto_mtg(sci_idx, argc, argv)
 		(void) fprintf (stderr, "Bad form of unique name\n");
 		return;
 	}
-	/* XXX should keep a handle on RPC connection */
-	if (open_rpc(machine, "discuss", &code) == 0) { 
+	if ((cur_conv=open_rpc(machine, "discuss", &code)) == NULL) { 
 		(void) free (machine);
 		(void) fprintf (stderr, "%s: %s\n", argv[1], 
 				error_message(code));
@@ -282,7 +288,7 @@ goto_mtg(sci_idx, argc, argv)
 		return;
 	}
 	cur_mtg = (char *) malloc(strlen(mtg_name) + 1);
-	if (cur_mtg) strcpy(cur_mtg, mtg_name);
+	if (cur_mtg) strcpy(cur_mtg, mtg_name); 
 	else fprintf(stderr, "malloc failed; could not go to meeting\n");
 }
 
