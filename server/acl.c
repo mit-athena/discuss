@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl.c,v 1.6 1987-03-17 02:25:19 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl.c,v 1.7 1987-07-20 21:23:25 wesommer Exp $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
  *
@@ -8,6 +8,10 @@
  *	along with routines to move them to and from files.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.6  87/03/17  02:25:19  srz
+ * Added expunging.  added acl_copy, and fixed acl_canon to deal with
+ * spaces without barfing.
+ * 
  * Revision 1.5  86/12/08  23:30:56  wesommer
  * Changed acl_canon() to line up columns.
  * 
@@ -27,7 +31,7 @@
  */
 
 #ifndef lint
-static char *rcsid_acl_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl.c,v 1.6 1987-03-17 02:25:19 srz Exp $";
+static char *rcsid_acl_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl.c,v 1.7 1987-07-20 21:23:25 wesommer Exp $";
 #endif lint
 
 #include "../include/acl.h"
@@ -59,7 +63,7 @@ Acl *acl_read(fd)
      int fd;
 {
 	static char buf[128];
-	FILE *f=fdopen(fd, "r");
+	FILE *f=fdopen(dup(fd), "r");
 	register char *cp;
 	register int n;
 	register acl_entry *ae;
@@ -83,22 +87,40 @@ Acl *acl_read(fd)
 			--ae;
 		}
 	}
-	(void) fdclose(f); /*XXX*/
+	(void) fclose(f);
 	return(list);
 }
+/*
+ * Attempt to write an access control list to fd.
+ * Return FALSE on failure with reason in errno.
+ */
 
 bool acl_write(fd, list)
      int fd;
      Acl *list;
 {
-	FILE *f=fdopen(fd, "w");
+	FILE *f=fdopen(dup(fd), "w");
 	register int n;
 	register acl_entry *ae;
-	(void) fprintf(f, "%d\n", list->acl_length);
-	for (ae=list->acl_entries, n=list->acl_length; n; --n, ++ae)
-		(void) fprintf(f, "%s:%s\n", ae->modes, ae->principal);
-	(void) fdclose(f); /*XXX*/
+	char buf[BUFSIZ];
+	int len;
+
+	(void) sprintf(buf, "%d\n", list->acl_length);
+	len = strlen(buf);
+	if (fwrite(buf, 1, len, f) != len) goto punt;
+	
+	for (ae=list->acl_entries, n=list->acl_length; n; --n, ++ae) {
+		(void) sprintf(buf, "%s:%s\n", ae->modes, ae->principal);
+		len = strlen(buf);
+		if (fwrite(buf, 1, len, f) != len) goto punt;
+	}
+	if (fflush(f) == EOF) goto punt;
+	if (fsync(fileno(f)) < 0) goto punt;
+	if (fclose(f) == EOF) return FALSE;
 	return(TRUE);
+punt:
+	fclose(f);
+	return(FALSE);
 }
 
 acl_add_access(list, principal, modes)
@@ -429,27 +451,3 @@ panic(s)
 	abort();
 }
 
-/*
- *	Can you say "modularity violation??":  This does an fclose 
- *	without close(2)'ing the file descriptor behind it.
- */
-
-#include <stdio.h>
-
-fdclose(iop)
-	register FILE *iop;
-{
-	register int r;
-
-	r = EOF;
-	if (iop->_flag&(_IOREAD|_IOWRT|_IORW) && (iop->_flag&_IOSTRG)==0) {
-		r = fflush(iop);
-		if (iop->_flag&_IOMYBUF)
-			free(iop->_base);
-	}
-	iop->_cnt = 0;
-	iop->_base = (char *)NULL;
-	iop->_ptr = (char *)NULL;
-	iop->_bufsiz = iop->_flag = iop->_file = 0;
-	return(r);
-}
