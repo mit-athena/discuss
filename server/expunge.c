@@ -20,8 +20,6 @@
 #include <discuss/acl.h>
 #include "mtg.h"
 
-#define NULL 0
-#define MAX_TRNS 1000
 #define min(a, b) (a < b ? a : b)
 
 static int tempf;
@@ -30,6 +28,7 @@ static char *backup_location = NULL;
 static char *future_location = NULL;
 static int found_eof = 0;
 static int error_occurred = 0;
+static char *temp_dir = "/tmp";
 
 tfile unix_tfile ();
 char *malloc();
@@ -66,6 +65,11 @@ char **argv;
 	  case 'n':
 	       if (++i < argc)
 		    mtg_name = argv[i];
+	       continue;
+
+	   case 't':
+	       if (++i < argc)
+		   temp_dir = argv[i];
 	       continue;
 
 	  default:
@@ -264,9 +268,11 @@ lusage:
  */
 create_temp()
 {
-     char filename [20];
+     char *filename;
 
-     strcpy (filename, "/tmp/rcXXXXXX");
+     filename = malloc (strlen (temp_dir) + 20);
+     strcpy (filename, temp_dir);
+     strcat (filename, "/rcXXXXXX");
      mktemp (filename);
 
      tempf = open (filename, O_RDWR | O_CREAT, 0700);
@@ -275,5 +281,3 @@ create_temp()
 	  exit (1);
      }
 }
-
-
