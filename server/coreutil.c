@@ -7,7 +7,7 @@
  */
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.20 1989-09-01 11:54:13 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.21 1990-02-24 18:56:30 srz Exp $
  *
  *
  * coreutil.c  -- These contain lower-layer, utility type routines to
@@ -15,6 +15,9 @@
  *		  in-memory superblock, and to open & close meetings.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.20  89/09/01  11:54:13  srz
+ * Defined use_zephyr variable, even when ZEPHYR is not defined.
+ * 
  * Revision 1.19  89/09/01  11:51:18  srz
  * Fixed memory leak, and cut connection between super_chairman and access.
  * 
@@ -83,7 +86,7 @@
 const
 #endif
 static char rcsid_coreutil_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.20 1989-09-01 11:54:13 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.21 1990-02-24 18:56:30 srz Exp $";
 #endif /* lint */
 
 #include <discuss/types.h>
@@ -462,11 +465,13 @@ chain_blk *cb;
  * read_trn -- routine to read a transaction from the transaction file.
  *
  */
-int read_trn (trn_addr, th, th_subject, th_author)
+int read_trn (trn_addr, th, th_subject, th_author, th_signature)
 faddr trn_addr;
 trn_hdr *th;
-char **th_subject, **th_author;
+char **th_subject, **th_author, **th_signature;
 {
+     char *author;
+
      lseek (u_trn_f, (long)trn_addr, 0);
      read (u_trn_f, (char *) th, sizeof (trn_hdr));
 
@@ -476,18 +481,31 @@ char **th_subject, **th_author;
      if (th -> version != TRN_HDR_1)
 	  return(NEW_VERSION);
 
-     if (th_subject != 0) {
+     if (th_subject != NULL) {
 	  *th_subject = malloc ((unsigned)(th -> subject_len));
 	  lseek (u_trn_f, (long)(th -> subject_addr), 0);
 	  read (u_trn_f, *th_subject, th -> subject_len);
      }
 	  
-     if (th_author != 0) {
-	  *th_author = malloc ((unsigned)(th -> author_len));
+     if (th_author != NULL || th_signature != NULL) {
+	  author = malloc ((unsigned)(th -> author_len));
 	  lseek (u_trn_f, (long)(th -> author_addr), 0);
-	  read (u_trn_f, *th_author, th -> author_len);
+	  read (u_trn_f, author, th -> author_len);
      }
 
+     if (th_author != NULL)
+	  *th_author = author;
+
+     if (th_signature != NULL) {
+	  if (strlen(author)+1 == th -> author_len) {
+	       *th_signature = new_string(author);	/* No signature, return author */
+	  } else {
+	       *th_signature = new_string(&author[strlen(author)+1]);
+	  }
+	  if (th_author == NULL)
+	       free(author);
+     }
+	       
      return(0);
 }
 	  
@@ -640,14 +658,14 @@ char *str;
 
 static const char * this_host = (const char *) NULL;
 
-void mtg_znotify(mtg_name, subject, author)
-	char *mtg_name, *subject, *author;
+void mtg_znotify(mtg_name, subject, author, signature)
+	char *mtg_name, *subject, *author, *signature;
 {
 	register dsc_acl_entry *ae;
 	register int n;
 	ZNotice_t notice;
 	char *msglst[4],bfr[30],fullpath[256];
-	int code;
+	int code, list_size;
 
 	if (!use_zephyr)
 	    return;
@@ -681,13 +699,20 @@ void mtg_znotify(mtg_name, subject, author)
 	notice.z_class_inst = fullpath;
 	notice.z_opcode = "NEW_TRN";
 	notice.z_sender = 0;
-	notice.z_default_format = "New transaction [$1] entered in $2\nFrom: $3\nSubject: $4";
-
+	if (signature == NULL)
+	     notice.z_default_format = "New transaction [$1] entered in $2\nFrom: $3\nSubject: $4";
+	else
+	     notice.z_default_format = "New transaction [$1] entered in $2\nFrom: $3 ($5)\nSubject: $4";
 	msglst[0] = bfr;
 	sprintf(msglst[0],"%04d",super.highest);
 	msglst[1] = super_long_name;
 	msglst[2] = author;
 	msglst[3] = subject;
+	list_size = 4;
+	if (signature != NULL) {
+	     msglst[4] = signature;
+	     list_size = 5;
+	}
 
 	/* Does "*" have read access? If so, just send out a global
 	 * notice.
@@ -707,7 +732,7 @@ void mtg_znotify(mtg_name, subject, author)
 	if (n) {
 		notice.z_recipient = "";
 		/* We really don't care if it gets through... */
-		code = ZSendList(&notice,msglst,4,ZNOAUTH);
+		code = ZSendList(&notice,msglst,list_size,ZNOAUTH);
 		return;
 	}
 	for (ae = mtg_acl->acl_entries, n=mtg_acl->acl_length;
@@ -715,7 +740,7 @@ void mtg_znotify(mtg_name, subject, author)
 	     ae++, n--) {
 		if (acl_is_subset("r", ae->modes)) {
 			notice.z_recipient = ae->principal;
-			ZSendList(&notice,msglst,4,ZNOAUTH);
+			ZSendList(&notice,msglst,list_size,ZNOAUTH);
 		}
 	}
 }
