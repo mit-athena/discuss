@@ -52,6 +52,7 @@ int *result;
      senddata(source_file);
      if (rpc_err) { *result = rpc_err; return; }
      recvreply ();
+     if (rpc_err) { *result = rpc_err; return; }
      *result_trn = recvint();
      *result = recvint();
      if (rpc_err) { *result = rpc_err; return; }
@@ -78,6 +79,7 @@ int *result;
      sendit("discuss");
      if (rpc_err) { *result = rpc_err; return; }
      recvreply();
+     if (rpc_err) { *result = rpc_err; return; }
      recv_trn_info(info);
      *result = recvint();
      if (rpc_err) { *result = rpc_err; return; }
@@ -104,6 +106,7 @@ int *result;
      sendit("discuss");
      if (rpc_err) { *result = rpc_err; return; }
      recvreply();
+     if (rpc_err) { *result = rpc_err; return; }
      *result = recvint();
      if (rpc_err) { *result = rpc_err; return; }
      return;
@@ -129,6 +132,7 @@ int *result;
      sendit("discuss");
      if (rpc_err) { *result = rpc_err; return; }
      recvreply();
+     if (rpc_err) { *result = rpc_err; return; }
      *result = recvint();
      if (rpc_err) { *result = rpc_err; return; }
      return;
@@ -157,6 +161,7 @@ int *result;
      sendit("discuss");
      if (rpc_err) { *result = rpc_err; return; }
      recvreply();
+     if (rpc_err) { *result = rpc_err; return; }
      *result = recvint();
      if (rpc_err) { *result = rpc_err; return; }
      return;
@@ -181,6 +186,7 @@ int *result;
      sendit("discuss");
      if (rpc_err) { *result = rpc_err; return; }
      recvreply();
+     if (rpc_err) { *result = rpc_err; return; }
      old_recv_mtg_info(info);
      *result = recvint();
      if (rpc_err) { *result = rpc_err; return; }
@@ -204,6 +210,7 @@ int *result;
      sendit("discuss");
      if (rpc_err) { *result = rpc_err; return; }
      recvreply();
+     if (rpc_err) { *result = rpc_err; return; }
      recv_mtg_info(info);
      *result = recvint();
      if (rpc_err) { *result = rpc_err; return; }
@@ -232,6 +239,7 @@ int *result;
      if (rpc_err) { *result = rpc_err; return; }
      recvdata(dest_file);
      recvreply();
+     if (rpc_err) { *result = rpc_err; return; }
      *result = recvint();
      if (rpc_err) { *result = rpc_err; return; }
      return;
@@ -255,6 +263,7 @@ int *result;
      sendit("discuss");
      if (rpc_err) { *result = rpc_err; return; }
      recvreply();
+     if (rpc_err) { *result = rpc_err; return; }
      *result = recvint();
      if (rpc_err) { *result = rpc_err; return; }
      return;
@@ -279,6 +288,7 @@ int *result;
      sendit("discuss");
      if (rpc_err) { *result = rpc_err; return; }
      recvreply();
+     if (rpc_err) { *result = rpc_err; return; }
      *updated = recvbool();
      *result = recvint();
      if (rpc_err) { *result = rpc_err; return; }
@@ -300,6 +310,7 @@ get_acl(mtg_name, result, list)
 	sendit("discuss");
 	rpccheck;
 	recvreply();
+	if (rpc_err) { *result = rpc_err; return; }
 	*result = recvint();
 	*list = recv_acl();
 	rpccheck;
@@ -319,6 +330,7 @@ get_access(mtg_name, princ_name, modes, result)
 	sendit("discuss");
 	rpccheck;
 	recvreply();
+	if (rpc_err) { *result = rpc_err; return; }
 	*modes = recvstr();
 	*result = recvint();
 	rpccheck;
@@ -338,6 +350,7 @@ set_access(mtg_name, princ_name, modes, result)
 	sendit("discuss");
 	rpccheck;
 	recvreply();
+	if (rpc_err) { *result = rpc_err; return; }
 	*result = recvint();
 	rpccheck;
 	return;
@@ -355,11 +368,13 @@ delete_access(mtg_name, princ_name, result)
 	sendit("discuss");
 	rpccheck;
 	recvreply();
+	if (rpc_err) { *result = rpc_err; return; }
 	*result = recvint();
 	rpccheck;
 	return;
 }
 
+/*
 whoami(ident)
 	char **ident;
 {
@@ -372,6 +387,7 @@ whoami(ident)
 	rpccheck;
 	return;
 }
+*/
 
 
 /*
