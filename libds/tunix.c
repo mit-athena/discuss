@@ -1,20 +1,25 @@
 /*
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tunix.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tunix.c,v 1.3 1987-07-18 00:01:38 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tunix.c,v 1.4 1989-01-04 20:47:00 raeburn Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
  * tunix.c -- procedures to have tfiles work from unix files.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.3  87/07/18  00:01:38  srz
+ * Added control operation to tfile's.  First control operation:  FORCE_NL,
+ * which forces a NL onto a tfile if it isn't already there.
+ * 
  * Revision 1.2  87/04/11  00:06:29  srz
  * Added RCS junk
  * 
  *
  */
 #ifndef lint
-static char *rcsid_tunix_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tunix.c,v 1.3 1987-07-18 00:01:38 srz Exp $";
+static char rcsid_tunix_c[] =
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tunix.c,v 1.4 1989-01-04 20:47:00 raeburn Exp $";
 #endif lint
 
 #define min(A, B) ((A) < (B) ? (A) : (B))
@@ -23,7 +28,7 @@ static char *rcsid_tunix_c = "$Header: /afs/dev.mit.edu/source/repository/athena
 #define SUCCESS 1
 
 #include <stdio.h>
-#include "../include/tfile.h"
+#include <discuss/tfile.h>
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/stat.h>
