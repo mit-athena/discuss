@@ -4,7 +4,9 @@
  *
  */
 
-typedef struct {
+#ifndef __discuss_dsname_h
+
+typedef struct dsc_name_blk {
 	char *hostname;
 	char *pathname;
 	char *user_id;
@@ -32,3 +34,12 @@ typedef struct {
 extern void dsc_destroy_name_blk();
 extern void dsc_destroy_mtg_set();
 extern void dsc_copy_name_blk();
+#ifndef __STDC__
+extern void dsc_update_mtg_set ();
+#else
+extern void dsc_update_mtg_set (const char *user_id, name_blk *nbp,
+				int num, int *result);
+#endif
+
+#define __discuss_dsname_h
+#endif /* ! __discuss_dsname_h */

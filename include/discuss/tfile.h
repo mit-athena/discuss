@@ -2,17 +2,18 @@
  *
  * tfile.h  -- Definition for internal 'tfile's.
  *
+ * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/include/discuss/tfile.h,v 1.2 1991-09-04 11:33:58 lwvanels Exp $
+ * $Log: not supported by cvs2svn $
  */
 
-
-struct trecord {
+struct _tfile {
      int (*proc)();				/* file proc */
      int size;					/* file size */
      char *infop;				/* pointer to misc info */
      int info;
 };
 
-typedef struct trecord *tfile;
+typedef struct _tfile *tfile;
 
 #define TFOPEN 1
 #define TFCLOSE 2

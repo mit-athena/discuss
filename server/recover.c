@@ -1,6 +1,7 @@
 /*
  *
- *	Copyright (C) 1988, 1989 by the Massachusetts Institute of Technology
+ *	Copyright (C) 1988, 1989, 1991 by the Massachusetts Institute of
+ * 	Technology.
  *    	Developed by the MIT Student Information Processing Board (SIPB).
  *    	For copying information, see the file mit-copyright.h in this release.
  *
@@ -36,9 +37,10 @@ static int trnf;
 static int trnfsize;
 static int num_trns;
 static int current_pos;
-static char *mtg_name = NULL, *location = NULL, *chairman = NULL, *trn_file = NULL;
+static char *mtg_name, *location, *chairman, *trn_file;
 static int trn_pos[MAX_TRNS];
-static int found_eof = 0;
+static int found_eof;
+static int do_byteswap;
 static char *temp_dir = "/tmp";
 
 tfile unix_tfile ();
@@ -47,6 +49,47 @@ static fsize(),read_trn_hdr(),read_last_trn(),save_trn();
 
 extern char rpc_caller[];
 extern int has_privs, use_zephyr;
+
+#ifndef __GNUC__
+#define inline
+#endif
+
+static inline short Sshort(P_s)
+	short	P_s;
+{
+    union {
+	short s;
+	char c[2];
+    } x1, x2;
+    x1.s = P_s;
+    x2.c[0] = x1.c[1];
+    x2.c[1] = x1.c[0];
+    return x2.s;
+}
+
+static inline long Slong(P_l)
+	long	P_l;
+{
+    union {
+	long l;
+	char c[4];
+    } x1, x2;
+    x1.l = P_l;
+    x2.c[0] = x1.c[3];
+    x2.c[1] = x1.c[2];
+    x2.c[2] = x1.c[1];
+    x2.c[3] = x1.c[0];
+    return x2.l;
+}
+
+#define S(X) \
+    (sizeof(X)==4		\
+     ? (X = Slong(X))		\
+     : (sizeof(X)==2		\
+	? (X = Sshort(X))	\
+	: (sizeof(X)==1		\
+	   ? 0			\
+	   : abort())))
 
 main (argc, argv)
 int argc;
@@ -154,20 +197,39 @@ read_header()
 	  exit(1);
      }
 
-     if (tb.version != TRN_BASE_1) {
-	  fprintf (stderr, "Invalid trn_base version\n");
-	  exit(1);
+     if (tb.unique != TRN_BASE_UNIQUE) {
+	     /*
+	      * Try byte swapping the arguments before giving up.
+	      */
+	     S(tb.unique);
+	     if (tb.unique == TRN_BASE_UNIQUE)
+		     do_byteswap++;
+	     else {
+		     fprintf (stderr, "Invalid trn_base unique\n");
+		     exit(1);
+	     }
      }
 
-     if (tb.unique != TRN_BASE_UNIQUE) {
-	  fprintf (stderr, "Invalid trn_base unique\n");
+     if (do_byteswap) {
+	     S(tb.version);
+	     S(tb.date_created);
+	     S(tb.long_name_addr);
+	     S(tb.chairman_addr);
+	     S(tb.long_name_len);
+	     S(tb.chairman_len);
+	     S(tb.public_flag);
+     }
+	     
+     if (tb.version != TRN_BASE_1) {
+	  fprintf (stderr, "Invalid trn_base version\n");
 	  exit(1);
      }
 
      /* read the chairman */
      if (chairman == NULL) {
 	  if (tb.chairman_len > 255) {
-	       fprintf (stderr, "Unreasonable chairman length\n");
+	       fprintf (stderr, "Unreasonable chairman length: %d\n",
+			tb.chairman_len);
 	       exit(1);
 	  }
 	  chairman = malloc (tb.chairman_len);
@@ -232,6 +294,22 @@ no_read:
      if (read (trnf, &th, sizeof (th)) != sizeof (th))
 	  goto no_read;
 
+     if (do_byteswap) {
+	     S(th.version);
+	     S(th.unique);
+	     S(th.current);
+	     S(th.orig_pref);
+	     S(th.date_entered);
+	     S(th.num_lines);
+	     S(th.num_chars);
+	     S(th.prev_trn);
+	     S(th.subject_addr);
+	     S(th.author_addr);
+	     S(th.text_addr);
+	     S(th.subject_len);
+	     S(th.author_len);
+     }
+     
      /* safety checks */
      if (th.version != TRN_HDR_1) {
 	  fprintf (stderr, "Invalid trn_hdr version at %d\n", position);
@@ -272,6 +350,22 @@ int position;
      if (read (trnf, &th, sizeof (th)) != sizeof (th))
 	  return (FALSE);
 
+     if (do_byteswap) {
+	     S(th.version);
+	     S(th.unique);
+	     S(th.current);
+	     S(th.orig_pref);
+	     S(th.date_entered);
+	     S(th.num_lines);
+	     S(th.num_chars);
+	     S(th.prev_trn);
+	     S(th.subject_addr);
+	     S(th.author_addr);
+	     S(th.text_addr);
+	     S(th.subject_len);
+	     S(th.author_len);
+     }	     
+     
      /* safety checks */
      if (th.version != TRN_HDR_1) {
 	  return (FALSE);

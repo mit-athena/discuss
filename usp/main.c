@@ -81,6 +81,12 @@
 
 */
 
+/*
+ * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/usp/main.c,v 1.2 1991-09-04 11:44:24 lwvanels Exp $
+ * $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/usp/main.c,v $
+ * $Locker:  $
+ */
+
 #include <stdio.h>
 #include <errno.h>
 #include <strings.h>
@@ -90,6 +96,9 @@
 #include <netinet/in.h>
 #include "gen.h"
 #include "usp.h"
+
+static char rcsid[] =
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/usp/main.c,v 1.2 1991-09-04 11:44:24 lwvanels Exp $";
 
 /* connection operations */
 
@@ -181,7 +190,12 @@ int	s;
      }
      /* (don't care much if this fails) */
      (void) setsockopt (s, SOL_SOCKET, SO_KEEPALIVE, &on, sizeof(on));
-     if((write_desc = dup(s)) == ERROR) {
+#if 0
+     write_desc = dup(s);
+#else
+     write_desc = s;
+#endif
+     if(write_desc == ERROR) {
 	 cfree((char *) us);
 	 return(NULL);
      }
