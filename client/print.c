@@ -3,12 +3,15 @@
  *	Print-related requests for DISCUSS.
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.12 1987-03-22 04:41:25 spook Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.13 1987-04-08 03:54:20 wesommer Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
  *
  *      $Log: not supported by cvs2svn $
+ * Revision 1.12  87/03/22  04:41:25  spook
+ * Changes for new interfaces.
+ * 
  * Revision 1.11  86/12/07  16:05:09  rfrench
  * Globalized sci_idx
  * 
@@ -48,7 +51,7 @@
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.12 1987-03-22 04:41:25 spook Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.13 1987-04-08 03:54:20 wesommer Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -115,6 +118,16 @@ prt_trans(argc, argv)
 	selection_list *trn_list;
 
 	request_name = ss_name(sci_idx);
+
+	if (argc != 1) {
+		if (strcmp(argv[0], "print") &&
+		    strcmp(argv[0], "pr") &&
+		    strcmp(argv[0], "p")) {
+		     	fprintf(stderr, "Usage: %s\n", argv[0]);
+			return;
+		}
+	}
+
 	if (!dsc_public.attending) {
 		(void) fprintf(stderr, "No current meeting.\n");
 		return;
@@ -138,7 +151,14 @@ prt_trans(argc, argv)
 	}
 
 	if (argc == 1) {
-	        trn_list = trn_select(&t_info, "current",
+		char *ref;
+		if (!strcmp(argv[0], "print") ||
+		    !strcmp(argv[0], "pr") ||
+		    !strcmp(argv[0], "p")) {
+		        ref = "current";
+		} else ref = argv[0];
+
+	        trn_list = trn_select(&t_info, ref,
 				      (selection_list *)NULL, &code);
 		if (code) {
 			ss_perror(sci_idx, code, "");
