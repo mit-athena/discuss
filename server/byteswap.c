@@ -18,6 +18,8 @@
 #include <discuss/interface.h>
 #include "mtg.h"
 
+extern int add_trn_priv(char *, tfile, char *, char *, trn_nums, trn_nums,
+              char *, date_times, int, trn_nums *, int *);
 #define NULL 0
 #define MAX_TRNS 20000
 #define min(a, b) (a < b ? a : b)
@@ -416,7 +418,7 @@ int position;
 
      tf = unix_tfile (tempf);
 
-     add_trn_priv (location, tf, th_subject, th.orig_pref, th.current, th_author, th.date_entered, &result_trn, &result);
+     add_trn_priv (location, tf, th_subject, NULL, th.orig_pref, th.current, th_author, th.date_entered, 0, &result_trn, &result);
      if (result != 0) {
 	  fprintf (stderr, "Couldn't add transaction %d; %s", th.current, error_message(result));
 	  exit(1);
