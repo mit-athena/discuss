@@ -1,8 +1,8 @@
 #
-# $Id: Imakefile,v 1.1 1993-10-12 05:58:56 probe Exp $
+# $Id: Imakefile,v 1.2 1997-03-17 21:13:42 ghudson Exp $
 #
 
-DISCUSS_UID=32000
+DISCUSS_UID=discuss
 OBJS=	disserve.o atom.o dispatch.o acl.o acl_core.o \
 	../libds/tfile.o ../libds/tnet.o \
 	../ets/dsc_et.o ../ets/rpc_et.o
