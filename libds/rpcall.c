@@ -307,8 +307,7 @@ int *code;
 
 #ifdef KERBEROS
      ExpandHost(hp, phost, krb_realm);
-     if (rem == KSUCCESS)
-	  rem = mk_ap_req (&ticket, serv, phost, krb_realm, (u_long)0);
+     rem = mk_ap_req (&ticket, serv, phost, krb_realm, (u_long)0);
      if (rem == KSUCCESS) {			/* send ticket */
 	  USP_begin_block(us,KRB_TICKET);
 	  sendshort(ticket.length);
