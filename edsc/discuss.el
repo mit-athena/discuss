@@ -11,7 +11,7 @@
 ;;;    	For copying information, see the file mit-copyright.h in this release.
 ;;;
 ;;;	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v $
-;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.27 1991-03-09 22:34:09 tytso Exp $
+;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.28 1991-03-12 17:57:40 tytso Exp $
 ;;;
 ;;;  Emacs lisp code to remote control a "discuss" shell process to
 ;;;  provide an emacs-based interface to the discuss conferencing system.
@@ -20,6 +20,9 @@
 ;;;  Written by Stan Zanarotti, Bill Sommerfeld and Theodore Ts'o.
 ;;;
 ;;;  $Log: not supported by cvs2svn $
+; Revision 1.27  91/03/09  22:34:09  tytso
+; Fixed stupid mistake in setting discuss-old-ss
+; 
 ; Revision 1.26  91/03/09  16:33:49  tytso
 ; *** empty log message ***
 ; 
@@ -471,6 +474,14 @@ a	Add meeting."
 
 (defun discuss-end-of-goto ()
   (let ((last (nth 4 discuss-form)))
+    ;
+    ; To have gotten this far, we must have had status access....
+    ;
+    (if (not (string-match "r" (nth 10 discuss-form)))
+	(progn
+	  (discuss-goto-error)
+	  (error "Insufficient access to read transactions in %s"
+		 (nth 1 discuss-current-meeting-info))))
     (setq discuss-highest-seen (nth 11 discuss-form))
     (if (> discuss-highest-seen last)
 	(progn
@@ -760,8 +771,7 @@ the argument or the current transaction and leaves the meeting."
 	  (setq meeting (cadr (aref discuss-meeting-list curline))))
 	(message "Catching up in %s" meeting)
 	(discuss-send-cmd (format "(gmi %s)\n" meeting)
-			  'discuss-end-of-catchup 'discuss-read-form
-			  'discuss-goto-error))
+			  'discuss-end-of-catchup 'discuss-read-form))
     ;; Otherwise just set discuss-highest-seen.
     (setq discuss-highest-seen (nth 6 discuss-current-meeting-info))
     (discuss-mark-read-meeting (nth 1 discuss-current-meeting-info))
@@ -1212,7 +1222,7 @@ discuss server while we spin-block."
 ; run this at each load
 (defun discuss-initialize nil
   (setq discuss-version
-	"$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.27 1991-03-09 22:34:09 tytso Exp $")
+	"$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.28 1991-03-12 17:57:40 tytso Exp $")
 
 ;;;
 ;;; Lots of autoload stuff....
