@@ -8,7 +8,7 @@
 /*
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/res_module.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/res_module.c,v 1.8 1989-06-03 00:21:31 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/res_module.c,v 1.9 1990-06-03 16:44:03 raeburn Exp $
  *
  * resolve_module () --
  *	Can you say "Put all the configuration into one file?"  Can you
@@ -20,6 +20,9 @@
  *	the remote function is executed as a subprocess.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.8  89/06/03  00:21:31  srz
+ * Added standard copyright notice.
+ * 
  * Revision 1.7  89/05/19  18:12:21  srz
  * krb name changes, etc.
  * 
@@ -30,7 +33,7 @@
 
 #ifndef lint
 static char rcsid_res_module_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/res_module.c,v 1.8 1989-06-03 00:21:31 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/res_module.c,v 1.9 1990-06-03 16:44:03 raeburn Exp $";
 #endif lint
 
 #include "rpc_et.h"
@@ -224,6 +227,7 @@ static void ExpandHost (primary_name, krb_host, krb_realm )
      * could give the command "menel echo foo" and we will resolve
      * it to "menelaus".
      */
+#ifdef OLD_KERBEROS
     *krb_realm = '\0';		/* null for now */
     p = index( sp, '.' );
     if (p) {
@@ -237,6 +241,9 @@ static void ExpandHost (primary_name, krb_host, krb_realm )
 		*p1=toupper(*p1);
 	} while (*p1++);
     }
+#else
+    (void) strcpy(krb_realm, krb_realmofhost(primary_name));
+#endif /* OLD_KERBEROS */
     /* lower case Kerberos host name */
     do {
 	if (isupper(*sp)) *dp=tolower(*sp);
@@ -248,8 +255,10 @@ static void ExpandHost (primary_name, krb_host, krb_realm )
 
     if (*krb_realm == '\0')
 	strcpy (krb_realm, local_realm());
+#ifdef notdef
     if (!strcmp(krb_realm,"MIT.EDU"))
 	strcpy(krb_realm,"ATHENA.MIT.EDU");
+#endif
     return;
 }
 #endif
