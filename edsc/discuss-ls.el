@@ -6,6 +6,7 @@ last trn.
 If ARG is positive, list last ARG transactions.
 If ARG is negative, prompt for range to display."
   (interactive "P")
+  (message "Listing meeting %s..." discuss-current-meeting)
   (let ((start discuss-current-transaction) ;lower limit
 	(finish (nth 4 discuss-current-meeting-info))) ;upper limit
     (if (and discuss-ls-filename
@@ -26,7 +27,7 @@ If ARG is negative, prompt for range to display."
 		(setq start (car range)
 		      finish (car (cdr range))))
 	    (setq start (1+ (- finish arg))))))
-	  
+
     (discuss-send-cmd (format "(ls %s %d %d %d %s)\n"
 			      discuss-ls-filename
 			      start
@@ -40,15 +41,24 @@ If ARG is negative, prompt for range to display."
 	(string-to-int (read-string "End of range: "))))
 
 (defun discuss-end-list-mtg ()
-  (message "done list mtg")
-  (let ((retwin (selected-window)))
-    (if (get-buffer "*discuss-ls*") (kill-buffer "*discuss-ls*"))
-    (setq discuss-ls-buf
-	  (get-buffer-create "*discuss-ls*"))
-    (let ((pop-up-windows t))
-      (pop-to-buffer discuss-ls-buf))
-    ;; (discuss-ls-mode)
-    (let ((buffer-read-only nil))
-      (insert-file-contents discuss-ls-filename))
-    (select-window retwin))
-  )
+  (message "Listing meeting %s... done." discuss-current-meeting)
+  (let ((win (selected-window))
+	(buf (current-buffer)))
+    (unwind-protect
+	(let ((buf (get-buffer "*discuss-ls*"))
+	      (pop-up-windows t)
+	      )
+	  (if buf
+	      (pop-to-buffer buf)
+	    (setq buf (get-buffer-create "*discuss-ls*"))
+	    (pop-to-buffer buf)
+	    (setq buffer-read-only t)
+	    (setq truncate-lines t)
+	    )
+	  (setq discuss-ls-buf buf)
+	  (let ((buffer-read-only nil))
+	    (erase-buffer)
+	    ;; (discuss-ls-mode)
+	    (insert-file-contents discuss-ls-filename)))
+      (select-window win)
+      (set-buffer buf))))
