@@ -1,4 +1,3 @@
-
 /*
  *
  *  rpcall.c -- Procedures to implement a simple (perhaps brain-asleep) RPC
@@ -169,8 +168,7 @@ init_rpc ()
  */
 term_rpc()
 {
-     if (us != NULL)
-	  USP_close_connection(us);
+     flush_convs ();
      return;
 }
 
