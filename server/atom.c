@@ -30,6 +30,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/file.h>
+#include <unistd.h>
 #if HAVE_FCNTL_H
 #include <fcntl.h>
 #endif
@@ -54,7 +55,6 @@ struct dir_blk {
 
 char *malloc(),*calloc();
 char *find_block();
-off_t lseek();
 
 static int maxdirty = 0;				/* meter: maximum dirty blks */
 
@@ -130,7 +130,7 @@ char *buf;
      for (bn = bstart; bn <= bend; bn++) {
 	  toread = min (numleft, ABLOCKSIZE - offset);
 	  if ((bptr = find_block (af, bn)) == NULL) {	/* not there, read file */
-	       lseek (af -> desc, (long)(bn * ABLOCKSIZE + offset), 0);
+	       lseek (af -> desc, (long)(bn * ABLOCKSIZE + offset), SEEK_SET);
 	       result = read (af -> desc, dest_ptr, toread);
 	       if (result != toread)
 		    goto read_error;
@@ -175,12 +175,12 @@ char *buf;
 	  towrite = min (ABLOCKSIZE - offset, numleft);
 	  if ((bptr = find_block (af, bn)) == NULL) {	/* not there, make new one */
 	       bptr = calloc (1, ABLOCKSIZE);
-	       lseek (af -> desc, (long)(bn * ABLOCKSIZE), 0);
+	       lseek (af -> desc, (long)(bn * ABLOCKSIZE), SEEK_SET);
 	       result = read (af -> desc, bptr, ABLOCKSIZE);
 	       if (result < 0)
 		    goto write_error;
 	       /* write block back out, thus reserving quota */
-	       lseek (af -> desc, (long)(bn * ABLOCKSIZE), 0);
+	       lseek (af -> desc, (long)(bn * ABLOCKSIZE), SEEK_SET);
 	       result = write (af -> desc, bptr, ABLOCKSIZE);
 	       if (result < 0)
 		    goto write_error;
@@ -215,7 +215,8 @@ afile af;
      /* loop thru dir blocks, writing all blocks */
      for (db = (struct dir_blk *) af -> dir_list; db != NULL;) {
 	  for (i = 0; i < db -> used; i++) {
-	       lseek (af -> desc, (long)(db -> bnum[i] * ABLOCKSIZE), 0);
+	       lseek (af -> desc, (long)(db -> bnum[i] * ABLOCKSIZE), 
+		      SEEK_SET);
 	       write (af -> desc, db -> bptr[i], ABLOCKSIZE);
 	       free (db -> bptr[i]);
 	       db -> bptr[i] = 0;

@@ -19,12 +19,14 @@
 #include <stdio.h>
 #include <string.h>
 #include <fcntl.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 tfile unix_tfile();
 char *mktemp();
 
 #ifndef	lint
-static char rcsid[] = "$Id: dspipe.c,v 1.10 1999-02-02 20:40:32 kcr Exp $";
+static char rcsid[] = "$Id: dspipe.c,v 1.11 2002-04-06 15:18:51 zacheiss Exp $";
 #endif
 
 main (argc,argv)
@@ -92,7 +94,7 @@ char **argv;
 			break;
 	}
 
-	lseek (d, 0, 0);	/* rewind temp */
+	lseek (d, 0, SEEK_SET);	/* rewind temp */
 
 	tf = unix_tfile (d);
 

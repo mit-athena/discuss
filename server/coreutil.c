@@ -6,7 +6,7 @@
  *
  */
 /*
- *	$Id: coreutil.c,v 1.31 1999-02-02 20:40:41 kcr Exp $
+ *	$Id: coreutil.c,v 1.32 2002-04-06 15:18:55 zacheiss Exp $
  *
  *
  * coreutil.c  -- These contain lower-layer, utility type routines to
@@ -20,7 +20,7 @@
 const
 #endif
 static char rcsid_coreutil_c[] =
-    "$Id: coreutil.c,v 1.31 1999-02-02 20:40:41 kcr Exp $";
+    "$Id: coreutil.c,v 1.32 2002-04-06 15:18:55 zacheiss Exp $";
 #endif /* lint */
 
 #include <discuss/types.h>
@@ -38,6 +38,7 @@ static char rcsid_coreutil_c[] =
 #include <stdlib.h>
 #include <errno.h>
 #include <sys/types.h>
+#include <unistd.h>
 #include <netdb.h>
 #include <sys/file.h>
 #include <sys/stat.h>
@@ -45,6 +46,7 @@ static char rcsid_coreutil_c[] =
 #if HAVE_FCNTL_H
 #include <fcntl.h>
 #endif
+#include <unistd.h>
 
 /* global variables */
 char current_mtg [256] = "";	/* meeting that's opened */
@@ -69,7 +71,6 @@ int use_zephyr = 0;
 
 
 /* EXTERNAL */
-extern off_t lseek();
 extern int errno;
 extern char rpc_caller [];
 
@@ -233,7 +234,7 @@ int read_super()
      if (nuclear) {
 	  aread (a_control_f, (char *) &super, sizeof(super), 0);
      } else {
-	     lseek (u_control_f, (long)0, 0);
+	     lseek (u_control_f, (long)0, SEEK_SET);
 	     read (u_control_f, (char *) &super, sizeof (super));
      }
 
@@ -256,9 +257,9 @@ int read_super()
 	  aread (a_control_f, super_long_name, super.long_name_len, super.long_name_addr);
 	  aread (a_control_f, super_chairman, super.chairman_len, super.chairman_addr);
      } else {
-	  lseek (u_control_f, (long)super.long_name_addr, 0);
+	  lseek (u_control_f, (long)super.long_name_addr, SEEK_SET);
 	  read (u_control_f, super_long_name, super.long_name_len);
-	  lseek (u_control_f, (long)super.chairman_addr, 0);
+	  lseek (u_control_f, (long)super.chairman_addr, SEEK_SET);
 	  read (u_control_f, super_chairman, super.chairman_len);
      }
 
@@ -295,11 +296,11 @@ write_super ()
 	  awrite (a_control_f, super_long_name, slong_name_len, slong_name_addr);
 	  awrite (a_control_f, super_chairman, schairman_len, schairman_addr);
      } else {
-	  lseek (u_control_f, (long)0, 0);
+	  lseek (u_control_f, (long)0, SEEK_SET);
 	  write (u_control_f, (char *)  &super, sizeof (super));
-	  lseek (u_control_f, (long)slong_name_addr, 0);
+	  lseek (u_control_f, (long)slong_name_addr, SEEK_SET);
 	  write (u_control_f, super_long_name, slong_name_len);
-	  lseek (u_control_f, (long)schairman_addr, 0);
+	  lseek (u_control_f, (long)schairman_addr, SEEK_SET);
 	  write (u_control_f, super_chairman, schairman_len);
      }
 
@@ -398,7 +399,7 @@ chain_blk *cb;
      if (nuclear)
 	  aread (a_control_f, (char *) cb, sizeof (chain_blk), cbaddr);
      else {
-	  lseek (u_control_f, (long)cbaddr, 0);
+	  lseek (u_control_f, (long)cbaddr, SEEK_SET);
 	  read (u_control_f, (char *) cb, sizeof (chain_blk));
      }
 
@@ -434,7 +435,7 @@ chain_blk *cb;
 	  }
      }
      else {
-	  lseek (u_control_f, (long)cbaddr, 0);
+	  lseek (u_control_f, (long)cbaddr, SEEK_SET);
 	  if (write (u_control_f, (char *) cb, sizeof (chain_blk)) != sizeof (chain_blk)) {
 	       if (mtg_swapped)
 		    swap_chain(cb);
@@ -459,7 +460,7 @@ char **th_subject, **th_author, **th_signature;
 {
      char *author;
 
-     lseek (u_trn_f, (long)trn_addr, 0);
+     lseek (u_trn_f, (long)trn_addr, SEEK_SET);
      read (u_trn_f, (char *) th, sizeof (trn_hdr));
 
      if (mtg_swapped)
@@ -473,13 +474,13 @@ char **th_subject, **th_author, **th_signature;
 
      if (th_subject != NULL) {
 	  *th_subject = malloc ((unsigned)(th -> subject_len));
-	  lseek (u_trn_f, (long)(th -> subject_addr), 0);
+	  lseek (u_trn_f, (long)(th -> subject_addr), SEEK_SET);
 	  read (u_trn_f, *th_subject, th -> subject_len);
      }
 	  
      if (th_author != NULL || th_signature != NULL) {
 	  author = malloc ((unsigned)(th -> author_len));
-	  lseek (u_trn_f, (long)(th -> author_addr), 0);
+	  lseek (u_trn_f, (long)(th -> author_addr), SEEK_SET);
 	  read (u_trn_f, author, th -> author_len);
      }
 

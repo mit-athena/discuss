@@ -7,7 +7,7 @@
  */
 /*
  *
- *	$Id: core.c,v 1.40 2001-02-28 20:44:23 ghudson Exp $
+ *	$Id: core.c,v 1.41 2002-04-06 15:18:55 zacheiss Exp $
  *
  *
  * core.c --    Routines that are the meat of discuss.  These provide user
@@ -16,7 +16,7 @@
  */
 #ifndef lint
 static char rcsid_core_c[] =
-    "$Id: core.c,v 1.40 2001-02-28 20:44:23 ghudson Exp $";
+    "$Id: core.c,v 1.41 2002-04-06 15:18:55 zacheiss Exp $";
 #endif /* lint */
 
 
@@ -40,6 +40,7 @@ static char rcsid_core_c[] =
 #if HAVE_FCNTL_H
 #include <fcntl.h>
 #endif
+#include <unistd.h>
 
 #ifndef min
 #define min(a, b) (a < b ? a : b)
@@ -47,7 +48,6 @@ static char rcsid_core_c[] =
 extern char *malloc();
 extern char *new_string();
 extern long time();
-extern off_t lseek();
 
 extern mtg_super super;
 extern char *super_chairman;
@@ -63,7 +63,6 @@ extern int has_privs;
 extern int no_nuke;
 extern tfile abort_file;
 extern dsc_acl *mtg_acl;
-
 
 /*
  *
@@ -277,7 +276,7 @@ int *result;
      if (mtg_swapped)
 	  swap_trn(&th);
 
-     lseek (u_trn_f, (long)0, 2);
+     lseek (u_trn_f, (long)0, SEEK_END);
      if (write (u_trn_f, (char *) &th, sizeof (th)) != sizeof (th)) goto werror;
 
      if (mtg_swapped)					/* Swap it back */
@@ -312,7 +311,7 @@ int *result;
      if (mtg_swapped)
 	  swap_trn(&th);
 
-     lseek(u_trn_f, (long)(cb.trn_addr), 0);
+     lseek(u_trn_f, (long)(cb.trn_addr), SEEK_SET);
      if (write (u_trn_f, (char *) &th, sizeof (trn_hdr)) != sizeof (trn_hdr)) goto werror;	/* update num_lines */
 
      super.trn_fsize = fsize (u_trn_f);
@@ -1432,7 +1431,7 @@ int *result;
 
      (void) free(th_author);
 
-     lseek (u_trn_f, (long)(th.text_addr), 0);
+     lseek (u_trn_f, (long)(th.text_addr), SEEK_SET);
      tfs = th.num_chars;
      while (tfs > 0) {
 	  tocopy = min (512, tfs);
@@ -1567,7 +1566,7 @@ int *result;
      }
 
      /* forget locking (and stuff) for what we're doing */
-     lseek (uf, (long)0, 0);
+     lseek (uf, (long)0, SEEK_SET);
      read (uf, (char *) &mysuper, sizeof (mysuper));
      close(uf);
 

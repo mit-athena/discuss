@@ -12,6 +12,7 @@
 #include <sys/types.h>
 #include <sys/file.h>
 #include <sys/stat.h>
+#include <unistd.h>
 
 #include <discuss/types.h>
 #include <discuss/dsc_et.h>
@@ -156,7 +157,7 @@ expunge_range:
 	       }
 	  } else if (result == 0) {
 	       ftruncate(tempf,0);
-	       lseek(tempf,0,0);
+	       lseek(tempf,0,SEEK_SET);
 	       tf = unix_tfile (tempf);
 
 	       get_trn (location, i, tf, &result);
@@ -170,7 +171,7 @@ expunge_range:
 	       }
 
 	       tdestroy (tf);
-	       lseek(tempf,0,0);
+	       lseek(tempf,0,SEEK_SET);
 
 	       tf = unix_tfile (tempf);
 	       no_nuke = TRUE;

@@ -11,6 +11,7 @@
 #include <sys/types.h>
 #include <sys/file.h>
 #include <sys/stat.h>
+#include <unistd.h>
 
 #include <discuss/types.h>
 #include <discuss/dsc_et.h>
@@ -200,7 +201,7 @@ read_header()
      int result;
      int pos;
 
-     lseek(trnf,0,0);				/* rewind file */
+     lseek(trnf, 0, SEEK_SET);				/* rewind file */
      if (read (trnf, &tb, sizeof (trn_base)) < sizeof (trn_base)) {
 	  fprintf (stderr, "Can't read trn_base\n");
 	  exit(1);
@@ -233,7 +234,7 @@ read_header()
 	       exit(1);
 	  }
 	  chairman = malloc (tb.chairman_len);
-	  if (lseek(trnf, tb.chairman_addr, 0) < 0) {
+	  if (lseek(trnf, tb.chairman_addr, SEEK_SET) < 0) {
 no_chairman:
 	       fprintf (stderr, "Can't read chairman\n");
 	       exit(1);
@@ -250,7 +251,7 @@ no_chairman:
 	       exit(1);
 	  }
 	  mtg_name = malloc (tb.long_name_len);
-	  if (lseek(trnf, tb.long_name_addr, 0) < 0) {
+	  if (lseek(trnf, tb.long_name_addr, SEEK_SET) < 0) {
 no_long_name:
 	       fprintf (stderr, "Can't read long_name\n");
 	       exit(1);
@@ -285,7 +286,7 @@ static
 read_trn_hdr (position)
 int position;
 {
-     if (lseek (trnf, position, 0) < 0) {
+     if (lseek (trnf, position, SEEK_SET) < 0) {
 no_read:
 	  fprintf (stderr, "Can't find transaction at %d\n", position);
 	  exit (1);
@@ -341,7 +342,7 @@ static
 maybe_read_trn_hdr(position)
 int position;
 {
-     if (lseek (trnf, position, 0) < 0) {
+     if (lseek (trnf, position, SEEK_SET) < 0) {
 	  return (FALSE);
      }
 
@@ -414,18 +415,18 @@ int position;
      read_trn_hdr (position);
 
      th_subject = malloc (th.subject_len);
-     lseek (trnf, th.subject_addr, 0);
+     lseek (trnf, th.subject_addr, SEEK_SET);
      read (trnf, th_subject, th.subject_len);
 	  
      th_author = malloc (th.author_len);
-     lseek (trnf, th.author_addr, 0);
+     lseek (trnf, th.author_addr, SEEK_SET);
      read (trnf, th_author, th.author_len);
 
      /* start temp file */
      ftruncate(tempf,0);
-     lseek(tempf,0,0);
+     lseek(tempf, 0, SEEK_SET);
 
-     lseek(trnf, th.text_addr, 0);
+     lseek(trnf, th.text_addr, SEEK_SET);
      tfs = th.num_chars;
      while (tfs > 0) {
 	  tocopy = min (512, tfs);
@@ -434,7 +435,7 @@ int position;
 	  tfs -= tocopy;
      }
 
-     lseek(tempf,0,0);
+     lseek(tempf, 0, SEEK_SET);
 
      tf = unix_tfile (tempf);
 
