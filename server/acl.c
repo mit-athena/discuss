@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl.c,v 1.3 1986-11-22 06:17:45 spook Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl.c,v 1.4 1986-12-04 10:18:57 srz Exp $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
  *
@@ -8,6 +8,9 @@
  *	along with routines to move them to and from files.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.3  86/11/22  06:17:45  spook
+ * Changed to make lint happy; also punted duplicate boolean types.
+ * 
  * Revision 1.2  86/11/16  06:01:47  wesommer
  * Implemented acl_replace_access.
  * Redefined acl_delete_access and diked out the old one.
@@ -18,7 +21,7 @@
  */
 
 #ifndef lint
-static char *rcsid_acl_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl.c,v 1.3 1986-11-22 06:17:45 spook Exp $";
+static char *rcsid_acl_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl.c,v 1.4 1986-12-04 10:18:57 srz Exp $";
 #endif lint
 
 #include "../include/acl.h"
@@ -120,11 +123,13 @@ acl_add_access(list, principal, modes)
 	/*
 	 * Is the last entry "*"?  If so, push it back one.
 	 */
-	if (!strcmp(ae->principal, "*")) {
-		if(!strcmp(principal, "*")) 
-			panic("acl broke");
-		*(ae+1) = *ae;
-		--ae;
+	if (list -> acl_length > 1) {		/* non-empty acl */
+	     if (!strcmp(ae->principal, "*")) {
+		  if(!strcmp(principal, "*")) 
+		       panic("acl broke");
+		  *(ae+1) = *ae;
+		  --ae;
+	     }
 	}
 	ae++;
 	ae->principal = malloc((unsigned)(strlen(principal)+1));
