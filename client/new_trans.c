@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v 1.8 1986-12-07 17:49:44 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v 1.9 1986-12-08 00:44:32 wesommer Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
@@ -8,6 +8,9 @@
  *	New-transaction routine for DISCUSS.  (Request 'talk'.)
  *
  *      $Log: not supported by cvs2svn $
+ * Revision 1.8  86/12/07  17:49:44  wesommer
+ * Lint fixes.
+ * 
  * Revision 1.7  86/12/07  16:04:59  rfrench
  * Globalized sci_idx
  * 
@@ -34,7 +37,7 @@
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v 1.8 1986-12-07 17:49:44 wesommer Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v 1.9 1986-12-08 00:44:32 wesommer Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -65,17 +68,54 @@ new_trans(argc, argv)
 	int fd, txn_no;
 	tfile tf;
 	char *subject = &buffer[0];
+	char *whoami = argv[0];
+	char *mtg = NULL;
 	int code;
+	char *editor = NULL;
 
 	USE(sci_idx);
+	
+	while (++argv, --argc) {
+		if (!strcmp (*argv, "-meeting") || !strcmp (*argv, "-mtg")) {
+			if (argc==1) {
+				(void) fprintf(stderr, 
+					       "No argument to %s.\n", *argv);
+				return;
+			} else {
+				--argc;
+				mtg = *(++argv);
+			}
+		} else if (!strcmp (*argv, "-editor") || !strcmp(*argv, "-ed")) {
+			if (argc==1) {
+				(void) fprintf(stderr, 
+					       "No argument to %s.\n", *argv);
+				return;
+			} else {
+				--argc;
+				editor = *(++argv);
+			}
+		} else if (!strcmp(*argv, "-no_editor")) {
+			editor = "";
+		} else {
+			(void) fprintf(stderr, "Usage:  %s [ -editor cmd ] [ -no_editor ] [ -mtg meeting_name ]\n", whoami);
+			return;
+		}
+	}
+	
+	if(mtg) {
+		(void) sprintf(buffer, "goto %s", mtg);
+		ss_execute_line(sci_idx, buffer, &code);
+		if (code != 0) {
+			ss_perror(sci_idx, code, buffer);
+			return;
+		}
+	}
+
 	if (!dsc_public.attending) {
 		(void) fprintf(stderr, "Not currently attending a meeting.\n");
 		return;
 	}
-	if (argc != 1) {
-		(void) fprintf(stderr, "Usage:  %s\n", argv[0]);
-		return;
-	}
+	
 	/*
 	 * Sanity check on access control; this could be changed on the fly
 	 * (which is why it is only a warning)
@@ -86,10 +126,11 @@ new_trans(argc, argv)
 	(void) printf("Subject: ");
 	if (gets(subject) == (char *)NULL) {
 		(void) fprintf(stderr, "Error reading subject.\n");
+		clearerr(stdin);
 		return;
 	}
 	(void) unlink(temp_file);
-	if (edit(temp_file) != 0) {
+	if (edit(temp_file, editor) != 0) {
 		(void) fprintf(stderr,
 			       "Error during edit; transaction not entered\n");
 		unlink(temp_file);
