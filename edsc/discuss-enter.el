@@ -1,5 +1,5 @@
 ;;;	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss-enter.el,v $
-;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss-enter.el,v 1.1 1988-10-24 22:33:12 srz Exp $
+;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss-enter.el,v 1.2 1988-10-26 15:17:35 eichin Exp $
 ;;;
 ;;;  Emacs lisp code to enter transaction into discuss.  Part of the
 ;;;  emacs-based interface to the discuss conferencing system.
@@ -38,9 +38,9 @@
 	nil
       (setq subject (concat "Re: " subject)))
     (discuss-enter discuss-current-meeting discuss-current-transaction
-		   subject)))
+		   subject t)))
 
-(defun discuss-enter (mtg-name reply-trn subject)
+(defun discuss-enter (mtg-name reply-trn subject &optional reply)
     (setq discuss-new-trn-buf
 	  (get-buffer discuss-trn-buffer))
     (if discuss-new-trn-buf
@@ -48,7 +48,10 @@
       (progn
 	(setq discuss-new-trn-buf
 	      (get-buffer-create discuss-trn-buffer))
-	(switch-to-buffer discuss-new-trn-buf)
+	(if (not (null reply))
+	    (let ((pop-up-windows t))
+	      (pop-to-buffer discuss-new-trn-buf))
+	  (switch-to-buffer discuss-new-trn-buf))
 	(discuss-edit-mode)
 	(insert "Subject: "
 		subject
@@ -122,11 +125,13 @@ C-c C-]  discuss-abort-edit (exit without enterring)"
   (set-buffer discuss-trn-buffer)
   (message (format "Transaction %s entered in %s meeting."
 		   (discuss-format-trn-num (car discuss-form))
-		   discuss-enter-mtg)
+		   discuss-enter-mtg))
+  (delete-window)
   (kill-buffer discuss-trn-buffer)
-  (discuss-update)))
+  (discuss-update))
 
 (defun discuss-abort-edit ()
   "Aborts entering a transaction."
   (interactive)
+  (delete-window)
   (kill-buffer discuss-trn-buffer))
