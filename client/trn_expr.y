@@ -18,7 +18,7 @@ range	: trn_no
 		{ trnexpr_low = $1;
 		  trnexpr_high = $1;
 		}
-	| trn_no ':' trn_no
+	| trn_no sep trn_no
 		{ trnexpr_low = $1;
 		  trnexpr_high = $3;
 		}
@@ -31,6 +31,9 @@ range	: trn_no
 		  trnexpr_high = trnexpr_curmtg->last;
 		}
 	;	  
+sep	: ':'
+	| ','
+	;
 
 trn_no	: INTEGER
 	| NREF
