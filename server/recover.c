@@ -36,12 +36,15 @@ tfile unix_tfile ();
 char *malloc();
 
 extern rpc_caller[];
+extern int has_privs;
 
 main (argc, argv)
 int argc;
 char **argv;
 {
      int i;
+
+     has_privs = TRUE;
 
      for (i = 1; i < argc; i++) {
 	  if (*argv[i] == '-') switch (argv[i][1]) {
@@ -106,6 +109,15 @@ char **argv;
      for (i = 1; i <= num_trns; i++) {
 	  if (trn_pos [i] != 0)
 	       save_trn (trn_pos [i]);
+	  else {
+	       int result;
+
+	       expunge_trn(location, i, &result);
+	       if (result != 0) {
+		    fprintf(stderr, "Error expunging transaction [%04d]: %s\n", i, error_message(result));
+		    exit(1);
+	       }
+	  }
      }
 
      exit (0);
@@ -174,7 +186,7 @@ no_long_name:
      /* got the params, now create the meeting */
      create_mtg_priv (location, mtg_name, tb.public_flag, tb.date_created, chairman, NULL, &result);
      if (result != 0) {
-	  fprintf (stderr, "Couldn't create meeting, code = %d", result);
+	  fprintf (stderr, "Couldn't create meeting, %s", error_message(result));
 	  exit(1);
      }
 
@@ -206,7 +218,7 @@ no_read:
 
      /* safety checks */
      if (th.version != TRN_HDR_1) {
-	  fprintf (stderr, "Invalid trn_hdr version\n");
+	  fprintf (stderr, "Invalid trn_hdr version at %d\n", position);
 	  exit(1);
      }
 
@@ -322,7 +334,7 @@ int position;
 
      add_trn_priv (location, tf, th_subject, th.orig_pref, th.current, th_author, th.date_entered, &result_trn, &result);
      if (result != 0) {
-	  fprintf (stderr, "Couldn't add transaction %d, code = %d", th.current, result);
+	  fprintf (stderr, "Couldn't add transaction %d; %s", th.current, error_message(result));
 	  exit(1);
      }
 
