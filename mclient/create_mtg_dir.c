@@ -14,14 +14,13 @@
 #include <sys/file.h>
 #include <sys/param.h>
 #include <pwd.h>
-#ifndef SOLARIS
 #include <strings.h>
-#else
+#ifdef SOLARIS
 #include <unistd.h>
 #include <string.h>
 #endif
 #ifndef	lint
-static char rcsid_create_mtg_dir_c[] = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/create_mtg_dir.c,v 1.4 1993-04-28 15:31:23 miki Exp $";
+static char rcsid_create_mtg_dir_c[] = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/create_mtg_dir.c,v 1.5 1994-03-25 16:48:24 miki Exp $";
 #endif
 
 main(argc, argv)
@@ -48,7 +47,7 @@ main(argc, argv)
 		exit(1);
 	}
 
-	if ((entry = rindex(dir, '/')) == dir) {
+	if ((entry = strrchr(dir, '/')) == dir) {
 		fprintf(stderr, "%s: Can't create meeting there\n", dir);
 		exit(1);
 	}
