@@ -2,11 +2,13 @@
  *
  * edsc () -- A subprocess to make implement emacs discuss mode easier.
  *
+ *	Copyright (C) 1988 by the Student Information Processing Board
+ * 
  */
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/edsc.c,v 1.1 1988-10-24 22:32:05 srz Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/edsc.c,v 1.2 1988-10-26 15:04:59 srz Exp $";
 #endif lint
 
 #include <stdio.h>
