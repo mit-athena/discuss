@@ -6,7 +6,7 @@
  *
  */
 /*
- *	$Id: crmtgs.c,v 1.6 1999-04-11 19:16:35 danw Exp $
+ *	$Id: crmtgs.c,v 1.7 1999-04-12 16:47:06 ghudson Exp $
  *
  *	Fill out a .meetings file with the primary name of all the
  *	meetings in it.  This requires that the meeting be accessible
@@ -17,9 +17,10 @@
 
 #ifndef lint
 static char rcsid_crmtgs_c[] =
-    "$Id: crmtgs.c,v 1.6 1999-04-11 19:16:35 danw Exp $";
+    "$Id: crmtgs.c,v 1.7 1999-04-12 16:47:06 ghudson Exp $";
 #endif /* lint */
 
+#include <stdio.h>
 #include <discuss/discuss.h>
 
 extern char *getenv ();
