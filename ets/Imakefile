@@ -1,31 +1,16 @@
 #
-# Imakefile for the Discuss error tables.
+# $Id: Imakefile,v 1.2 1991-09-04 11:32:17 lwvanels Exp $
 #
 
-# This is only a library for convenience.  It will *never* be
-# profiled.
-# XXX Some of these header files should be installed somewhere..
+error_table(discuss_err)
+error_table(dsc_et)
+error_table(rpc_et)
+error_table(usp_et)
 
+all:: krb_et.o
+all:: discuss_err.o dsc_et.o rpc_et.o usp_et.o
 
-ETS	= discuss_err.et dsc_et.et rpc_et.et usp_et.et
-OBJS	= discuss_err.o dsc_et.o krb_et.o rpc_et.o usp_et.o
-HDRS	= discuss_err.h dsc_et.h krb_et.h rpc_et.h usp_et.h
-SRCS	= krb_et.c
+krb_et.o: krb_et.c
+	$(RM) krb_et.o
+	$(CC) $(CFLAGS) -c krb_et.c
 
-all:: $(OBJS)
-
-clean::
-	$(RM) *.o *.h
-
-# Make really should figure this out itself.
-discuss_err.o : discuss_err.c
-discuss_err.c : discuss_err.et
-dsc_et.o : dsc_et.c
-dsc_et.c : dsc_et.et
-rpc_et.o : rpc_et.c
-rpc_et.c : rpc_et.et
-usp_et.o : usp_et.c
-usp_et.c : usp_et.et
-
-# no .et file
-krb_et.o : krb_et.c 
