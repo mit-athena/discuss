@@ -7,7 +7,7 @@
  */
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.17 1989-06-03 00:42:34 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.18 1989-08-09 22:39:43 srz Exp $
  *
  *
  * coreutil.c  -- These contain lower-layer, utility type routines to
@@ -15,6 +15,9 @@
  *		  in-memory superblock, and to open & close meetings.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.17  89/06/03  00:42:34  srz
+ * Added standard copyright notice.
+ * 
  * Revision 1.16  89/06/03  00:36:43  srz
  * Include file fixups, more efficient Zephyr service.
  * 
@@ -74,7 +77,7 @@
 const
 #endif
 static char rcsid_coreutil_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.17 1989-06-03 00:42:34 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.18 1989-08-09 22:39:43 srz Exp $";
 #endif /* lint */
 
 #include <discuss/types.h>
@@ -159,6 +162,13 @@ char *mtg_name;
      if (mtg_name[0] != '/' || mtg_name_len == 0 || mtg_name_len > 168
 	 || mtg_name [mtg_name_len-1] == '/') {
 	  return (BAD_PATH);
+     }
+
+     /* Check for moved meeting */
+     (void) strcpy (str, mtg_name);
+     (void) strcat (str, "/forward");
+     if (!stat(str, &sb)) {
+	  return(MTG_MOVED);
      }
 
      (void) strcpy (str, mtg_name);

@@ -8,13 +8,16 @@
 /*
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.26 1989-06-03 00:42:11 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.27 1989-08-09 22:39:05 srz Exp $
  *
  *
  * core.c --    Routines that are the meat of discuss.  These provide user
  *		callable routines.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.26  89/06/03  00:42:11  srz
+ * Added standard copyright notice.
+ * 
  * Revision 1.25  89/01/29  17:17:12  srz
  * Added flag routines.
  * 
@@ -66,7 +69,7 @@
  */
 #ifndef lint
 static char rcsid_core_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.26 1989-06-03 00:42:11 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.27 1989-08-09 22:39:05 srz Exp $";
 #endif lint
 
 
@@ -89,7 +92,7 @@ static char rcsid_core_c[] =
 
 #define min(a, b) (a < b ? a : b)
 #define NULL 0
-extern char *malloc();
+extern char *malloc(),*index();
 extern char *new_string();
 extern long time();
 extern off_t lseek();
@@ -1186,7 +1189,43 @@ int *result;
      info -> public_flag = TRUE;
 
      *result = open_mtg (mtg_name);
-     if (*result) return;
+     if (*result) {
+	  if (*result == MTG_MOVED) {
+	       char buf[100];
+	       int mf;
+	       char *cp;
+
+	       strcpy(buf, mtg_name);
+	       strcat(buf, "/forward");
+	       if ((mf = open(buf, O_RDONLY, 0700)) < 0) {
+		    *result = INCONSISTENT;
+		    return;
+	       }
+	       if (read(mf, buf, 100) < 0) {
+		    *result = INCONSISTENT;
+		    close(mf);
+		    return;
+	       }
+	       close(mf);
+	       cp = index(buf, '\n');
+	       if (cp == NULL) {
+		    *result = INCONSISTENT;
+		    return;
+	       }
+	       *cp = '\0';
+	       cp = index(buf, ':');
+	       if (cp == NULL) {
+		    *result = INCONSISTENT;
+		    return;
+	       }
+	       *cp++ = '\0';
+	       free(info -> long_name);
+	       info -> long_name = new_string (buf);
+	       free(info -> location);
+	       info -> location = new_string (cp);
+	  }
+	  return;
+     }
 
      free(info -> access_modes);
      info -> access_modes = new_string (acl_get_access(mtg_acl, rpc_caller));
@@ -1383,6 +1422,7 @@ int *result;
      char str[256];
      int mtg_name_len;
      mtg_super mysuper; 
+     struct stat sb;
      int uf;
 
      *updated = 0;
@@ -1391,6 +1431,14 @@ int *result;
      mtg_name_len = strlen (mtg_name);
      if (mtg_name[0] != '/' || mtg_name_len == 0 || mtg_name_len >= MAXPATHLEN || mtg_name [mtg_name_len-1] == '/') {
 	  *result = BAD_PATH;
+	  return;
+     }
+
+     strcpy (str, mtg_name);
+     strcat (str, "/forward");
+     if (!stat(str, &sb)) {		/* Show moved meetings as changed */
+	  *updated = TRUE;
+	  *result = 0;
 	  return;
      }
 
