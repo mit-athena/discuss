@@ -1,15 +1,18 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/rn.c,v $
  *	$Author: srz $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/rn.c,v 1.1 1987-10-24 19:48:02 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/rn.c,v 1.2 1987-11-07 02:50:38 srz Exp $
  *
  *	Copyright (C) 1987 by the Massachusetts Institute of Technology
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.1  87/10/24  19:48:02  srz
+ * Initial revision
+ * 
  */
 
 #ifndef lint
-static char *rcsid_update_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/rn.c,v 1.1 1987-10-24 19:48:02 srz Exp $";
+static char *rcsid_update_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/rn.c,v 1.2 1987-11-07 02:50:38 srz Exp $";
 #endif lint
 
 #include "types.h"
@@ -53,29 +56,39 @@ rn(argc, argv, ss_idx)
 
 	flag_interrupts();
 	printf("\n");
-	while(changed_meetings()) {
-	        if (interrupt)
-		     break;
-		cmd = more_break("Hit space to go to next meeting: ", " q");
-	        if (interrupt)
-		     break;
-	        printf("\n");
-		switch(cmd) {
-		case 'q': 
-			goto punt;
 
-		case ' ':
-		case 'n':
-			break;
-		}
-		ss_execute_line(ss_idx, "nm", &code);
-		if (code != 0) goto punt;
+	if (!changed_meetings())
+	     return;
+
+	cmd = more_break("Hit space to go to next meeting: ", " qn?");
+	if (interrupt)
+	     goto done;
+	printf("\n");
+	switch(cmd) {
+	case 'q':
+	     goto done;
+	case ' ':
+	case 'n':
+	     break;
+	case '?':
+	     printf("List of possible responses:\n\n");
+	     printf("<space>,n\tNext meeting\n");
+	     printf("q\t\tQuit from read_new\n");
+	     printf("?\t\tShow this list\n\n");
+	     break;
+	}
+	ss_execute_line(ss_idx, "nm", &code);
+	if (code != 0) goto punt;
+
+	while (1) {			/* we get out when changed_meetings is false */
+	        if (interrupt)
+		     break;
 		
 		while (unseen_transactions()) {
 		        if (interrupt)
 			     break;
 
-			cmd = more_break("Hit space for next transaction: ", " q");
+			cmd = more_break("Hit space for next transaction: ", " qnptr?");
 			if (interrupt)
 			     break;
 		        printf("\n");
@@ -84,12 +97,73 @@ rn(argc, argv, ss_idx)
 				goto punt;
 			case ' ':
 			case 'n':
+				ss_execute_line(ss_idx, "next", &code);
+				if (code != 0) goto punt;
+				break;
+			case 'p':
+				ss_execute_line(ss_idx, "prev", &code);
+				if (code != 0) goto punt;
+				break;
+			case 'r':
+				ss_execute_line(ss_idx, "reply", &code);
+				if (code != 0) goto punt;
+				break;
+			case 't':
+				ss_execute_line(ss_idx, "talk", &code);
+				if (code != 0) goto punt;
+				break;
+			case '?':
+				printf("List of possible responses:\n\n");
+				printf("<space>,n\tNext transaction\n");
+				printf("p\t\tPrevious transaction\n");
+				printf("q\t\tQuit from read_new\n");
+				printf("r\t\tReply to current transaction\n");
+				printf("t\t\tEnter a new transaction\n");
+				printf("?\t\tShow this list\n\n");
 				break;
 			}
-			ss_execute_line(ss_idx, "next", &code);
-			if (code != 0) goto punt;
+		}
+
+		if (!changed_meetings())
+		     break;
+
+		cmd = more_break("Hit space to go to next meeting: ", " qn?ptr");
+		if (interrupt)
+		     break;
+		printf("\n");
+		switch(cmd) {
+		case 'q':
+		     goto punt;
+		case ' ':
+		case 'n':
+		     ss_execute_line(ss_idx, "nm", &code);
+		     if (code != 0) goto punt;
+		     break;
+		case 'p':
+		     ss_execute_line(ss_idx, "prev", &code);
+		     if (code != 0) goto punt;
+		     break;
+		case 'r':
+		     ss_execute_line(ss_idx, "reply", &code);
+		     if (code != 0) goto punt;
+		     break;
+		case 't':
+		     ss_execute_line(ss_idx, "talk", &code);
+		     if (code != 0) goto punt;
+		     break;
+		case '?':
+		     printf("List of possible responses:\n\n");
+		     printf("<space>,n\tNext meeting\n");
+		     printf("p\t\tPrevious transaction\n");
+		     printf("q\t\tQuit from read_new\n");
+		     printf("r\t\tReply to current transaction\n");
+		     printf("t\t\tEnter a new transaction\n");
+		     printf("?\t\tShow this list\n\n");
+		     break;
 		}
 	}
+
+done:
 	return;
 
 punt:
@@ -134,5 +208,5 @@ more_break(prompt, cmds)
 static
 unseen_transactions()
 {
-     return (dsc_public.highest_seen < dsc_public.m_info.last);
+     return (dsc_public.current < dsc_public.m_info.last);
 }
