@@ -1,9 +1,12 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v 1.5 1987-03-22 04:51:58 spook Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v 1.6 1987-04-08 15:46:22 spook Exp $
  *	$Locker:  $
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.5  87/03/22  04:51:58  spook
+ * Rewritten for new interfaces.
+ * 
  * Revision 1.4  87/02/12  21:40:57  spook
  * Rob's changes; removed "../include" stuff, other frobs.
  * 
@@ -16,7 +19,7 @@
  */
 
 #ifndef lint
-static char *rcsid_mkds_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v 1.5 1987-03-22 04:51:58 spook Exp $";
+static char *rcsid_mkds_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v 1.6 1987-04-08 15:46:22 spook Exp $";
 #endif lint
 
 #include "tfile.h"
@@ -83,8 +86,14 @@ char *argv[];
 	}
 
 	gethostname(hostname, 256);
-	nb.hostname = malloc(strlen(hostname)+1);
-	strcpy(nb.hostname, hostname);
+	{
+		register char *h;
+		struct hostent *hp;
+		hp = gethostbyname(hostname);
+		h = (hp ? hp->h_name : hostname);
+		nb.hostname = malloc(strlen(h)+1);
+		strcpy(nb.hostname, h);
+	}
 
 	printf("Meeting location [default %s]: ", default_dir);
 	(void) gets(mtg_path);
