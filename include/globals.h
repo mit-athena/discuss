@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/include/globals.h,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/include/globals.h,v 1.11 1987-04-11 00:54:40 spook Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/include/globals.h,v 1.12 1987-04-19 21:48:44 srz Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
@@ -31,8 +31,8 @@ struct _dsc_pub {
 /* Variables */
 
 extern struct _dsc_pub dsc_public;
+extern char	dsc_version[];
 extern char	*buffer;
-extern int	time_now, time_sixmonthsago;
 extern int	*chosen_trn_map; /* which trns we want to see */
 extern int	map_size;	/* size of chosen_trn_map */
 extern char	*temp_file;	/* generic temporary file... */
@@ -47,9 +47,6 @@ extern bool 	use_editor;	/* Should we snarf input from stdin, or
 extern char	*editor_path;	/* Pathname of editor to use */
 
 extern	char	*user_id;	/* user.instance@realm identifier for user */
-
-#define	CURRENT_VERSION	"1.1"
-
 
 /* Subroutine declarations */
 
