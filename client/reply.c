@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v 1.10 1988-08-17 00:34:23 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v 1.11 1988-10-12 13:39:05 raeburn Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
@@ -11,7 +11,7 @@
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v 1.10 1988-08-17 00:34:23 srz Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v 1.11 1988-10-12 13:39:05 raeburn Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -185,7 +185,7 @@ repl(argc, argv)
 	}
  
 	close(fd);
-	(void) printf("Transaction [%04d] entered in the %s meeting.",
+	(void) printf("Transaction [%04d] entered in the %s meeting.\n",
 		       txn_no, dsc_public.mtg_name);
 
 	dsc_public.current = orig_trn;
