@@ -52,7 +52,8 @@ will cause
 .B dsmail
 to retain the ``default'' fields.  These are the to, from, cc, and
 date fields, the Message-Id field, the MIME-related fields, and any
-other fields ending in ``-to'' or ``-from''.
+other fields ending in ``-to'' (except for fields beginning with
+``d'', such as Delivered-To) or ``-from''.
 .TP
 .B \-A
 causes ALL fields to be retained.  This can be modified by the 

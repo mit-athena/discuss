@@ -12,6 +12,10 @@
  *        $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/dsmail.c,v $
  *
  *        $Log: not supported by cvs2svn $
+ *        Revision 1.8  1998/04/16 22:17:33  ghudson
+ *        From mhpower: prevent /tmp symlink attachs and check malloc return
+ *        values.
+ *
  *        Revision 1.7  1998/04/07 22:00:03  danw
  *        Add Message-ID and MIME headers to the list of default (-d) headers to keep
  *
@@ -140,7 +144,7 @@
 
 #ifndef	lint
 static char rcsid[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/dsmail.c,v 1.8 1998-04-16 22:17:33 ghudson Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/dsmail.c,v 1.9 1998-04-16 22:20:41 ghudson Exp $";
 #endif
 
 char *malloc(), *realloc ();
@@ -154,7 +158,7 @@ extern char *optarg;                /* External variables for getopt */
 extern int optind;
 
 char *deflist[] = {
-	"^to$","^from$","^cc$",".*-to$",".*-from$","^date$",
+	"^to$","^from$","^cc$","^[^d].*-to$",".*-from$","^date$",
 	"^message-id$", "^mime-version$", "^content-.*$", NULL
 };
 		
