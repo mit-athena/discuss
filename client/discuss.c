@@ -1,6 +1,7 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.4 1986-07-31 15:56:08 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.5 1986-08-01 02:41:35 spook Exp $
+ *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
  *
@@ -8,12 +9,20 @@
  *	ss library for the command interpreter.
  *
  *      $Log: not supported by cvs2svn $
+ * Revision 1.4  86/07/31  15:56:08  wesommer
+ * Fixed up some brain-damage surrounding the prt_trans/write_trans
+ * interactions.
+ *      "If you're using longjmp, you're doing something wrong"
+ *                              - Jim Gettys
+ * write_trans no longer takes an sci_idx as its argument; it has an
+ * additional last argument, which is an error code.
+ * 
  */
 
 #include <X/mit-copyright.h>
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.4 1986-07-31 15:56:08 wesommer Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.5 1986-08-01 02:41:35 spook Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -62,27 +71,6 @@ main(argc, argv)
 	}
 	ss_listen (sci, &zcode);
 	unlink(temp_file);
-}
-
-edit(fn)
-	char *fn;
-{
-	char *ed = getenv("EDITOR");
-	if (!ed) ed="/bin/ed";
-
-	switch(fork()) {
-	case -1:
-		perror("couldn't fork");
-		break;
-	case 0:
-		execlp(ed, ed, fn, 0);
-		perror(ed);
-		exit(1);
-		break;
-	default:
-		break;
-	}
-	wait(0);
 }
 
 new_trans(sci_idx, argc, argv)
