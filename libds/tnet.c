@@ -1,17 +1,20 @@
 /*
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tnet.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tnet.c,v 1.2 1987-04-11 00:06:25 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tnet.c,v 1.3 1987-07-17 03:11:26 spook Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
  * tnet.c -- procedures to have tfiles go over the net.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.2  87/04/11  00:06:25  srz
+ * Added RCS junk
+ * 
  *
  */
 #ifndef lint
-static char *rcsid_tnet_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tnet.c,v 1.2 1987-04-11 00:06:25 srz Exp $";
+static char *rcsid_tnet_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tnet.c,v 1.3 1987-07-17 03:11:26 spook Exp $";
 #endif lint
 
 #define min(A, B) ((A) < (B) ? (A) : (B))
@@ -39,7 +42,7 @@ char **infop, *argp;
 {
      USPStream *us;
      USPCardinal bt;
-     int numread;
+     unsigned numread;
 
      *result = 0;		/* optimist */
      us = (USPStream *) *infop;
@@ -104,5 +107,5 @@ tfile net_tfile (tfs, us)
 int tfs;
 USPStream *us;
 {
-     return (tcreate (tfs, us, 0, tnet));
+     return (tcreate (tfs, (char *)us, 0, tnet));
 }
