@@ -1,13 +1,13 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v 1.7 1987-04-08 03:57:39 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v 1.8 1987-04-09 05:41:04 wesommer Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
  */
 
 #ifndef lint
-static char *rcsid_dsname_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v 1.7 1987-04-08 03:57:39 wesommer Exp $";
+static char *rcsid_dsname_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v 1.8 1987-04-09 05:41:04 wesommer Exp $";
 #endif lint
 
 /*
@@ -104,7 +104,8 @@ static int set_rc_filename(auser_id, buf, len)
 	register char *cp = NULL;
 
 	if ((auser_id == NULL) || 
-	    (auser_id[0] == '\0')) {
+	    (auser_id[0] == '\0') ||
+	    (me && !strcmp(auser_id, me))) {
 		if (!disrcfile) {
 			register int code;
 			if (code = find_rc_filename())
