@@ -1,0 +1,83 @@
+ACCESS(DISCUSS)					  ACCESS(DISCUSS)
+
+TOPIC
+     access - access control for discuss
+
+DESCRIPTION
+     The discuss system permits fine-grained access control to meetings.
+     Each meeting has an access control list (acl) which specifies
+     who is allowed to manipulate the meeting.  The acl consists of a
+     series of pairs consisting of a set of allowed access modes and a 
+     (possibly wildcarded) Kerberos ID.
+
+     When specified in the command line, principal names take the form 
+     of a username followed by optional instance and realm names; if
+     unspecified, the instance defaults to the null instance, and the realm
+     defaults to the local realm.  The instance is separated from the 
+     username by a '.' character; the realm is separated by a '@' 
+     character.
+
+     There are seven possible permitted access modes:
+
+	a (Answer):
+	   Indicates that the principal can respond to transactions in
+	   the meeting.
+
+	c (Chairman):
+	   Indicates that the principal is a chairman, allowing him to 
+	   edit the access control list.  Note that a chairman who does not
+	   watch what he is doing can delete his own access from the
+	   meeting.  Also, having chairman access does not
+	   automatically imply any other form of access
+
+	d (Delete):
+	   Indicates that the principal may delete or retrieve from deletion
+	   any transaction in the meeting.
+
+	o (Owner):
+	   Indicates that the principal may delete or retrieve from deletion
+	   any transaction entered by that principal.
+
+	r (Read):
+	   Indicates that the principal may read or list any
+	   transaction in the meeting.
+
+	s (Status): 
+	   Indicates that the principal may find out summary information 
+	   about a meeting, such as listing the access control list,
+	   finding the number of transactions, etc.
+
+	w (Write):
+	   Indicates that the user may add a new transaction to the meeting
+	   as other than a reply.
+
+     Normal access configurations:
+     There are a few normal access configurations for discuss, depending on 
+     the purpose of the meeting.  Using access control lists, it is possible
+     to fine-tune who is permitted to access a meeting.
+
+     There should always be one or more chairmen for a meeting; the chairmen 
+     should have full ("acdorsw") access.  If the meeting is "public" and 
+     for general discussion on some topic, the only other entry on the ACL
+     should be "aorsw" for "*".  
+
+     If a meeting is for "official" announcements from a limited
+     number of principals, they should be given "aorsw" access, 
+     while access for "*" should be set to "ors".
+
+     If a meeting is designed for bug reporting, where everyone can make
+     reports, but only designated people may make official responses,
+     access should be set to "orsw" for "*" and "aorsw" for the designated 
+     respondants.
+
+     Meetings designed as archives for mailing lists should have a chairman,
+     have "w" access for "daemon@<local-realm>", and "ors" access for "*".
+     See the man page for dsmail(1) to see how that should be set up.
+
+SEE ALSO
+     discuss(1), list_acl(discuss), set_acl(discuss), delete_acl(discuss),
+     acl(3)
+
+BUGS
+     Currently, the only allowed wildcard is "*", indicating all
+     possible principals.

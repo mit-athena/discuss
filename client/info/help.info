@@ -1,0 +1,26 @@
+HELP(DISCUSS)					    HELP(DISCUSS)
+
+NAME
+     help - Get help on a command or topic
+
+SYNOPSYS
+     help <topic|command>
+
+DESCRIPTION
+     The help command provides help on commands and topics of discuss. 
+     A complete list of commands can be obtained by using the 
+     list_requests command (which can be abbreviated to just "?").
+     Other topics available include:
+
+	access - help on access control lists for discuss meetings.
+	specifiers, spec - Help on specifying transactions to commands.
+
+SEE ALSO
+     discuss(1)
+
+DIAGNOSTICS
+     discuss(help): No info found for [topic]
+	There is no entry in the info directory for this topic.
+
+BUGS
+     There should be some way to list help topics.

@@ -1,0 +1,28 @@
+#
+#   Error table defining USP error codes and messages.
+#
+
+	error_table	usp
+
+	ec	UENOTRCVING,
+		"Not receiving block"
+
+	ec	UENOTSENDING,
+		"Not sending block"
+
+	ec	UECBNOTENDED,
+		"Current block not ended"
+
+	ec	UEPREMEOB,
+		"Premature end of block"
+
+	ec	UEBADATA,
+		"Bad data"
+
+	ec	UENOMEM,
+		"No memeory"
+
+	ec	UEINTERNAL,
+		"Internal error"
+
+	end

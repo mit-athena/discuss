@@ -1,0 +1,1567 @@
+
+./client/edit.c,31
+edit(119,3198
+touch(206,5150
+
+./client/list.c,209
+del_trans(153,3700
+static delete_it 127,3138
+static flag_it(283,7097
+list 103,2652
+static list_it(40,1117
+void map_trns(193,4479
+ret_trans(185,4365
+static retrieve_it 162,3838
+int switch_cmd(320,7886
+
+./client/ckm.c,62
+check_meetings 96,2473
+do_mtg(31,699
+next_meeting(143,3568
+
+./client/lsm.c,60
+int do_line(36,864
+do_mtg(78,2033
+list_meetings 127,3030
+
+./client/data.c,0
+
+./client/new_trans.c,38
+#define	USE(34,763
+new_trans(43,954
+
+./client/addmtg.c,177
+add_mtg(47,1242
+add_mtg_it(215,5294
+add_the_mtg(365,9202
+command_query 497,11958
+del_mtg(408,10297
+del_the_mtg 477,11441
+hostpath_to_nb 315,7709
+parse_mtg_info(254,6468
+
+./client/pager.c,25
+int pager_create(11,224
+
+./client/reply.c,13
+repl(40,898
+
+./client/status.c,48
+add_msg(36,748
+put_msg(48,917
+status(57,1052
+
+./client/set.c,16
+set_cmd(35,782
+
+./client/output.c,21
+output_trans(36,878
+
+./client/interrupt.c,79
+dont_flag_interrupts(37,716
+flag_interrupts(30,611
+interrupt_handler(23,549
+
+./client/print.c,104
+#define	USE(35,817
+display_trans(52,1118
+#define max(40,886
+prt_trans(76,1691
+write_trans(179,3916
+
+./client/trn_spec.c,215
+add_new_te(250,5956
+#define max(52,1644
+parse_trans_spec(100,2953
+process_an_arg(153,4220
+int n_trn_table = (sizeof(80,2509
+int n_switches = (sizeof(89,2669
+tg_next_trn(208,5234
+int tg_next_trn_num(265,6255
+
+./client/anm.c,21
+announce_mtg 29,644
+
+./client/discuss.c,105
+#define	DONT_USE(37,912
+#define	FREE(42,991
+int getyn(212,5317
+int main 60,1359
+#define max(43,1033
+
+./client/time.c,19
+short_time(24,696
+
+./client/trn_select.c,172
+#define	MAX(21,539
+#define	MIN(20,504
+int filter_call_func 86,1745
+sl_free(74,1608
+sl_insert_num(64,1424
+sl_insert_range(29,685
+sl_map(103,2345
+trn_select(201,4870
+
+./client/catchup.c,34
+catchup(29,651
+set_seen(51,1110
+
+./client/rn.c,96
+static changed_meetings(59,1617
+more_break(231,5470
+rn(76,1903
+unseen_transactions(262,6061
+
+./client/trn_spec.h,0
+
+./client/nls.c,31
+list_it(36,897
+nlist(70,1640
+
+./client/goto.c,158
+#define	DONT_USE(33,734
+#define	FREE(38,813
+goto_mtg(49,1076
+void leave_mtg(221,6497
+#define max(39,855
+switch_to_mtg(61,1261
+switch_to_mtg_nb(79,1553
+
+./client/trn_expr.c,154
+main(181,3732
+static match(67,1260
+#define	to_lower(66,1210
+int trnexpr_parse(157,3145
+static yyerror(50,997
+static yylex(78,1397
+yyparse(268,5816
+
+./client/randrp.c,15
+randrp(27,622
+
+./client/list_acl.c,74
+del_acl(145,3389
+list_acl(62,1715
+print_acl(103,2463
+set_acl(114,2685
+
+./client/sequencer.c,105
+static changed_meetings(22,329
+more_break(89,1418
+sequencer(43,670
+static unseen_transactions(39,615
+
+./client/malloc.c,459
+#define ASSERT(191,7572
+#define ASSERT(194,7673
+#define CHAIN(236,9012
+#define New(151,6551
+botch(13,207
+find_sym(911,25645
+public free 591,18399
+public get_lim_data 785,23237
+public get_lim_data 796,23397
+public get_lim_data 803,23480
+getpool 436,14183
+public int m_blocksize(310,10981
+malloc 494,15668
+malloc_dump_all(823,23829
+public malloc_init 298,10805
+malloc_stats 744,22373
+malloc_warning(7,134
+morecore 324,11353
+realloc 649,19932
+
+./et/et_name.c,38
+const char * error_table_name(25,700
+
+./et/error_message.c,35
+const char * error_message 29,866
+
+./et/compile_et.c,177
+static int check_arg 53,1082
+static void dup_err 122,2513
+int main 128,2697
+int strcasecmp 284,6652
+static void usage 116,2398
+char * xmalloc 44,943
+int yyerror(293,6853
+
+./et/init_et.c,29
+int init_error_table(37,759
+
+./et/com_err.c,259
+void com_err 101,2279
+void com_err_va 91,2093
+    default_com_err_proc 57,1366
+    default_com_err_proc 59,1460
+errf reset_com_err_hook 139,2973
+errf set_com_err_hook 128,2784
+#define vfprintf(22,515
+#	define vfprintf(32,787
+#define vfprintf(48,1155
+
+./et/com_err.h,132
+void (*reset_com_err_hook 28,784
+void (*reset_com_err_hook 35,983
+void (*set_com_err_hook 26,655
+void (*set_com_err_hook 34,951
+
+./et/error_table.h,0
+
+./et/mit-sipb-copyright.h,0
+
+./et/test.c,13
+main(16,364
+
+./et/compiler.h,0
+
+./et/internal.h,0
+
+./ets/krb_et.c,29
+int init_krb_err_tbl 25,494
+
+./include/config.h,0
+
+./include/rpc.h,0
+
+./include/ansi.h,0
+
+./include/atom.h,0
+
+./include/globals.h,24
+#define alloca(81,1924
+
+./include/internal.h,0
+
+./include/trn_spec.h,0
+
+./include/mit-copyright.h,0
+
+./include/discuss/discuss.h,0
+
+./include/discuss/tfile.h,0
+
+./include/discuss/mit-sipb-copyright.h,0
+
+./include/discuss/dsname.h,0
+
+./include/discuss/interface.h,0
+
+./include/discuss/types.h,0
+
+./include/discuss/acl.h,0
+
+./libds/rpcall.c,499
+void close_rpc(234,4219
+void init_rpc 212,3970
+#define min(74,2032
+rpc_conversation open_rpc 259,4555
+static void panic(88,2263
+unsigned short recvbool(428,8064
+void recvdata(473,8797
+int recvint 399,7703
+void recvreply 379,7421
+char *recvstr 417,7920
+void sendbool(168,3420
+void senddata(446,8327
+void sendfile(182,3595
+void sendint(126,2846
+void sendit(198,3795
+void sendshort(138,3021
+void sendstr(151,3187
+void set_rpc(247,4390
+void startsend(107,2575
+void term_rpc(223,4095
+
+./libds/interface.c,749
+#define	FREE(55,1449
+static meeting *create_mblock(57,1492
+dsc_add_trn(143,3198
+dsc_add_trn2(155,3487
+dsc_create_mtg(254,5750
+dsc_delete_access 343,7456
+dsc_delete_trn(234,5384
+void dsc_destroy_mtg_info 363,7795
+void dsc_destroy_trn_info 384,8175
+void dsc_destroy_trn_info3 397,8382
+dsc_get_access 321,7049
+dsc_get_acl 311,6878
+dsc_get_mtg_info(270,6118
+dsc_get_trn(281,6308
+dsc_get_trn_info(172,3958
+dsc_get_trn_info2(183,4172
+dsc_get_trn_info3(199,4538
+dsc_remove_mtg(292,6508
+dsc_retrieve_trn(244,5565
+dsc_set_access 332,7253
+dsc_set_trn_flags(219,5081
+dsc_updated_mtg 301,6664
+dsc_whoami(353,7637
+log_warning(414,8670
+#define	same_mtg(35,1016
+#define same_str(33,895
+select_meeting(110,2532
+set_warning_hook(426,8892
+
+./libds/stubs.c,607
+add_trn 78,2121
+add_trn2 111,3075
+create_mtg 287,7380
+delete_access(502,12334
+delete_trn 233,6076
+dwhoami(541,13131
+get_access(462,11585
+get_acl(444,11269
+get_mtg_info 341,8664
+get_server_version(558,13380
+get_trn 370,9351
+get_trn_info 145,3987
+get_trn_info2 174,4688
+get_trn_info3 203,5393
+old_get_mtg_info 314,7999
+old_recv_mtg_info(655,15708
+dsc_acl *recv_acl(693,16716
+recv_mtg_info(676,16222
+recv_trn_info(580,13792
+recv_trn_info2(604,14392
+recv_trn_info3(629,15028
+remove_mtg 399,10083
+retrieve_trn 259,6700
+set_access(482,11979
+set_trn_flags(520,12657
+updated_mtg 420,10620
+
+./libds/auth_krb.c,27
+get_authenticator 41,1112
+
+./libds/dsname.c,514
+static void clear_current 158,3356
+static char * compress(364,7090
+INLINE static char * ds(67,1530
+void dsc_copy_name_blk 444,8759
+void dsc_destroy_mtg_set(499,9879
+void dsc_destroy_name_blk(469,9386
+dsc_expand_mtg_set(382,7392
+dsc_get_mtg 512,10107
+void dsc_update_mtg_set(544,10694
+static void enddbent(177,3767
+static char ** expand(330,6523
+int find_rc_filename(87,1990
+static int getdbent(196,4126
+static int is_a_name(308,6163
+static int set_rc_filename(125,2666
+static int setdbent(281,5661
+
+./libds/conv_mgr.c,106
+void flush_convs 189,4726
+get_conv_server_version(221,5332
+get_module 61,1352
+void set_module 78,1756
+
+./libds/host.c,44
+local_host_name 28,816
+int namcmp(46,1158
+
+./libds/test.c,13
+main 13,142
+
+./libds/tfile.c,182
+#define min(41,1008
+tclose(93,1790
+int tcontrol(133,2543
+tfile tcreate 48,1126
+int tdestroy 147,2809
+int tfsize 73,1494
+topen(79,1551
+int tread(105,2010
+int twrite(119,2275
+
+./libds/tnet.c,64
+#define min(35,901
+tfile net_tfile 121,2457
+int tnet 54,1189
+
+./libds/tunix.c,67
+#define min(36,1023
+int tunix 62,1397
+tfile unix_tfile 121,2554
+
+./libds/auth_dum.c,26
+get_authenticator 28,805
+
+./libds/announce.c,45
+dsc_announce_mtg 31,777
+#define min(27,713
+
+./libds/dsc_enter.c,140
+dsc_enter(65,1522
+dsc_enter_filter(95,2331
+#define field_ok(77,1778
+static bool list_compare(245,5907
+static void strndowncpy(260,6112
+
+./libds/tfpager.c,157
+crank(206,3839
+int init_tfpager(225,4191
+tfile pager_tfile(261,4817
+pgr_prompt(153,2911
+void set_echo(65,1221
+void set_no_echo(56,1050
+tpager 75,1402
+
+./libds/tmem.c,124
+static int iovmove 41,984
+tfile mem_tfile 99,2105
+tfile memv_tfile 111,2380
+#define min(37,913
+static int tmem(73,1607
+
+./libds/foodriver.c,11
+main(7,67
+
+./libds/res_module.c,96
+static void ExpandHost 220,5712
+const char *local_realm 274,7364
+void resolve_module 71,1963
+
+./mclient/pmtg.c,85
+int main 27,539
+resolve_mtg 152,3307
+write_header(97,1905
+write_trailer 126,2581
+
+./mclient/dspipe.c,35
+main 29,657
+resolve_mtg 149,2965
+
+./mclient/dlsm.c,13
+main(10,308
+
+./mclient/crmtgs.c,48
+main(41,1152
+punt(98,2469
+punt_code(105,2527
+
+./mclient/mkds.c,102
+#define clower(80,2044
+#define cupper(79,1998
+getyn(345,8313
+main(90,2215
+char *strtrim(363,8666
+
+./mclient/dsc_setup.c,13
+main(16,421
+
+./mclient/ndsmail.c,171
+int CheckField(283,6169
+void MakeLowerCase(275,6051
+void PRS(299,6510
+void PipeToMeeting(235,5078
+#define alloca(44,1006
+int list_compare(354,7518
+int main 98,1798
+
+./mclient/create_mtg_dir.c,13
+main(23,566
+
+./mclient/dsmail.c,193
+int CheckField(275,6460
+void MakeLowerCase(267,6350
+void PRS(291,6779
+void SendToMeeting(197,4636
+extract_full_name(481,9897
+int list_compare(350,7853
+main(105,2444
+strip_addr(368,8110
+
+./server/mtg.h,0
+
+./server/config.h,0
+
+./server/acl.c,493
+acl_add_access(180,4781
+char *acl_canon(437,10891
+bool acl_check(79,2429
+dsc_acl *acl_copy 307,7904
+dsc_acl *acl_create(299,7702
+acl_delete_access(276,7315
+acl_delete_modes(225,5940
+acl_destroy(348,9010
+const char *acl_get_access(329,8658
+char *acl_intersection(381,9751
+bool acl_is_subset(367,9444
+dsc_acl *acl_read(96,2820
+acl_replace_access(256,6817
+char *acl_subtract(415,10375
+char *acl_union(398,10042
+bool acl_write(152,4140
+main(468,11452
+static void panic(499,12543
+
+./server/core.c,393
+add_trn 138,3794
+add_trn2 159,4446
+add_trn_priv 175,4963
+create_mtg 1156,28512
+create_mtg_priv 1165,28815
+delete_trn 843,21111
+expunge_trn(403,11225
+get_mtg_info 1333,33268
+get_trn 1429,35565
+get_trn_info 473,12592
+get_trn_info2 574,14979
+get_trn_info3 676,17436
+#define min(108,3104
+remove_mtg 1509,37234
+retrieve_trn 960,23715
+set_trn_flags 780,19924
+updated_mtg 1574,38476
+
+./server/atom.c,177
+aabort(232,5922
+aclose(198,5058
+add_block 289,7101
+afile aopen 66,1822
+aread(102,2524
+awrite(147,3668
+char *find_block(266,6647
+#define max(35,1218
+#define min(36,1252
+
+./server/coreutil.c,437
+faddr chain_addr(413,10662
+core_abort 525,13201
+finish_read(400,10498
+fis_owner 567,13737
+forget_super(367,9895
+fsize 552,13543
+bool has_mtg_access(616,14643
+bool has_trn_access(584,13980
+void mtg_znotify(668,15411
+char *new_string 152,4617
+int open_mtg 169,4885
+panic(651,15168
+int read_chain 422,10835
+int read_super(294,7642
+int read_trn 475,11940
+start_read(385,10229
+int write_chain 448,11370
+write_super 325,8575
+
+./server/dispatch.c,198
+dispatch 74,2834
+old_send_mtg_info(437,10970
+send_acl(478,11964
+send_mtg_info(458,11455
+send_trn_info(362,9193
+send_trn_info2(386,9751
+send_trn_info3(411,10342
+int	numprocs = sizeof 72,2781
+
+./server/disserve.c,17
+int main 29,693
+
+./server/attic/acl.c,377
+acl_add_access(83,1739
+Bool acl_check(20,313
+Acl *acl_create(166,3662
+acl_delete_access(123,2705
+acl_destroy(194,4173
+char *acl_get_access(174,3840
+char *acl_intersection(227,4796
+Bool acl_is_subset(213,4495
+Acl *acl_read(37,687
+acl_replace_access(154,3529
+char *acl_subtract(261,5372
+char *acl_union(244,5069
+Bool acl_write(68,1379
+main(279,5674
+panic(308,6733
+
+./server/attic/atest.c,33
+main(13,197
+#define min(11,162
+
+./server/attic/atom.c,174
+aabort(216,5452
+aclose(182,4662
+add_block 273,6582
+afile aopen 57,1545
+aread(86,2152
+awrite(131,3288
+char *find_block(250,6128
+#define max(27,948
+#define min(28,982
+
+./server/attic/core.c,241
+add_trn 56,1583
+add_trn_priv 70,2032
+create_mtg 647,16214
+create_mtg_priv 656,16491
+delete_trn 342,9021
+get_mtg_info 791,20047
+get_trn 844,21226
+get_trn_info 246,6839
+#define min(30,990
+remove_mtg 918,22729
+retrieve_trn 455,11525
+
+./server/attic/coreutil.c,384
+faddr chain_addr(282,6331
+core_abort 376,8273
+finish_read(271,6191
+fis_owner 415,8764
+forget_super(244,5737
+fsize 400,8570
+bool has_mtg_access(460,9595
+bool has_trn_access(432,9007
+char *new_string 47,1067
+code open_mtg 64,1318
+code read_chain 291,6504
+code read_super(173,3602
+code read_trn 341,7484
+start_read(258,5951
+code write_chain 317,7034
+write_super 204,4492
+
+./server/attic/dispatch.c,97
+dispatch 33,1079
+send_mtg_info(181,4247
+send_trn_info(157,3687
+int	numprocs = sizeof 31,1026
+
+./server/attic/disserve.c,11
+main 6,65
+
+./server/attic/glue.c,161
+USP_begin_block 16,260
+USP_end_block 19,293
+USP_flush_block 22,324
+USP_get_byte_block 25,357
+USP_put_byte_block 28,393
+USP_rcv_blk 13,231
+init_rpc 10,215
+
+./server/attic/recover.c,215
+create_temp(375,8058
+fsize 340,7581
+main 37,763
+maybe_read_trn_hdr(233,5335
+#define min(21,429
+char *new_string 358,7814
+read_header(115,2448
+read_last_trn 270,6126
+read_trn_hdr 191,4330
+save_trn 282,6326
+
+./server/attic/rpproc.c,254
+init_rpc 58,926
+#define min(35,545
+unsigned short recvbool(159,2602
+tfile recvfile 176,2849
+int recvint 125,2116
+recvit 98,1628
+char *recvstr 142,2365
+sendbool(237,3730
+sendint(209,3315
+sendreply(251,3933
+sendstr(223,3521
+startreply(197,3181
+
+./server/glue.c,17
+init_rpc 17,452
+
+./server/recover.c,216
+create_temp(410,9112
+fsize 375,8635
+main 51,1225
+maybe_read_trn_hdr(265,6213
+#define min(30,720
+char *new_string 393,8868
+read_header(146,3261
+read_last_trn 302,7004
+read_trn_hdr 223,5192
+save_trn 314,7204
+
+./server/rpproc.c,320
+handle_kerberos(258,5355
+init_rpc 112,2421
+#define min(82,1921
+bool recvbool(404,7931
+tfile recvfile 421,8154
+int recvint 359,7336
+recvit 318,6698
+short recvshort 370,7494
+char *recvstr 387,7712
+sendbool(480,8946
+senddunno(508,9320
+sendint(453,8575
+sendreply(494,9133
+sendstr(466,8754
+startreply(441,8439
+
+./server/expunge.c,173
+create_temp(298,8359
+extract_full_name(479,11292
+get_from_signature(323,8896
+get_header(565,12998
+lower(353,9376
+main 53,1304
+#define min(31,755
+strip_addr(365,9498
+
+./server/acl_core.c,195
+delete_access(231,5723
+get_access(162,4336
+get_acl(153,4171
+locked_abort(328,7808
+locked_close_mtg(343,8019
+locked_open_mtg(273,6569
+static dsc_acl *read_acl(108,3305
+set_access(184,4741
+
+./server/expunge2.c,55
+create_temp(264,7298
+main 42,930
+#define min(25,536
+
+./server/byteswap.c,306
+#define S(72,1415
+static inline long Slong 59,1202
+static inline short Sshort 48,1031
+create_temp(475,10086
+fsize 440,9609
+main 81,1571
+maybe_read_trn_hdr(319,7066
+#define min(23,483
+char *new_string 458,9842
+read_header(176,3607
+read_last_trn 370,8147
+read_trn_hdr 263,5755
+save_trn 382,8347
+
+./ss/invocation.c,63
+int ss_create_invocation(17,433
+ss_delete_invocation(71,2078
+
+./ss/help.c,85
+void ss_add_info_dir(88,2201
+void ss_delete_info_dir(125,3116
+void ss_help 17,373
+
+./ss/execute_cmd.c,226
+static int check_request_table 72,1927
+static struct _ss_request_entry * get_request 38,905
+#define get_request(47,1183
+static int really_execute_command 125,3370
+ss_execute_command(158,4109
+int ss_execute_line 192,4824
+
+./ss/listen.c,150
+static int listen_int_handler(52,1105
+static int print_prompt(36,737
+void ss_abort_subsystem(127,2826
+int ss_listen 58,1195
+int ss_quit(135,2967
+
+./ss/parse.c,49
+#define NEW_ARGV(35,882
+char **ss_parse 38,975
+
+./ss/error.c,93
+void ss_error 57,1260
+void ss_error 59,1328
+char * ss_name(18,430
+void ss_perror 82,1761
+
+./ss/prompt.c,44
+ss_get_prompt(31,676
+ss_set_prompt(23,544
+
+./ss/request_tbl.c,62
+ss_add_request_table(14,350
+ss_delete_request_table(46,1171
+
+./ss/list_rqs.c,50
+#define DONT_USE(15,420
+ss_list_requests(24,620
+
+./ss/pager.c,85
+void ss_page_stdin(70,1261
+int ss_pager_create(35,722
+int ss_pager_create(62,1160
+
+./ss/requests.c,89
+#define	DECLARE(16,351
+DECLARE(21,496
+DECLARE(31,714
+DECLARE(39,862
+DECLARE(48,1061
+
+./ss/data.c,0
+
+./ss/mk_cmds.c,30
+main(33,724
+yyerror(92,2036
+
+./ss/utils.c,215
+char *ds(130,3274
+char * generate_cmds_string(36,943
+void generate_function_definition(48,1273
+char * generate_rqte(56,1452
+gensym(87,2382
+char *quote(115,2978
+char *str_concat3(99,2609
+void write_ct(19,457
+
+./ss/options.c,17
+flag_val(26,591
+
+./ss/ss.h,0
+
+./ss/ss_internal.h,343
+#define LOCAL_ALLOC(53,1116
+#define LOCAL_ALLOC(57,1204
+#define LOCAL_ALLOC(63,1364
+#define LOCAL_ALLOC(68,1487
+#define LOCAL_FREE(54,1159
+#define LOCAL_FREE(58,1237
+#define LOCAL_FREE(64,1397
+#define LOCAL_FREE(69,1520
+#define PROTOTYPE(16,356
+#define PROTOTYPE(23,442
+#define	ss_current_request(120,2761
+#define	ss_info(119,2715
+
+./ss/copyright.h,0
+
+./ss/test.c,41
+int main(39,812
+void test_cmd 114,2595
+
+./ss/mit-sipb-copyright.h,0
+
+./usp/usp_et.h,0
+
+./usp/block.c,159
+USP_begin_block(146,3874
+USP_end_block(167,4313
+Boolean USP_end_of_block_p(211,5097
+USP_flush_block(185,4670
+USP_rcv_blk(34,774
+char *usp_error(221,5250
+
+./usp/gen.h,20
+#define max(20,375
+
+./usp/get.c,190
+USP_get_boolean(15,287
+USP_get_byte_block(210,4014
+USP_get_cardinal(70,1272
+USP_get_integer(46,832
+USP_get_long_cardinal(118,2186
+USP_get_long_integer(94,1721
+USP_get_string(142,2663
+
+./usp/internal.c,180
+get_from_net(107,2666
+get_from_sub_block(70,1643
+get_sub_block_header(16,307
+put_into_sub_block(135,3271
+put_onto_net(197,4791
+send_sub_block(167,4092
+skip_sub_block(44,961
+
+./usp/main.c,130
+USPStream *USP_associate(178,5302
+USP_close_connection(217,6118
+USPStream *USP_make_connection(107,3515
+USP_shutdown(254,6790
+
+./usp/notice.h,0
+
+./usp/put.c,189
+USP_put_boolean(15,288
+USP_put_byte_block(181,3707
+USP_put_cardinal(57,1039
+USP_put_integer(40,717
+USP_put_long_cardinal(91,1706
+USP_put_long_integer(74,1364
+USP_put_string(108,2051
+
+./usp/usp.h,0
+
+./xdsc/main.c,38
+int _exit(178,4575
+int main(68,1661
+
+./xdsc/stuff.h,545
+static inline void _Ibzero 41,822
+static inline void * _Icalloc 57,1169
+static inline void _Imemmove 27,431
+static inline char * _Istrchr 66,1374
+static inline char * _Istrdup 49,985
+static inline int _Istrlen 17,264
+static inline char * _Istrrchr 76,1559
+#define abs(93,1866
+#define alloca(92,1828
+#define alloca(104,2090
+#define bzero(47,952
+#define calloc(64,1339
+#define index(94,1898
+#define memcpy(38,738
+#define rindex(95,1929
+#define strchr(74,1524
+#define strdup(55,1138
+#define strlen(25,400
+#define strrchr(85,1718
+
+./xdsc/Meeting.c,1298
+static void ClassInitialize 223,6420
+static void Destroy 932,27448
+static void Initialize 808,23293
+static inline ldiv_t Ivax_ldiv 174,5088
+static void abort_mtg 284,8078
+static inline Widget add_a_button 639,18588
+#define add_label(742,21736
+static void build_command_box 779,22475
+static void cancel_edit 386,10888
+static void chain 565,16321
+static void change_trn 304,8705
+static void destroy_widget_soon 375,10651
+static Boolean destroy_window_wp 370,10548
+static void enter_transaction 397,11196
+#define free(29,621
+static inline DiscussMeetingWidget get_dsc_widget 217,6231
+static inline ldiv_t ldiv 166,4879
+#define ldiv(182,5339
+static void list 596,17272
+static void list_em 577,16632
+#define malloc(27,535
+static void popup_edit_window 422,11926
+static void quit_mtg 290,8324
+static void radio 611,17758
+#define realloc(28,575
+static void redo 227,6491
+static void reply 540,15609
+static void run_discuss_command 533,15368
+static void run_xterm_command 505,14738
+static void save_info 267,7554
+static void inline set_label_text 205,5890
+static inline time_buf short_time(186,5428
+static void inline show_error 211,6044
+static void show_transaction 643,18723
+static void skip_chain 340,9851
+static void talk 559,16128
+static void update_info 239,6751
+
+./xdsc/mtg.c,169
+static Boolean destroy_window_wp 27,528
+void schedule_window_destruction_cb 32,631
+select_mtg 43,995
+void select_null_mtg 105,2907
+#define set_refigure_mode(25,459
+
+./xdsc/buttons.c,188
+static Pixmap XtGrayPixmap 19,382
+Boolean check_a_meeting 63,1269
+cmd_abort(168,4051
+cmd_ckm 156,3791
+cmd_quit(50,1064
+set_up_cmd_button_box(189,4426
+set_up_mtg_button_box 223,5327
+
+./xdsc/Meeting.h,0
+
+./xdsc/X11/VPaned.h,0
+
+./xdsc/strdup.c,40
+char *strdup 20,324
+int strlen 13,224
+
+./xdsc/stdarg.h,106
+#define __va_rounded_size(9,202
+#define va_end(22,613
+#define va_start(13,323
+#define va_start(16,427
+
+./xdsc/time.c,88
+static ldiv_t ldiv 25,650
+static inline ldiv_t ldiv 33,829
+char * short_time(46,1098
+
+./xdsc/MeetingP.h,0
+
+./xdsc/windows.c,16
+windows(24,542
+
+./xdsc/vax/open.c,126
+#define CALLER(80,1619
+#define PREV_FRAME_POINTER(79,1559
+int close 164,3343
+static dump_fd_list(39,621
+int open(83,1665
+
+./xdsc/vax/krbglue.c,322
+int an_to_ln(48,1503
+int check_replay 129,3238
+int get_credentials 62,1695
+int mk_ap_req(30,1063
+long mk_appl_err_msg 109,2894
+long mk_private_msg 69,1839
+long mk_safe_msg 90,2418
+int rd_ap_req(38,1269
+long rd_appl_err_msg 117,3029
+long rd_private_msg 79,2115
+long rd_safe_msg 99,2647
+int set_serv_key 55,1601
+
+./xdsc/mit-sipb-copyright.h,0
+
+./xdsc/frep.c,38
+void go_away 16,239
+int main 34,603
+
+./xdsc/old/DM.c,0
+
+./xdsc/old/DiskSrc.c,340
+static int DiskAppendText 174,4947
+int DiskReadText 110,3190
+static XtTextPosition DiskScan 228,6671
+static int DiskSetLastPos 214,6243
+static int DummyReplaceText 161,4635
+static int FillBuffer 132,3887
+#define Increment(62,2182
+static char Look(84,2707
+XtTextSource XtDiskSourceCreate(295,8236
+void XtDiskSourceDestroy 350,9991
+
+./xdsc/old/VFoo.c,353
+static void ChangeManaged(291,7951
+static void ClassInitialize(96,2471
+static DoLayout(121,3180
+static XtGeometryResult GeometryManager(236,6079
+static void Initialize(299,8086
+static Boolean PreferredSize(167,4507
+static void Realize(321,8890
+static void Resize(182,4852
+static Boolean SetValues 345,9445
+static Boolean TryNewLayout(198,5237
+
+./xdsc/old/VFoo.h,0
+
+./xdsc/old/VPaneBBox.c,63
+XtVPaneButtonBoxAddButton(28,614
+XtVPaneButtonBoxCreate(4,27
+
+./xdsc/old/bar/BBox.c,849
+static XtStatus AddButton(423,10544
+static WidgetData ButtonBoxDataFromWindow(133,4417
+static XtGeometryReturnCode ButtonBoxGeometryManager(402,9922
+static void ButtonBoxInitialize(122,4253
+int DeleteButton(458,11397
+static void Destroy(263,7027
+static int DoLayout(149,4751
+static XtEventReturnCode EventHandler(234,6477
+static WindowLugPtr FindButton(286,7449
+static void Layout(222,6305
+static int PreferredSize(208,6074
+static XtGeometryReturnCode ResizeButtonRequest(365,8976
+static int TryLayout(304,7725
+static int TryNewLayout(349,8674
+XtStatus XtButtonBoxAddButton(555,14107
+Window XtButtonBoxCreate(480,12000
+XtStatus XtButtonBoxDeleteButton(583,14819
+void XtButtonBoxGetValues 627,15717
+void XtButtonBoxSetValues 644,15987
+#define assignmax(40,1464
+#define assignmin(41,1511
+#define max(38,1376
+#define min(39,1420
+
+./xdsc/old/bar/command.c,277
+ChildDone(64,2154
+DoCommand(74,2429
+char *DoCommandToFile(180,5600
+char *DoCommandToString(126,4111
+char *DoCommandToString(147,4701
+#define FD_CLR(44,1633
+#define FD_ISSET(45,1713
+#define FD_SET(43,1554
+#define FD_ZERO(46,1791
+static char *FullPathOfCommand(53,1916
+
+./xdsc/old/bar/largewindow.c,70
+finish_setup(17,320
+setup_large_window(36,822
+setup_windows(29,670
+
+./xdsc/old/bar/malloc.c,481
+#define ASSERT(212,8019
+#define ASSERT(215,8120
+#define CHAIN(257,9459
+#define New(153,6533
+#define New(172,6998
+botch(13,174
+find_sym(932,26092
+public free 612,18846
+public get_lim_data 806,23684
+public get_lim_data 817,23844
+public get_lim_data 824,23927
+getpool 457,14630
+public int m_blocksize(331,11428
+malloc 515,16115
+malloc_dump_all(844,24276
+public malloc_init 319,11252
+malloc_stats 765,22820
+malloc_warning(7,101
+morecore 345,11800
+realloc 670,20379
+
+./xdsc/old/bar/screen.c,448
+Scrn CreateNewScrn(323,11368
+void DestroyScrn(470,15205
+void EnableProperButtons(105,3697
+static FillCompButtons(75,2612
+static FillViewButtons(51,1703
+MakeComp(309,11075
+static MakeTocAndView(163,5294
+MakeView(299,10844
+void MapScrn(494,15756
+Scrn NewCompScrn(451,14861
+Scrn NewViewScrn(437,14643
+void PrepareDoubleClickFolder(145,4926
+void PrepareDoubleClickSequence(153,5088
+ScrnGeometryRequest(39,1486
+#define SetButton(101,3525
+
+./xdsc/old/bar/smallwindow.c,93
+setup_buttonbox(21,316
+setup_cmd_box(26,344
+setup_small_windows(14,227
+setup_text(30,365
+
+./xdsc/old/bar/windows.1.c,171
+finish_map(39,661
+foo(140,3368
+nuke_dbox(130,3111
+void select_mtg(16,282
+set_up_big_window(55,1223
+set_up_button_box(72,1627
+set_up_buttons(95,2235
+windows(26,422
+
+./xdsc/old/bar/xmh.bbox.c,739
+void BBoxAddButton(234,6701
+void BBoxAllowAnySize(446,12109
+Button BBoxButtonNumber(372,10429
+void BBoxChangeBorderWidth(474,12767
+ButtonBox BBoxCreate(160,4923
+void BBoxDeleteBox(462,12495
+void BBoxDeleteButton(282,8386
+void BBoxDisable(344,9893
+void BBoxEnable(331,9695
+Button BBoxFindButtonNamed(357,10133
+void BBoxForceFullSize(429,11604
+char *BBoxNameOfButton(392,10717
+int BBoxNumButtons(383,10586
+ButtonBox BBoxRadioCreate(105,3198
+void BBoxSetRadio(172,5134
+void BBoxStartUpdate(416,11266
+void BBoxStopUpdate(405,11081
+FreeButton(41,1561
+static XtEventReturnCode HandleBBoxResize(54,1801
+static XtEventReturnCode HandleBBoxResize(78,2442
+static ProcessAddedButtons(189,5613
+static void SendEnableMsg(318,9365
+
+./xdsc/old/bar/Atoms.h,0
+
+./xdsc/old/bar/BBox.h,0
+
+./xdsc/old/bar/Intrinsic.h,87
+#define XtAtomToAction(448,12729
+#define XtNumber(80,2566
+#define XtSetArg(154,4232
+
+./xdsc/old/bbox.c,35
+Widget set_up_a_button_box(11,205
+
+./xdsc/old/event.c,25
+void event_handler(3,23
+
+./xdsc/old/loop.c,13
+loop(10,105
+
+./xdsc/old/setup.c,14
+setup(13,160
+
+./xdsc/Toggle.c,454
+AddToRadioList(379,11025
+ClassInit(163,5505
+CreateRadioList(354,10305
+GetRadioList(335,9875
+static void Initialize(202,6619
+static void Notify(267,8131
+RemoveFromRadioList(438,12339
+SetValues 285,8563
+Toggle(252,7843
+ToggleDestroy(313,9288
+ToggleSet(240,7630
+TurnOffRadioSiblings(409,11693
+XtToggleChangeRadioGroup(465,12994
+XtToggleGetCurrent(490,13688
+XtToggleSetCurrent(516,14366
+XtToggleUnsetCurrent(565,15534
+#define offset(71,2432
+
+./xdsc/Viewport.c,580
+static void ChangeManaged(269,8777
+static void ConstraintInitialize(216,7283
+static void CreateScrollbar(124,4472
+static Boolean DoLayout(658,20157
+static XtGeometryResult GeometryManager(579,17569
+static void Initialize(183,6390
+static void MoveChild(363,11483
+static XtGeometryResult PreferredGeometry(692,21154
+static void Realize(222,7439
+static void RedrawThumbs(346,11076
+static void Resize(386,12069
+static void ScrollUpDownProc(531,16356
+static void SetBar(338,10894
+static Boolean SetValues(248,8212
+static void ThumbProc(548,16807
+#define offset(41,1559
+
+./xdsc/AsciiSink.c,464
+static AsciiClearToBackground 215,6041
+static int AsciiDisplayText 106,3106
+static AsciiFindDistance 227,6292
+static AsciiFindPosition(266,7569
+static AsciiInsertCursor 177,4856
+static int AsciiMaxHeightForLines 354,10136
+static int AsciiMaxLinesForHeight 342,9870
+static int AsciiResolveToPosition 324,9430
+static int CharWidth 76,2432
+static Pixmap CreateInsertCursor(165,4585
+XtTextSink XtAsciiSinkCreate 368,10424
+void XtAsciiSinkDestroy 474,14061
+
+./xdsc/version.c,0
+
+./edsc/do_stuff.c,283
+do_am(794,18161
+do_at(519,11703
+do_dm(833,19058
+do_gcm(433,10036
+do_gmi(35,696
+do_gml(387,9199
+do_gpv(863,19602
+do_grt(342,8247
+do_grtn(678,15453
+do_gt(137,3011
+do_gtf(221,5149
+do_gti(82,1753
+do_nut(577,12979
+do_sfl(749,17191
+do_ss(482,10909
+hostpath_to_nb 873,19712
+
+./edsc/edsc.c,72
+bit_bucket(147,3063
+do_quit(153,3119
+log_warn(140,2954
+main(70,1451
+
+./edsc/edsc.h,0
+
+./edsc/parse.c,75
+#define EAT_SPACE(17,324
+get_word(21,382
+lowercase(58,942
+trim(69,1061
+
+./edsc/do_mtg.c,152
+do_am(241,5362
+do_dm(298,6705
+do_gmi(30,627
+do_gml(134,3162
+do_gmn(229,5191
+do_ss(189,4370
+handle_moved_meeting(82,1819
+hostpath_to_nb 332,7306
+
+./edsc/do_cache.c,191
+struct cache_info *cache_empty(86,1703
+void cache_flush(61,1239
+struct cache_info *cache_search(109,2141
+void cache_transaction(40,892
+int cmp_meetings(143,2745
+int keypressed(157,3123
+
+./edsc/do_trn.c,168
+do_at(349,8716
+do_dt(667,16035
+do_grt(304,7765
+do_grtn(508,12463
+do_gt(81,1831
+do_gtf(174,4319
+do_gti(25,520
+do_nut(407,9991
+do_rt(628,15252
+do_sfl(580,14254
+
+./edsc/time.c,19
+short_time(24,696
+
+./edsc/do_quote.c,23
+char *do_quote(31,807
+
+./edsc/do_misc.c,156
+#define	MIN(24,499
+do_dacl(99,2046
+do_gpv(29,595
+do_ls(173,3415
+do_pacl(36,727
+do_sacl(132,2646
+char *fix_principal(87,1752
+static list_it(304,6373
+
+./edsc/version.c,0
+
+./et.old/copyright.c,0
+
+./et.old/et_name.c,23
+error_table_name(5,49
+
+./et.old/error_message.c,35
+error_message(48,898
+itoa(31,611
+
+./et.old/compile_et.c,31
+main(27,438
+yyerror(125,2483
+
+./et.old/perror.c,85
+com_err(12,187
+perror(61,1118
+reset_com_err_hook(55,1054
+set_com_err_hook(47,926
+
+./et.old/init_et.c,25
+init_error_table(33,614
+
+./et.old/error_table.h,0
+
+./et.old/test.c,12
+main(8,128
+
+./et.old/log_warning.c,73
+static _log_warning(23,654
+log_warning(32,840
+set_warning_hook(39,937
+
+./ss.really_old/cmds_utils.c,105
+generate_cmds_string(27,578
+generate_function_definition(42,852
+generate_rqte(51,991
+write_ct(13,309
+
+./ss.really_old/ct.h,0
+
+./ss.really_old/current_req.c,27
+ss_current_request 10,193
+
+./ss.really_old/data.c,0
+
+./ss.really_old/execute_cmd.c,315
+static int check_command(99,2000
+static int check_request_table 193,4112
+static void execute_call(153,3116
+#define	get_request(130,2543
+static int interrupt_handler(148,3056
+static char **parse 32,672
+really_execute_command(243,5278
+splice_in(219,4720
+ss_execute_command(288,6279
+ss_execute_line 322,6945
+
+./ss.really_old/help.c,70
+ss_add_info_dir(86,1975
+ss_delete_info_dir(124,2827
+ss_help 15,269
+
+./ss.really_old/invocation.c,59
+ss_create_invocation(11,221
+ss_delete_invocation(61,1752
+
+./ss.really_old/list_requests.c,50
+#define	DONT_USE(13,317
+ss_list_requests(22,502
+
+./ss.really_old/listen.c,113
+listen_int_handler(41,878
+print_prompt(27,583
+ss_abort_subsystem(107,2415
+ss_listen 48,956
+ss_quit(116,2547
+
+./ss.really_old/make_commands.c,31
+main(27,579
+yyerror(119,2801
+
+./ss.really_old/mit-sipb-copyright.h,0
+
+./ss.really_old/mkcmds_utils.c,107
+generate_cmds_string(34,816
+generate_function_definition(48,1094
+generate_rqte(61,1355
+write_ct(15,310
+
+./ss.really_old/options.c,17
+flag_val(24,491
+
+./ss.really_old/pager.c,54
+int ss_page_stdin(55,983
+int ss_pager_create(27,550
+
+./ss.really_old/prompt.c,44
+ss_get_prompt(18,337
+ss_set_prompt(10,205
+
+./ss.really_old/request_tbl.c,62
+ss_add_request_table(11,249
+ss_delete_request_table(43,1072
+
+./ss.really_old/requests.c,88
+#define	DECLARE(13,238
+DECLARE(18,383
+DECLARE(28,601
+DECLARE(36,749
+DECLARE(45,948
+
+./ss.really_old/ss_internal.h,60
+#define	ss_current_request(50,1043
+#define	ss_info(49,997
+
+./ss.really_old/ss_perror.c,35
+ss_name(13,251
+ss_perror(51,1023
+
+./ss.really_old/string_utils.c,79
+char *ds(56,1120
+gensym(13,228
+char *quote(41,824
+char *str_concat3(25,455
+
+./ss.abbrev/invocation.c,63
+int ss_create_invocation(15,321
+ss_delete_invocation(68,1980
+
+./ss.abbrev/help.c,85
+void ss_add_info_dir(86,2082
+void ss_delete_info_dir(123,2997
+void ss_help 15,254
+
+./ss.abbrev/execute_cmd.c,226
+static int check_request_table 70,1814
+static struct _ss_request_entry * get_request 36,792
+#define get_request(45,1070
+static int really_execute_command 122,3188
+ss_execute_command(199,5179
+int ss_execute_line 233,5894
+
+./ss.abbrev/listen.c,149
+static int listen_int_handler(48,986
+static int print_prompt(32,618
+void ss_abort_subsystem(123,2707
+int ss_listen 54,1076
+int ss_quit(131,2848
+
+./ss.abbrev/parse.c,49
+#define NEW_ARGV(33,763
+char **ss_parse 36,856
+
+./ss.abbrev/error.c,93
+void ss_error 67,1310
+void ss_error 69,1378
+char * ss_name(28,482
+void ss_perror 92,1810
+
+./ss.abbrev/prompt.c,44
+ss_get_prompt(27,557
+ss_set_prompt(19,425
+
+./ss.abbrev/request_tbl.c,62
+ss_add_request_table(12,238
+ss_delete_request_table(44,1059
+
+./ss.abbrev/list_rqs.c,50
+#define DONT_USE(13,308
+ss_list_requests(22,508
+
+./ss.abbrev/pager.c,85
+void ss_page_stdin(66,1142
+int ss_pager_create(31,603
+int ss_pager_create(58,1041
+
+./ss.abbrev/requests.c,88
+#define	DECLARE(13,213
+DECLARE(18,358
+DECLARE(28,576
+DECLARE(36,724
+DECLARE(45,923
+
+./ss.abbrev/data.c,0
+
+./ss.abbrev/abbrev.c,316
+static inline const char * copy_string 30,876
+static inline const char * const * copy_strings 38,1062
+static inline void free_strings 52,1393
+void ss_abbrev_handler 156,4258
+void ss_add_abbrev 101,2597
+void ss_delete_abbrev 62,1567
+void ss_list_abbrevs 144,3899
+const char *const * ss_lookup_abbrevs 84,2172
+
+./ss.abbrev/mk_cmds.c,30
+main(29,605
+yyerror(88,1917
+
+./ss.abbrev/utils.c,215
+char *ds(128,3162
+char * generate_cmds_string(34,831
+void generate_function_definition(46,1161
+char * generate_rqte(54,1340
+gensym(85,2270
+char *quote(113,2866
+char *str_concat3(97,2497
+void write_ct(17,345
+
+./ss.abbrev/options.c,17
+flag_val(24,479
+
+./ss.abbrev/ss.h,0
+
+./ss.abbrev/ss_internal.h,333
+#define LOCAL_ALLOC(29,445
+#define LOCAL_ALLOC(33,533
+#define LOCAL_ALLOC(39,693
+#define LOCAL_ALLOC(44,816
+#define LOCAL_FREE(30,488
+#define LOCAL_FREE(34,566
+#define LOCAL_FREE(40,726
+#define LOCAL_FREE(45,849
+#define PROTOTYPE(14,244
+#define PROTOTYPE(21,330
+#define	ss_current_request(92,1995
+#define	ss_info(91,1949
+
+./ss.abbrev/copyright.h,0
+
+./ss.abbrev/test.c,40
+int main(24,429
+void test_cmd 99,2212
+
+./ss.abbrev/mit-sipb-copyright.h,0

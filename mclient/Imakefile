@@ -1,0 +1,24 @@
+#
+# $Id: Imakefile,v 1.1 1993-10-12 05:58:42 probe Exp $
+#
+
+KLIBS=	-ldsk -lusp -lcom_err -lkrb -ldes
+NKLIBS=	-lds -lusp -lcom_err
+
+#ifdef _AUX_SOURCE
+DSMAILO=emul_re.o
+DSLIB=-lPW -lc
+#endif
+
+SimpleProgram(create_mtg_dir,create_mtg_dir.o,,$(ATHBINDIR))
+SimpleProgram(crmtgs,crmtgs.o ../ets/dsc_et.o,$(KLIBS),$(ATHBINDIR))
+SimpleProgram(mkds,mkds.o ../ets/dsc_et.o ../client/edit.o,$(KLIBS),$(ATHBINDIR))
+SimpleProgram(pmtg,pmtg.o ../ets/dsc_et.o,$(KLIBS),$(ATHBINDIR))
+SimpleProgram(dsmail,dsmail.o ../ets/dsc_et.o $(DSMAILO),$(NKLIBS) $(DSLIB),$(ATHBINDIR))
+SimpleProgram(dspipe,dspipe.o ../ets/dsc_et.o,$(KLIBS),$(ATHBINDIR))
+
+install::
+	-$(RM) $(DESTDIR)$(ATHBINDIR)/rmds
+	-ln -s mkds $(DESTDIR)$(ATHBINDIR)/rmds
+
+install_script(dsc_setup.sh,,$(ATHBINDIR)/dsc_setup)

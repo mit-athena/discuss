@@ -1,0 +1,39 @@
+DELETE(DISCUSS)					  DELETE(DISCUSS)
+
+NAME
+     delete, dl, d - Delete a transaction
+
+SYNOPSYS
+     delete transaction_specifiers ...
+
+DESCRIPTION
+
+     Delete deletes the specified transaction(s) of the current
+     meeting.  The transactions are only logically deleted;  they can be
+     subsequently retrieved using the retrieve command.  The expunge command
+     will physically reclaim space used by deleted transactions.  If no
+     transactions are specified, the current transaction is deleted.
+
+SEE ALSO
+     discuss(1),retrieve(discuss),specifiers(discuss)
+
+DIAGNOSTICS
+     No current meeting.
+	The user is not attending a meeting.  The "goto" request allows
+        the user to attend a meeting.
+
+     Insufficient access for operation.
+	Insufficient access to delete the given transaction(s).  Delete
+	requires either delete (d) access on the meeting, or owner (o)
+	access to delete a transaction entered by the current user.
+
+     No transactions selected.
+	The given transaction specifiers do not refer to any non-deleted
+	transactions.  
+
+     Invalid transaction specification.
+	The given transaction specification is not valid.  See
+	specifiers(discuss) for more information about transaction
+	specifiers.
+
+

@@ -1,0 +1,27 @@
+LIST_ACL(DISCUSS)				LIST_ACL(DISCUSS)
+
+NAME
+     list_acl, la - List the access control list of this meeting.
+
+SYNOPSYS
+     list_acl [principal ... ]
+
+DESCRIPTION
+     list_acl either prints the entire access control list (if called
+     with no arguments), or lists the access given to each principal 
+     name given on the command line.  See access(discuss) for 
+     information on interpreting access modes.
+
+SEE ALSO
+     discuss(1), access(discuss), set_acl(discuss), delete_acl(discuss)
+
+DIAGNOSTICS
+     Insufficient access for operation.
+	Insufficient access to list the given access.  List_acl
+	requires status (s) access on the meeting to list its
+	access control list.
+
+BUGS
+     It should be possible to enter principal names without a realm
+     attached and have them default to the local realm.
+

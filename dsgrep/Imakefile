@@ -1,0 +1,17 @@
+LIBS = -lregexp ../lib/libdsk.a ../lib/libusp.a -lcom_err -lkrb -ldes
+LFLAGS = -Lregexp
+
+#define ISUBDIRS regexp
+
+DEFINES = -I./regexp -I../include
+
+OBJS= dsgrep.o regerror.o
+
+all:: libregexp dsgrep
+
+libregexp:
+	cd regexp	; make $(MFLAGS1) all
+
+build_program(dsgrep,$(OBJS),$(LFLAGS),$(LIBS))
+install_program(dsgrep,,$(ATHBINDIR))
+install_man(dsgrep.1,dsgrep.1)

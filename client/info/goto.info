@@ -1,0 +1,26 @@
+GOTO(DISCUSS)						GOTO(DISCUSS)
+
+NAME
+     goto, go, g - Go to specified meeting.
+
+SYNOPSYS
+     goto meeting_name
+
+DESCRIPTION
+     Goto selects meeting_name as the current meeting.  When you go
+     to a meeting, you are considered "attending" it
+     
+FILES
+     ~/.meetings		list of user's meetings
+
+SEE ALSO
+     discuss(1)
+
+DIAGNOSTICS
+     No such meeting
+	The given meeting does not exist.
+
+     Insufficient access for operation
+	The user does not have sufficient access to attend the given
+	meeting.  Goto requires either read (r) or status (s)
+	access to attend a meeting.

@@ -1,0 +1,68 @@
+#
+# $Id: Imakefile,v 1.1 1993-10-12 05:58:56 probe Exp $
+#
+
+DISCUSS_UID=32000
+OBJS=	disserve.o atom.o dispatch.o acl.o acl_core.o \
+	../libds/tfile.o ../libds/tnet.o \
+	../ets/dsc_et.o ../ets/rpc_et.o
+LIBS=	-lzephyr ../lib/libdsk.a -lkrb -ldes ../lib/libusp.a -lcom_err
+
+all::	debug recover expunge
+
+SimpleProgram(discussd,$(OBJS) rpproc.k.o core.o coreutil.o,$(LIBS),$(ATHETCDIR))
+build_program(disserve,$(OBJS) rpproc.nk.o core.o coreutil.o,,$(LIBS))
+install_program(disserve,-m 4755 -o $(DISCUSS_UID),$(ATHETCDIR))
+
+servetest: ../client/discuss.o ../client/cmds.o ../client/libss.a \
+		../client/discuss_utils.o core.o coreutil.o atom.o acl.o \
+		../libds/tfile.o glue.o
+	$(LD) $(LDFLAGS) -o servetest ../client/discuss.o ../client/cmds.o \
+		../client/libss.a ../client/discuss_utils.o core.o coreutil.o \
+		atom.o acl.o ../libds/tfile.o glue.o $(LDLIBS)
+
+recover: recover.o core.o coreutil.o atom.o acl.o ../libds/tunix.o \
+		../libds/tfile.o glue.o ../ets/dsc_et.o $(COMERR)
+	$(RM) recover
+	$(LD) $(LDFLAGS) -o recover recover.o core.o coreutil.o atom.o acl.o \
+		glue.o $(LIBS) $(LDLIBS)
+
+expunge: expunge.o core.o coreutil.o atom.o acl.o acl_core.o \
+		../libds/tunix.o ../libds/tfile.o glue.o ../ets/dsc_et.o \
+		$(COMERR)
+	$(RM) expunge
+	$(LD) $(LDFLAGS) -o expunge expunge.o core.o coreutil.o atom.o acl.o \
+		acl_core.o glue.o $(LIBS) $(LDLIBS)
+
+debug:	disdebug
+
+disdebug: $(OBJS) rpproc.debug.o core.o coreutil.o
+	$(RM) disdebug
+	$(LD) $(LDFLAGS) -o disdebug $(OBJS) core.o coreutil.o rpproc.debug.o \
+		$(LIBS) $(LDLIBS)
+
+rpproc.k.o: rpproc.c
+	$(RM) rpproc.k.o rpproc.o
+	$(CC) $(CFLAGS) -DINETD -DKERBEROS -c rpproc.c
+	mv rpproc.o rpproc.k.o
+
+rpproc.nk.o: rpproc.c
+	$(RM) rpproc.o rpproc.nk.o
+	$(CC) $(CFLAGS) -DSUBPROC -c rpproc.c
+	mv rpproc.o rpproc.nk.o
+
+rpproc.debug.o: rpproc.c
+	$(RM) rpproc.debug.o rpproc.o
+	$(CC) $(CFLAGS) -DKERBEROS -c rpproc.c
+	mv rpproc.o rpproc.debug.o
+
+core.o: core.c
+	$(RM) core.o
+	$(CC) $(CFLAGS) -DKERBEROS -c core.c
+
+coreutil.o: coreutil.c
+	$(RM) coreutil.o
+	$(CC) $(CFLAGS) -DKERBEROS -c coreutil.c
+
+clean::
+	$(RM) *.o *~ \#* disserve recover expunge discussd disdebug

@@ -1,0 +1,15 @@
+#
+# Error table for bind users
+#
+
+	error_table bind
+
+	error_code	BIND_HOST_NOT_FOUND,
+			"No such host"
+	error_code	BIND_TRY_AGAIN,
+			"Nameserver timeout"
+	error_code	BIND_NO_RECOVERY,
+			"Name service error"
+	error_code	BIND_NO_ADDRESS,
+			"Host has no internet address"
+	end

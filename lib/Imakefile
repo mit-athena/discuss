@@ -1,0 +1,21 @@
+#
+# $Id: Imakefile,v 1.1 1993-10-12 05:58:10 probe Exp $
+#
+
+all::	libusp.a libdsk.a libds.a #libcom_err.a
+
+libusp.a:
+	-ln -s ../usp/libusp.a .
+	-ln -s ../usp/libusp_p.a .
+
+libcom_err.a:
+	-ln -s ../et/libcom_err.a .
+	-ln -s ../et/libcom_err_p.a .
+
+libdsk.a:
+	-ln -s ../libds/libdsk.a .
+	-ln -s ../libds/libdsk_p.a .
+
+libds.a:
+	-ln -s ../libds/libds.a .
+	-ln -s ../libds/libds_p.a .

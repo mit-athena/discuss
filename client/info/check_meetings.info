@@ -1,0 +1,42 @@
+CKM(DISCUSS)						CKM(DISCUSS)
+
+NAME
+     check_meetings, ckm - Check for changed meetings
+
+SYNOPSYS
+     ckm {meeting_names} [-no_list]
+
+DESCRIPTION
+     Check_meetings is used to check what meetings have changed, so that
+     next_meeting can be used to advance from one meeting to another.
+
+     Typically, a user wants to attend all changed meetings so he can
+     read the new transactions.  To do this, he can use check_meetings
+     to find out what meetings have changed,  and then issue
+     next_meeting to goto the first changed meeting.  He can then
+     print out the new transactions, and then issue next_meeting to
+     visit the second changed meeting, and so on until no more
+     changed meetings are left.
+
+OPTIONS
+     -no_list (-nls)
+	Don't display the list of meetings which have changed.
+
+SEE ALSO
+     discuss(1),next_meeting(discuss)
+
+DIAGNOSTICS
+     No meetings have changed
+	No meetings that the user attends have new transactions.
+
+     Can't read Kerberos ticket file while connecting to ...
+	Unable to obtain kerberos tickets for the given machine.
+	The user will not be authenticated to meetings on that given
+	machine.  There are several different possible reasons why
+	this is happening.  The user may not have gotten kerberos
+        tickets, or the kerberos servers may be down, or there might
+	be time disagreement between the client machine and the servers.
+
+     Meeting does not exist
+	The given meeting does not exist.  The meeting may have been
+	deleted or moved.

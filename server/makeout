@@ -1,0 +1,8 @@
+rm -rf core.o
+cc -g -c core.c
+rm -rf acl.o
+cc -g -c acl.c
+rm -f disserve
+cc -g -o disserve disserve.o core.o coreutil.o atom.o dispatch.o acl.o acl_core.o ../libds/tfile.o ../libds/tnet.o ../ets/dsc_et.o ../ets/rpc_et.o rpproc.o ../lib/libusp.a ../lib/libcom_err.a
+rm -f discussd
+cc -g -o discussd disserve.o core.o coreutil.o atom.o dispatch.o acl.o acl_core.o ../libds/tfile.o ../libds/tnet.o ../ets/dsc_et.o ../ets/rpc_et.o rpproc.k.o ../lib/libusp.a ../lib/libkrb.a ../lib/libdes.a ../lib/libcom_err.a

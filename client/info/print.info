@@ -1,0 +1,48 @@
+PRINT(DISCUSS)					   PRINT(DISCUSS)
+
+NAME
+     print, pr, p - print transactions
+     next, prev, nref, pref - print related transaction.
+
+SYNOPSYS
+     print transaction_specifiers ...
+     next
+     prev
+     nref
+     pref
+
+DESCRIPTION
+     Print prints the specified transactions (defaulting to the
+     current transaction) of the current meeting to standard output;
+     the output is filtered through more(1).
+
+     The other commands print the one transaction specified by the 
+     command name.   Next (prev) print the next (previous)
+     transactions, respectively, and nref (pref) prints the 
+     next (previous) transaction in the current chain.
+
+SEE ALSO
+     more(1), discuss(1), specifiers(discuss)
+
+DIAGNOSTICS
+     No current meeting.
+	The user is not attending a meeting.  The "goto" request allows
+        the user to attend a meeting.
+
+     Can't start pager
+	Discuss was unable to find a program named "more" somewhere in
+	your search path.
+
+     Insufficient access for operation.
+	Insufficient access to print the given transaction(s).  Print
+	requires either read (r) access on the meeting, or owner (o)
+	access to print a transaction entered by the current user.
+
+     No transactions selected.
+	The given transaction specifiers do not refer to any non-deleted
+	transactions.  
+
+     Invalid transaction specification.
+	The given transaction specification is not valid.  See
+	specifiers(discuss) for more information about transaction
+	specifiers.

@@ -1,0 +1,20 @@
+SET(DISCUSS)					 SET(DISCUSS)
+
+NAME
+     set -  Set different discuss variables.
+		   
+SYNOPSYS
+     set seen transaction_specifier
+
+DESCRIPTION
+     set seen sets the seen pointer for the current meeting.  The given
+     transaction is set as the highest transaction seen in the meeting.
+     Higher transactions are considered "new". 
+
+SEE ALSO
+     discuss(1), ckm(discuss), lsm(discuss), specifiers(discuss)
+
+DIAGNOSTICS
+     No current meeting.
+	The user is not attending a meeting.  The "goto" request allows
+        the user to attend a meeting.

@@ -1,0 +1,42 @@
+LIST(DISCUSS)					    LIST(DISCUSS)
+
+NAME
+     list, ls - List transactions in current meeting.
+
+SYNOPSYS
+     list [-long_subjects] transaction_specifiers ...
+
+DESCRIPTION
+     This command displays summary information for the specified
+     transactions in the current meeting.  The transaction number,
+     flags, number of lines, date posted, author, and subject are displayed.
+     If no transactions are specified, all non-deleted transactions
+     in the meeting are listed.
+
+OPTIONS
+     -long_subjects (-lsj) causes subjects to be listed without any
+	truncation.
+
+SEE ALSO
+     discuss(1), specifiers(discuss)
+
+DIAGNOSTICS
+     No current meeting.
+	The user is not attending a meeting.  The "goto" request allows
+        the user to attend a meeting.
+
+     Insufficient access for operation.
+	Insufficient access to list the given transaction(s).  List
+	requires either read (r) access on the meeting, or owner (o)
+	access to list a transaction entered by the current user.
+
+     No transactions selected.
+	The given transaction specifiers do not refer to any non-deleted
+	transactions.  
+
+     Invalid transaction specification.
+	The given transaction specification is not valid.  See
+	specifiers(discuss) for more information about transaction
+	specifiers.
+
+

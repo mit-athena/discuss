@@ -1,0 +1,70 @@
+SPECIFIERS(DISCUSS)   		   	      SPECIFIERS(DISCUSS)
+
+TOPIC
+     specifiers - transaction specifiers for discuss
+
+DESCRIPTION
+     Many discuss commands, such as "list", operate on a set of
+     transactions; as such, they take transaction specifiers
+     as command line arguments.
+
+     The following transaction specifiers specify a set of
+     transactions: 
+
+	all:  Matches all transactions in the current meeting.
+	new:  Matches all unseen transactions.
+	aref: Matches all transactions in the current chain.
+
+     The remaining transaction specifiers specify a single
+     transaction.  By using a pair of them separated by a comma or
+     colon ("," or ":"), it is possible to specify a range of 
+     transactions; also, it is possible to specify simple arithmetic 
+     expressions by separating two specifiers with a "+" or "-" sign.
+  
+	current, .: Matches the current transaction.
+	first, f:  Matches the first transaction of the meeting.
+	last, l: Matches the last transaction of the meeting.
+	prev, p: Matches the previous transaction in the meeting.
+	next, n: Matches the next transaction in the meeting.
+	fref: Matches the first transaction in the current chain.
+	lref: Matches the last transaction in the current chain.
+	nref: Matches the next transaction in the current chain.
+	pref: Matches the previous transaction in the current chain.
+        Any integer matches the transaction of the same number.
+
+OPTIONS
+     Options can be used to modify and filter the transaction specifiers.
+     Putting these options anywhere on the line with affect all
+     transaction specifiers on that line.
+
+     -initial will only match transactions that are the beginnings of
+	chains.
+
+     -terminal will only match transactions that are the ends of chains.
+
+     -include_deleted (-idl) will allow matching of deleted transactions.
+	
+     -only_deleted (-odl) will only match transactions that have been
+	deleted
+
+     -flag_set (-flag) will only match transactions that have been flagged.
+
+     -flag_reset will only match transactions that have not been flagged.
+
+EXAMPLES
+     last-10,last		The last 10 transactions.
+     .,l		 	All transactions from the current
+				transaction to the end of the meeting.
+     n				The next transaction
+     n,.+10			The next 10 transactions.
+     new			The unseen transactions in a meeting.
+     all -initial		All transactions that start chains.
+     last-10:last -flag         Flagged transactions of the last 11
+				transactions in the meeting.
+
+SEE ALSO
+     discuss(1), list(discuss)
+
+BUGS
+     Some requests (add_meeting, write) do not accept options in
+     transaction specifiers.

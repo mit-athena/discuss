@@ -1,0 +1,74 @@
+TALK(DISCUSS)					    TALK(DISCUSS)
+
+NAME
+     talk, enter, send, t - Enter a new transaction (message) into a
+     meeting.
+
+SYNOPSYS
+     talk
+
+DESCRIPTION
+     Talk, enter, and send are all aliases for the same function of
+     discuss, which enters a transaction into the current meeting.
+
+     Talk first prompts for the subject of the transaction, which is 
+     one line of text.  If the DISCUSS_EDITOR environment variable
+     is set, then it will fork a subprocess to run the program
+     named in the environment variable. When the editor is finished,
+     it reads in the file and appends it to the meeting as
+     a new transaction.
+
+     If the DISCUSS_EDITOR environment variable is not set, Discuss
+     prompts for the transaction input directly.  When entering
+     the transaction, typing "\f" or "~e" on a line by itself will
+     fork a subprocess to run the editor specified by the EDITOR
+     environment variable.  Typing "~v" on a line by itself will fork
+     a subprocess to run the editor specified by the VISUAL environment
+     variable.  When the editor is finished, Discuss reads the file and
+     appends it to the meeting as a new transaction.
+
+OPTIONS
+     -editor (-ed)
+	specifies another editor to use instead of the default.
+
+     -meeting (-mtg) meeting_name
+	causes the reply to be entered into the named meeting, rather
+	than the current one.
+
+     -no_editor (-ned)
+	causes talk to use Fend as the "editor," even if the 
+	DISCUSS_EDITOR environment variable is set.
+
+
+FILES
+     /tmp/mtg%d.%d     Temporary file for use with editor
+
+SEE ALSO
+     environ(7), discuss(1), reply(discuss)
+
+DIAGNOSTICS
+     No file; not entered
+	The file containing the new transaction was not found; it
+	apparantly was not created by the editor.  
+
+     No current meeting.
+	The user is not attending a meeting.  The "goto" request allows
+        the user to attend a meeting.
+
+     You do not have access to create transactions in this meeting.
+	Talk requires write (w) access on the meeting.  Most meetings which
+	are read-only are fed through mail aliases; read the chairman's note
+	[0001] for information.
+
+     Error reading subject
+	An error was encountered while reading the subject (probably
+	end of file)
+
+     Transaction [####] entered in the xxxx meeting.
+	The transaction was successfully entered into the current
+	meeting.
+
+     Entry will be anonymous
+	If you have not been able to authenticate yourself to the server
+	using Kerberos, your message will be entered anonymously (from ???).
+
