@@ -1,14 +1,17 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list_acl.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list_acl.c,v 1.1 1986-11-16 06:16:59 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list_acl.c,v 1.2 1986-11-17 01:50:36 spook Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.1  86/11/16  06:16:59  wesommer
+ * Initial revision
+ * 
  */
 
 #ifndef lint
-static char *rcsid_list_acl_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list_acl.c,v 1.1 1986-11-16 06:16:59 wesommer Exp $";
+static char *rcsid_list_acl_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list_acl.c,v 1.2 1986-11-17 01:50:36 spook Exp $";
 #endif lint
 
 #include <strings.h>
@@ -21,14 +24,14 @@ static char *rcsid_list_acl_c = "$Header: /afs/dev.mit.edu/source/repository/ath
 extern char *malloc();
 
 list_acl(sci_idx, argc, argv)
-     int sci_idx, argc;
-     char **argv;
+	int sci_idx, argc;
+	char **argv;
 {
 	Acl *list;
 	int code;
 	char *modes;
 
-	if (!dsc_public.attending) {
+	if (!dsc_public.attending && (argc == 1)) {
 		(void) fprintf(stderr, "No current meeting.\n");
 		return;
 	}
