@@ -13,7 +13,7 @@
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/edsc.c,v 1.8 1991-09-04 11:39:31 lwvanels Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/edsc.c,v 1.9 1992-04-16 18:00:25 lwvanels Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -78,6 +78,7 @@ static struct edsc_req {
 int crash_handler(sig)
 	int	sig;
 {
+	static int	shutting_down_cache = 0;
 	int	pid;
 
 	pid = fork();
@@ -88,7 +89,10 @@ int crash_handler(sig)
 		printf("; Edsc crash (code dump in /usr/tmp) --- signal %d\n",
 		       sig);
 #ifdef EDSC_CACHE
-		cache_shutdown();
+		if (!shutting_down_cache) {
+			shutting_down_cache++;
+			cache_shutdown();
+		}
 #endif
 	}
 	/*
@@ -147,12 +151,27 @@ main(argc, argv)
      getrlimit(RLIMIT_CORE, &limit);
      limit.rlim_cur = limit.rlim_max;
      setrlimit(RLIMIT_CORE, &limit);
+#ifdef SIGILL
      signal(SIGILL, crash_handler);
+#endif
+#ifdef SIGIOT
      signal(SIGIOT, crash_handler);
+#endif
+#ifdef SIGEMT
      signal(SIGEMT, crash_handler);
+#endif
+#ifdef SIGFPE
      signal(SIGFPE, crash_handler);
+#endif
+#ifdef SIGBUS
      signal(SIGBUS, crash_handler);
+#endif
+#ifdef SIGSEGV
      signal(SIGSEGV, crash_handler);
+#endif
+#ifdef SIGPIPE
+     signal(SIGPIPE, SIG_IGN);
+#endif
      /*
       * Set up hooks in case we get a graceful die signal
       */
@@ -224,6 +243,9 @@ do_quit(args)
 	char	*args;
 {
 #ifdef EDSC_CACHE
+	signal(SIGHUP, SIG_IGN);
+	signal(SIGINT, SIG_IGN);
+	signal(SIGTERM, SIG_IGN);
 	cache_shutdown();
 #endif
 	exit(0);
