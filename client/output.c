@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/output.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/output.c,v 1.1 1986-12-07 01:31:16 rfrench Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/output.c,v 1.2 1987-01-04 19:30:10 srz Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board.
@@ -8,6 +8,9 @@
  *	Utility routines.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.1  86/12/07  01:31:16  rfrench
+ * Initial revision
+ * 
  * Revision 1.10  86/12/07  00:39:01  rfrench
  * Killed ../include
  * 
@@ -37,7 +40,7 @@
  */
 
 #ifndef lint
-static char *rcsid_discuss_utils_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/output.c,v 1.1 1986-12-07 01:31:16 rfrench Exp $";
+static char *rcsid_discuss_utils_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/output.c,v 1.2 1987-01-04 19:30:10 srz Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -78,7 +81,7 @@ output_trans(txn_no, tf, code)
 	else
 		plural = "";
      
-	(void) sprintf (line, "[%04d] %s %s %s (%d line%s)\n",
+	(void) sprintf (line, "[%04d] %s  %s  %s (%d line%s)\n",
 			tinfo.current, tinfo.author,
 			dsc_public.m_info.long_name,
 			&newtime[4], tinfo.num_lines, plural);
