@@ -55,4 +55,6 @@
 	ec	BAD_MTGS_FILE,
 		"Invalid format in meetings file"
 
+	ec	YOU_TWIT,
+		"Chairman cannot remove his own access"
 	end
