@@ -8,7 +8,7 @@
 
 #ifndef lint
 #ifndef SABER
-static char *RCSid = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/dsgrep/dsgrep.c,v 1.3 1992-01-16 18:57:43 lwvanels Exp $";
+static char *RCSid = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/dsgrep/dsgrep.c,v 1.4 1993-06-22 09:30:01 miki Exp $";
 #endif
 #endif
 
@@ -25,6 +25,10 @@ static char *RCSid = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/dis
 #include <sys/param.h>
 #include <sys/stat.h>
 #include <discuss/discuss.h>
+#ifdef SOLARIS
+#include <macros.h>
+#define MAX max
+#endif
 
 extern tfile unix_tfile();
 extern tfile mem_tfile();
