@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/randrp.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/randrp.c,v 1.5 1988-09-24 00:45:41 balamac Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/randrp.c,v 1.6 1989-01-05 02:05:39 raeburn Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1988 by the Student Information Processing Board
@@ -10,11 +10,11 @@
  */
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/randrp.c,v 1.5 1988-09-24 00:45:41 balamac Exp $";
+static char rcsid_discuss_c[] =
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/randrp.c,v 1.6 1989-01-05 02:05:39 raeburn Exp $";
 #endif lint
 
-#include "types.h"
-#include "interface.h"
+#include <discuss/discuss.h>
 #include "globals.h"
 #include <stdio.h>
 #include <sys/time.h>
