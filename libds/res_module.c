@@ -1,7 +1,7 @@
 /*
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/res_module.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/res_module.c,v 1.6 1989-05-19 17:05:18 raeburn Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/res_module.c,v 1.7 1989-05-19 18:12:21 srz Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
@@ -15,21 +15,29 @@
  *	the remote function is executed as a subprocess.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.6  89/05/19  17:05:18  raeburn
+ * *** empty log message ***
+ * 
  */
 
 #ifndef lint
 static char rcsid_res_module_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/res_module.c,v 1.6 1989-05-19 17:05:18 raeburn Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/res_module.c,v 1.7 1989-05-19 18:12:21 srz Exp $";
 #endif lint
 
 #include "rpc_et.h"
 #include "config.h"
+#include "ansi.h"
 #include <netdb.h>
 #include <string.h>
 #include <ctype.h>
 
 #ifdef KERBEROS
 #include "krb.h"
+#ifndef MAX_K_NAME_SZ
+/* @#$%^$ last minute changes by jtkohl */
+#define krb_get_lrealm get_krbrlm
+#endif
 static void ExpandHost ();
 #endif /* KERBEROS */
 
@@ -244,7 +252,7 @@ const char *local_realm ()
     static char realm [REALM_SZ] = "";
 
     if (realm [0] == '\0')
-	get_krbrlm (realm, 1);
+	krb_get_lrealm (realm, 1);
 
     return (realm);
 #else KERBEROS
