@@ -1,9 +1,9 @@
-%token INTEGER NREF PREF FIRST LAST NEXT PREV AREF LREF CUR
+%token INTEGER NREF PREF FIRST LAST NEXT PREV FREF LREF CUR
 %left '+' '-'
 %{
-#define TRNERR_SYNERR 1
+#define TRNERR_SYNERR 777
 #include <ctype.h>
-#include "interface.h"
+#include "../include/interface.h"
 
 static trn_info *trnexpr_curtrn;
 static mtg_info *trnexpr_curmtg;
@@ -15,7 +15,7 @@ static int trnexpr_err;
 %%
 range	: trn_no 
 		{ trnexpr_low = $1;
-		   trnexpr_high = -1;
+		  trnexpr_high = $1;
 		}
 	| trn_no ':' trn_no
 		{ trnexpr_low = $1;
@@ -30,7 +30,7 @@ trn_no	: INTEGER
 	| LAST
 	| NEXT
 	| PREV
-	| AREF
+	| FREF
 	| LREF
 	| CUR
 	| expr
@@ -48,7 +48,7 @@ static yyerror()
 	trnexpr_err = TRNERR_SYNERR;
 }
 
-yylex() 
+static yylex() 
 {	
 	if (!*cp) return -1;
 	if(isdigit(*cp)) {
@@ -77,6 +77,8 @@ yylex()
 		return(NREF);
 	} else if (!strncmp(cp, "pref", 4)) {
 		cp += 4;
+		printf("pref: cur=%d, pref=%d\n", trnexpr_curtrn->current,
+		       trnexpr_curtrn->pref);
 		yylval=trnexpr_curtrn->pref;
 		return(PREF);
  	} else if (!strncmp(cp, "first", 5)) {
@@ -87,6 +89,14 @@ yylex()
 		cp += 4;
 		yylval=trnexpr_curmtg->last;
 		return(LAST);
+	} else if (!strncmp(cp, "fref", 4)) {
+		cp += 4;
+		yylval=trnexpr_curtrn->fref;
+		return(FREF);
+	} else if (!strncmp(cp, "lref", 4)) {
+		cp += 4;
+		yylval=trnexpr_curtrn->lref;
+		return(LREF);
 	} else if (*cp=='n') {
 		cp++;
 		yylval=trnexpr_curtrn->next;
@@ -117,12 +127,16 @@ int trnexpr_parse(mtg, trn, string, lorange, highrange)
 	trnexpr_curtrn = trn;
 	trnexpr_err = 0;
 	yyparse();
-	if(lorange)*lorange =trnexpr_low;
-	if(highrange)*highrange = trnexpr_high;
+	if(lorange)
+		*lorange = trnexpr_low;
+	if(highrange)
+		*highrange = trnexpr_high;
 	return(trnexpr_err);
 }
 
 #ifdef notdef
+mtg_info mtg = { 0, "/tmp/foo", "bar", "quux", 1, 30, 22, 23, 1 };
+trn_info trn = { 0, 7, 6, 8, 5, 9, 2, 17, 3, 42, 7, 48, "Qux", "me" };
 main(argc, argv) 
 	int argc;
 	char **argv;
@@ -131,7 +145,7 @@ main(argc, argv)
 	argv++; argc--;
 	while(argc--) {
 		low = -1; high = -1;
-		trnexpr_parse(*argv, &low, &high);
+		trnexpr_parse(&mtg, &trn, *argv, &low, &high);
 		printf("%s: %d:%d\n", *argv, low, high);
 		if(trnexpr_err) {
 			printf("Error %d\n", trnexpr_err);
@@ -140,6 +154,4 @@ main(argc, argv)
 		argv++;
 	}
 }
-
-
 #endif notdef
