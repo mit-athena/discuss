@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.11 1986-09-10 18:57:03 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.12 1986-09-13 20:41:42 srz Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
@@ -9,6 +9,10 @@
  *	ss library for the command interpreter.
  *
  *      $Log: not supported by cvs2svn $
+ * Revision 1.11  86/09/10  18:57:03  wesommer
+ * Made to work with kerberos; meeting names are now longer.
+ * ./
+ * 
  * Revision 1.10  86/09/10  17:20:11  wesommer
  * Ken, please use RCS..
  * 
@@ -40,7 +44,7 @@
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.11 1986-09-10 18:57:03 wesommer Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.12 1986-09-13 20:41:42 srz Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -52,6 +56,7 @@ static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athe
 #include "../include/tfile.h"
 #include "../include/interface.h"
 #include "../include/config.h"
+#include "../include/dsname.h"
 #include "globals.h"
 
 #ifdef	lint
@@ -232,7 +237,8 @@ goto_mtg(sci_idx, argc, argv)
 	char **argv;
 {
 	int code;
-	char machine [50],mtg_name[100];
+	char *machine,*mtg_name;
+	name_blk nb;
 
 	DONT_USE(sci_idx);
 	if (argc != 2) {
@@ -245,13 +251,26 @@ goto_mtg(sci_idx, argc, argv)
 	}
 	cur_mtg = (char *)NULL;
 
-	resolve_mtg(argv[1], machine, mtg_name);
+	get_mtg_unique_id ("", "srz", argv[1], &nb, &code);
+	if (code != 0) {
+		(void) fprintf (stderr, "Meeting not found in search path. %s\n", argv[1]);
+		return;
+	}
+
+	get_mtg_location(nb.unique_id, &machine, &mtg_name, &code);
+	if (code != 0) {
+		(void) fprintf (stderr, "Bad form of unique name\n");
+		return;
+	}
 	/* XXX should keep a handle on RPC connection */
 	if (open_rpc(machine, "discuss", &code) == 0) { 
+		(void) free (machine);
 		(void) fprintf (stderr, "%s: %s\n", argv[1], 
 				error_message(code));
 		return;
 	}
+	(void) free(machine);
+
 	if (code)
 		(void) fprintf (stderr, "Warning: %s\n", error_message(code));
 	get_mtg_info(mtg_name, &m_info, &code);
