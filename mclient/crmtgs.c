@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/crmtgs.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/crmtgs.c,v 1.1 1987-04-08 04:00:53 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/crmtgs.c,v 1.2 1988-09-23 23:55:27 raeburn Exp $
  *
  *	Fill out a .meetings file with the primary name of all the
  *	meetings in it.  This requires that the meeting be accessible
@@ -10,14 +10,20 @@
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.1  87/04/08  04:00:53  wesommer
+ * Initial revision
+ * 
  */
 
 #ifndef lint
-static char *rcsid_crmtgs_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/crmtgs.c,v 1.1 1987-04-08 04:00:53 wesommer Exp $";
-#endif lint
+static char rcsid_crmtgs_c[] =
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/crmtgs.c,v 1.2 1988-09-23 23:55:27 raeburn Exp $";
+#endif /* lint */
 
 #include <dsname.h>
 #include <interface.h>
+
+extern char *getenv ();
 
 main(argc, argv)
 	int argc;
