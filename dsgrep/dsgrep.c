@@ -8,7 +8,7 @@
 
 #ifndef lint
 #ifndef SABER
-static char *RCSid = "$Id: dsgrep.c,v 1.15 1999-05-12 17:34:01 danw Exp $";
+static char *RCSid = "$Id: dsgrep.c,v 1.16 1999-06-01 19:02:19 ghudson Exp $";
 #endif
 #endif
 
@@ -58,7 +58,7 @@ main(argc,argv)
   void s_to_lower();
   int tmp_fd1,tmp_fd2;
   int using_dflt_mtgs = 0;
-  char *tmp_buf;
+  char *subject;
   struct stat statb;
   
   initialize_dsc_error_table();
@@ -201,8 +201,16 @@ main(argc,argv)
 	}
 	if (!search_deleted && (ti.flags & TRN_FDELETED))
 	  continue;
-	if (case_insens) s_to_lower(ti.subject);
-	if (!use_re || !regexec(&search_re,ti.subject,0,NULL,0) ||
+	if (case_insens) {
+	  subject = strdup(ti.subject);
+	  if (!subject) {
+	    fprintf(stderr,"dsgrep: out of memory\n");
+	    exit(1);
+	  }
+	  s_to_lower(subject);
+	} else
+	  subject = ti.subject;
+	if (!use_re || !regexec(&search_re,subject,0,NULL,0) ||
 	    (search_trans &&
 	     s_trans(meetings[i],j,ti.num_chars,&search_re,case_insens)))  {
 	  printf("%s [%d]: %s\n",
@@ -217,6 +225,8 @@ main(argc,argv)
 	    printf("*** End of Transaction ***\n");
 	  }
 	}
+	if (case_insens)
+	  free(subject);
       }
   }
   if (using_dflt_mtgs)
