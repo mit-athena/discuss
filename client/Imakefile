@@ -1,16 +1,12 @@
 #
-# $Id: Imakefile,v 1.2 1994-08-24 03:11:32 cfields Exp $
+# $Id: Imakefile,v 1.1 1991-08-09 15:46:41 lwvanels Exp $
 #
 
 # libzephyr.a needed only for Zephyr notifications
 # libkrb.a,libdes.a needed for Kerberos
 
 INFODIR=/usr/athena/lib/discuss/info
-#ifdef SOLARIS
-LIBS=	../server/acl.o -ldsk -lkrb -ldes -lusp -lss -lcom_err /lib/libbsdmalloc.a
-#else
-LIBS=	../server/acl.o -ldsk -lkrb -ldes -lusp -lss -lcom_err 
-#endif
+LIBS=	../server/acl.o -ldsk -lkrb -ldes -lusp -lss -lcom_err
 OBJS=	discuss.o edit.o output.o trn_expr.o list.o trn_select.o \
 	status.o new_trans.o print.o lsm.o addmtg.o list_acl.o \
 	interrupt.o goto.o reply.o ckm.o anm.o time.o data.o \
