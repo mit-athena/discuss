@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.15 1988-10-13 01:26:29 discuss Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.16 1989-06-03 00:36:43 srz Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
@@ -11,6 +11,9 @@
  *		  in-memory superblock, and to open & close meetings.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.15  88/10/13  01:26:29  discuss
+ * Fixed Zephyr stuff.  Can you say, "Insufficient documentation?"  -srz
+ * 
  * Revision 1.14  88/10/08  03:28:49  srz
  * Attempt at fixing Zephyr (doesn't work).
  * 
@@ -64,16 +67,17 @@
 const
 #endif
 static char rcsid_coreutil_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.15 1988-10-13 01:26:29 discuss Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.16 1989-06-03 00:36:43 srz Exp $";
 #endif /* lint */
 
-#include "../include/types.h"
-#include "../include/dsc_et.h"
-#include "../include/atom.h"
+#include <discuss/types.h>
+#include <discuss/dsc_et.h>
+#include "atom.h"
 #include "mtg.h"
-#include "../include/tfile.h"
-#include "../include/acl.h"
-#include "../include/internal.h"
+#include <discuss/tfile.h>
+#include <discuss/acl.h>
+#include "internal.h"
+#include "ansi.h"
 #ifdef ZEPHYR
 #include <zephyr/zephyr.h>
 #endif ZEPHYR
@@ -87,19 +91,22 @@ static char rcsid_coreutil_c[] =
 #define NULL 0
 
 /* global variables */
-char current_mtg [256] = "";			/* meeting that's opened */
-int u_trn_f,u_control_f,u_acl_f;		/* UNIX file descriptors */
-bool nuclear = FALSE;				/* Using atomic reads/writes */
-afile a_control_f = NULL;			/* radioactive file descriptor */
-tfile abort_file = NULL;			/* close this on abort */
-bool  read_lock = FALSE;			/* have lock on u_control_f */
-dsc_acl   *mtg_acl = NULL;			/* current mtg acl */
-int 	last_acl_mod;				/* last mod to ACL */
+char current_mtg [256] = "";	/* meeting that's opened */
+int u_trn_f,u_control_f,u_acl_f; /* UNIX file descriptors */
+bool nuclear = FALSE;		/* Using atomic reads/writes */
+afile a_control_f = NULL;	/* radioactive file descriptor */
+tfile abort_file = NULL;	/* close this on abort */
+bool  read_lock = FALSE;	/* have lock on u_control_f */
+dsc_acl   *mtg_acl = NULL;	/* current mtg acl */
+int 	last_acl_mod;		/* last mod to ACL */
 mtg_super super;
 char *super_chairman;
 char *super_long_name;
-int has_privs = 0;				/* Has privileges (linked) */
-int no_nuke = 0;				/* Don't be atomic (linked) */
+int has_privs = 0;		/* Has privileges (linked) */
+int no_nuke = 0;		/* Don't be atomic (linked) */
+#ifdef ZEPHYR
+int use_zephyr = 1;		/* Actually do use Zephyr. */
+#endif
 
 
 /* EXTERNAL */
@@ -142,7 +149,8 @@ char *mtg_name;
      struct stat sb;
 
      mtg_name_len = strlen (mtg_name);
-     if (mtg_name[0] != '/' || mtg_name_len == 0 || mtg_name_len > 168 || mtg_name [mtg_name_len-1] == '/') {
+     if (mtg_name[0] != '/' || mtg_name_len == 0 || mtg_name_len > 168
+	 || mtg_name [mtg_name_len-1] == '/') {
 	  return (BAD_PATH);
      }
 
@@ -591,33 +599,50 @@ char *str;
      perror("discuss");
      exit(1);
 }
+
 #ifdef ZEPHYR
 /*
  *
  * mtg_znotify -- send off a Zephyr notification as appropriate
  *
  */
-mtg_znotify(mtg_name, subject, author)
+
+static const char * this_host = (const char *) NULL;
+
+void mtg_znotify(mtg_name, subject, author)
 	char *mtg_name, *subject, *author;
 {
 	register dsc_acl_entry *ae;
 	register int n;
 	ZNotice_t notice;
-	char *msglst[4],bfr[30],host[100],fullpath[256];
-	struct hostent *hent;
+	char *msglst[4],bfr[30],fullpath[256];
 	int code;
-	
+
+	if (!use_zephyr)
+	    return;
+
+	if (!this_host) {
+	    /* perform initializations */
+	    char *h;
+	    char host[100];
+	    struct hostent *hent;
+	    if (gethostname(host,100) != 0)
+		return;
+	    hent = (struct hostent *) gethostbyname(host);
+	    if (hent == 0)
+		return;
+	    h = (char *) malloc (strlen (hent->h_name) + 1);
+	    if (!h)
+		return;
+	    strcpy (h, hent->h_name);
+	    this_host = h;
+	    ZInitialize();
+	}
+
 	/* Set up the notice structure */
 	bzero(&notice, sizeof(notice));
-	ZInitialize();
 
-	if (gethostname(host,100) != 0)
-		return;
-	hent = (struct hostent *)gethostbyname(host);
-	if (hent == 0)
-		return;
-	sprintf(fullpath,"%s:%s",hent->h_name,mtg_name);
-		
+	sprintf(fullpath,"%s:%s", this_host, mtg_name);
 	ZOpenPort(NULL);
 	notice.z_kind = UNSAFE;
 	notice.z_port = 0;
@@ -640,7 +665,7 @@ mtg_znotify(mtg_name, subject, author)
 	/* XXX
 	 * Check at some point for people who don't have access, etc.
 	 */
-	
+
 	for (ae = mtg_acl->acl_entries, n=mtg_acl->acl_length;
 	     n;
 	     ae++, n--) {
@@ -663,4 +688,4 @@ mtg_znotify(mtg_name, subject, author)
 		}
 	}
 }
-#endif ZEPHYR
+#endif /* ZEPHYR */
