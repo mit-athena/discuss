@@ -1,7 +1,7 @@
 /*
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/conv_mgr.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/conv_mgr.c,v 1.8 1988-10-16 13:53:59 raeburn Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/conv_mgr.c,v 1.9 1989-01-04 20:39:34 raeburn Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
@@ -17,12 +17,12 @@
 
 #ifndef lint
 static const char rcsid_conv_mgr_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/conv_mgr.c,v 1.8 1988-10-16 13:53:59 raeburn Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/conv_mgr.c,v 1.9 1989-01-04 20:39:34 raeburn Exp $";
 #endif lint
 
 #include <errno.h>
 #include <string.h>
-#include <discuss/rpc.h>
+#include "rpc.h"
 #define NULL 0
 
 char *malloc (), *realloc();
@@ -69,9 +69,9 @@ get_module ()
  *
  *
  */
-set_module (module,fatal_error,result)
-char *module;
-int *fatal_error,*result;
+void set_module (module,fatal_error,result)
+    char *module;
+    int *fatal_error,*result;
 {
      char *hostname, *service_id;
      int port,i;
@@ -179,7 +179,7 @@ create_entry:
  * flush_convs () -- Routine to flush all conversations.
  *
  */
-flush_convs ()
+void flush_convs ()
 {
      int i,j;
      struct conv *convp;
