@@ -1,10 +1,28 @@
+/*
+ *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.4 1986-07-31 15:56:08 wesommer Exp $
+ *
+ *	Copyright (C) 1986 by the Student Information Processing Board
+ *
+ *	A simple shell-type user interface to discuss; uses Ken Raeburn's
+ *	ss library for the command interpreter.
+ *
+ *      $Log: not supported by cvs2svn $
+ */
+
+#include <X/mit-copyright.h>
+
+#ifndef lint
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.4 1986-07-31 15:56:08 wesommer Exp $";
+#endif lint
+
 #include <stdio.h>
 #include <sys/file.h>
 #include <strings.h>
-#include "ss.h"
-#include "tfile.h"
-#include "interface.h"
-#include "config.h"
+#include "../include/ss.h"
+#include "../include/tfile.h"
+#include "../include/interface.h"
+#include "../include/config.h"
 
 extern ss_request_table discuss_cmds;
 int current_trans = -1;
@@ -233,7 +251,15 @@ prt_trans(sci_idx, argc, argv)
 		ss_abort_line(sci_idx);
 	}
 	tf = unix_tfile(fd);
-	write_trans(sci_idx, txn_no, tf);
+	write_trans(txn_no, tf, &l_zcode);
+	if(l_zcode) {
+		if (l_zcode == DELETED_TRN)
+			fprintf(stderr, "Transaction has been deleted.\n");
+		else if (l_zcode == NO_SUCH_TRN)
+			fprintf(stderr, "No such transaction.\n");
+		else
+			fprintf(stderr, "Error %d.\n", l_zcode);
+	}
 	tclose(tf);
 	close(fd);
 	tdestroy(tf);
