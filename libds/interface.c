@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.17 1988-03-21 20:00:38 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.18 1988-10-16 14:02:34 raeburn Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
@@ -8,16 +8,16 @@
 
 #ifndef lint
 static char rcsid_interface_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.17 1988-03-21 20:00:38 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.18 1988-10-16 14:02:34 raeburn Exp $";
 #endif lint
 
 #include <stdio.h>
 #include <strings.h>
-#include "tfile.h"
-#include "interface.h"
-#include "acl.h"
 #include <errno.h>
-#include "dsname.h"
+#include <discuss/tfile.h>
+#include <discuss/interface.h>
+#include <discuss/acl.h>
+#include <discuss/dsname.h>
 
 /* for linked list of meetings */
 
@@ -231,7 +231,7 @@ dsc_updated_mtg (nbp, updated, result)
 dsc_get_acl (nbp, result, list)
 	name_blk *nbp;
 	int *result;	
-	Acl **list;
+	dsc_acl **list;
 {	
 	select_meeting(nbp, result);
 	if(*result) return;
