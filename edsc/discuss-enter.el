@@ -1,16 +1,13 @@
-;;;
-;;;	Copyright (C) 1989 by the Massachusetts Institute of Technology
-;;;    	Developed by the MIT Student Information Processing Board (SIPB).
-;;;    	For copying information, see the file mit-copyright.h in this release.
-;;;
 ;;;	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss-enter.el,v $
-;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss-enter.el,v 1.6 1989-06-02 23:44:54 srz Exp $
+;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss-enter.el,v 1.7 1990-09-19 16:32:40 bjaspan Exp $
 ;;;
 ;;;  Emacs lisp code to enter transaction into discuss.  Part of the
 ;;;  emacs-based interface to the discuss conferencing system.
 ;;;
-;;;  Written by Stan Zanarotti and Bill Sommerfeld.
+;;;  Copyright (c) 1989 by the Massachusetts Institute of Technology.
+;;;  Written by Stan Zanarotti, Bill Sommerfeld and Theodore Ts'o.
 ;;;
+;;; $Log: not supported by cvs2svn $
 
 (require 'discuss)
 
@@ -29,16 +26,22 @@
 (defun discuss-temp-file ()
   "Return name of temporary buffer to use to transfer transactions."
   (format "/tmp/em.disc%d" 
-	  (process-id (get-buffer-process discuss-shell-buffer))))
+	  (process-id discuss-process)))
 
 (defun discuss-talk ()
   "Enter a new discuss transaction."
   (interactive)
+  (if (not (string-match "w" (nth 10 discuss-current-meeting-info)))
+      (error "Insufficient access for talk in %s"
+	     (nth 1 discuss-current-meeting-info)))
   (discuss-enter discuss-current-meeting 0 ""))
 
 (defun discuss-reply ()
   "Reply to an existing discuss transaction."
   (interactive)
+  (if (not (string-match "a" (nth 10 discuss-current-meeting-info)))
+      (error "Insufficient access for reply in %s"
+	     (nth 1 discuss-current-meeting-info)))
   (let ((subject (nth 11 discuss-current-transaction-info)))
     ;; Add the Re: field
     (if (and (> (length subject) 3)
@@ -51,6 +54,9 @@
 (defun discuss-randrp ()
   "Randrp in a meeting."
   (interactive)
+  (if (not (string-match "a" (nth 10 discuss-current-meeting-info)))
+      (error "Insufficient access for reply in %s"
+	     (nth 1 discuss-current-meeting-info)))
   (discuss-send-cmd (format "(grtn %s)\n" discuss-current-meeting)
 		    'discuss-randrp-gmi-end 'discuss-read-form))
 
@@ -93,7 +99,7 @@
   "Major mode for editing Discuss transactions to be entered.
 Like Text Mode but with these additional commands:
 C-c C-c  discuss-send (enter the transaction)
-C-c C-]  discuss-abort-edit (exit without enterring)"
+C-c C-]  discuss-abort-edit (exit without entering)"
   (interactive)
   (kill-all-local-variables)
   (make-local-variable 'discuss-reply-trn)
@@ -106,6 +112,7 @@ C-c C-]  discuss-abort-edit (exit without enterring)"
   (setq major-mode 'discuss-edit-mode)
   (setq mode-name "Discuss Edit")
   (setq buffer-offer-save t)
+  (auto-save-mode 1)
   (run-hooks 'text-mode-hook 'discuss-edit-mode-hook))
 
 (if discuss-edit-mode-map
@@ -151,8 +158,12 @@ C-c C-]  discuss-abort-edit (exit without enterring)"
 		   (discuss-format-trn-num (car discuss-form))
 		   discuss-enter-mtg))
   (if (not (one-window-p)) (delete-window))
+  (delete-auto-save-file-if-necessary)
   (kill-buffer discuss-trn-buffer)
-  (discuss-update))
+  (save-excursion
+    (set-buffer discuss-cur-mtg-buf)
+    (discuss-la-invalidate-relatives discuss-current-transaction)
+    (discuss-show-trn discuss-current-transaction)))
 
 (defun discuss-abort-edit ()
   "Aborts entering a transaction."
