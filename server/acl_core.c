@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v 1.7 1987-10-24 07:01:03 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v 1.8 1988-05-31 17:43:49 srz Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
@@ -8,6 +8,10 @@
  *	Originally written for the discuss system by Bill Sommerfeld
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.7  87/10/24  07:01:03  wesommer
+ * Rearrange to allow access routines to work on meeting-group acls as
+ * well.
+ * 
  * Revision 1.6  87/04/06  02:18:19  wesommer
  * Make sure that chair doesn't terminate himself.
  * 
@@ -40,7 +44,7 @@
 #include <strings.h>
 
 #ifndef lint
-static char *rcsid_acl_core_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v 1.7 1987-10-24 07:01:03 wesommer Exp $";
+static char *rcsid_acl_core_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v 1.8 1988-05-31 17:43:49 srz Exp $";
 #endif lint
 
 extern Acl *mtg_acl;
@@ -131,7 +135,7 @@ get_acl(mtg_name, code, list)
 	int *code;		/* RETURN */
 	Acl **list;		/* RETURN */
 {
-	*list = read_acl(mtg_name, code, 1);
+	*list = read_acl(mtg_name, code, !has_privs);
 	return;
 }
 
@@ -145,7 +149,7 @@ get_access(mtg_name, princ_name, modes, code)
 	*modes = NULL;
 	
 	*code = 0;
-	list = read_acl(mtg_name, code, strcmp(princ_name, rpc_caller) != 0);
+	list = read_acl(mtg_name, code, !has_privs && (strcmp(princ_name, rpc_caller) != 0));
 	if (*code) return;
 	
 	*modes = new_string(acl_get_access(list, princ_name));
