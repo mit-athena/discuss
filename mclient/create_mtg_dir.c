@@ -14,10 +14,14 @@
 #include <sys/file.h>
 #include <sys/param.h>
 #include <pwd.h>
+#ifndef SOLARIS
 #include <strings.h>
-
+#else
+#include <unistd.h>
+#include <string.h>
+#endif
 #ifndef	lint
-static char rcsid_create_mtg_dir_c[] = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/create_mtg_dir.c,v 1.3 1989-06-03 00:30:28 srz Exp $";
+static char rcsid_create_mtg_dir_c[] = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/create_mtg_dir.c,v 1.4 1993-04-28 15:31:23 miki Exp $";
 #endif
 
 main(argc, argv)
