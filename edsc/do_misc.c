@@ -26,6 +26,7 @@
 
 extern char	*edsc_protocol_version, *edsc_version_string;
 
+extern const char *local_realm();
 
 do_gpv(args)
 	char	*args;

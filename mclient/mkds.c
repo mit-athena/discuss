@@ -7,10 +7,13 @@
  */
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v 1.19 1998-03-24 22:26:23 ghudson Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v 1.20 1998-12-22 21:25:26 rbasch Exp $
  *	$Locker:  $
  *
  *	$Log: not supported by cvs2svn $
+ *	Revision 1.19  1998/03/24 22:26:23  ghudson
+ *	/usr/spool -> /var/spool
+ *
  *	Revision 1.18  1994/03/25 16:55:49  miki
  *	replaced rindex with strrchr
  *
@@ -65,7 +68,7 @@
 
 #ifndef lint
 static char rcsid_mkds_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v 1.19 1998-03-24 22:26:23 ghudson Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v 1.20 1998-12-22 21:25:26 rbasch Exp $";
 #endif lint
 
 #include <discuss/discuss.h>
@@ -79,6 +82,7 @@ static char rcsid_mkds_c[] =
 #include <sys/time.h>
 #include <sys/file.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
 #include <netdb.h>
@@ -95,7 +99,7 @@ char default_dir[] = "/var/spool/discuss";
 char *whoami;
 int  interrupt = 0;
 
-char *getenv(), *malloc();
+extern const char *local_realm();
 
 char *strtrim();
 

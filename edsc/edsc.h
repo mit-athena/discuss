@@ -29,6 +29,8 @@ extern int	do_sfl(), do_am(), do_dm(), do_gpv();
 extern int	do_pacl(), do_sacl(), do_dacl();
 extern int	do_dt(), do_rt(), do_ls();
 
+extern char *short_time();
+
 /* selection flags */
 #define flag_AREF		8
 

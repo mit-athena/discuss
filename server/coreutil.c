@@ -7,7 +7,7 @@
  */
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.28 1998-05-05 19:18:38 ghudson Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.29 1998-12-22 21:25:32 rbasch Exp $
  *
  *
  * coreutil.c  -- These contain lower-layer, utility type routines to
@@ -15,6 +15,10 @@
  *		  in-memory superblock, and to open & close meetings.
  *
  *	$Log: not supported by cvs2svn $
+ *	Revision 1.28  1998/05/05 19:18:38  ghudson
+ *	From kretch: add support for byte-swapping when a meeting was written out
+ *	on a platform with the opposite endianness.
+ *
  *	Revision 1.27  1997/01/28 11:08:51  ghudson
  *	From kretch and srz: use F_SETLKW instead of F_SETLK when setting locks,
  *	so we wait instead of bombing out.  In start_read(), use a non-exclusive
@@ -113,7 +117,7 @@
 const
 #endif
 static char rcsid_coreutil_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.28 1998-05-05 19:18:38 ghudson Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.29 1998-12-22 21:25:32 rbasch Exp $";
 #endif /* lint */
 
 #include <discuss/types.h>
@@ -127,6 +131,7 @@ static char rcsid_coreutil_c[] =
 #ifdef ZEPHYR
 #include <zephyr/zephyr.h>
 #endif ZEPHYR
+#include <stdlib.h>
 #include <errno.h>
 #include <sys/types.h>
 #include <netdb.h>
