@@ -50,9 +50,6 @@ extern tfile net_tfile ();
 
 /* Static variables */
 
-/* argument info */
-static int procno;				/* procedure number */
-
 /* connections & socket info */
 static USPStream *us = NULL;
 
@@ -321,7 +318,6 @@ tfile recvfile ()
 {
      USPLong_integer tfs;
      tfile tf;
-     char *buf,*str,*bptr;
 
      if (USP_get_long_integer(us, &tfs) != SUCCESS) {
 	  rpc_err = errno;
