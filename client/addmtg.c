@@ -9,13 +9,13 @@
  *	command line, in which case they are used as meeting announcements.
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.15 1987-07-17 01:09:49 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.16 1987-07-17 19:11:45 srz Exp $
  *	$Locker:  $
  *
  */
 
 #ifndef lint
-static char *rcsid_addmtg_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.15 1987-07-17 01:09:49 srz Exp $";
+static char *rcsid_addmtg_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.16 1987-07-17 19:11:45 srz Exp $";
 #endif lint
 
 #include <strings.h>
@@ -217,7 +217,7 @@ int trn_no;
 	       sprintf (cerror, "Transaction [%04d]", trn_no);
 	       ss_perror(sci_idx, code, cerror);
 	  }
-	  return;
+	  return(0);
      }
      
      add_the_mtg (&nb, &code);
@@ -228,6 +228,7 @@ int trn_no;
 	  printf ("Transaction [%04d] Meeting %s (%s) added.\n", trn_no, nb.aliases[0], nb.aliases[1]);
      
      free_nb (&nb);
+     return(0);
 }
 
 parse_mtg_info(mtg_nbp, trn_no, result_nbp, code)
