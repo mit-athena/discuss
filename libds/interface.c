@@ -1,21 +1,44 @@
+/*
+ *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.3 1986-11-11 17:00:20 wesommer Exp $
+ *
+ *	Copyright (C) 1986 by the Massachusetts Institute of Technology
+ *
+ *	$Log: not supported by cvs2svn $
+ */
+
+#ifndef lint
+static char *rcsid_interface_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.3 1986-11-11 17:00:20 wesommer Exp $";
+#endif lint
+
 #include <stdio.h>
 #include "../include/rpc.h"
 #include "../include/tfile.h"
 #include "../include/interface.h"
 
-typedef struct {
-	struct meeting *next;
-	char *unique_id;
+
+typedef struct _connection{
+	struct _connection *next;
+	struct _connection *prev;
 	char *hostname;
-	char *name;
 	rpc_conversation rc;
+} connection;
+
+typedef struct _meeting {
+	struct _meeting *next;
+	struct _meeting *prev;
+	char *unique_id;
+	char *name;
+	connection *cn;
 } meeting;
 
 extern char *malloc();
+extern char *new_string();
 
 static int initialized = 0;
 static meeting *meeting_list = (meeting *)NULL;
-static meeting *cmtg = (meeting *)NULL;	/* current meeting */
+meeting *cmtg = (meeting *) NULL;
+static connection *conn_list = (connection *) NULL;
 #define	mtg_name (cmtg->name)
 
 #define	FREE(ptr) { if (ptr) free(ptr); }
@@ -23,71 +46,78 @@ static meeting *cmtg = (meeting *)NULL;	/* current meeting */
 static
 select_meeting(mtg_uid, code_ptr)
 	char *mtg_uid;
-	error_code *code_ptr;
+	int *code_ptr;
 {
 	char *host, *path;
 	char *current_host;
+	register meeting *mp;
+	register connection *cp;
+	extern int errno;
 
 	*code_ptr = 0;
 	if (!initialized) {
 		init_rpc();
-		cmtg = (meeting *)NULL;
+		meeting_list = (meeting *)NULL;
 		initialized = 1;
 	}
-	if (cmtg == (meeting *)NULL) {
-		cmtg = (meeting *)malloc(sizeof(meeting));
-		if (cmtg == (meeting *)NULL) {
-			*code_ptr = ERRNO;
+	/*
+	 * Is the current meeting one which we've talked to recently?
+	 */
+	for (mp = meeting_list; mp; mp = mp->next) {
+		if (mp->unique_id == mtg_uid 
+		|| !strcmp(mp->unique_id, mtg_uid))
+			break;
+	}
+	if (!mp) {
+		get_mtg_location(mtg_uid, &host, &path, code_ptr);
+		if (*code_ptr) return;
+
+		if (!(mp = (meeting *)malloc(sizeof(meeting)))) {
+			*code_ptr = errno;
 			return;
 		}
-		bzero(cmtg, sizeof(*cmtg));
+
+		/* find the conversation, if any.. */
+		for (cp = conn_list; cp; cp=cp->next) {
+			if (!strcmp(cp->hostname, host)) {
+				mp->cn = cp;
+				break;
+			}
+		}
+		if(!cp) {
+			if (!(cp = (connection *)malloc(sizeof(connection)))) {
+				FREE(mp);
+				*code_ptr = errno;
+				return;
+			}
+			if(!(cp->rc = open_rpc(host, "discuss", code_ptr))) {
+				FREE(mp);
+				FREE(cp);
+				return;
+			}
+			cp->hostname = new_string(host);
+			cp->prev = NULL;
+			cp->next = conn_list;
+			if (conn_list) conn_list->prev = cp;
+			conn_list = cp;
+		} else {
+			/* XXX warp cp to head of list */
+		}
+		mp->unique_id = new_string(mtg_uid);
+		mp->name = path;
+		mp->cn = cp;
+		/* link 'em up.. */
+		mp->next = meeting_list;
+		mp->prev = NULL;
+		if (meeting_list) meeting_list -> prev = mp;
+		meeting_list = mp;
+
+	} else {
+		/*XXX should move mp to head of list.. but not yet */
 	}
-	else if (cmtg->unique_id == mtg_uid)
-		return;
-	else if (!strcmp(cmtg->unique_id, mtg_uid))
-		return;
-	/* we need to set the meeting */
-#ifdef	DEBUG
-	printf("interface.debug: Changing to meeting %s\n", mtg_uid);
-#endif
-	current_host = cmtg->hostname;
-	FREE(cmtg->unique_id);
-	FREE(cmtg->name);
-	get_mtg_location(mtg_uid, &host, &path, code_ptr);
-	if (*code_ptr) {
-		FREE(host);
-		FREE(cmtg->hostname);
-		FREE(path);
-		close_rpc(cmtg->rc);
-		FREE(cmtg);
-		cmtg = (meeting *)NULL;
-		return;
-	}
-	cmtg->unique_id = malloc(strlen(mtg_uid)+1);
-	strcpy(cmtg->unique_id, mtg_uid);
-	cmtg->hostname = host;
-	cmtg->name = path;
-	if (!strcmp(current_host, host)) {
-		FREE(current_host);
-		return;
-	}
-	/* we need to set the host */
-#ifdef	DEBUG
-	printf("interface.debug: Changing host to %s\n", host);
-#endif
-	FREE(current_host);
-	if (cmtg->rc)
-		close_rpc(cmtg->rc);
-	cmtg->rc = open_rpc(host, "discuss", code_ptr);
-	if (cmtg -> rc == NULL) {
-		FREE(host);
-		FREE(path);
-		FREE(cmtg);
-		cmtg = (meeting *)NULL;
-		return;
-	}
-	/* we don't need to grab info here; let the next call lose.... */
-	*code_ptr = 0;					/* sigh */
+	set_rpc(mp->cn->rc);
+	/* XXX Should sanity check that "rc" is a valid connection.. */
+	cmtg = mp;
 }
 
 dsc_add_trn(mtg_uid, text, subject, reply_trn, result_trn, code_ptr)
@@ -95,7 +125,7 @@ dsc_add_trn(mtg_uid, text, subject, reply_trn, result_trn, code_ptr)
 	tfile text;
 	char *subject;
 	trn_nums reply_trn, result_trn;
-	error_code *code_ptr;
+	int *code_ptr;
 {
 	select_meeting(mtg_uid, code_ptr);
 	if (*code_ptr) return;
@@ -106,7 +136,7 @@ dsc_get_trn_info(mtg_uid, trn, info, code_ptr)
 	char *mtg_uid;
 	trn_nums trn;
 	trn_info *info;
-	error_code *code_ptr;
+	int *code_ptr;
 {
 	select_meeting(mtg_uid, code_ptr);
 	if (*code_ptr) return;
@@ -116,7 +146,7 @@ dsc_get_trn_info(mtg_uid, trn, info, code_ptr)
 dsc_delete_trn(mtg_uid, trn, code_ptr)
 	char *mtg_uid;
 	trn_nums trn;
-	error_code *code_ptr;
+	int *code_ptr;
 {
 	select_meeting(mtg_uid, code_ptr);
 	if (*code_ptr) return;
@@ -126,7 +156,7 @@ dsc_delete_trn(mtg_uid, trn, code_ptr)
 dsc_retrieve_trn(mtg_uid, trn, code_ptr)
 	char *mtg_uid;
 	trn_nums trn;
-	error_code *code_ptr;
+	int *code_ptr;
 {
 	select_meeting(mtg_uid, code_ptr);
 	if (*code_ptr) return;
@@ -137,7 +167,7 @@ char *
 dsc_create_mtg(host, location, name, public, hidden, code_ptr)
 	char *host, *location, *name;
 	bool public, hidden;
-	error_code *code_ptr;
+	int *code_ptr;
 {
 	/* mumble */
 	/* hand back mtg_uid */
@@ -146,7 +176,7 @@ dsc_create_mtg(host, location, name, public, hidden, code_ptr)
 dsc_get_mtg_info(mtg_uid, info, code_ptr)
 	char *mtg_uid;
 	mtg_info *info;
-	error_code *code_ptr;
+	int *code_ptr;
 {
 	select_meeting(mtg_uid, code_ptr);
 	if (*code_ptr) return;
@@ -158,7 +188,7 @@ dsc_get_trn(mtg_uid, trn, dest, code_ptr)
 	char *mtg_uid;
 	trn_nums trn;
 	tfile dest;
-	error_code *code_ptr;
+	int *code_ptr;
 {
 	select_meeting(mtg_uid, code_ptr);
 	if (*code_ptr) return;
@@ -167,7 +197,7 @@ dsc_get_trn(mtg_uid, trn, dest, code_ptr)
 
 dsc_remove_mtg(mtg_uid, code_ptr)
 	char *mtg_uid;
-	error_code *code_ptr;
+	int *code_ptr;
 {
 	select_meeting(mtg_uid, code_ptr);
 	if (*code_ptr) return;
@@ -183,4 +213,22 @@ int *result;
      select_meeting(mtg_uid, result);
      if (*result) return;
      updated_mtg(mtg_name, date_attended, last, updated, result);
+}
+
+/*
+ *
+ * new_string (s)  --   Routine to create a copy of the given string, using
+ *		      	malloc.
+ *
+ */
+char *new_string (s)
+char *s;
+{
+     int len;
+     char *newstr;
+
+     len = strlen (s) + 1;
+     newstr = malloc (len);
+     strcpy (newstr, s);
+     return (newstr);
 }
