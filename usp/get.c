@@ -181,11 +181,12 @@ USPString   *str;
 	return ERROR;
     }
     /* de-netasciify */
-
+    actual -= oddp;
+    
     while (actual > 0) {
 	--actual;
 	c = *sptr++;
-	if(c == '\r' && actual > 0) {
+	if ((c == '\r') && (actual > 0)) {
 	    --actual;
 	    c = *sptr++;
 	    if(c == '\012') {
