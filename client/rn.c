@@ -1,11 +1,14 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/rn.c,v $
  *	$Author: srz $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/rn.c,v 1.3 1988-01-15 23:11:33 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/rn.c,v 1.4 1988-04-20 16:34:04 srz Exp $
  *
  *	Copyright (C) 1987 by the Massachusetts Institute of Technology
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.3  88/01/15  23:11:33  srz
+ * Fixed bug where new meetings caused problems for "next"
+ * 
  * Revision 1.2  87/11/07  02:50:38  srz
  * Added new commands ('r', 't', 'p', '?'), and fixed bug that Mark reported
  * about trying to reprint the same transaction over and over again when
@@ -17,7 +20,7 @@
  */
 
 #ifndef lint
-static char *rcsid_update_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/rn.c,v 1.3 1988-01-15 23:11:33 srz Exp $";
+static char *rcsid_update_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/rn.c,v 1.4 1988-04-20 16:34:04 srz Exp $";
 #endif lint
 
 #include "types.h"
@@ -65,23 +68,27 @@ rn(argc, argv, ss_idx)
 	if (!changed_meetings())
 	     return;
 
-	cmd = more_break("Hit space to go to next meeting: ", " qn?");
-	if (interrupt)
-	     goto done;
-	printf("\n");
-	switch(cmd) {
-	case 'q':
-	     goto done;
-	case ' ':
-	case 'n':
-	     break;
-	case '?':
-	     printf("List of possible responses:\n\n");
-	     printf("<space>,n\tNext meeting\n");
-	     printf("q\t\tQuit from read_new\n");
-	     printf("?\t\tShow this list\n\n");
-	     break;
+	for (;;) {
+	     cmd = more_break("Hit space to go to next meeting: ", " qn?");
+	     if (interrupt)
+		  goto done;
+	     printf("\n");
+	     switch(cmd) {
+	     case 'q':
+		  goto done;
+	     case ' ':
+	     case 'n':
+		  goto first_meeting;
+		  break;
+	     case '?':
+		  printf("List of possible responses:\n\n");
+		  printf("<space>,n\tNext meeting\n");
+		  printf("q\t\tQuit from read_new\n");
+		  printf("?\t\tShow this list\n\n");
+		  break;
+	     }
 	}
+first_meeting:
 	ss_execute_line(ss_idx, "nm", &code);
 	if (code != 0) goto punt;
 
@@ -93,7 +100,7 @@ rn(argc, argv, ss_idx)
 		        if (interrupt)
 			     break;
 
-			cmd = more_break("Hit space for next transaction: ", " qnptr?");
+			cmd = more_break("Hit space for next transaction: ", " qcnptr?");
 			if (interrupt)
 			     break;
 		        printf("\n");
@@ -107,6 +114,9 @@ rn(argc, argv, ss_idx)
 				else
 					ss_execute_line(ss_idx, "next", &code);
 				if (code != 0) goto punt;
+				break;
+			case 'c':
+				catchup(0,0);
 				break;
 			case 'p':
 				ss_execute_line(ss_idx, "prev", &code);
@@ -123,6 +133,7 @@ rn(argc, argv, ss_idx)
 			case '?':
 				printf("List of possible responses:\n\n");
 				printf("<space>,n\tNext transaction\n");
+				printf("c\t\tCatch up on transactions in meeting\n");
 				printf("p\t\tPrevious transaction\n");
 				printf("q\t\tQuit from read_new\n");
 				printf("r\t\tReply to current transaction\n");
