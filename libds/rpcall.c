@@ -16,9 +16,6 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
-#ifdef KERBEROS
-#include <krb.h>
-#endif
 #include "../include/tfile.h"
 #include "../include/rpc.h"
 #include "../include/config.h"
@@ -31,12 +28,8 @@
 
 /* EXTERNAL ROUTINES */
 
-char *malloc();
+char *malloc(),*rindex();
 extern int errno;
-
-#ifdef KERBEROS
-extern int krb_err_base;
-#endif
 
 int rpc_err;
 
@@ -48,7 +41,6 @@ static char *myhostname = NULL;
 
 /* connections & socket info */
 static USPStream *us = NULL;
-static USPStream *childus = NULL;
 
 /*
  *
@@ -164,29 +156,10 @@ char *dest;
  */
 init_rpc ()
 {
-     char kern_host[100];
      struct hostent *hp;
 
      init_rpc_err_tbl();
      init_usp_err_tbl();
-
-#ifdef KERBEROS
-     init_krb_err_tbl();
-#endif
-
-     /* get our canonical name (sigh!) */
-     if (myhostname != NULL)
-	  return;				/* we have it already, bye. */
-
-     gethostname(kern_host, 100);
-     hp = gethostbyname(kern_host);
-     if (hp == NULL) {
-	  perror("Unable to resolve own host name\n");
-	  return;
-     }
-
-     myhostname = malloc (strlen (hp -> h_name));
-     strcpy (myhostname, hp -> h_name);
 }
 
 /*
@@ -209,8 +182,7 @@ term_rpc()
 close_rpc(rc)
 rpc_conversation rc;
 {
-     if (rc != childus)				/* don't close down child */
-	  USP_close_connection(rc);
+     USP_close_connection(rc);
      us = NULL;
      return;
 }
@@ -232,43 +204,22 @@ rpc_conversation rc;
  *		   Returns an rpc conversation id.
  *
  */
-rpc_conversation open_rpc (host, serv, code)
-char *host, *serv;
-int *code;
+rpc_conversation open_rpc (host, port_num, service_id, code)
+char *host;				/* hostname to connect to */
+int port_num;				/* port number to use */
+char *service_id;			/* authenticator service id */
+int *code;				/* return code */
 {
-#ifdef KERBEROS
-     char krb_realm[REALM_SZ];
-     KTEXT_ST ticket;
-     int rem;
-     char phost[MAX_HSTNM];	/* principal hostname, for Kerberos only */
-#endif
-#ifdef SUBPROC
      int parent,sv[2];
-#endif
      rpc_conversation conv;
      struct hostent *hp;
-     int i;
+     int i,s,authl;
+     char *server_name,*authp;
+     struct sockaddr_in address;
 
      *code = 0;
-     if (myhostname == NULL) {				/* not initialized */
-	  *code = RPC_NOT_INIT;
-	  return(NULL);
-     }
 
-     hp = gethostbyname(host);
-     if (hp == NULL) {
-	  *code = RPC_HOST_UNKNOWN;
-	  return(NULL);
-     }
-
-
-#ifdef SUBPROC
-     if (!namcmp(hp -> h_name, myhostname)) {
-	  if (childus != NULL) {		/* have child, we reuse it */
-	       us = childus;
-	       return(childus);
-	  }
-
+     if (service_id [0] == '/') {		/* authenticate using sub-process */
 	  if (socketpair(AF_UNIX,SOCK_STREAM,0,sv) < 0)
 	       panic ("can't do socket pair");
 	  
@@ -280,51 +231,63 @@ int *code;
 	       
 	       for (i = 3; i < 20; i++)
 		    (void) close (i);
-	       execl(SERVER, SERVER_NAME, 0);
+
+	       server_name = rindex (service_id, '/');
+	       if (server_name == NULL)
+		    server_name = service_id;
+	       else
+		    server_name++;
+	       execl(service_id, server_name, 0);
 	       panic ("Can't exec");
 	  } else {
 	       (void) close (sv[1]);
-	       childus = USP_associate (sv[0]);
-	       us = childus;
+	       us = USP_associate (sv[0]);
 	       return(us);
 	  }
      }
-#endif
-
-#ifndef CONNECT
-     *code = RPC_HOST_UNKNOWN;
-     return(NULL);
-#else
-     if ((conv = USP_make_connection (host, serv)) == NULL) {
-	  if (errno == 0)
-	       *code = RPC_SERV_UNKNOWN;		/* sigh */
-	  else 
-	       *code = errno;
+	  
+     hp = gethostbyname(host);
+     if (hp == NULL) {
+	  *code = RPC_HOST_UNKNOWN;
 	  return(NULL);
      }
 
+     /* since we already have our port number, the following code was
+	stolen from USP to manually set up the connection.  Note that
+	one benefit from using the primitive USP routine (USP_associate)
+	is that we eliminate an extra host lookup, and we don't have
+	to rely on USP's primitive error mechanism.  Yeah! */
+
+     bzero((char *) &address, sizeof(address));
+     bcopy(hp->h_addr, (char *) &address.sin_addr, hp->h_length);
+     address.sin_family = hp->h_addrtype;
+     address.sin_port = port_num;
+     if((s = socket(hp->h_addrtype, SOCK_STREAM, 0)) < 0) {
+	  *code = errno;
+	  return(NULL);
+     }
+     if(connect(s, (char *) &address, sizeof(address)) < 0) {
+	  *code = errno;
+	  return(NULL);
+     }
+     
+     conv = USP_associate (s);
      us = conv;
 
-#ifdef KERBEROS
-     ExpandHost(hp, phost, krb_realm);
-     rem = mk_ap_req (&ticket, serv, phost, krb_realm, (u_long)0);
-     if (rem == KSUCCESS) {			/* send ticket */
+     get_authenticator(service_id, 0, &authp, &authl, code);
+     if (! *code) {
 	  USP_begin_block(us,KRB_TICKET);
-	  sendshort(ticket.length);
-	  for (i = 0; i < ticket.length; i++) {
-	       sendshort(ticket.dat[i]);
+	  sendshort(authl);
+	  for (i = 0; i < authl; i++) {
+	       sendshort(*authp++);
 	  }
 	  USP_end_block(us);
-     }
-     if (rem != KSUCCESS) {
+     } else {
 	  USP_begin_block(us,KRB_TICKET);	/* send blank ticket */
 	  sendshort(0);
 	  USP_end_block(us);
-	  *code = rem + krb_err_base;
      }
-#endif
      return(conv);
-#endif
 }
 
 /*
@@ -427,7 +390,8 @@ tfile tf;
 {
      int tfs;
      char buffer[508];
-     USPCardinal bt,actual;
+     USPCardinal bt;
+     unsigned actual;
      int result;
      
      if (USP_rcv_blk(us, &bt) != SUCCESS) {
@@ -470,91 +434,3 @@ char *str;
      perror("discuss");
      exit(1);
 }
-
-#ifdef KERBEROS
-/*
- *
- * ExpandHost -- takes a user string alias for a host, and converts it
- *		 to the official Kerberos principal name, plus the realm
- *		 that it lies in.
- *
- *     Warning:  There are some heuristics here.
- *		 
- *
- */
-
-
-ExpandHost( hp, krb_host, krb_realm )
-        struct hostent *hp;
-	char *krb_host,*krb_realm;
-
-{
-	struct hostent *h;
-	char *p,*sp,*dp=krb_host;
-	/*
-	 * The convention established by the Kerberos-authenticated rcmd
-	 * services (rlogin, rsh, rcp) is that the principal host name is
-	 * all lower case characters.  Therefore, we can get this name from
-	 * an alias by taking the official, fully qualified hostname, stripping off
-	 * the domain info (ie, take everything up to but excluding the
-	 * '.') and translating it to lower case.  For example, if "menel" is an
-	 * alias for host officially named "menelaus" (in /etc/hosts), for 
-	 * the host whose official name is "MENELAUS.MIT.EDU", the user could
-	 * give the command "menel echo foo" and we will resolve it to "menelaus".
-	 */
-	*krb_realm = '\0';		/* null for now */
-	sp = hp -> h_name;
-
-	p = index( sp, '.' );
-	if (p) {
-	     char *p1;
-
-	     strncpy(krb_realm,p+1,REALM_SZ);		/* Realm after '.' */
-	     krb_realm[REALM_SZ-1] = NULL;
-             p1 = krb_realm;                           /* Upper case this */
-	     do {
-		  if (islower(*p1)) *p1=toupper(*p1);
-	     } while (*p1++);
-	}
-	/* lower case Kerberos host name */
-	do {
-	     if (isupper(*sp)) *dp=tolower(*sp);
-	     else *dp = *sp;
-	} while (*dp++,*sp && (*sp++ != '.'));
-	*(--dp) = NULL;
-
-	/* heuristics */
-	if (*krb_realm == NULL)
-	     get_krbrlm(krb_realm,1);
-	if (!strcmp(krb_realm,"MIT.EDU"))
-	     strcpy(krb_realm,"ATHENA.MIT.EDU");
-	return;
-}
-#endif
-
-int namcmp(str1, str2)
-register char *str1, *str2;
-{
-     register char c1,c2;
-
-     while (*str1 && *str2) {
-	  if (*str1 == *str2) {
-	       *str1++,*str2++;
-	       continue;
-	  } else if (isalpha (*str1)) {
-	       c1 = *str1++;
-	       c2 = *str2++;
-	       if (islower (c1))
-		    c1 = toupper (c1);
-	       if (islower (c2))
-		    c2 = toupper (c2);
-	       if (c1 == c2)
-		    continue;
-	       return(1);
-	  } else
-	       return (1);
-     }
-
-     return (*str1 || *str2);
-}
-
