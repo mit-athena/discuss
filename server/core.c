@@ -11,7 +11,7 @@
 /*
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.16 1987-10-23 21:42:40 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.17 1987-10-23 23:49:15 wesommer Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
@@ -21,6 +21,9 @@
  *		callable routines.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.16  87/10/23  21:42:40  wesommer
+ * This isn't Multics.
+ * 
  * Revision 1.15  87/08/22  22:36:28  rfrench
  * Moved calling location of mtg_znotify -- write_super frees things!
  * 
@@ -39,7 +42,7 @@
  *
  */
 #ifndef lint
-static char *rcsid_core_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.16 1987-10-23 21:42:40 wesommer Exp $";
+static char *rcsid_core_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.17 1987-10-23 23:49:15 wesommer Exp $";
 #endif lint
 
 
@@ -75,6 +78,7 @@ extern bool nuclear;
 extern afile a_control_f;
 extern char rpc_caller [];
 extern int errno;
+extern int has_privs;
 extern tfile abort_file;
 extern Acl *mtg_acl;
 
@@ -810,6 +814,40 @@ int *result;
 	  return;
      }
 
+     /*
+      * Then see if we should have access to build it..  Yes, this is
+      * a crock, but UNIX doesn't have an easy way to
+      * canonicalize a pathname
+      */
+
+     *result = 0;
+     
+     if (!has_privs) {
+	  strcpy (str, location);
+	  strcat (str, "/../.ds_acl");
+
+	  if (!access(str, R_OK)) { /* access is negative-true!! */
+	       int aclfd;
+	       if ((aclfd = open(str, O_RDONLY, 0700)) < 0) {
+
+		       *result = errno;
+	       } else {
+		    Acl *tmp_acl = acl_read(aclfd);
+		    (void) close(aclfd);
+
+		    if (tmp_acl == NULL ||
+			!acl_check(tmp_acl, rpc_caller, "a"))
+			 *result = NO_ACCESS;
+		    (void) acl_destroy(tmp_acl);
+	       }
+          } 
+	  if (*result) {
+	       (void) rmdir(location); /* we don't care if this fails; */
+				       /* we can't do anything about it */
+	       return;
+	  }
+     }
+     
      strcpy (str, location);
      strcat (str, "/control");
 
