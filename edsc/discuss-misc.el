@@ -4,7 +4,7 @@
 ;;;    	For copying information, see the file mit-copyright.h in this release.
 ;;;
 ;;;	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss-misc.el,v $
-;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss-misc.el,v 1.5 1991-02-17 20:24:06 bjaspan Exp $
+;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss-misc.el,v 1.6 1992-04-16 18:29:29 lwvanels Exp $
 ;;;
 ;;;  Emacs lisp code with random parts of the emacs discuss user interface
 ;;;  We may want to split out the mail functions into a separate file if
@@ -12,6 +12,9 @@
 ;;;  Written by Theodore Ts'o, Barry Jaspan, and Mark Eichin
 ;;;
 ;;; $Log: not supported by cvs2svn $
+; Revision 1.5  1991/02/17  20:24:06  bjaspan
+; added initial "/usr/spool/discuss/" to add-mtg
+;
 ; Revision 1.4  90/12/06  17:27:11  tytso
 ; Added a require line so that mail-utils will always be loaded.
 ; 
@@ -162,43 +165,64 @@
 		(insert "\n------- End forwarded transaction\n"))
 	      (insert-buffer forward-buffer)))))
 
-(defun discuss-reply-by-mail ()
-  "Reply to the current discuss transaction with Emacs sendmail"
+(defun discuss-forward-to-meeting ()
+  "Forward a transaction to another discuss meeting."
   (interactive)
-  (let ((to (mh-get-field "To:"))
-	(from (mh-get-field "From:"))
-	(cc (mh-get-field "Cc:"))
-	(subject (nth 11 discuss-current-transaction-info)))
+  (if (not discuss-cur-mtg-buf)
+      (error "Not looking at a meeting."))
+  
+  (let ((subject (concat "[" (discuss-get-from-addr)
+			 ": " (or (mail-fetch-field "Subject") "") "]"))
+	(meeting (completing-read "Forward to meeting: "
+				  discuss-meeting-completion-list
+				  nil t ""))
+	(trn-txt (concat "\n\n------- Forwarded transaction\n\n"
+			 (buffer-substring (point-min) (point-max))
+			 "\n------- End forwarded transaction\n")))
+    (discuss-enter meeting 0 subject nil trn-txt)
+    ))
+
+(defun discuss-reply-by-mail ()
+  "Reply to the current discuss transaction with Emacs sendmail."
+  (interactive)
+  (let ((to (discuss-fetch-mail-field "To"))
+	(from (discuss-fetch-mail-field "From"))
+	(cc (discuss-fetch-mail-field "Cc"))
+	(subject (nth 11 discuss-current-transaction-info))
+	(author (nth 12 discuss-current-transaction-info))
+	(in-reply (concat "[" (int-to-string
+			       (car discuss-current-transaction-info))
+			  "]")))
+    
+    (if (equal from "")
+	(setq from author
+	      in-reply (concat (nth 1 discuss-current-meeting-info)
+			       ":" in-reply)))
     
     (if (and (> (length subject) 3)
 	     (not (string-match "[Rr]e: " (substring subject 0 4))))
 	(setq subject (concat "Re: " subject)))
 
-    (mail-other-window nil from subject 
-		       (concat "[" (int-to-string 
-				    (car discuss-current-transaction-info))
-			       "]")
-		       (concat to ", " cc) discuss-cur-mtg-buf)
+    (mail-other-window nil from subject in-reply
+		       (cond ((equal to "") nil)
+			     ((equal cc "") to)
+			     (t (concat to ", " cc)))
+		       discuss-cur-mtg-buf)
     ))
 
-; Stolen from mh-e.el
-(defun mh-get-field (field)
-  ;; Find and return the value of field FIELD in the current buffer.
-  ;; Returns the empty string if the field is not in the message.
-  (let ((case-fold-search t))
-    (goto-char (point-min))
-    (cond ((not (search-forward field nil t)) "")
-	  ((looking-at "[\t ]*$") "")
-	  (t
-	   (re-search-forward "[\t ]*\\([^\t \n].*\\)$" nil t)
-	   (let ((field (buffer-substring (match-beginning 1)
-					  (match-end 1)))
-		 (end-of-match (point)))
-	     (forward-line)
-	     (while (looking-at "[ \t]") (forward-line 1))
-	     (backward-char 1)
-	     (if (<= (point) end-of-match)
-		 field
-		 (format "%s%s"
-			 field
-			 (buffer-substring end-of-match (point))))))))) 
+(defun discuss-fetch-mail-field (field)
+  (let (p)
+    (save-excursion
+      (save-restriction
+	(goto-char (point-min))
+	(if (re-search-forward "^[a-z]+:" nil t) nil
+	  (error "Not looking at a mail-fed transaction!"))
+	(beginning-of-line)
+	(setq p (point))
+	(goto-char (point-max))
+	(re-search-backward "^[a-z]+:")
+	(re-search-forward "^$")
+	(narrow-to-region p (point))
+	(or (mail-fetch-field field nil t)
+	    "")
+	))))
