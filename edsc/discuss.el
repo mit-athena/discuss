@@ -7,7 +7,7 @@
 ;;; For copying information, see the file mit-copyright.h in this release.
 ;;;
 ;;; $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v $
-;;; $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.35 1998-04-07 22:00:57 danw Exp $
+;;; $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.36 1998-05-31 20:38:53 danw Exp $
 ;;;
 
 ;;
@@ -55,6 +55,11 @@ discuss-delete-trn.")
   "If true, use the Message-Id field in a message for generating the
 In-Reply-To field, rather than using the discuss convention of
 In-Reply-To: [###] in Meeting.")
+
+(defvar discuss-auto-reply-to-alist nil
+  "Association list of discuss meeting names (long forms) and default
+Reply-To addresses that should be inserted into replies by mail (to help
+ensure that people don't drop the CC to the discuss meeting.)")
 
 (defvar discuss-mtgs-mode-map nil
   "Keymap used by the meetings-list mode of the discuss subsystem.")
@@ -969,7 +974,7 @@ discuss server while we spin-block."
 ; run this at each load
 (defun discuss-initialize nil
   (setq discuss-version
-	"$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.35 1998-04-07 22:00:57 danw Exp $")
+	"$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.36 1998-05-31 20:38:53 danw Exp $")
 
 ;;;
 ;;; Lots of autoload stuff....
@@ -1166,6 +1171,11 @@ meeting (usually a c)."
   (discuss-mark-read-meeting meeting ?c))
 
 ;;;  $Log: not supported by cvs2svn $
+;;;  Revision 1.35  1998/04/07 22:00:57  danw
+;;;  Add variable discuss-reply-by-mail-with-message-id that says to use the
+;;;  Message-ID field instead of the discuss transaction number when composing
+;;;  a reply by mail
+;;;
 ;;;  Revision 1.34  1996/04/12 22:30:49  ghudson
 ;;;  From bjaspan:
 ;;;  	Add discuss-mark-unread-meeting and change set-last-seen to

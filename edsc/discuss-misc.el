@@ -4,7 +4,7 @@
 ;;;    	For copying information, see the file mit-copyright.h in this release.
 ;;;
 ;;;	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss-misc.el,v $
-;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss-misc.el,v 1.9 1998-04-07 22:00:57 danw Exp $
+;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss-misc.el,v 1.10 1998-05-31 20:38:11 danw Exp $
 ;;;
 ;;;  Emacs lisp code with random parts of the emacs discuss user interface
 ;;;  We may want to split out the mail functions into a separate file if
@@ -179,7 +179,10 @@
 			       (car discuss-current-transaction-info))
 			  "] in "
 			  (nth 1 discuss-current-meeting-info)
-			  "\"")))
+			  "\""))
+	(mail-default-reply-to (or (cdr (assoc discuss-current-meeting
+					       discuss-auto-reply-to-alist))
+				   mail-default-reply-to)))
     
     (if (equal from "")
 	(setq from author))
