@@ -7,13 +7,15 @@
  */
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.25 1989-06-03 00:21:19 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.26 1989-06-03 12:50:32 srz Exp $
  *
  */
 
 #ifndef lint
 static char rcsid_interface_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.25 1989-06-03 00:21:19 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.26 1989-06-03 12:50:32 srz Exp $";
+static char copyright[] =
+    "Copyright (C) 1989 by the Massachusetts Institute of Technology";
 #endif lint
 
 #include <stdio.h>
