@@ -5,9 +5,14 @@
  *		This file handles the caller's side of the connection.
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/rpcall.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/rpcall.c,v 1.12 1988-10-16 14:53:22 raeburn Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/rpcall.c,v 1.13 1989-01-04 20:36:24 raeburn Exp $
  *	$Locker:  $
  *	$Log: not supported by cvs2svn $
+ * Revision 1.12  88/10/16  14:53:22  raeburn
+ * Added function type definitions; handled different errors from
+ * gethostbyname; moved static "panic" to top (to avoid implicit
+ * declaration).
+ * 
  * Revision 1.11  88/10/16  14:03:54  raeburn
  * revised include format
  *
@@ -30,7 +35,7 @@
  */
 #ifndef lint
 static char rcsid_rpcall_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/rpcall.c,v 1.12 1988-10-16 14:53:22 raeburn Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/rpcall.c,v 1.13 1989-01-04 20:36:24 raeburn Exp $";
 #endif lint
 
 /* INCLUDES */
@@ -43,8 +48,8 @@ static char rcsid_rpcall_c[] =
 #include <netinet/in.h>
 #include <netdb.h>
 #include <discuss/tfile.h>
-#include <discuss/rpc.h>
-#include <discuss/config.h>
+#include "rpc.h"
+#include "config.h"
 
 /* DEFINES */
 
@@ -233,7 +238,7 @@ void set_rpc(rc)
  *		   Returns an rpc conversation id.
  *
  */
-int rpc_conversation open_rpc (host, port_num, service_id, code)
+rpc_conversation open_rpc (host, port_num, service_id, code)
     char *host;			/* hostname to connect to */
     int port_num;		/* port number to use */
     char *service_id;		/* authenticator service id */
@@ -286,16 +291,16 @@ int rpc_conversation open_rpc (host, port_num, service_id, code)
 	extern int h_errno;
 	int h = h_errno;
 	switch (h) {
-	HOST_NOT_FOUND:
+	case HOST_NOT_FOUND:
 	    *code = RPC_HOST_UNKNOWN;
 	    break;
-	TRY_AGAIN:
+	case TRY_AGAIN:
 	    *code = RPC_NS_TIMEOUT;
 	    break;
-	NO_RECOVERY:
+	case NO_RECOVERY:
 	    *code = RPC_NS_ERROR;
 	    break;
-	NO_ADDRESS:
+	case NO_ADDRESS:
 	    *code = RPC_NO_ADDR;
 	    break;
 	default:
