@@ -12,6 +12,7 @@
 #include <strings.h>
 #include <sys/wait.h>
 #include <ctype.h>
+#include <sys/time.h>
 #include "discuss.h"
 
 extern char *user_id;
@@ -543,6 +544,77 @@ char *args;
 done:
      dsc_destroy_trn_info(&t_info);
 done2:     
+     dsc_destroy_name_blk(&nb);
+     dsc_destroy_mtg_info(&m_info);
+}
+
+do_grtn(args)
+char *args;
+{
+     char *cp = args, *mtg_name, delim;
+     name_blk nb;
+     mtg_info m_info;
+     trn_info t_info;
+     char mtime[30];
+     int code, rnd_num, i;
+     int randrp_retry = 15;
+     struct timeval tv;
+     int pid = getpid();
+     int active_transactions, rnd_trn;
+
+     /* First, we get the meeting name */
+     if (get_word(&cp, &mtg_name, ")", &delim) < 0) {
+	  printf("; Missing meeting name\n");
+	  return;
+     }
+
+     dsc_get_mtg (user_id, mtg_name, &nb, &code);
+     if (code != 0) {
+	  printf(";%s\n", error_message(code));
+	  return;
+     }
+
+     dsc_get_mtg_info(&nb,&m_info,&code);
+     if (code != 0) {
+	  printf(";%s\n", error_message(code));
+	  dsc_destroy_name_blk(&nb);
+	  return;
+     }
+
+     gettimeofday(&tv, (struct timezone *) NULL);
+     srandom(tv.tv_sec ^ tv.tv_usec ^ pid);
+
+     for (i=1;i<=randrp_retry;i++) {
+	     do {
+		     rnd_num = random();
+		     active_transactions = (m_info.last - m_info.first);
+		     if (active_transactions != 0) {
+			     rnd_trn = (m_info.first +
+					(rnd_num % active_transactions));
+		     } else {
+			     rnd_trn = m_info.first;
+		     }
+		     dsc_get_trn_info(&nb, rnd_trn, &t_info, &code);
+	     } while (code != 0);
+	     if (!t_info.pref) break;
+     }
+     
+     t_info.subject = do_quote(t_info.subject);
+     printf("(%d %d %d %d %d %d %d %d \"%s\" %d %d \"%s\" \"%s\")\n",
+	    t_info.current,
+	    t_info.prev,
+	    t_info.next,
+	    t_info.pref,
+	    t_info.nref,
+	    t_info.fref,
+	    t_info.lref,
+	    t_info.chain_index,
+	    short_time(&t_info.date_entered),
+	    t_info.num_lines,
+	    t_info.num_chars,
+	    t_info.subject,
+	    t_info.author);
+     
      dsc_destroy_name_blk(&nb);
      dsc_destroy_mtg_info(&m_info);
 }

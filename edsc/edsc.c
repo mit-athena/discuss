@@ -8,7 +8,7 @@
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/edsc.c,v 1.3 1988-10-26 18:31:54 srz Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/edsc.c,v 1.4 1988-10-29 01:36:04 balamac Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -102,6 +102,8 @@ bad_syntax:
 	       do_gt(args);
 	  else if (!strcmp(op, "grt"))
 	       do_grt(args);
+	  else if (!strcmp(op, "grtn"))
+	       do_grtn(args);
 	  else if (!strcmp(op, "ss"))
 	       do_ss(args);
 	  else if (!strcmp(op, "at"))
