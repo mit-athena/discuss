@@ -7,7 +7,7 @@
  */
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v 1.21 1989-06-03 00:20:54 srz Exp $
+ *	$Id: dsname.c,v 1.22 1989-11-28 14:56:41 raeburn Exp $
  *
  */
 
@@ -29,8 +29,8 @@
 
 #ifndef lint
 static const char rcsid_dsname_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v 1.21 1989-06-03 00:20:54 srz Exp $";
-#endif lint
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v 1.22 1989-11-28 14:56:41 raeburn Exp $";
+#endif
 
 extern char *malloc (), *local_realm (), *getenv ();
 extern int errno;
@@ -627,10 +627,12 @@ void dsc_update_mtg_set(user_id, set, num, result)
 	if (!touched[i]) {
 	    char *temp = compress (nbp->aliases);
 
-	    if(fprintf(new_file, format,
-		       nbp->status, nbp->date_attended, nbp->last,
-		       nbp->hostname, nbp->pathname,
-		       temp, nbp->spare) == EOF) {
+	    assert (nbp->hostname != 0 && nbp->pathname != 0);
+	    assert (nbp->spare != 0);
+	    if (fprintf (new_file, format,
+			 nbp->status, nbp->date_attended, nbp->last,
+			 nbp->hostname, nbp->pathname,
+			 temp, nbp->spare) == EOF) {
 		free (temp);
 		goto punt;
 	    }
