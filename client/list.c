@@ -9,14 +9,14 @@
  *
  * List request for DISCUSS
  *
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.27 1989-06-02 23:37:25 srz Exp $
+ * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.28 1990-02-24 18:51:58 srz Exp $
  * $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v $
  * $Locker:  $
  *
  */
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.27 1989-06-02 23:37:25 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.28 1990-02-24 18:51:58 srz Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -28,7 +28,7 @@ static char rcsid_discuss_c[] =
 #include "globals.h"
 
 char *ctime(), *malloc(), *local_realm(), *error_message(), *short_time();
-static trn_info2 t_info;
+static trn_info3 t_info;
 static list_it(),delete_it(),retrieve_it();
 static int performed;		/* true if trn was acted upon */
 static int barred;		/* true if access was denied sometime */
@@ -38,11 +38,11 @@ static int setting;		/* Whether we are turning flag on or off */
 void map_trns();
 
 static list_it(t_infop, codep)
-trn_info2 *t_infop;
+trn_info3 *t_infop;
 int *codep;
 {
 	char newtime[26], nlines[10];
-	char *cp;
+	char *cp,*author;
 	int max_len;
 
 	if (*codep == NO_ACCESS) {
@@ -64,10 +64,15 @@ int *codep;
 	}
 
 	strcpy(newtime, short_time(&t_infop->date_entered));
+	if (t_infop-> signature != NULL && *(t_infop->signature) != '\0')
+	     author = t_infop -> signature;
+	else
+	     author = t_infop -> author;
+
 	/*
-	 * If author ends with current realm, punt the realm.
+	 * If author/signature ends with current realm, punt the realm.
 	 */
-	if ((cp=index(t_infop->author, '@')) != NULL)
+	if ((cp=index(author, '@')) != NULL)
 		if (!strcmp(cp+1, local_realm()))
 			*cp = '\0';
 
@@ -79,11 +84,11 @@ int *codep;
 	(void) strncat (buffer, "     ",
 			MIN (5, 13-strlen (buffer)) - strlen (nlines));
 
-	if (strlen(t_infop->author) > 15)
-		(void) strcpy(&t_infop->author[12], "...");
+	if (strlen(author) > 15)
+		(void) strcpy(&author[12], "...");
 
 	(void) sprintf (buffer + strlen (buffer), "%s %s %-15s ",
-			nlines, newtime, t_infop->author);
+			nlines, newtime, author);
 	max_len = 79 - strlen (buffer);
 
 	if (!long_subjects && strlen (t_infop->subject) > max_len)
@@ -120,7 +125,7 @@ list (argc, argv, sci_idx)
 }
 
 static delete_it (t_infop, codep)
-trn_info2 *t_infop;
+trn_info3 *t_infop;
 int *codep;
 {
      if (*codep == DELETED_TRN) {		/* Already deleted, done */
@@ -155,7 +160,7 @@ del_trans(argc, argv)
 }
 
 static retrieve_it (t_infop, codep)
-trn_info2 *t_infop;
+trn_info3 *t_infop;
 int *codep;
 {
      if (*codep == 0) {				/* Transaction exists */
@@ -276,7 +281,7 @@ void map_trns(argc, argv, defalt, proc, filter_flags)
 }
 
 static flag_it(t_infop, codep)
-trn_info2 *t_infop;
+trn_info3 *t_infop;
 int *codep;
 {
      if (*codep == DELETED_TRN) {
