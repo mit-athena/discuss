@@ -8,7 +8,7 @@
 
 #ifndef lint
 #ifndef SABER
-static char *RCSid = "$Id: dsgrep.c,v 1.16 1999-06-01 19:02:19 ghudson Exp $";
+static char *RCSid = "$Id: dsgrep.c,v 1.17 2001-02-28 20:43:54 ghudson Exp $";
 #endif
 #endif
 
@@ -16,6 +16,7 @@ static char *RCSid = "$Id: dsgrep.c,v 1.16 1999-06-01 19:02:19 ghudson Exp $";
 #define MAX_MEETINGS 128
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 #include <sys/file.h>
@@ -44,12 +45,12 @@ main(argc,argv)
   extern int optind;
   extern char *optarg;
 
-  char *meetings_file,*homedir,*getenv(),*var;
+  char *meetings_file,*homedir,*regexp_str,*var;
   name_blk *meetings,*tmp_mtg;
   mtg_info meeting_info;
   char tmp_meeting_file[MAXPATHLEN];
   int n_meetings,result,i,cur_meeting,n_to_look,j,c;
-  int print_trans,use_re,search_trans,search_deleted,s_trans();
+  int print_trans,flags,search_trans,search_deleted,s_trans();
   int case_insens,trans_num;
   int high,low;
   regex_t search_re;
@@ -58,7 +59,6 @@ main(argc,argv)
   void s_to_lower();
   int tmp_fd1,tmp_fd2;
   int using_dflt_mtgs = 0;
-  char *subject;
   struct stat statb;
   
   initialize_dsc_error_table();
@@ -66,12 +66,12 @@ main(argc,argv)
   n_to_look = 50;
   print_trans = 0;
   search_trans = 0;
-  use_re = 0;
   verbose_errors = 0;
   case_insens = 0;
   search_deleted = 0;
   trans_num = 0;
   meetings_file = NULL;
+  regexp_str = NULL;
 
   while ((c = getopt(argc,argv, "n:e:f:t:apvdhi")) != EOF)
     switch(c) {
@@ -96,11 +96,7 @@ main(argc,argv)
       }
       break;
     case 'e':
-      if (regcomp(&search_re, optarg, REG_NOSUB) != 0) {
-	fprintf(stderr,"dsgrep: Invalid regular expression %s\n",optarg);
-	exit(1);
-      }
-      use_re = 1;
+      regexp_str = optarg;
       break;
     case 'f':
       meetings_file = optarg;
@@ -126,6 +122,14 @@ main(argc,argv)
       exit(1);
       break;
     }
+
+  if (regexp_str) {
+    flags = REG_NOSUB | (case_insens ? REG_ICASE : 0);
+    if (regcomp(&search_re, regexp_str, flags) != 0) {
+      fprintf(stderr,"dsgrep: Invalid regular expression %s\n",regexp_str);
+      exit(1);
+    }
+  }
 
   if (meetings_file) {
     var = malloc(strlen(meetings_file) + strlen("MEETINGS=") + 1);
@@ -201,16 +205,7 @@ main(argc,argv)
 	}
 	if (!search_deleted && (ti.flags & TRN_FDELETED))
 	  continue;
-	if (case_insens) {
-	  subject = strdup(ti.subject);
-	  if (!subject) {
-	    fprintf(stderr,"dsgrep: out of memory\n");
-	    exit(1);
-	  }
-	  s_to_lower(subject);
-	} else
-	  subject = ti.subject;
-	if (!use_re || !regexec(&search_re,subject,0,NULL,0) ||
+	if (!regexp_str || !regexec(&search_re,ti.subject,0,NULL,0) ||
 	    (search_trans &&
 	     s_trans(meetings[i],j,ti.num_chars,&search_re,case_insens)))  {
 	  printf("%s [%d]: %s\n",
@@ -225,8 +220,6 @@ main(argc,argv)
 	    printf("*** End of Transaction ***\n");
 	  }
 	}
-	if (case_insens)
-	  free(subject);
       }
   }
   if (using_dflt_mtgs)
