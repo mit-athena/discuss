@@ -6,12 +6,12 @@ LFLAGS=	-uhv -I../include
 
 OBJS=	discuss.o edit.o output.o trn_expr.o list.o trn_select.o \
 	status.o new_trans.o print.o lsm.o addmtg.o list_acl.o \
-	interrupt.o goto.o reply.o \
+	interrupt.o goto.o reply.o ckm.o \
 	cmds.o ../ets/discuss_err.o
 
 SRCS=	discuss.c edit.c output.c trn_expr.c list.c trn_select.c \
 	status.c new_trans.c print.c lsm.c addmtg.c list_acl.c \
-	interrupt.c goto.c reply.c
+	interrupt.c goto.c reply.c ckm.c
 
 .SUFFIXES:	.ct .h
 
@@ -50,14 +50,15 @@ lint:	$(SRCS) ../server/acl.c ../libds/llib-lds.ln ../lib/llib-lcom_err.ln \
 
 clean:
 	rm -f *.o *~ \#* *.bak
-	rm -f discuss trn_expr.c y.tab.c TAGS
+	rm -f discuss trn_expr.c y.tab.c TAGS info.tar
 
-dist:	$(SRCS) Makefile make_commands libss.a trn_expr.y cmds.ct
+dist:	$(SRCS) Makefile trn_expr.y cmds.ct
 	-mkdir ../dist/client
 	cp -p $(SRCS) ../dist/client/
 	cp -p Makefile ../dist/client/
 	cp -p trn_expr.y cmds.ct ../dist/client/
-	tar cf - info | (cd ../dist/client ; tar xfv - )
+	tar cf info.tar info
+	(cd ../dist/client ; tar xf ../../client/info.tar )
 	ln -s ../include/ss.h ../dist/client/ss.h
 	ln -s ../include/ss_err.h ../dist/client/ss_err.h
 	ln -s ../ss/make_commands ../dist/client/make_commands
@@ -66,9 +67,8 @@ dist:	$(SRCS) Makefile make_commands libss.a trn_expr.y cmds.ct
 ./discuss_err.h: discuss_err.h
 
 # 'make depend' code
-CFILES=	$(SRCS)
-depend: ${CFILES}
-	${CC} -M -I../include ${COPTS} ${CFILES} | \
+depend: ${SRCS}
+	${CC} -M -I../include ${CFLAGS} ${SRCS} | \
 	sed -e ':loop' \
 	    -e 's/\.\.\/[^ /]*\/\.\./../' \
 	    -e 't loop' | \
