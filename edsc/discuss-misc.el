@@ -4,7 +4,7 @@
 ;;;    	For copying information, see the file mit-copyright.h in this release.
 ;;;
 ;;;	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss-misc.el,v $
-;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss-misc.el,v 1.8 1998-03-24 22:26:19 ghudson Exp $
+;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss-misc.el,v 1.9 1998-04-07 22:00:57 danw Exp $
 ;;;
 ;;;  Emacs lisp code with random parts of the emacs discuss user interface
 ;;;  We may want to split out the mail functions into a separate file if
@@ -172,6 +172,7 @@
   (let ((to (discuss-fetch-mail-field "To"))
 	(from (discuss-fetch-mail-field "From"))
 	(cc (discuss-fetch-mail-field "Cc"))
+	(msg-id (discuss-fetch-mail-field "Message-Id"))
 	(subject (nth 11 discuss-current-transaction-info))
 	(author (nth 12 discuss-current-transaction-info))
 	(in-reply (concat "\"[" (int-to-string
@@ -183,6 +184,10 @@
     (if (equal from "")
 	(setq from author))
     
+    (if (and discuss-reply-by-mail-with-message-id
+	     (not (equal msg-id "")))
+	(setq in-reply msg-id))
+
     (if (and (> (length subject) 3)
 	     (not (string-match "[Rr]e: " (substring subject 0 4))))
 	(setq subject (concat "Re: " subject)))

@@ -7,7 +7,7 @@
 ;;; For copying information, see the file mit-copyright.h in this release.
 ;;;
 ;;; $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v $
-;;; $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.34 1996-04-12 22:30:49 ghudson Exp $
+;;; $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.35 1998-04-07 22:00:57 danw Exp $
 ;;;
 
 ;;
@@ -50,6 +50,11 @@ repeatedly hitting the space bar.  For the truly lazy user.")
 (defvar discuss-safe-delete nil
   "If true, discuss asks for confirmation before deleting a transaction with
 discuss-delete-trn.")
+
+(defvar discuss-reply-by-mail-with-message-id nil
+  "If true, use the Message-Id field in a message for generating the
+In-Reply-To field, rather than using the discuss convention of
+In-Reply-To: [###] in Meeting.")
 
 (defvar discuss-mtgs-mode-map nil
   "Keymap used by the meetings-list mode of the discuss subsystem.")
@@ -964,7 +969,7 @@ discuss server while we spin-block."
 ; run this at each load
 (defun discuss-initialize nil
   (setq discuss-version
-	"$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.34 1996-04-12 22:30:49 ghudson Exp $")
+	"$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.35 1998-04-07 22:00:57 danw Exp $")
 
 ;;;
 ;;; Lots of autoload stuff....
@@ -1161,6 +1166,26 @@ meeting (usually a c)."
   (discuss-mark-read-meeting meeting ?c))
 
 ;;;  $Log: not supported by cvs2svn $
+;;;  Revision 1.34  1996/04/12 22:30:49  ghudson
+;;;  From bjaspan:
+;;;  	Add discuss-mark-unread-meeting and change set-last-seen to
+;;;  	  use it
+;;;  	discuss-next-trn on last trn leaves meeting if DWIM is set
+;;;  	Add autoload for discuss-forward-by-meeting
+;;;  	Document M-f and M-l
+;;;  From tytso:
+;;;  	Don't rely on .elc files
+;;;  	Try to ignore shared library warning messages
+;;;  From srz:
+;;;  	Move discuss-pathname definition to top of file
+;;;  	Documentation fixes
+;;;  From raeburn:
+;;;  	Make edsc-machine-type a variable instead of a function
+;;;  	Use the load path if discuss-source-dir is nil
+;;;  	Wait until end of discuss-end-of-lsm to display "done"
+;;;  From ckclark:
+;;;  	Add discuss-show-trn-hooks
+;;;
 ; Revision 1.1  1995/08/06  05:54:13  ghudson
 ; Initial revision
 ;
