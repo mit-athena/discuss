@@ -8,7 +8,7 @@
 
 #ifndef lint
 #ifndef SABER
-static char *RCSid = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/dsgrep/dsgrep.c,v 1.6 1996-09-19 22:29:00 ghudson Exp $";
+static char *RCSid = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/dsgrep/dsgrep.c,v 1.7 1997-06-04 03:58:04 ghudson Exp $";
 #endif
 #endif
 
@@ -215,6 +215,7 @@ main(argc,argv)
 	  printf("%s [%d]: %s\n",
 		 strrchr(meetings[i].pathname,'/')+1, j, ti.subject);
 	  if (print_trans) {
+	    fflush(stdout);
 	    dsc_get_trn(&meetings[i],j,tf,&result);
 	    if ((result != 0) && verbose_errors)
 	      fprintf(stderr,"dsgrep: error getting transaction %s[%d]: %s\n",
