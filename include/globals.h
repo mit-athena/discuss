@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/include/globals.h,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/include/globals.h,v 1.10 1987-03-22 04:48:49 spook Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/include/globals.h,v 1.11 1987-04-11 00:54:40 spook Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
@@ -48,7 +48,7 @@ extern char	*editor_path;	/* Pathname of editor to use */
 
 extern	char	*user_id;	/* user.instance@realm identifier for user */
 
-#define	CURRENT_VERSION	"1.0"
+#define	CURRENT_VERSION	"1.1"
 
 
 /* Subroutine declarations */
