@@ -1,11 +1,11 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v 1.16 1988-04-15 14:18:02 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v 1.17 1988-06-17 23:16:14 srz Exp $
  *
  */
      
 #ifndef lint
-static char *rcsid_ckm_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v 1.16 1988-04-15 14:18:02 srz Exp $";
+static char *rcsid_ckm_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v 1.17 1988-06-17 23:16:14 srz Exp $";
 #endif lint
 
 #include <strings.h>
@@ -13,6 +13,7 @@ static char *rcsid_ckm_c = "$Header: /afs/dev.mit.edu/source/repository/athena/b
 #include "types.h"
 #include "interface.h"
 #include "globals.h"
+#include "dsc_et.h"
 
 extern char *malloc(),*ctime(), *error_message(), *calloc();
 
@@ -56,6 +57,10 @@ do_mtg(mtg_name)
 	       dsc_updated_mtg(nbp, &updated, &code);
 	       if (interrupt)
 		    break;
+	       if (code == NO_SUCH_TRN) {		/* Meeting lost trns */
+		    updated = TRUE;
+		    code = 0;
+	       }
 	  }
 	  if (strcmp(last_path, nbp->pathname) || 
 	      strcmp(last_host, nbp->hostname)) {

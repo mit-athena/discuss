@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/goto.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/goto.c,v 1.8 1988-02-20 02:03:16 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/goto.c,v 1.9 1988-06-17 23:17:12 srz Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
@@ -11,7 +11,7 @@
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/goto.c,v 1.8 1988-02-20 02:03:16 srz Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/goto.c,v 1.9 1988-06-17 23:17:12 srz Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -104,6 +104,13 @@ switch_to_mtg_nb(nbp)
 
 	dsc_public.attending = TRUE;
         dsc_public.highest_seen = dsc_public.current = dsc_public.nb.last;
+
+	/* Check to see if meeting has been accidentally truncated */
+	if (dsc_public.highest_seen > dsc_public.m_info.highest) {
+	     printf ("Warning:  Transactions appear to have been lost.\n");
+	     dsc_public.highest_seen = dsc_public.current = 0;
+	}
+	
 	printf ("%s meeting:  %d new, %d last.",
 		dsc_public.m_info.long_name,
 		max (dsc_public.m_info.last - dsc_public.highest_seen, 0),

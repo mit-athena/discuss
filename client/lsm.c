@@ -1,11 +1,11 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v 1.18 1988-02-15 00:58:33 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v 1.19 1988-06-17 23:17:03 srz Exp $
  *
  */
 
 #ifndef lint
-static char *rcsid_lsm_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v 1.18 1988-02-15 00:58:33 wesommer Exp $";
+static char *rcsid_lsm_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v 1.19 1988-06-17 23:17:03 srz Exp $";
 #endif lint
 
 
@@ -113,9 +113,13 @@ do_mtg(mtg_name)
 			  updated = (dsc_public.highest_seen 
 				     < dsc_public.m_info.last);
 		     } else {
-			  dsc_updated_mtg(nbp, &updated, &code);	
+			  dsc_updated_mtg(nbp, &updated, &code);
 			  if (interrupt)
 			       break;
+			  if (code == NO_SUCH_TRN) {	/* Meeting lost trns */
+			       updated = TRUE;
+			       code = 0;
+			  }
 		     }
 		}
 		do_line(nbp, code, updated);
