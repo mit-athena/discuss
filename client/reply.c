@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v 1.5 1987-07-17 00:23:45 spook Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v 1.6 1988-02-07 12:57:15 balamac Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
@@ -11,7 +11,7 @@
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v 1.5 1987-07-17 00:23:45 spook Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v 1.6 1988-02-07 12:57:15 balamac Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -133,6 +133,7 @@ repl(argc, argv)
 	free((char *)trn_list);
 
 	dsc_get_trn_info(&dsc_public.nb, orig_trn, &t_info, &code);
+
 	if (code != 0) {
 		ss_perror(sci_idx, code, "");
 		return;
