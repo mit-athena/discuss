@@ -8,7 +8,7 @@
 
 #ifndef lint
 #ifndef SABER
-static char *RCSid = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/dsgrep/dsgrep.c,v 1.2 1991-07-11 18:11:36 lwvanels Exp $";
+static char *RCSid = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/dsgrep/dsgrep.c,v 1.3 1992-01-16 18:57:43 lwvanels Exp $";
 #endif
 #endif
 
@@ -62,6 +62,8 @@ main(argc,argv)
   char *tmp_buf;
   struct stat statb;
   
+  initialize_dsc_error_table();
+
   n_to_look = 50;
   print_trans = 0;
   search_trans = 0;
@@ -159,7 +161,8 @@ main(argc,argv)
 	continue;
       }
       if (result != 0) {
-	fprintf(stderr,"dsgrep: error %d expanding meeting %s\n",result,argv[i]);
+	fprintf(stderr,"dsgrep: error expanding meeting %s: %s\n",
+		argv[i],error_message(result));
 	exit(1);
       }
       bcopy((char *)tmp_mtg,(char *)&meetings[cur_meeting],sizeof(name_blk));
@@ -177,8 +180,10 @@ main(argc,argv)
   for(i=0;i<cur_meeting;i++) {
     dsc_get_mtg_info(&meetings[i],&meeting_info[i],&result);
      if (result != 0) {
-       fprintf(stderr,"dsgrep: error %d getting meeting info for meeting %s:%s\n",
-             result, meetings[i].hostname, meetings[i].pathname);
+       fprintf(stderr,"dsgrep: error getting meeting info for meeting '%s:%s': %s\n",
+	       meetings[i].hostname, meetings[i].pathname,
+	       error_message(result));
+       continue;
      }
     if (trans_num != 0) {
       low = trans_num;
@@ -191,9 +196,12 @@ main(argc,argv)
     for(j=low;j<=high;j++)
       {
 	dsc_get_trn_info2(&meetings[i],j,&ti,&result);
-	if ((result != 0) && verbose_errors) {
-	  fprintf(stderr,"dsgrep: error %d getting transaction info for %s[%d]\n",
-		  result, (char *) (rindex(meetings[i].pathname,'/')+1),j);
+	if (result != 0) {
+	  if (verbose_errors)
+	    fprintf(stderr,"dsgrep: error getting transaction info for %s[%d]: %s\n",
+		    (char *) (rindex(meetings[i].pathname,'/')+1), j,
+		    error_message(result));
+	  continue;
 	}
 	if (!search_deleted && (ti.flags & TRN_FDELETED))
 	  continue;
@@ -206,8 +214,9 @@ main(argc,argv)
 	  if (print_trans) {
 	    dsc_get_trn(&meetings[i],j,tf,&result);
 	    if ((result != 0) && verbose_errors)
-	      fprintf(stderr,"dsgrep: error %d getting transaction %s[%d]\n",
-		      result,(char *) (rindex(meetings[i].pathname,'/')+1),j );
+	      fprintf(stderr,"dsgrep: error getting transaction %s[%d]: %s\n",
+		      (char *) (rindex(meetings[i].pathname,'/')+1), j,
+		      error_message(result));
 	    printf("*** End of Transaction ***\n");
 	  }
 	}
@@ -240,8 +249,9 @@ s_trans(nbp,trans_no,n_chars,search_re,case_insens)
   tf = mem_tfile(buffer,bsize);
   dsc_get_trn(&nbp,trans_no,tf,&result);
   if ((result != 0) && verbose_errors){
-    fprintf(stderr,"dsgrep: error %d getting transation %s[%d]\n", result,
-	    (char *) (rindex(nbp.pathname,'/')+1),trans_no);
+    fprintf(stderr,"dsgrep: error getting transation %s[%d]: %s\n",
+	    (char *) (rindex(nbp.pathname,'/')+1),trans_no,
+	    error_message(result));
   }
   tdestroy(tf);
   buffer[n_chars-1] = '\0';
