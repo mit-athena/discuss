@@ -2,25 +2,26 @@
  *
  * Status request for DISCUSS
  *
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/status.c,v 1.10 1987-06-27 01:41:13 spook Exp $
+ * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/status.c,v 1.11 1989-01-05 00:43:47 raeburn Exp $
  * $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/status.c,v $
  * $Locker:  $
  *
- * Copyright (C) 1986 by the MIT Student Information Processing Board
+ * Copyright (C) 1986, 1988 by the MIT Student Information Processing
+ * Board.
  *
  */
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/status.c,v 1.10 1987-06-27 01:41:13 spook Exp $";
+static char rcsid_discuss_c[] =
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/status.c,v 1.11 1989-01-05 00:43:47 raeburn Exp $";
 #endif lint
 
 #include <stdio.h>
 #include <ctype.h>
 #include "ss.h"
-#include "interface.h"
+#include <discuss/discuss.h>
 #include "config.h"
 #include "globals.h"
-#include <strings.h>
-#include "acl.h"
+#include <string.h>
 
 extern char *rindex();
 static int sending_msg;

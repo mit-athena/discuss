@@ -1,18 +1,19 @@
 /*
  *
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/trn_select.c,v 1.9 1987-07-17 00:48:49 srz Exp $
+ * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/trn_select.c,v 1.10 1989-01-05 00:39:17 raeburn Exp $
  * $Locker:  $
  *
  */
+
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/trn_select.c,v 1.9 1987-07-17 00:48:49 srz Exp $";
+static char rcsid_discuss_c[] =
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/trn_select.c,v 1.10 1989-01-05 00:39:17 raeburn Exp $";
 #endif lint
 
 #define	MIN(a,b)	((a)<(b)?(a):(b))
 #define	MAX(a,b)	((a)>(b)?(a):(b))
 #include <stdio.h>
-#include "interface.h"
-#include "discuss_err.h"
+#include <discuss/discuss.h>
 #include "globals.h"
 
 extern char *malloc();

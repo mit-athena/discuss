@@ -2,7 +2,7 @@
  *
  * List request for DISCUSS
  *
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.17 1988-12-03 01:39:27 raeburn Exp $
+ * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.18 1989-01-05 00:34:48 raeburn Exp $
  * $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v $
  * $Locker:  $
  *
@@ -11,18 +11,15 @@
  */
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.17 1988-12-03 01:39:27 raeburn Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.18 1989-01-05 00:34:48 raeburn Exp $";
 #endif lint
 
 #include <stdio.h>
 #include <string.h>
 #include <sys/param.h>		/* for MIN() */
-#include "discuss_err.h"
 #include "ss.h"
-#include "tfile.h"
-#include "interface.h"
 #include "config.h"
-#include "dsc_et.h"
+#include <discuss/discuss.h>
 #include "globals.h"
 
 char *ctime(), *malloc(), *local_realm(), *error_message(), *short_time();
