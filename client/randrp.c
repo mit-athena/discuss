@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/randrp.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/randrp.c,v 1.0 1988-01-03 21:55:19 balamac Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/randrp.c,v 1.1 1988-01-03 22:34:46 balamac Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1988 by the Student Information Processing Board
@@ -10,7 +10,7 @@
  */
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/randrp.c,v 1.0 1988-01-03 21:55:19 balamac Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/randrp.c,v 1.1 1988-01-03 22:34:46 balamac Exp $";
 #endif lint
 
 #include "types.h"
@@ -76,16 +76,11 @@ randrp(argc, argv, sci_idx)
 		return;
 	}
 
-	printf(" Lowest: %d\n",dsc_public.m_info.first);
-	printf(" Highest: %d\n",dsc_public.m_info.last);
 	rnd_num = random();
-	printf(" Random: %d\n",rnd_num);
 	active_transactions =
 		(dsc_public.m_info.last - dsc_public.m_info.first);
-	printf(" Active: %d\n",active_transactions);
 	rnd_trn = (dsc_public.m_info.lowest +
 			  (rnd_num % active_transactions));
-	printf(" Random_trn: %d\n",rnd_trn);
 
 	if ((editor != NULL) && !noeditor) {
 		(void) sprintf(buffer, "reply -editor %s %d", editor, rnd_trn);
