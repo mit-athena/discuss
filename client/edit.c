@@ -7,12 +7,15 @@
  */
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/edit.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/edit.c,v 1.12 1993-04-28 11:17:05 miki Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/edit.c,v 1.13 1994-03-25 16:27:35 miki Exp $
  *	$Locker:  $
  *
  *	Utility routines.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.12  93/04/28  11:17:05  miki
+ * ported to Solaris2.1
+ * 
  * Revision 1.11  89/06/02  23:37:01  srz
  * Added standard copyright notice.
  * 
@@ -78,7 +81,7 @@
 
 #ifndef lint
 static char rcsid_discuss_utils_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/edit.c,v 1.12 1993-04-28 11:17:05 miki Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/edit.c,v 1.13 1994-03-25 16:27:35 miki Exp $";
 #endif /* lint */
 
 #include <stdio.h>
@@ -129,9 +132,15 @@ edit(fn, edit_path)
 #else
 	int wbuf;
 #endif
+
 	struct stat buf;
 	char buffer[BUFSIZ];
 	FILE *the_file = NULL;
+#ifdef POSIX
+       struct sigaction act, oact;
+       sigemptyset(&act.sa_mask);
+       act.sa_flags = 0;
+#endif
 
 	editor_path_e = getenv("EDITOR");
 	if (!editor_path_e) editor_path_e = "/bin/ed";
@@ -188,10 +197,19 @@ edit(fn, edit_path)
 		default:
 			break;
 		}
+#ifdef POSIX
+		act.sa_handler= (void (*)()) SIG_IGN;
+		(void) sigaction(SIGINT, &act, &oact);
+#else
 		handler = signal(SIGINT, SIG_IGN);
+#endif
 		while (wait(&wbuf) != pid)
 			;
+#ifdef POSIX
+              (void) sigaction(SIGINT, &oact, NULL);
+#else
 		(void) signal(SIGINT, handler);
+#endif
 		if (WIFSIGNALED(wbuf))
 			return(ET_CHILD_DIED);
 #ifndef SOLARIS

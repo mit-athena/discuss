@@ -9,7 +9,7 @@
  *	Print-related requests for DISCUSS.
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.21 1993-04-28 11:21:08 miki Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.22 1994-03-25 16:31:38 miki Exp $
  *	$Locker:  $
  *
  */
@@ -17,7 +17,7 @@
 
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.21 1993-04-28 11:21:08 miki Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.22 1994-03-25 16:31:38 miki Exp $";
 #endif /* lint */
 
 #include <stdio.h>
@@ -81,9 +81,14 @@ prt_trans(argc, argv)
 	char **argv;
 {
 	int fd;
+#ifndef POSIX
 	int (*old_sig)();
+#endif
 	int code;
 	selection_list *trn_list;
+#ifdef POSIX
+      struct sigaction act, oact;
+#endif
 
 	request_name = ss_name(sci_idx);
 
@@ -161,7 +166,14 @@ prt_trans(argc, argv)
 	/*
 	 * Ignore SIGPIPE from the pager
 	 */
+#ifdef POSIX
+      sigemptyset(&act.sa_mask);
+      act.sa_flags = 0;
+      act.sa_handler= (void (*)()) SIG_IGN;
+      (void) sigaction(SIGPIPE, &act, &oact);
+#else
 	old_sig = signal(SIGPIPE, SIG_IGN);
+#endif
 	fd = ss_pager_create();
 	if (fd < 0) {
 	     ss_perror(sci_idx, errno, "Can't start pager");
@@ -178,7 +190,11 @@ prt_trans(argc, argv)
 #else
 	(void) wait((union wait *)0);
 #endif
+#ifdef POSIX
+      (void) sigaction (SIGPIPE, &oact, NULL);
+#else
 	(void) signal(SIGPIPE, old_sig);
+#endif
 	if (!performed)
 	     ss_perror(sci_idx, DISC_NO_TRN, "");
 }
