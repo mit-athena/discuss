@@ -7,7 +7,7 @@
  */
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/goto.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/goto.c,v 1.14 1989-06-02 23:37:10 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/goto.c,v 1.15 1989-07-29 18:22:11 srz Exp $
  *	$Locker:  $
  *
  *	Code for "goto" request in discuss.
@@ -16,7 +16,7 @@
 
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/goto.c,v 1.14 1989-06-02 23:37:10 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/goto.c,v 1.15 1989-07-29 18:22:11 srz Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -42,7 +42,7 @@ extern ss_request_table discuss_cmds;
 
 /* EXTERNAL ROUTINES */
 
-char	*malloc(), *getenv(), *gets(), *ctime(), *error_message();
+char	*malloc(), *getenv(), *gets(), *ctime(), *error_message(), *index();
 tfile	unix_tfile();
 void	leave_mtg ();
 
@@ -79,8 +79,8 @@ switch_to_mtg(name)
 switch_to_mtg_nb(nbp)
     name_blk *nbp;
 {
-    int code, have_a, have_w;
-    char msgbuf[80];
+    int code, have_a, have_w, dummy;
+    char msgbuf[80],*old_hostname,*old_pathname;
     trn_info t_info;
     
     /* Check to see if we're switching to same meeting. */
@@ -99,13 +99,48 @@ switch_to_mtg_nb(nbp)
     dsc_get_mtg_info(&dsc_public.nb,
 		     &dsc_public.m_info, &code);
     if (code != 0) {
-	if (code == NO_ACCESS)
-	    code = CANT_ATTEND;
-	(void) fprintf(stderr,
-		       "Error going to %s: %s\n", 
-		       dsc_public.nb.aliases[0], error_message(code));
-	dsc_public.host = (char *)NULL;
-	return;
+	 while (code == MTG_MOVED) {
+	      /* Meeting has moved.  In this case, dsc_public.m_info.long_name
+		 should contain the hostname/pathname for the meeting.
+		 We should update our information to reflect this change. */
+	      old_hostname = dsc_public.nb.hostname;
+	      dsc_public.nb.hostname = malloc(strlen(dsc_public.m_info.long_name)+1);
+	      strcpy(dsc_public.nb.hostname, dsc_public.m_info.long_name);
+	      old_pathname = dsc_public.nb.pathname;
+	      dsc_public.nb.pathname = malloc(strlen(dsc_public.m_info.location)+1);
+	      strcpy(dsc_public.nb.pathname, dsc_public.m_info.location);
+	      dsc_public.host = dsc_public.nb.hostname; /* warning - sharing */
+	      dsc_public.path = dsc_public.nb.pathname;
+	      dsc_get_mtg_info(&dsc_public.nb,
+			       &dsc_public.m_info, &code);
+	      if (code != 0 && code != MTG_MOVED) {
+		   fprintf(stderr, "Error checking moved meeting %s.  %s\n",
+			   dsc_public.nb.aliases[0], error_message(code));
+		   dsc_public.host = NULL;
+	      } else {
+		   fprintf(stdout, "Warning: %s moved to %s:%s\n",
+			   dsc_public.nb.aliases[0], dsc_public.host, dsc_public.path);
+		   /* Delete old meeting */
+		   dsc_public.nb.hostname = old_hostname;
+		   dsc_public.nb.pathname = old_pathname;
+		   dsc_public.nb.status |= DSC_ST_DELETED;
+		   dsc_update_mtg_set(user_id, &dsc_public.nb, 1, &dummy);
+		   dsc_public.nb.status &= ~(DSC_ST_DELETED);
+		   free(dsc_public.nb.hostname);
+		   dsc_public.nb.hostname = dsc_public.host;
+		   free(dsc_public.nb.pathname);
+		   dsc_public.nb.pathname = dsc_public.path;
+	      }
+	 }
+	 if (code != 0) {
+	      if (code == NO_ACCESS)
+		   code = CANT_ATTEND;
+	      (void) fprintf(stderr,
+			     "Error going to %s: %s\n", 
+			     dsc_public.nb.aliases[0], error_message(code));
+	      dsc_public.host = (char *)NULL;
+	      return;
+	 }
     }
     
     dsc_public.mtg_name = (char *)malloc((unsigned)strlen(dsc_public.m_info.long_name)+1);
