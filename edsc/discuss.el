@@ -11,7 +11,7 @@
 ;;;    	For copying information, see the file mit-copyright.h in this release.
 ;;;
 ;;;	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v $
-;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.26 1991-03-09 16:33:49 tytso Exp $
+;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.27 1991-03-09 22:34:09 tytso Exp $
 ;;;
 ;;;  Emacs lisp code to remote control a "discuss" shell process to
 ;;;  provide an emacs-based interface to the discuss conferencing system.
@@ -20,6 +20,9 @@
 ;;;  Written by Stan Zanarotti, Bill Sommerfeld and Theodore Ts'o.
 ;;;
 ;;;  $Log: not supported by cvs2svn $
+; Revision 1.26  91/03/09  16:33:49  tytso
+; *** empty log message ***
+; 
 ; Revision 1.25  91/03/08  21:05:33  tytso
 ; Fixed locking problem with the changed behavior of the "ss" command in
 ; edsc protocol version 2.4
@@ -1121,8 +1124,7 @@ Flushes the discuss cache and destroys the edsc process."
 	  (if (> 23 discuss-vers)
 	      (setq discuss-version-string "")
 	    (setq discuss-version-string (cadr discuss-form)))
-	  (if (= 23 discuss-vers)
-	      (setq discuss-old-ss t))
+	  (setq discuss-old-ss (= 23 discuss-vers))
 	  (if (> 20 discuss-vers)
 	      (progn
 		(discuss-restart)
@@ -1210,7 +1212,7 @@ discuss server while we spin-block."
 ; run this at each load
 (defun discuss-initialize nil
   (setq discuss-version
-	"$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.26 1991-03-09 16:33:49 tytso Exp $")
+	"$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.27 1991-03-09 22:34:09 tytso Exp $")
 
 ;;;
 ;;; Lots of autoload stuff....
