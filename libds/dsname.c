@@ -6,7 +6,7 @@
  */
 
 #ifndef lint
-static char *rcsid_dsname_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v 1.4 1986-10-27 16:04:25 wesommer Exp $";
+static char *rcsid_dsname_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v 1.5 1986-11-22 19:29:27 wesommer Exp $";
 #endif lint
 
 #include <strings.h>
@@ -207,7 +207,7 @@ static set_rc_filename(user, buf, len)
 	       pw = getpwuid(getuid());
 	       if (!pw) {
 		    printf("Who are you?\n"); /* XXX - use warning */
-		    strncpy(disrcbuf, "/tmp/.disrc");
+		    strcpy(disrcbuf, "/tmp/.disrc");
 	       } else {
 		    strncpy (disrcbuf, pw -> pw_dir, MAXPATHLEN-1);
 		    strncat (disrcbuf, "/.disrc", MAXPATHLEN-1);
