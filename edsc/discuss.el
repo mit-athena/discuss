@@ -1,5 +1,5 @@
 ;;;	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v $
-;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.3 1988-10-26 15:23:15 eichin Exp $
+;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.4 1988-10-26 23:25:47 srz Exp $
 ;;;
 ;;;  Emacs lisp code to remote control a "discuss" shell process to
 ;;;  provide an emacs-based interface to the discuss conferencing system.
@@ -8,6 +8,9 @@
 ;;;  Written by Stan Zanarotti and Bill Sommerfeld.
 ;;;
 ;;;  $Log: not supported by cvs2svn $
+; Revision 1.3  88/10/26  15:23:15  eichin
+; fix path for non-exl edsc client.
+; 
 ; Revision 1.2  88/10/26  15:17:01  eichin
 ; Added discuss-trn-output
 ; 
@@ -272,11 +275,17 @@ a	Add meeting.  Not implemented yet."
     (setq discuss-current-meeting-info discuss-form)
     (setq discuss-highest-seen highest-seen)
     (cond ((not (zerop discuss-current-transaction)) nil)
-	  ((not (zerop highest-seen))
-	   (discuss-show-trn highest-seen))
-	  ((not (zerop (nth 3 discuss-form)))
-	   (discuss-show-trn (nth 3 discuss-form)))
-	  (t (error "Empty meeting.")))))
+	  ((zerop (nth 3 discuss-form)) (error "Empty meeting."))
+	  ((or (zerop highest-seen) (>= highest-seen last))
+	   (discuss-show-trn last))
+	  (t (discuss-send-cmd (format "(nut %d %s)\n"
+				       highest-seen
+				       discuss-current-meeting)
+			       'discuss-next-goto
+			       'discuss-read-form)))))
+
+(defun discuss-next-goto ()
+  (discuss-show-trn (car discuss-form)))
 
 (defun discuss-show-trn (trn-num)
   "Show transaction number N (prefix argument)."
