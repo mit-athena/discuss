@@ -14,8 +14,11 @@
  * with the core discuss routines.  The exact protocol between the two 
  * has not been defined, although something ala RPC should be investiaged
  *
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/include/discuss/interface.h,v 1.4 1989-01-29 13:18:38 srz Exp $
+ * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/include/discuss/interface.h,v 1.5 1989-01-29 17:14:08 srz Exp $
  * $Log: not supported by cvs2svn $
+ * Revision 1.4  89/01/29  13:18:38  srz
+ * Ken's changes.
+ * 
  */
 
 #include <discuss/types.h>
@@ -50,6 +53,31 @@ typedef struct {
 	char *subject;		 /* subject of transaction */
 	char *author;		 /* author of transaction */
 } trn_info;
+
+/* Same as above, except includes flags */
+
+typedef struct {
+	int version;		 /* version of this structure */
+	trn_nums current;	 /* trans # of this transaction */
+	trn_nums prev;		 /* trans # of previous non-deleted trans */
+	trn_nums next;		 /* etc, etc. */
+	trn_nums pref;
+	trn_nums nref;
+	trn_nums fref;
+	trn_nums lref;
+
+ 	int chain_index;	 /* index of transaction in chain. Fref is 1 */
+	date_times date_entered; /* date/time transaction was entered */
+	int num_lines;		 /* # lines in transaction */
+	int num_chars;		 /* # chars in transaction */
+	char *subject;		 /* subject of transaction */
+	char *author;		 /* author of transaction */
+	int flags;		 /* Miscellaneous flags */
+} trn_info2;
+
+/* Meanings of flags */
+#define TRN_FDELETED 1
+#define TRN_FLAG1    2
 
 /*
  *
@@ -112,6 +140,20 @@ code *result;
  *
  *
  * returns information about the given transaction in info, with an error
+ * code as its return argument
+ *
+ *
+
+void get_trn_info2 (mtg_name, trn, info, result)
+char *mtg_name;
+trn_nums trn;
+trn_info2 *info;
+code *result;
+{}
+
+ *
+ *
+ * returns some more information about the given transaction in info, with an error
  * code as its return argument
  *
  *
