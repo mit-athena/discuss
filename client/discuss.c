@@ -12,16 +12,19 @@ char *cur_mtg = (char *)NULL;
 int l_zcode;
 char *temp_file = (char *)NULL;
 char *pgm = (char *)NULL;
-char *malloc(), *getenv(), *gets();
+char *malloc(), *getenv(), *gets(), *ctime();
 mtg_info m_info;
 char buffer[BUFSIZ];
-
+int time_now, time_sixmonthsago;
 main(argc, argv)
 	int argc;
 	char **argv;
 {
 	CODE zcode;
 	int sci;
+
+	time(&time_now); 
+	time_sixmonthsago = time_now - 6*30*24*60*60; 
 
 	sci = ss_create_invocation("discuss", "0.1", (char *)NULL,
 				   &discuss_cmds, (char *)NULL, &zcode);
@@ -76,6 +79,10 @@ new_trans(sci_idx, argc, argv)
 		fprintf(stderr, "Not currently attending a meeting.\n");
 		ss_abort_line(sci_idx);
 	}
+	if (argc != 1) {
+		fprintf(stderr, "Usage:  %s\n", argv[0]);
+		ss_abort_line(sci_idx);
+	}
 	printf("Subject: ");
 	if (gets(subject) == (char *)NULL) {
 		fprintf(stderr, "Error reading subject.\n");
@@ -94,7 +101,7 @@ new_trans(sci_idx, argc, argv)
 		fprintf(stderr, "Error %d.\n", l_zcode);
 		ss_abort_line(sci_idx);
 	}
-	printf("Transaction %d entered in the %s meeting.\n",
+	printf("Transaction [%04d] entered in the %s meeting.\n",
 	       txn_no, cur_mtg);
 	current_trans = txn_no;
 }
@@ -110,6 +117,10 @@ repl(sci_idx, argc, argv)
 
 	if (cur_mtg == (char *)NULL) {
 		fprintf(stderr, "Not currently attending a meeting.\n");
+		ss_abort_line(sci_idx);
+	}
+	if (argc != 1) {
+		fprintf(stderr, "Usage:  %s\n", argv[0]);
 		ss_abort_line(sci_idx);
 	}
 	if (current_trans == -1) {
@@ -160,6 +171,10 @@ del_trans(sci_idx, argc, argv)
 		printf("No current meeting.\n");
 		ss_abort_line(sci_idx);
 	}
+	if (argc != 2) {
+		fprintf(stderr, "Usage:  %s trn_no\n", argv[0]);
+		ss_abort_line(sci_idx);
+	}
 	txn_no = atoi(argv[1]);
 	delete_trn(cur_mtg, txn_no, &l_zcode);
 	if (l_zcode != 0) {
@@ -177,6 +192,10 @@ ret_trans(sci_idx, argc, argv)
 	int txn_no;
 	if (cur_mtg == (char *)NULL) {
 		printf("No current meeting.\n");
+		ss_abort_line(sci_idx);
+	}
+	if (argc != 2) {
+		fprintf(stderr, "Usage:  %s trn_no\n", argv[0]);
 		ss_abort_line(sci_idx);
 	}
 	txn_no = atoi(argv[1]);
@@ -201,21 +220,23 @@ prt_trans(sci_idx, argc, argv)
 		printf("No current meeting.\n");
 		ss_abort_line(sci_idx);
 	}
+	if (argc != 2) {
+		fprintf(stderr, "Usage:  %s trn_no\n", argv[0]);
+		ss_abort_line(sci_idx);
+	}
 	txn_no = atoi(argv[1]);
 	current_trans = txn_no;
-	fd = open(temp_file, O_RDWR|O_TRUNC|O_CREAT, 0600);
+	fd = pager_create();
 	if (fd < 0) {
-		ss_perror(sci_idx, ERRNO, "Can't create temporary file.");
-		perror(temp_file);
+		ss_perror(sci_idx, ERRNO, "Can't start pager");
 		ss_abort_line(sci_idx);
 	}
 	tf = unix_tfile(fd);
 	write_trans(sci_idx, txn_no, tf);
 	tclose(tf);
+	close(fd);
 	tdestroy(tf);
-	lseek(fd, 0, L_SET);
-	display_file(sci_idx, temp_file);
-	unlink(temp_file);
+	wait(0);
 }
 
 goto_mtg(sci_idx, argc, argv)
@@ -223,9 +244,18 @@ goto_mtg(sci_idx, argc, argv)
 	int argc;
 	char **argv;
 {
+	char *path;
+
+	if (argc != 2) {
+		fprintf(stderr, "Usage:  %s mtg_name\n", argv[0]);
+		ss_abort_line(sci_idx);
+	}
 	if (cur_mtg != (char *)NULL) free(cur_mtg);
 	cur_mtg = (char *)NULL;
-	get_mtg_info(argv[1], &m_info, &l_zcode);
+	path = malloc(strlen(argv[1]) + 20 * sizeof(char));
+	strcpy(path, "/usr/spool/discuss/");
+	strcat(path, argv[1]);
+	get_mtg_info(path, &m_info, &l_zcode);
 	if (l_zcode != 0) {
 		if (l_zcode == NO_SUCH_MTG)
 			fprintf(stderr, "No such meeting. %s\n", argv[1]);
@@ -235,8 +265,7 @@ goto_mtg(sci_idx, argc, argv)
 			fprintf(stderr, "Error %d.\n", l_zcode);
 		ss_abort_line(sci_idx);
 	}
-	cur_mtg = malloc((strlen(argv[1]) + 1) * sizeof(char));
-	strcpy(cur_mtg, argv[1]);
+	cur_mtg = path;
 }
 
 list(sci_idx, argc, argv)
@@ -247,7 +276,12 @@ list(sci_idx, argc, argv)
 	int txn_no;
 	trn_info t_info;
 	char newtime[26];
+	char *cp;
 
+	if (argc != 1) {
+		fprintf(stderr, "Usage:  %s\n", argv[0]);
+		ss_abort_line(sci_idx);
+	}
 	if (cur_mtg == (char *)NULL) {
 		ss_perror(sci_idx, 0, "No current meeting.\n");
 		ss_abort_line(sci_idx);
@@ -262,16 +296,25 @@ list(sci_idx, argc, argv)
 					txn_no, l_zcode);
 			break;
 		}
-		strcpy(newtime, ctime(&t_info.date_entered));
-		strcpy(newtime, &newtime[4]); /* punt first 4 */
-		strcpy(&newtime[12], &newtime[15]); /* punt secs */
+		cp=ctime(&t_info.date_entered);
+		if((t_info.date_entered < time_sixmonthsago) ||
+		   (t_info.date_entered > time_now))
+			sprintf(newtime, "%-7.7s %-4.4s", cp+4, cp+20);
+		else
+			sprintf(newtime, "%-12.12s", cp+4);
+		/*
+		 * If author ends with current realm, punt the realm.
+		 */
+		if (((cp=index(t_info.author, '@')) != NULL) &&
+		    (!strcmp(cp+1, REALM))) {
+			*cp = '\0';
+		}
 		if (strlen(t_info.author) > 15) {
 			t_info.author[15] = '\0';
 			t_info.author[14] = '.';
 			t_info.author[13] = '.';
 			t_info.author[12] = '.';
 		}
-		newtime[17] = '\0';
 		sprintf(buffer, "(%d)", t_info.num_lines);
 		printf(" [%04d]%c%5s %s %-15s %s\n",
 		       t_info.current,
