@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.30 1987-04-12 08:13:38 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.31 1987-04-19 21:49:10 srz Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
@@ -9,6 +9,9 @@
  *	ss library for the command interpreter.
  *
  *      $Log: not supported by cvs2svn $
+ * Revision 1.30  87/04/12  08:13:38  wesommer
+ * Cleaned up error message for "bad control arg".
+ * 
  * Revision 1.29  87/04/08  03:54:00  wesommer
  * Added new-user setup hooks.
  * 
@@ -102,7 +105,7 @@
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.30 1987-04-12 08:13:38 wesommer Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.31 1987-04-19 21:49:10 srz Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -135,6 +138,7 @@ extern ss_request_table discuss_cmds;
 
 struct _dsc_pub dsc_public = {0, 0, 0, (char *)NULL, (char *)NULL };
 
+char	dsc_version [] = "1.2";
 char	*temp_file = (char *)NULL;
 char	*pgm = (char *)NULL;
 char	buf[BUFSIZ];
@@ -233,7 +237,7 @@ main(argc, argv)
 		user_id = uid;
 	}
 
-	sci_idx = ss_create_invocation(subsystem_name, CURRENT_VERSION,
+	sci_idx = ss_create_invocation(subsystem_name, dsc_version,
 				       (char *)NULL, &discuss_cmds, &code);
 	if (code) {
 		ss_perror(sci_idx, code, "creating invocation");
