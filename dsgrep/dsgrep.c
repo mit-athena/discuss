@@ -8,15 +8,13 @@
 
 #ifndef lint
 #ifndef SABER
-static char *RCSid = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/dsgrep/dsgrep.c,v 1.1 1991-07-11 18:07:50 lwvanels Exp $";
+static char *RCSid = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/dsgrep/dsgrep.c,v 1.2 1991-07-11 18:11:36 lwvanels Exp $";
 #endif
 #endif
 
 #include "regexp.h"
 
 #define MAX_MEETINGS 128
-#define DEFAULT_MFILE "/mit/consult/lib/dsgrep/default_meetings"
-#define LOCAL_MFILE "/tmp/dsgrep_mtgsXXXXXX"
 
 #include <stdio.h>
 #include <strings.h>
@@ -74,7 +72,7 @@ main(argc,argv)
   trans_num = 0;
   meetings_file = NULL;
 
-  while ((c = getopt(argc,argv, "n:e:f:t:apvdhil")) != EOF)
+  while ((c = getopt(argc,argv, "n:e:f:t:apvdhi")) != EOF)
     switch(c) {
     case 'n':
       n_to_look = atoi(optarg);
@@ -111,48 +109,6 @@ main(argc,argv)
       break;
     case 'i':
       case_insens=1;
-      break;
-    case 'l':
-      strcpy(tmp_meeting_file,LOCAL_MFILE);
-      mktemp(tmp_meeting_file);
-      if ((tmp_fd1 = open(tmp_meeting_file,O_WRONLY|O_CREAT|O_TRUNC,0600))
-	  < 0) {
-	fprintf(stderr,"dsgrep: error opening temp meetings file %s: %s\n",
-		tmp_meeting_file, sys_errlist[errno]);
-	exit(errno);
-      }
-      if ((tmp_fd2 = open(DEFAULT_MFILE,O_RDONLY,0)) < 0) {
-	fprintf(stderr,"dsgrep: error opening default meetngs file %s: %s\n",
-		DEFAULT_MFILE, sys_errlist[errno]);
-	exit(errno);
-      }
-      if (fstat(tmp_fd2,&statb) < 0) {
-	fprintf(stderr,"dsgrep: error stat'ing default meetings file %s: %s\n",
-		tmp_meeting_file, sys_errlist[errno]);
-	exit(errno);
-      }
-      if ((tmp_buf = (char *)malloc(statb.st_size)) == NULL) {
-	fprintf(stderr,"dsgrep: error malloc'ing %d bytes\n", statb.st_size);
-	exit(-1);
-      }
-      if (read(tmp_fd2,tmp_buf,statb.st_size) != statb.st_size) {
-	fprintf(stderr,"dsgrep: error reading %s: %s\n",DEFAULT_MFILE,
-		sys_errlist[errno]);
-	exit(errno);
-      }
-      close(tmp_fd2);
-      if (write(tmp_fd1,tmp_buf,statb.st_size) != statb.st_size) {
-	fprintf(stderr,"dsgrep: error writing %s: %s\n",tmp_meeting_file,
-		sys_errlist[errno]);
-	exit(errno);
-      }
-      if (close(tmp_fd1) < 0) {
-	fprintf(stderr,"dsgrep: error closing %s: %s\n",tmp_meeting_file,
-		sys_errlist[errno]);
-	exit(errno);
-      }
-      using_dflt_mtgs = 1;
-      meetings_file = tmp_meeting_file;
       break;
     case '?':
     case 'h':
