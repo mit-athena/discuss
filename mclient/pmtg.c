@@ -1,5 +1,12 @@
 /*
  *
+ *	Copyright (C) 1988, 1989 by the Massachusetts Institute of Technology
+ *    	Developed by the MIT Student Information Processing Board (SIPB).
+ *    	For copying information, see the file mit-copyright.h in this release.
+ *
+ */
+/*
+ *
  * pmtg.c  -- Program to print out a entire meeting.
  *
  */
@@ -14,7 +21,7 @@ mtg_info minfo;
 
 #ifndef	lint
 static char rcsid_pmtg_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/pmtg.c,v 1.2 1989-01-05 07:06:41 raeburn Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/pmtg.c,v 1.3 1989-06-03 00:31:53 srz Exp $";
 #endif
 
 int main (argc,argv)

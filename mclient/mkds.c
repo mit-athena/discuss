@@ -1,9 +1,19 @@
 /*
+ *
+ *	Copyright (C) 1988, 1989 by the Massachusetts Institute of Technology
+ *    	Developed by the MIT Student Information Processing Board (SIPB).
+ *    	For copying information, see the file mit-copyright.h in this release.
+ *
+ */
+/*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v 1.14 1989-06-03 00:27:03 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v 1.15 1989-06-03 00:31:10 srz Exp $
  *	$Locker:  $
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.14  89/06/03  00:27:03  srz
+ * Ken's include file changes.
+ * 
  * Revision 1.13  89/02/25  16:54:47  srz
  * Added declaration of interrupt.
  * 
@@ -43,7 +53,7 @@
 
 #ifndef lint
 static char rcsid_mkds_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v 1.14 1989-06-03 00:27:03 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v 1.15 1989-06-03 00:31:10 srz Exp $";
 #endif lint
 
 #include <discuss/discuss.h>

@@ -1,4 +1,11 @@
 /*
+ *
+ *	Copyright (C) 1988, 1989 by the Massachusetts Institute of Technology
+ *    	Developed by the MIT Student Information Processing Board (SIPB).
+ *    	For copying information, see the file mit-copyright.h in this release.
+ *
+ */
+/*
  * Create a meeting directory; this program should run setuid root.
  * However, it is secure..
  */
@@ -10,7 +17,7 @@
 #include <strings.h>
 
 #ifndef	lint
-static char rcsid_create_mtg_dir_c[] = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/create_mtg_dir.c,v 1.2 1987-04-11 00:05:25 spook Exp $";
+static char rcsid_create_mtg_dir_c[] = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/create_mtg_dir.c,v 1.3 1989-06-03 00:30:28 srz Exp $";
 #endif
 
 main(argc, argv)

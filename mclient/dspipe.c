@@ -1,5 +1,12 @@
 /*
  *
+ *	Copyright (C) 1988, 1989 by the Massachusetts Institute of Technology
+ *    	Developed by the MIT Student Information Processing Board (SIPB).
+ *    	For copying information, see the file mit-copyright.h in this release.
+ *
+ */
+/*
+ *
  * dspipe.c -- Program to pipe stdin into a Discuss meeting.
  *
  */
@@ -16,7 +23,7 @@ tfile unix_tfile();
 char *mktemp();
 
 #ifndef	lint
-static char rcsid[] = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/dspipe.c,v 1.3 1989-05-25 02:06:11 srz Exp $";
+static char rcsid[] = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/dspipe.c,v 1.4 1989-06-03 00:31:04 srz Exp $";
 #endif
 
 main (argc,argv)
