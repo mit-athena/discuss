@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.17 1986-11-11 01:49:11 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.18 1986-11-16 06:16:09 wesommer Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
@@ -9,6 +9,12 @@
  *	ss library for the command interpreter.
  *
  *      $Log: not supported by cvs2svn $
+ * Revision 1.17  86/11/11  01:49:11  wesommer
+ * Added access control warning on reply.
+ * Added access control flags on entry to meetings: chairmen are told
+ * such, and if reply or write access are lacking, the user is told
+ * "read-only", "reply-only" or "no replies".
+ * 
  * Revision 1.16  86/10/29  10:25:23  srz
  * Clean up global variables.
  * Moves delete and retrieve over to list.c
@@ -62,7 +68,7 @@
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.17 1986-11-11 01:49:11 wesommer Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.18 1986-11-16 06:16:09 wesommer Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -124,6 +130,7 @@ main(argc, argv)
 
 	init_disc_err_tbl();
 	init_dsc_err_tbl();
+	init_acl_err_tbl();
 
 	temp_file = malloc(64);
 	pgm = malloc(64);
