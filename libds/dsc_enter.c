@@ -2,11 +2,11 @@
  * dsc_enter.c - enter a transaction from a file into discuss.
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsc_enter.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsc_enter.c,v 1.1 1987-11-17 02:56:30 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsc_enter.c,v 1.2 1988-01-26 02:13:06 raeburn Exp $
  */
 
 #ifndef	lint
-static char rcsid[] = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsc_enter.c,v 1.1 1987-11-17 02:56:30 wesommer Exp $";
+static char rcsid[] = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsc_enter.c,v 1.2 1988-01-26 02:13:06 raeburn Exp $";
 #endif
 
 #include <stdio.h>
@@ -100,6 +100,7 @@ dsc_enter_filter(source, mtg_host, mtg_path, accept_headers,
 	int reply_to = 0;		/* Transaction number to reply to. */
 	int header_count = 0;		/* Header line count */
 	
+	int fatal;			/* Do we lose contacting the mtg? */
 	int result;			/* Return code */
 
 	char filename[60];		/* temporary filename */
@@ -204,8 +205,8 @@ dsc_enter_filter(source, mtg_host, mtg_path, accept_headers,
 	(void) strcat(&module[8], mtg_host);
 
 	init_rpc();
-	set_module(module, &result);
-	if (result) goto out;
+	set_module(module, &fatal, &result);
+	if (result && fatal) goto out;
 
 	/* back to the beginning */
 	(void) rewind(f);
@@ -248,10 +249,8 @@ static void strndowncpy(dp, sp, count)
 	register unsigned char c;
 
 	while ((c = *sp++) && count > 0) {
-		if (isupper(c))
-			*dp++ = tolower(c);
-		else *dp++ = c;
-		count--;
+	    *dp++ = isupper(c) ? tolower(c) : c;
+	    count--;
 	}
 	*dp++ = '\0';
 }
