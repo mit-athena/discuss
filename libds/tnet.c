@@ -1,8 +1,18 @@
 /*
  *
+ *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tnet.c,v $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tnet.c,v 1.2 1987-04-11 00:06:25 srz Exp $
+ *
+ *	Copyright (C) 1986 by the Massachusetts Institute of Technology
+ *
  * tnet.c -- procedures to have tfiles go over the net.
  *
+ *	$Log: not supported by cvs2svn $
+ *
  */
+#ifndef lint
+static char *rcsid_tnet_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tnet.c,v 1.2 1987-04-11 00:06:25 srz Exp $";
+#endif lint
 
 #define min(A, B) ((A) < (B) ? (A) : (B))
 #define NIL 0

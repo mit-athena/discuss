@@ -10,10 +10,22 @@
 
 /*
  *
+ *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.11 1987-04-11 00:10:00 srz Exp $
+ *
+ *	Copyright (C) 1986 by the Massachusetts Institute of Technology
+ *
+ *
+ *
  * core.c --    Routines that are the meat of discuss.  These provide user
  *		callable routines.
  *
+ *	$Log: not supported by cvs2svn $
+ *
  */
+#ifndef lint
+static char *rcsid_core_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.11 1987-04-11 00:10:00 srz Exp $";
+#endif lint
 
 
 /* Derived from CORE.PAS 06/21/86 by SRZ */

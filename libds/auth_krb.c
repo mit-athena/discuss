@@ -1,9 +1,19 @@
 /*
  *
+ *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/auth_krb.c,v $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/auth_krb.c,v 1.3 1987-04-11 00:05:45 srz Exp $
+ *
+ *	Copyright (C) 1986 by the Massachusetts Institute of Technology
+ *
  * auth_krb () -- Authentication procedure for kerberos.  This contains the
  *		  standard authentication for kerberos.
  *
+ *	$Log: not supported by cvs2svn $
+ *
  */
+#ifndef lint
+static char *rcsid_auth_krb_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/auth_krb.c,v 1.3 1987-04-11 00:05:45 srz Exp $";
+#endif lint
 
 #include <ctype.h>
 #include "krb.h"

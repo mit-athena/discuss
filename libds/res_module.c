@@ -1,5 +1,10 @@
 /*
  *
+ *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/res_module.c,v $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/res_module.c,v 1.3 1987-04-11 00:05:58 srz Exp $
+ *
+ *	Copyright (C) 1986 by the Massachusetts Institute of Technology
+ *
  * resolve_module () -- 
  *	Can you say "Put all the configuration into one file?"  Can you
  *	say "Concentrated kludgery?"  I knew you could.  This procedure
@@ -9,7 +14,12 @@
  *	Note that if service name contains a '/' as the first character, then
  *	the remote function is executed as a subprocess.
  *
+ *	$Log: not supported by cvs2svn $
+ *
  */
+#ifndef lint
+static char *rcsid_res_module_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/res_module.c,v 1.3 1987-04-11 00:05:58 srz Exp $";
+#endif lint
 
 #ifdef KERBEROS
 #include "krb.h"

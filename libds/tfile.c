@@ -1,8 +1,19 @@
 /*
  *
+ *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tfile.c,v $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tfile.c,v 1.2 1987-04-11 00:06:21 srz Exp $
+ *
+ *	Copyright (C) 1986 by the Massachusetts Institute of Technology
+ *
  * tfile.c -- a new implementation of tfile's.
  *
+ *	$Log: not supported by cvs2svn $
+ *
  */
+#ifndef lint
+static char *rcsid_tfile_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tfile.c,v 1.2 1987-04-11 00:06:21 srz Exp $";
+#endif lint
+
 #include <stdio.h>
 #include <errno.h>
 #include "../include/tfile.h"

@@ -1,8 +1,18 @@
 /*
  *
+ *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tunix.c,v $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tunix.c,v 1.2 1987-04-11 00:06:29 srz Exp $
+ *
+ *	Copyright (C) 1986 by the Massachusetts Institute of Technology
+ *
  * tunix.c -- procedures to have tfiles work from unix files.
  *
+ *	$Log: not supported by cvs2svn $
+ *
  */
+#ifndef lint
+static char *rcsid_tunix_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tunix.c,v 1.2 1987-04-11 00:06:29 srz Exp $";
+#endif lint
 
 #define min(A, B) ((A) < (B) ? (A) : (B))
 #define NIL 0

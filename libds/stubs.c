@@ -10,10 +10,19 @@
 
 /*
  *
+ *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/stubs.c,v $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/stubs.c,v 1.5 1987-04-11 00:06:13 srz Exp $
+ *
+ *	Copyright (C) 1986 by the Massachusetts Institute of Technology
+ *
  * stubs.c -- These are stubs that handle the calling of routines.
  *
+ *	$Log: not supported by cvs2svn $
+ *
  */
-
+#ifndef lint
+static char *rcsid__c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/stubs.c,v 1.5 1987-04-11 00:06:13 srz Exp $";
+#endif lint
 
 /* Derived from CORE.PAS 06/21/86 by SRZ */
 

@@ -5,9 +5,12 @@
  *		This file handles the caller's side of the connection.
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/rpcall.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/rpcall.c,v 1.8 1987-03-18 12:24:35 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/rpcall.c,v 1.9 1987-04-11 00:06:04 srz Exp $
  *	$Locker:  $
  *	$Log: not supported by cvs2svn $
+ * Revision 1.8  87/03/18  12:24:35  srz
+ * Better handling of unknown rpc's.
+ * 
  * Revision 1.7  87/03/10  00:07:23  wesommer
  * Added cleanup routines and error exit path for open connection.
  * 
@@ -16,6 +19,9 @@
  * 
  *
  */
+#ifndef lint
+static char *rcsid_rpcall_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/rpcall.c,v 1.9 1987-04-11 00:06:04 srz Exp $";
+#endif lint
 
 /* INCLUDES */
 

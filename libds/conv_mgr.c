@@ -1,10 +1,20 @@
 /*
  *
+ *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/conv_mgr.c,v $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/conv_mgr.c,v 1.3 1987-04-11 00:05:50 srz Exp $
+ *
+ *	Copyright (C) 1986 by the Massachusetts Institute of Technology
+ *
  * conv_mgr () -- File that contains procedure to handle conversations.  This
  *		  allows multiplexing of RPC stream, setting up the correct
  *		  stream for the given module.
  *
+ *	$Log: not supported by cvs2svn $
+ *
  */
+#ifndef lint
+static char *rcsid_conv_mgr_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/conv_mgr.c,v 1.3 1987-04-11 00:05:50 srz Exp $";
+#endif lint
 
 #include "rpc.h"
 

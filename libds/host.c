@@ -1,11 +1,21 @@
 /*
  *
+ *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/host.c,v $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/host.c,v 1.3 1987-04-11 00:05:55 srz Exp $
+ *
+ *	Copyright (C) 1986 by the Massachusetts Institute of Technology
+ *
  * host.c () -- Program to return the default hostname, internet style.  
  *		Placed here because UNIX is too brain-damaged to have this
  *		routine (gethostname is doesn't return unique names.  This
  *		caches the result.
  *
+ *	$Log: not supported by cvs2svn $
+ *
  */
+#ifndef lint
+static char *rcsid_host_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/host.c,v 1.3 1987-04-11 00:05:55 srz Exp $";
+#endif lint
 
 #include <netdb.h>
 #include <ctype.h>
