@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.6 1986-08-02 14:01:11 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.7 1986-08-07 13:40:44 spook Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
@@ -9,6 +9,9 @@
  *	ss library for the command interpreter.
  *
  *      $Log: not supported by cvs2svn $
+ * Revision 1.6  86/08/02  14:01:11  wesommer
+ * Fixed to ignore SIGPIPE if the pager goes away.
+ * 
  * Revision 1.5  86/08/01  02:41:35  spook
  * Moved edit() to discuss_utils.c.
  * 
@@ -25,7 +28,7 @@
 #include <X/mit-copyright.h>
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.6 1986-08-02 14:01:11 wesommer Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.7 1986-08-07 13:40:44 spook Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -59,7 +62,7 @@ main(argc, argv)
 
 	sci = ss_create_invocation("discuss", "0.1", (char *)NULL,
 				   &discuss_cmds, 
-				   "/projects/discuss/client/info", &zcode);
+				   INFO_DIR, &zcode);
 	if (zcode != (CODE)0) {
 		ss_perror(sci, zcode, "creating invocation");
 		exit(1);
