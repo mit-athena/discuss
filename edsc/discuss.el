@@ -6,7 +6,7 @@
 ;;; Written by Stan Zanarotti, Bill Sommerfeld and Theodore Ts'o.
 ;;; For copying information, see the file mit-copyright.h in this release.
 ;;;
-;;; $Id: discuss.el,v 1.40 1999-04-28 01:51:14 danw Exp $
+;;; $Id: discuss.el,v 1.41 1999-06-04 14:11:13 danw Exp $
 ;;;
 
 ;;
@@ -744,7 +744,9 @@ the argument or the current transaction and leaves the meeting."
 	(setq discuss-cur-mtg-buf nil)
 	(setq discuss-current-meeting nil)
 	(if (and (not discuss-keep-discuss-ls) (get-buffer "*discuss-ls*"))
-	    (delete-windows-on (get-buffer "*discuss-ls*")))
+	    (progn
+	      (delete-windows-on (get-buffer "*discuss-ls*"))
+	      (bury-buffer (get-buffer "*discuss-ls*"))))
 	(switch-to-buffer discuss-main-buffer))))
 
 (defun discuss-catchup (&optional meeting)
@@ -1042,7 +1044,7 @@ discuss server while we spin-block."
 ; run this at each load
 (defun discuss-initialize nil
   (setq discuss-version
-	"$Id: discuss.el,v 1.40 1999-04-28 01:51:14 danw Exp $")
+	"$Id: discuss.el,v 1.41 1999-06-04 14:11:13 danw Exp $")
 
 ;;;
 ;;; Lots of autoload stuff....
