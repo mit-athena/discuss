@@ -1,9 +1,12 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v 1.10 1987-04-12 00:13:47 spook Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v 1.11 1987-04-25 10:12:03 spook Exp $
  *	$Locker:  $
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.10  87/04/12  00:13:47  spook
+ * Removed unused variables.
+ * 
  * Revision 1.9  87/04/10  23:18:01  spook
  * Added checks for EOF on input.
  * 
@@ -28,7 +31,7 @@
  */
 
 #ifndef lint
-static char rcsid_mkds_c[] = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v 1.10 1987-04-12 00:13:47 spook Exp $";
+static char rcsid_mkds_c[] = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v 1.11 1987-04-25 10:12:03 spook Exp $";
 #endif lint
 
 #include "tfile.h"
@@ -220,14 +223,15 @@ char *argv[];
 		goto kaboom;
 	}
 
+	printf("\n");
 	for (;;) {
-		printf("\nAnnounce in what meeting? ");
+		printf("Announce in what meeting? ");
 		if (!gets(ann_mtg))
 		        exit(1);
 		dsc_get_mtg(nbsrc.user_id,ann_mtg,&nbdest,&result); /* XXX */
 		if (!result)
 			break;
-		printf("Meeting not found in search path.\n");
+		fprintf(stderr, "Meeting not found in search path.\n");
 	}
 
 	fd = open(temp_file,O_RDONLY,0);
@@ -241,13 +245,14 @@ char *argv[];
 	dsc_announce_mtg(&nbsrc, &nbdest, public, tf, &txn_no, &result);
 
 	if (result) {
-		(void) fprintf(stderr,"Error adding transation: %s\n",
-			error_message(result));
-		goto kaboom;
+	     (void) fprintf(stderr, "mkds: Error adding transaction: %s\n",
+			    error_message(result));
+	     (void) fprintf(stderr,
+			   "Use announce_meeting (anm) request in discuss.\n");
 	}
-
-	(void) printf("Transaction [%04d] entered in the %s meeting.\n",
-		      txn_no, nbdest.aliases[0]);
+	else
+	     (void) printf("Transaction [%04d] entered in the %s meeting.\n",
+			   txn_no, nbdest.aliases[0]);
 
 	(void) close(fd);
 
@@ -260,53 +265,12 @@ kaboom:
 	if (error && delmtg) {
 		fprintf(stderr,"\nError encountered - deleting meeting.\n");
 		remove_mtg(mtg_path,&result);
+		if (result)
+		     perror("Can't delete meeting");
 	}
 	term_rpc();
 	exit(!error);
 }
-
-#ifdef notdef
-make_unique(path,unique,host,realm,result)
-char *path,*unique,*host,*realm;
-int *result;
-{
-	char *colon,bitbucket[128],*cp;
-	int host_len;
-	struct hostent *hp;
-
-	colon = index(path,':');
- 
-	if (!colon) {
-		if (gethostname(host,50)) {
-			*result = 1;
-			fprintf(stderr,"Unable to get host name\n");
-			return;
-		}
-	}
-	else {
-		host_len = colon-path;
-		bcopy(path,host,host_len);
-		host[host_len] = '\0';
-		(void) strcpy(path,colon+1);
-	}
-	hp = gethostbyname(host);
-	if (!hp) {
-		*result = 1;
-		fprintf(stderr,"Unable to resolve host name\n");
-		return;
-	}
-	(void) strcpy(host,hp->h_name);
-	(void) strcpy(unique,hp->h_name);
-	/* Upper case unique host name */
-	for (cp = unique; *cp; cp++)
-	     *cp = clower(*cp);
-	(void) strcat(unique,":");
-	(void) sprintf(unique+strlen(hp->h_name)+1,"%d",time(0));
-	(void) strcat(unique,path);
-	*result = 0;
-	return;
-}
-#endif
 
 getyn(prompt,def)
 char *prompt,def;
