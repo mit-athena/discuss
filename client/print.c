@@ -2,7 +2,7 @@
  *	Print-related requests for DISCUSS.
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.15 1987-07-17 00:39:37 spook Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.16 1988-01-03 21:59:10 srz Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
@@ -10,7 +10,7 @@
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.15 1987-07-17 00:39:37 spook Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.16 1988-01-03 21:59:10 srz Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -101,7 +101,11 @@ prt_trans(argc, argv)
 
 	dsc_get_trn_info(&dsc_public.nb, dsc_public.current,
 			 &t_info, &code);
-	if (code)
+	if (code == DELETED_TRN) {
+	        t_info.current = dsc_public.current;
+		t_info.next = dsc_public.current+1;
+		t_info.prev = dsc_public.current-1;
+	} else if (code)
 		t_info.current = 0;
 	else {
 		free(t_info.subject); /* don't need these */
