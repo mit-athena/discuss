@@ -1,7 +1,7 @@
 /*
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/res_module.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/res_module.c,v 1.3 1987-04-11 00:05:58 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/res_module.c,v 1.4 1987-06-27 01:28:36 spook Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
@@ -14,11 +14,9 @@
  *	Note that if service name contains a '/' as the first character, then
  *	the remote function is executed as a subprocess.
  *
- *	$Log: not supported by cvs2svn $
- *
  */
 #ifndef lint
-static char *rcsid_res_module_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/res_module.c,v 1.3 1987-04-11 00:05:58 srz Exp $";
+static char *rcsid_res_module_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/res_module.c,v 1.4 1987-06-27 01:28:36 spook Exp $";
 #endif lint
 
 #ifdef KERBEROS
@@ -27,6 +25,7 @@ static char *rcsid_res_module_c = "$Header: /afs/dev.mit.edu/source/repository/a
 #include "rpc_et.h"
 #include "config.h"
 #include <netdb.h>
+#include <strings.h>
 #include <ctype.h>
 
 #ifndef SNAME_SZ
@@ -37,7 +36,7 @@ static char *rcsid_res_module_c = "$Header: /afs/dev.mit.edu/source/repository/a
 
 #define NULL 0
 
-char *local_host_name (), *local_realm (), *index ();
+char *local_host_name (), *local_realm ();
 
 resolve_module (modname, port, hostp, servp, result)
 char *modname;					/* name to translate */

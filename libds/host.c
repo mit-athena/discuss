@@ -1,7 +1,7 @@
 /*
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/host.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/host.c,v 1.3 1987-04-11 00:05:55 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/host.c,v 1.4 1987-06-27 01:24:33 spook Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
@@ -10,13 +10,12 @@
  *		routine (gethostname is doesn't return unique names.  This
  *		caches the result.
  *
- *	$Log: not supported by cvs2svn $
- *
  */
 #ifndef lint
-static char *rcsid_host_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/host.c,v 1.3 1987-04-11 00:05:55 srz Exp $";
+static char *rcsid_host_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/host.c,v 1.4 1987-06-27 01:24:33 spook Exp $";
 #endif lint
 
+#include <strings.h>
 #include <netdb.h>
 #include <ctype.h>
 

@@ -1,16 +1,12 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/announce.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/announce.c,v 1.2 1987-04-09 00:12:23 rfrench Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/announce.c,v 1.3 1987-06-27 01:33:18 spook Exp $
  *	$Locker:  $
  *
- *	$Log: not supported by cvs2svn $
- * Revision 1.1  87/04/08  21:41:30  rfrench
- * Initial revision
- * 
  */
 
 #ifndef lint
-static char *rcsid_announce_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/announce.c,v 1.2 1987-04-09 00:12:23 rfrench Exp $";
+static char *rcsid_announce_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/announce.c,v 1.3 1987-06-27 01:33:18 spook Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -20,6 +16,8 @@ static char *rcsid_announce_c = "$Header: /afs/dev.mit.edu/source/repository/ath
 #include "dsc_et.h"
 
 #define min(x,y) ((x)<(y)?(x):(y))
+
+extern tfile unix_tfile();
 
 dsc_announce_mtg (nbpsrc, nbpdest, public, tf, txn_no, code_ptr)
 name_blk *nbpsrc, *nbpdest;
@@ -69,7 +67,8 @@ int *code_ptr;
 		tfs -= tocopy;
 	}
 	(void) fclose(fp);
-	(void) tclose(tf2);
+	(void) tclose(tf2, code_ptr);
+	*code_ptr = 0;
 
 	fd = open(temp_file,O_RDONLY,0);
 	if (fd < 0) {

@@ -1,7 +1,7 @@
 /*
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/conv_mgr.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/conv_mgr.c,v 1.5 1987-06-20 13:36:38 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/conv_mgr.c,v 1.6 1987-06-27 01:22:40 spook Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
@@ -9,28 +9,17 @@
  *		  allows multiplexing of RPC stream, setting up the correct
  *		  stream for the given module.
  *
- *	$Log: not supported by cvs2svn $
- * Revision 1.4  87/05/03  01:02:55  srz
- * Changed it so that connection errors will set a conversation as 'down',
- * and it won't retry that conversation, but simply return a fatal_error
- * that happened.
- * 
- * Revision 1.3  87/04/11  00:05:50  srz
- * Added RCS junk
- * 
- *
  */
 #ifndef lint
-static char *rcsid_conv_mgr_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/conv_mgr.c,v 1.5 1987-06-20 13:36:38 srz Exp $";
+static char *rcsid_conv_mgr_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/conv_mgr.c,v 1.6 1987-06-27 01:22:40 spook Exp $";
 #endif lint
 
 #include <errno.h>
-
+#include <strings.h>
 #include "rpc.h"
-
 #define NULL 0
 
-char *malloc ();
+char *malloc (), *realloc();
 
 
 /* conversation structure */
