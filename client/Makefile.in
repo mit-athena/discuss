@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.1 1999-02-02 20:39:45 kcr Exp $
+# $Id: Makefile.in,v 1.2 1999-05-06 22:02:41 kcr Exp $
 #
 
 SHELL=/bin/sh
@@ -19,7 +19,7 @@ DEFS=@DEFS@
 CPPFLAGS=@CPPFLAGS@
 CFLAGS=@CFLAGS@
 LDFLAGS=@LDFLAGS@
-LIBS=../server/acl.o ../libds/libdsk.a ../usp/libusp.a @KRB4_LIBS@ -lss @LIBS@
+LIBS=../server/acl.o ../libds/libdsk.a ../usp/libusp.a @KRB4_LIBS@ -lss -lreadline -lhistory -lcurses @LIBS@
 ALL_CFLAGS=-I../include ${CPPFLAGS} ${CFLAGS} ${DEFS}
 
 OBJS=	discuss.o edit.o output.o trn_expr.o list.o trn_select.o \
