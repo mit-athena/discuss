@@ -7,13 +7,13 @@
  */
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.26 1989-06-03 12:50:32 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.27 1990-02-24 18:53:54 srz Exp $
  *
  */
 
 #ifndef lint
 static char rcsid_interface_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.26 1989-06-03 12:50:32 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.27 1990-02-24 18:53:54 srz Exp $";
 static char copyright[] =
     "Copyright (C) 1989 by the Massachusetts Institute of Technology";
 #endif lint
@@ -152,6 +152,23 @@ dsc_add_trn(nbp, text, subject, reply_trn, result_trn, code_ptr)
 	add_trn(mtg_name, text, subject, reply_trn, result_trn, code_ptr);
 }
 
+dsc_add_trn2(nbp, text, subject, signature, reply_trn, result_trn, code_ptr)
+	name_blk *nbp;
+	tfile text;
+	char *subject;
+        char *signature;
+	trn_nums reply_trn, *result_trn;
+	int *code_ptr;
+{
+	select_meeting(nbp, code_ptr);
+	if (*code_ptr) return;
+	if (get_conv_server_version() >= SERVER_2)
+	     add_trn2(mtg_name, text, subject, signature, reply_trn, result_trn, code_ptr);
+	else {
+	     add_trn(mtg_name, text, subject, reply_trn, result_trn, code_ptr);
+	}
+}
+
 dsc_get_trn_info(nbp, trn, info, code_ptr)
 	name_blk *nbp;
 	trn_nums trn;
@@ -175,6 +192,26 @@ dsc_get_trn_info2(nbp, trn, info, code_ptr)
 	     get_trn_info2(mtg_name, trn, info, code_ptr);
 	else {
 	     get_trn_info(mtg_name, trn, (trn_info *) info, code_ptr);
+	     info -> flags = 0;
+	}
+}
+
+dsc_get_trn_info3(nbp, trn, info, code_ptr)
+	name_blk *nbp;
+	trn_nums trn;
+	trn_info3 *info;
+	int *code_ptr;
+{
+	select_meeting(nbp, code_ptr);
+	if (*code_ptr) return;
+	if (get_conv_server_version() >= SERVER_2)
+	     get_trn_info3(mtg_name, trn, info, code_ptr);
+	else if (get_conv_server_version() >= SERVER_1) {
+	     get_trn_info2(mtg_name, trn, (trn_info2 *) info, code_ptr);
+	     info -> signature = 0;
+	} else {
+	     get_trn_info(mtg_name, trn, (trn_info *) info, code_ptr);
+	     info -> signature = 0;
 	     info -> flags = 0;
 	}
 }
@@ -354,6 +391,23 @@ void dsc_destroy_trn_info (info)
 	if (info->subject) {
 		free (info->subject);
 		info->subject = NULL;
+	}
+}
+
+void dsc_destroy_trn_info3 (info)
+	register trn_info3 *info;
+{
+	if (info->author) {
+		free (info->author);
+		info->author = NULL;
+	}
+	if (info->subject) {
+		free (info->subject);
+		info->subject = NULL;
+	}
+	if (info->signature) {
+		free (info->signature);
+		info->signature = NULL;
 	}
 }
 

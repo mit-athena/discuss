@@ -8,11 +8,14 @@
 /*
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/stubs.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/stubs.c,v 1.14 1989-06-03 00:21:54 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/stubs.c,v 1.15 1990-02-24 18:53:16 srz Exp $
  *
  * stubs.c -- These are stubs that handle the calling of routines.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.14  89/06/03  00:21:54  srz
+ * Added standard copyright notice.
+ * 
  * Revision 1.13  89/03/27  00:33:07  srz
  * Null out fields, so that callers can FREE() fields of trn_info & mtg_info
  * after calling.
@@ -45,7 +48,7 @@
  */
 #ifndef lint
 static char rcsid_stubs_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/stubs.c,v 1.14 1989-06-03 00:21:54 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/stubs.c,v 1.15 1990-02-24 18:53:16 srz Exp $";
 #endif lint
 
 /* Derived from CORE.PAS 06/21/86 by SRZ */
@@ -82,6 +85,41 @@ int *result;
      sendstr(mtg_name);
      sendfile(source_file);
      sendstr(subject);
+     sendint(reply_trn);
+     sendit(discuss);
+     senddata(source_file);
+     if (rpc_err) { *result = rpc_err; return; }
+     recvreply ();
+     if (rpc_err) { *result = rpc_err; return; }
+     *result_trn = recvint();
+     *result = recvint();
+     if (rpc_err) { *result = rpc_err; return; }
+     return;
+}
+
+/*
+ *
+ * add_trn2 () --
+ * adds a transaction to the current meeting, either as a reply or an
+ * original transaction.  Allows a signature to be given.
+ * Returns an error code, and the transaction number given to the transaction
+ *
+ */
+add_trn2 (mtg_name, source_file, subject, signature, reply_trn, result_trn, result)
+char *mtg_name;
+tfile source_file;
+char *subject;
+char *signature;
+trn_nums reply_trn;		/* trn replying to;  0 if original */
+trn_nums *result_trn;		/* trn number given to added trn */
+int *result;
+{
+     startsend(ADD_TRN2);
+     if (rpc_err) { *result = rpc_err; return; }
+     sendstr(mtg_name);
+     sendfile(source_file);
+     sendstr(subject);
+     sendstr(signature);
      sendint(reply_trn);
      sendit(discuss);
      senddata(source_file);
@@ -147,6 +185,35 @@ int *result;
      recvreply();
      if (rpc_err) { *result = rpc_err; return; }
      recv_trn_info2(info);
+     *result = recvint();
+     if (rpc_err) { *result = rpc_err; return; }
+     return;
+}
+
+/*
+ *
+ * get_trn_info3 () --
+ * returns information about the given transaction in info, with an error
+ * code as its return argument
+ *
+ */
+get_trn_info3 (mtg_name, trn, info, result)
+char *mtg_name;
+trn_nums trn;
+trn_info3 *info;
+int *result;
+{
+     info -> subject = NULL;			/* Not allocated */
+     info -> author = NULL;
+     startsend(GET_TRN_INFO3);
+     if (rpc_err) { *result = rpc_err; return; }
+     sendstr(mtg_name);
+     sendint(trn);
+     sendit(discuss);
+     if (rpc_err) { *result = rpc_err; return; }
+     recvreply();
+     if (rpc_err) { *result = rpc_err; return; }
+     recv_trn_info3(info);
      *result = recvint();
      if (rpc_err) { *result = rpc_err; return; }
      return;
@@ -549,6 +616,32 @@ trn_info2 *tinfo;
      tinfo -> subject = recvstr ();
      tinfo -> author = recvstr ();
      tinfo -> flags = recvint ();
+}
+
+/*
+ *
+ * recv_trn_info3 -- recv a trn_info2 struct.
+ *
+ */
+recv_trn_info3(tinfo)
+trn_info3 *tinfo;
+{
+     tinfo -> version = recvint ();
+     tinfo -> current = recvint ();
+     tinfo -> prev = recvint ();
+     tinfo -> next = recvint ();
+     tinfo -> pref = recvint ();
+     tinfo -> nref = recvint ();
+     tinfo -> fref = recvint ();
+     tinfo -> lref = recvint ();
+     tinfo -> chain_index = recvint ();
+     tinfo -> date_entered = recvint ();
+     tinfo -> num_lines = recvint ();
+     tinfo -> num_chars = recvint ();
+     tinfo -> subject = recvstr ();
+     tinfo -> author = recvstr ();
+     tinfo -> flags = recvint ();
+     tinfo -> signature = recvstr ();
 }
     
 /*
