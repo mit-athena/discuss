@@ -2,7 +2,7 @@
 ;; WARNING --- change discuss-source-dir when installing this file! 
 ;; 
 
-(defvar discuss-source-dir "/mit/discuss/source/edsc"
+(defvar discuss-source-dir "/usr/athena/lib/edsc"
   "Source directory which this version of discuss is loaded from.")
 
 ;;;
@@ -11,7 +11,7 @@
 ;;;    	For copying information, see the file mit-copyright.h in this release.
 ;;;
 ;;;	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v $
-;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.29 1991-04-26 17:24:17 raeburn Exp $
+;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.30 1991-07-22 11:19:52 lwvanels Exp $
 ;;;
 ;;;  Emacs lisp code to remote control a "discuss" shell process to
 ;;;  provide an emacs-based interface to the discuss conferencing system.
@@ -20,6 +20,9 @@
 ;;;  Written by Stan Zanarotti, Bill Sommerfeld and Theodore Ts'o.
 ;;;
 ;;;  $Log: not supported by cvs2svn $
+; Revision 1.29  91/04/26  17:24:17  raeburn
+; Don't use ptys for subprocesses.
+; 
 ; Revision 1.28  91/03/12  17:57:40  tytso
 ; Cleaned up error handling for discuss-catchup.  Calling discuss-goto-error
 ; was a bad move!
@@ -203,27 +206,7 @@ Currently ignored (always async).")
   "Contains error message returned by edsc process.  If nil, means last 
 request completed successfully.")
 
-;;
-;;  Determine pathname for subprocess.  Pretty gross.
-(defun edsc-machine-type nil
-  (let ((foo nil)
-	(process-connection-type nil)
-	(buf (get-buffer-create " *edsc-xyzzy*")))
-    (save-excursion
-      (set-buffer buf)
-      (erase-buffer)
-      (call-process-region (point) (point) "/bin/athena/machtype" nil t nil)
-      (goto-char (point-max))
-      (delete-backward-char 1)
-      (setq foo (buffer-string))
-      (kill-buffer buf)
-      (if (eq foo "")
-	  (error "Can't determine machine type.")
-	foo)
-      )))
-
-(defvar discuss-pathname
-  (concat "/afs/sipb.mit.edu/user/tytso/src/edsc/edsc." (edsc-machine-type))
+(defvar discuss-pathname "/usr/athena/etc/edsc"
   "*Name of program to run as slave process for discuss.")
 
 
@@ -1230,7 +1213,7 @@ discuss server while we spin-block."
 ; run this at each load
 (defun discuss-initialize nil
   (setq discuss-version
-	"$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.29 1991-04-26 17:24:17 raeburn Exp $")
+	"$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.30 1991-07-22 11:19:52 lwvanels Exp $")
 
 ;;;
 ;;; Lots of autoload stuff....
