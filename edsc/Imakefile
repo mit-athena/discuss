@@ -1,0 +1,16 @@
+OBJS	= edsc.o parse.o time.o do_quote.o do_trn.o do_mtg.o do_misc.o\ 
+	do_cache.o version.o
+
+SRCS	= edsc.c parse.c time.c do_quote.c do_trn.c do_mtg.c do_misc.c\
+	do_cache.c
+
+LIBS	= ../server/acl.o -ldsk -lusp -lkrb -ldes -lcom_err
+LFLAGS	= -L../lib
+DEFINES = $(FLAGS)
+
+edsc:: newvers.sh
+	-$(RM) edsc
+	sh newvers.sh
+
+build_program(edsc,$(OBJS),$(LFLAGS),$(LIBS))
+install_program(edsc,,$(ATHETCDIR))
