@@ -1,5 +1,5 @@
 ;;;	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss-enter.el,v $
-;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss-enter.el,v 1.7 1990-09-19 16:32:40 bjaspan Exp $
+;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss-enter.el,v 1.8 1990-10-19 00:42:11 eichin Exp $
 ;;;
 ;;;  Emacs lisp code to enter transaction into discuss.  Part of the
 ;;;  emacs-based interface to the discuss conferencing system.
@@ -8,6 +8,10 @@
 ;;;  Written by Stan Zanarotti, Bill Sommerfeld and Theodore Ts'o.
 ;;;
 ;;; $Log: not supported by cvs2svn $
+; Revision 1.7  90/09/19  16:32:40  bjaspan
+; merged my changes (check talk/reply permissions ahead of time), added
+; $Log: not supported by cvs2svn $
+; 
 
 (require 'discuss)
 
@@ -113,6 +117,12 @@ C-c C-]  discuss-abort-edit (exit without entering)"
   (setq mode-name "Discuss Edit")
   (setq buffer-offer-save t)
   (auto-save-mode 1)
+  (setq paragraph-start (concat "^" mail-header-separator
+				"$\\|^[ \t]*[-_][-_][-_]+$\\|"
+				paragraph-start))
+  (setq paragraph-separate (concat "^" mail-header-separator
+				   "$\\|^[ \t]*[-_][-_][-_]+$\\|"
+				   paragraph-separate))
   (run-hooks 'text-mode-hook 'discuss-edit-mode-hook))
 
 (if discuss-edit-mode-map
