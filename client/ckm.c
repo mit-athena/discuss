@@ -7,16 +7,16 @@
  */
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v 1.22 1992-12-23 11:46:37 probe Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v 1.23 1996-09-19 22:28:26 ghudson Exp $
  *
  */
      
 #ifndef lint
 static char rcsid_ckm_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v 1.22 1992-12-23 11:46:37 probe Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v 1.23 1996-09-19 22:28:26 ghudson Exp $";
 #endif lint
 
-#include <strings.h>
+#include <string.h>
 #include <stdio.h>
 #include <discuss/discuss.h>
 #include "globals.h"

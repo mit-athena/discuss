@@ -8,13 +8,16 @@
 /*
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.34 1994-03-25 17:21:46 miki Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.35 1996-09-19 22:32:23 ghudson Exp $
  *
  *
  * core.c --    Routines that are the meat of discuss.  These provide user
  *		callable routines.
  *
  *	$Log: not supported by cvs2svn $
+ *	Revision 1.34  1994/03/25 17:21:46  miki
+ *	chnaged index to strchr
+ *
  * Revision 1.33  93/04/29  17:06:33  miki
  *  ported to Solaris2.1
  * 
@@ -106,7 +109,7 @@
  */
 #ifndef lint
 static char rcsid_core_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.34 1994-03-25 17:21:46 miki Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.35 1996-09-19 22:32:23 ghudson Exp $";
 #endif lint
 
 
@@ -125,12 +128,8 @@ static char rcsid_core_c[] =
 #include <sys/file.h>
 #include <sys/stat.h>
 #include <sys/param.h>
-#ifndef SOLARIS
-#include <strings.h>
-#else
 #include <string.h>
 #include <fcntl.h>
-#endif
 #ifdef SVR4
 #include <fcntl.h>
 #endif

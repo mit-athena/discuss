@@ -82,14 +82,14 @@
 */
 
 /*
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/usp/main.c,v 1.3 1994-03-25 17:09:42 miki Exp $
+ * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/usp/main.c,v 1.4 1996-09-19 22:35:40 ghudson Exp $
  * $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/usp/main.c,v $
  * $Locker:  $
  */
 
 #include <stdio.h>
 #include <errno.h>
-#include <strings.h>
+#include <string.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
@@ -98,7 +98,7 @@
 #include "usp.h"
 
 static char rcsid[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/usp/main.c,v 1.3 1994-03-25 17:09:42 miki Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/usp/main.c,v 1.4 1996-09-19 22:35:40 ghudson Exp $";
 
 /* connection operations */
 
@@ -123,12 +123,8 @@ char	*service;
      if(! (host_info = gethostbyname(host))) {
 	 return(NULL);
      }
-     memset((char *) &address, 0, sizeof(address));
-#ifdef POSIX
-   memmove((char *) &address.sin_addr, host_info->h_addr, host_info->h_length);
-#else
-     bcopy(host_info->h_addr, (char *) &address.sin_addr, host_info->h_length);
-#endif
+     memset(&address, 0, sizeof(address));
+     memcpy(&address.sin_addr, host_info->h_addr, host_info->h_length);
      address.sin_family = host_info->h_addrtype;
      address.sin_port = svc_info->s_port;
      if((s = socket(host_info->h_addrtype, SOCK_STREAM, 0)) == ERROR) {

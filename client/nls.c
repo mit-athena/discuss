@@ -2,7 +2,7 @@
  *
  * List request for DISCUSS
  *
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/nls.c,v 1.3 1996-09-08 20:31:26 ghudson Exp $
+ * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/nls.c,v 1.4 1996-09-19 22:28:28 ghudson Exp $
  * $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/nls.c,v $
  * $Locker:  $
  *
@@ -10,11 +10,11 @@
  *
  */
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/nls.c,v 1.3 1996-09-08 20:31:26 ghudson Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/nls.c,v 1.4 1996-09-19 22:28:28 ghudson Exp $";
 #endif lint
 
 #include <stdio.h>
-#include <strings.h>
+#include <string.h>
 #include "discuss_err.h"
 #include <ss/ss.h>
 #include "tfile.h"
@@ -44,7 +44,7 @@ list_it(ti)
 	/*
 	 * If author ends with current realm, punt the realm.
 	 */
-	if ((cp=index(ti->author, '@')) != NULL)
+	if ((cp=strchr(ti->author, '@')) != NULL)
 		if (!strcmp(cp+1, local_realm()))
 			*cp = '\0';
 	

@@ -15,7 +15,7 @@
 #include <stdio.h>
 #include <sys/file.h>
 #include <signal.h>
-#include <strings.h>
+#include <string.h>
 #include <sys/wait.h>
 #include <ctype.h>
 #include <sys/time.h>
@@ -394,9 +394,9 @@ int *code;
      strcpy(nbp -> user_id, user_id);
      nbp -> aliases = (char **)NULL;
      dsc_get_mtg_info(nbp, &m_info, code);
-     short_name = rindex(path,'/');
+     short_name = strrchr(path,'/');
      if (!short_name)
-	  short_name = rindex(path,':');
+	  short_name = strrchr(path,':');
      while (*code == MTG_MOVED)
 	     handle_moved_meeting(nbp, &m_info, code, short_name, FALSE);
      if (*code) {

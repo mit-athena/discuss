@@ -1,17 +1,20 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tfpager.c,v $
- *	$Author: probe $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tfpager.c,v 1.1 1993-10-12 05:58:26 probe Exp $
+ *	$Author: ghudson $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tfpager.c,v 1.2 1996-09-19 22:30:53 ghudson Exp $
  *
  *	Copyright (C) 1987 by the Massachusetts Institute of Technology
  *
  *	An auto-paging tfile.
  *
  *	$Log: not supported by cvs2svn $
+ *	Revision 1.1  1993/10/12 05:58:26  probe
+ *	Initial revision
+ *
  */
 
 #ifndef lint
-static char *rcsid_tfpager_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tfpager.c,v 1.1 1993-10-12 05:58:26 probe Exp $";
+static char *rcsid_tfpager_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tfpager.c,v 1.2 1996-09-19 22:30:53 ghudson Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -261,7 +264,7 @@ int init_tfpager()
 tfile pager_tfile()
 {
 	tpager_info *pgr = (tpager_info *)malloc(sizeof(*pgr));
-	bzero((char *)pgr, sizeof(*pgr));
+	memset(pgr, 0, sizeof(*pgr));
 	pgr->counting = 1;
 	pgr->clear_on_open = 1;
 	pgr->clear_on_page = 1;

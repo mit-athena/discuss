@@ -20,7 +20,7 @@
 #include <sys/file.h>
 #include <errno.h>
 #include <signal.h>
-#include <strings.h>
+#include <string.h>
 #include <sys/wait.h>
 #include <ctype.h>
 #include <netdb.h>
@@ -492,7 +492,7 @@ void cache_init(size)
 	if (cache)
 		free(cache);
 	cache = (struct cache_info *) malloc(sizeof(struct cache_info)*size);
-	bzero((char *) cache, sizeof(struct cache_info)*size);
+	memset(cache, 0, sizeof(struct cache_info)*size);
 	top_used = bot_used = NULL;
 	top_empty = cache;
 	for (i = 1; i < size; i++)

@@ -14,7 +14,7 @@
 #include <stdio.h>
 #include <sys/file.h>
 #include <signal.h>
-#include <strings.h>
+#include <string.h>
 #include <sys/wait.h>
 #include <ctype.h>
 #include <sys/time.h>
@@ -899,9 +899,9 @@ int *code;
 	  }
 	  goto punt;
      }
-     short_name = rindex(path,'/');
+     short_name = strrchr(path,'/');
      if (!short_name)
-	  short_name = rindex(path,':');
+	  short_name = strrchr(path,':');
      nbp -> aliases = (char **)calloc(3, sizeof(char *));
      nbp -> aliases[0] = malloc(strlen(m_info.long_name)+1);
      strcpy(nbp -> aliases[0], m_info.long_name);

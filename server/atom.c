@@ -146,11 +146,7 @@ char *buf;
 	       if (result != toread)
 		    goto read_error;
 	  } else {
-#ifdef POSIX
-	       memmove (dest_ptr, bptr + offset,  toread);
-#else
-	       bcopy (bptr + offset, dest_ptr, toread);
-#endif
+	       memcpy (dest_ptr, bptr + offset,  toread);
 	  }
 	  dest_ptr += toread;
 	  numleft -= toread;
@@ -202,11 +198,7 @@ char *buf;
 
 	       add_block (af, bn, bptr);
 	  }
-#ifdef POSIX
-	  memmove (bptr+offset, src_ptr, towrite);
-#else
-	  bcopy (src_ptr, bptr+offset, towrite);
-#endif
+	  memcpy (bptr+offset, src_ptr, towrite);
 	  src_ptr += towrite;
 	  numleft -= towrite;
 	  offset = 0;					/* after first, no offset */

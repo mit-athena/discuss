@@ -9,14 +9,14 @@
  *
  * Status request for DISCUSS
  *
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/status.c,v 1.14 1996-09-08 20:31:33 ghudson Exp $
+ * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/status.c,v 1.15 1996-09-19 22:28:31 ghudson Exp $
  * $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/status.c,v $
  * $Locker:  $
  *
  */
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/status.c,v 1.14 1996-09-08 20:31:33 ghudson Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/status.c,v 1.15 1996-09-19 22:28:31 ghudson Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -25,7 +25,7 @@ static char rcsid_discuss_c[] =
 #include <discuss/discuss.h>
 #include "config.h"
 #include "globals.h"
-#include <strings.h>
+#include <string.h>
 
 static int sending_msg;
 static char msg_buf[64];
@@ -65,7 +65,7 @@ status(argc, argv)
 
      printf("Attending %s (%s) meeting.",
 	    dsc_public.m_info.long_name,
-	    rindex(dsc_public.m_info.location, '/')+1);
+	    strrchr(dsc_public.m_info.location, '/')+1);
      if (dsc_public.m_info.public_flag)
 	  add_msg("public");
      if (acl_is_subset("c", dsc_public.m_info.access_modes)) 

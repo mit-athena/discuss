@@ -17,18 +17,14 @@
 #include <rpc.h>
 #include <sys/file.h>
 #include <stdio.h>
-#ifndef SOLARIS
-#include <strings.h>
-#else
 #include <string.h>
 #include <fcntl.h>
-#endif
 
 tfile unix_tfile();
 char *mktemp();
 
 #ifndef	lint
-static char rcsid[] = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/dspipe.c,v 1.7 1994-03-25 16:54:16 miki Exp $";
+static char rcsid[] = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/dspipe.c,v 1.8 1996-09-19 22:31:29 ghudson Exp $";
 #endif
 
 main (argc,argv)

@@ -7,12 +7,15 @@
  */
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl.c,v 1.13 1994-03-25 17:21:04 miki Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl.c,v 1.14 1996-09-19 22:32:20 ghudson Exp $
  *
  * 	Routines for the manipulation of access control lists in core,
  *	along with routines to move them to and from files.
  *
  *	$Log: not supported by cvs2svn $
+ *	Revision 1.13  1994/03/25 17:21:04  miki
+ *	replaced index with strchr
+ *
  * Revision 1.12  89/06/03  00:41:20  srz
  * Added standard copyright notice.
  * 
@@ -63,11 +66,11 @@
 
 #ifndef lint
 static const char rcsid_acl_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl.c,v 1.13 1994-03-25 17:21:04 miki Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl.c,v 1.14 1996-09-19 22:32:20 ghudson Exp $";
 #endif lint
 
 #include <stdio.h>
-#include <strings.h>
+#include <string.h>
 #include <ctype.h>
 #include <discuss/discuss.h>
 #include "internal.h"

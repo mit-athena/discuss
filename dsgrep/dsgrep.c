@@ -8,7 +8,7 @@
 
 #ifndef lint
 #ifndef SABER
-static char *RCSid = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/dsgrep/dsgrep.c,v 1.5 1993-07-22 20:23:15 vrt Exp $";
+static char *RCSid = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/dsgrep/dsgrep.c,v 1.6 1996-09-19 22:29:00 ghudson Exp $";
 #endif
 #endif
 
@@ -17,7 +17,7 @@ static char *RCSid = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/dis
 #define MAX_MEETINGS 128
 
 #include <stdio.h>
-#include <strings.h>
+#include <string.h>
 #include <ctype.h>
 #include <sys/file.h>
 #include <sys/errno.h>
@@ -168,7 +168,7 @@ main(argc,argv)
 		argv[i],error_message(result));
 	exit(1);
       }
-      bcopy((char *)tmp_mtg,(char *)&meetings[cur_meeting],sizeof(name_blk));
+      memcpy(&meetings[cur_meeting],tmp_mtg,sizeof(name_blk));
       cur_meeting++;
     }
   }
@@ -202,7 +202,7 @@ main(argc,argv)
 	if (result != 0) {
 	  if (verbose_errors)
 	    fprintf(stderr,"dsgrep: error getting transaction info for %s[%d]: %s\n",
-		    (char *) (rindex(meetings[i].pathname,'/')+1), j,
+		    strrchr(meetings[i].pathname,'/')+1, j,
 		    error_message(result));
 	  continue;
 	}
@@ -212,13 +212,13 @@ main(argc,argv)
 	if (!use_re || regexec(search_re,ti.subject) ||
 	    (search_trans &&
 	     s_trans(meetings[i],j,ti.num_chars,search_re,case_insens)))  {
-	  printf("%s [%d]: %s\n",(char *)
-		 (rindex(meetings[i].pathname,'/')+1), j, ti.subject);
+	  printf("%s [%d]: %s\n",
+		 strrchr(meetings[i].pathname,'/')+1, j, ti.subject);
 	  if (print_trans) {
 	    dsc_get_trn(&meetings[i],j,tf,&result);
 	    if ((result != 0) && verbose_errors)
 	      fprintf(stderr,"dsgrep: error getting transaction %s[%d]: %s\n",
-		      (char *) (rindex(meetings[i].pathname,'/')+1), j,
+		      strrchr(meetings[i].pathname,'/')+1, j,
 		      error_message(result));
 	    printf("*** End of Transaction ***\n");
 	  }
@@ -253,7 +253,7 @@ s_trans(nbp,trans_no,n_chars,search_re,case_insens)
   dsc_get_trn(&nbp,trans_no,tf,&result);
   if ((result != 0) && verbose_errors){
     fprintf(stderr,"dsgrep: error getting transation %s[%d]: %s\n",
-	    (char *) (rindex(nbp.pathname,'/')+1),trans_no,
+	    strrchr(nbp.pathname,'/')+1,trans_no,
 	    error_message(result));
   }
   tdestroy(tf);

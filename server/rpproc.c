@@ -16,9 +16,12 @@
 /*
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/rpproc.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/rpproc.c,v 1.11 1994-03-25 17:22:48 miki Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/rpproc.c,v 1.12 1996-09-19 22:32:25 ghudson Exp $
  *
  *	$Log: not supported by cvs2svn $
+ *	Revision 1.11  1994/03/25 17:22:48  miki
+ *	replaced bcopy with memmove for POSIX
+ *
  * Revision 1.10  90/06/21  01:16:24  srz
  * Change the NOTTY of the controlling terminal to simply setting our
  * process group;  this is a better way of avoiding tty signals since the
@@ -237,17 +240,9 @@ init_rpc (service,code)
     if (fromlen == 0) {		/* no len, UNIX domain = me */
 	gethostname(hostname, sizeof(hostname));
 	hp = gethostbyname(hostname);
-#ifdef POSIX
-      memmove(&hostaddr, hp -> h_addr,  4);
-#else
-	bcopy(hp -> h_addr, &hostaddr, 4);
-#endif
+	memcpy(&hostaddr, hp -> h_addr,  4);
     } else {
-#ifdef POSIX
-      memmove(&hostaddr, &from.sin_addr, 4);
-#else
-	bcopy(&from.sin_addr, &hostaddr, 4);
-#endif
+	memcpy(&hostaddr, &from.sin_addr, 4);
     }
 
     

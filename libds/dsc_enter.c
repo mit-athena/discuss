@@ -9,8 +9,12 @@
  * dsc_enter.c - enter a transaction from a file into discuss.
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsc_enter.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsc_enter.c,v 1.7 1994-08-15 17:36:45 cfields Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsc_enter.c,v 1.8 1996-09-19 22:30:48 ghudson Exp $
  *	$Log: not supported by cvs2svn $
+ *	Revision 1.7  1994/08/15 17:36:45  cfields
+ *	Removed Solaris specific regexp code.
+ *	7.7 checkin; changes by miki
+ *
  * Revision 1.6  94/03/25  16:43:41  miki
  * replace bcopy with memmove for POSIX platforms; replaced bzero with memset and ind
  * with strchr
@@ -28,18 +32,15 @@
 
 #ifndef	lint
 static char rcsid[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsc_enter.c,v 1.7 1994-08-15 17:36:45 cfields Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsc_enter.c,v 1.8 1996-09-19 22:30:48 ghudson Exp $";
 #endif
 
 #include <stdio.h>
-#ifdef SOLARIS
 #include <string.h>
-#include <sys/fcntl.h>
+#include <fcntl.h>
+#ifdef SOLARIS
 #include <regexpr.h>
-#else
-#include <strings.h>
 #endif
-#include <strings.h>
 #include <ctype.h>
 #include <sys/file.h>
 

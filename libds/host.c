@@ -8,7 +8,7 @@
 /*
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/host.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/host.c,v 1.5 1989-06-03 00:21:10 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/host.c,v 1.6 1996-09-19 22:30:50 ghudson Exp $
  *
  * host.c () -- Program to return the default hostname, internet style.  
  *		Placed here because UNIX is too brain-damaged to have this
@@ -17,10 +17,10 @@
  *
  */
 #ifndef lint
-static char *rcsid_host_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/host.c,v 1.5 1989-06-03 00:21:10 srz Exp $";
+static char *rcsid_host_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/host.c,v 1.6 1996-09-19 22:30:50 ghudson Exp $";
 #endif lint
 
-#include <strings.h>
+#include <string.h>
 #include <netdb.h>
 #include <ctype.h>
 

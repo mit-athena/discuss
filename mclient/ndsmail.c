@@ -5,6 +5,9 @@
  *        $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/ndsmail.c,v $
  *
  *        $Log: not supported by cvs2svn $
+ *        Revision 1.1  1993/10/12 05:58:47  probe
+ *        Initial revision
+ *
  * Revision 1.7  88/01/15  22:42:39  srz
  * set_module now returns fatal flag, again.
  * 
@@ -25,7 +28,7 @@
  */
 
 #include <stdio.h>
-#include <strings.h>
+#include <string.h>
 #include <ctype.h>
 #include <sys/file.h>
 
@@ -46,7 +49,7 @@ pragma alloca(on);
 
 #ifndef	lint
 static char rcsid[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/ndsmail.c,v 1.1 1993-10-12 05:58:47 probe Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/ndsmail.c,v 1.2 1996-09-19 22:31:30 ghudson Exp $";
 #endif
 
 char *malloc();
@@ -190,7 +193,7 @@ int main (argc,argv)
 		}	
 	    } else if (list_compare(key, inreplyto)) {
 		char *cp;
-		if ((cp = index(line,'[')) && index(cp, ']')) {
+		if ((cp = strchr(line,'[')) && strchr(cp, ']')) {
 		    cp++;
 		    if (isdigit(*cp))
 			reply_to = atoi(cp);

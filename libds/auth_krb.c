@@ -8,7 +8,7 @@
 /*
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/auth_krb.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/auth_krb.c,v 1.7 1992-11-08 22:59:11 probe Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/auth_krb.c,v 1.8 1996-09-19 22:30:47 ghudson Exp $
  *
  * auth_krb () -- Authentication procedure for kerberos.  This contains the
  *		  standard authentication for kerberos.
@@ -16,10 +16,10 @@
  */
 #ifndef lint
 static char *rcsid_auth_krb_c =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/auth_krb.c,v 1.7 1992-11-08 22:59:11 probe Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/auth_krb.c,v 1.8 1996-09-19 22:30:47 ghudson Exp $";
 #endif lint
 
-#include <strings.h>
+#include <string.h>
 #include <ctype.h>
 #include "krb.h"
 
@@ -56,18 +56,18 @@ int *result;
 
      init_krb_err_tbl();
 
-     realmp = index (service_id, '@');
+     realmp = strchr (service_id, '@');
      if (realmp == NULL || realmp - service_id >= sizeof (serv)) {
 	  realmp = "";
 	  strncpy (serv, service_id, sizeof (serv));
      } else {
-	 bcopy (service_id, serv, realmp - service_id); /* copy over to serv */
+	 memcpy (serv, service_id, realmp - service_id); /* copy to serv */
 	 serv [realmp - service_id] = '\0';
 	 realmp++;
      }
 
      /* look for service instance */
-     instancep = index (serv, '.');
+     instancep = strchr (serv, '.');
      if (instancep == NULL) {
 	  instancep = "";
      } else {

@@ -12,9 +12,13 @@
  *		This file handles the caller's side of the connection.
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/rpcall.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/rpcall.c,v 1.17 1994-03-25 16:45:22 miki Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/rpcall.c,v 1.18 1996-09-19 22:30:52 ghudson Exp $
  *	$Locker:  $
  *	$Log: not supported by cvs2svn $
+ *	Revision 1.17  1994/03/25 16:45:22  miki
+ *	replace bcopy with memmove for POSIX platforms; replaced bzero with memset and
+ *	ndex with strchr
+ *
  * Revision 1.16  92/11/08  22:58:54  probe
  * Avoid incompatible redeclarations (AIX 3.2)
  * 
@@ -55,7 +59,7 @@
  */
 #ifndef lint
 static char rcsid_rpcall_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/rpcall.c,v 1.17 1994-03-25 16:45:22 miki Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/rpcall.c,v 1.18 1996-09-19 22:30:52 ghudson Exp $";
 #endif lint
 
 /* INCLUDES */
@@ -63,7 +67,7 @@ static char rcsid_rpcall_c[] =
 #include <sys/types.h>
 #include <stdio.h>
 #include <ctype.h>
-#include <strings.h>
+#include <string.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
@@ -338,12 +342,8 @@ rpc_conversation open_rpc (host, port_num, service_id, code)
        is that we eliminate an extra host lookup, and we don't have
        to rely on USP's primitive error mechanism.  Yeah! */
 
-    memset((char *) &address, 0, sizeof(address));
-#ifdef POSIX
-    memmove((char *) &address.sin_addr, hp->h_addr, hp->h_length);
-#else
-    bcopy(hp->h_addr, (char *) &address.sin_addr, hp->h_length);
-#endif
+    memset(&address, 0, sizeof(address));
+    memcpy(&address.sin_addr, hp->h_addr, hp->h_length);
     address.sin_family = hp->h_addrtype;
     address.sin_port = port_num;
     if((s = socket(hp->h_addrtype, SOCK_STREAM, 0)) < 0)

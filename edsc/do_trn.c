@@ -21,10 +21,8 @@
 #include <ctype.h>
 #include <sys/time.h>
 #include <netdb.h>
-#ifdef SOLARIS
 #include <fcntl.h>
-#endif
-#include <strings.h>
+#include <string.h>
 #include "edsc.h"
 #ifdef SOLARIS
 #define random lrand48

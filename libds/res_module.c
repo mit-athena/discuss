@@ -8,7 +8,7 @@
 /*
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/res_module.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/res_module.c,v 1.12 1996-06-26 07:21:10 ghudson Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/res_module.c,v 1.13 1996-09-19 22:30:51 ghudson Exp $
  *
  * resolve_module () --
  *	Can you say "Put all the configuration into one file?"  Can you
@@ -20,6 +20,10 @@
  *	the remote function is executed as a subprocess.
  *
  *	$Log: not supported by cvs2svn $
+ *	Revision 1.12  1996/06/26 07:21:10  ghudson
+ *	Kerberos has nothing to do with maximum hostname sizes.  Use BUFSIZ,
+ *	which is what resolvers sometimes use internally.
+ *
  *	Revision 1.11  1991/09/04 11:35:11  lwvanels
  *	stuff not checked in when picked up for the release; local server stuff.
  *
@@ -42,7 +46,7 @@
 
 #ifndef lint
 static char rcsid_res_module_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/res_module.c,v 1.12 1996-06-26 07:21:10 ghudson Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/res_module.c,v 1.13 1996-09-19 22:30:51 ghudson Exp $";
 #endif lint
 
 #include "rpc_et.h"
@@ -299,7 +303,7 @@ static void ExpandHost (primary_name, krb_host, krb_realm )
      */
 #ifdef OLD_KERBEROS
     *krb_realm = '\0';		/* null for now */
-    p = index( sp, '.' );
+    p = strchr( sp, '.' );
     if (p) {
 	char *p1;
 

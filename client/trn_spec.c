@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/trn_spec.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/trn_spec.c,v 1.3 1991-09-04 11:29:35 lwvanels Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/trn_spec.c,v 1.4 1996-09-19 22:28:32 ghudson Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
@@ -28,6 +28,9 @@
  *	which called eval..  but it isn't.  Sorry.
  *
  * 	$Log: not supported by cvs2svn $
+ * 	Revision 1.3  1991/09/04 11:29:35  lwvanels
+ * 	unchecked in stuff in release
+ *
  * Revision 1.2  87/07/08  19:06:42  wesommer
  * Another intermediate version.
  * 
@@ -37,7 +40,7 @@
  */
 
 #ifndef lint
-static char *rcsid_trn_spec_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/trn_spec.c,v 1.3 1991-09-04 11:29:35 lwvanels Exp $";
+static char *rcsid_trn_spec_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/trn_spec.c,v 1.4 1996-09-19 22:28:32 ghudson Exp $";
 #endif lint
 
 #include "interface.h"
@@ -46,7 +49,7 @@ static char *rcsid_trn_spec_c = "$Header: /afs/dev.mit.edu/source/repository/ath
 #include "discuss_err.h"
 #include "dsc_et.h"
 #include <stdio.h>
-#include <strings.h>
+#include <string.h>
 #include <ctype.h>
 
 #define max(a,b) ((a)<(b)?(b):(a))
@@ -157,8 +160,8 @@ process_an_arg(tg, arg)
 	int i, val, retval;
 	char *cp;
 
-	if ((cp = index(arg, ',')) ||
-	    (cp = index(arg, ':'))) {
+	if ((cp = strchr(arg, ',')) ||
+	    (cp = strchr(arg, ':'))) {
 	        *cp = '\0';
 		retval = process_an_arg(tg, arg);
 		if (!retval) {

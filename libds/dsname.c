@@ -7,7 +7,7 @@
  */
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v $
- *	$Id: dsname.c,v 1.24 1994-03-25 16:44:44 miki Exp $
+ *	$Id: dsname.c,v 1.25 1996-09-19 22:30:49 ghudson Exp $
  *
  */
 
@@ -18,7 +18,7 @@
 
 #include <stdio.h>
 #ifndef SOLARIS
-#include <strings.h>
+#include <string.h>
 #else
 #include <string.h>
 #include <unistd.h>
@@ -34,7 +34,7 @@
 
 #ifndef lint
 static const char rcsid_dsname_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v 1.24 1994-03-25 16:44:44 miki Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v 1.25 1996-09-19 22:30:49 ghudson Exp $";
 #endif
 
 extern char *malloc (), *local_realm (), *getenv ();
@@ -79,11 +79,7 @@ INLINE static char * ds(s)
 {
     register int len = strlen (s) + 1;
     register char *ns = malloc (len);
-#ifdef POSIX
-    memmove (ns, s, len);
-#else
-    bcopy (s, ns, len);
-#endif
+    memcpy (ns, s, len);
     return (ns);
 }
 
@@ -546,11 +542,7 @@ dsc_get_mtg (user_id, name, nbp, result)
 	    dsc_destroy_name_blk(&set[i]);
 	}
     }
-#ifdef POSIX
-    memmove(nbp, &set[0], sizeof(name_blk));
-#else
-    bcopy(&set[0], nbp, sizeof(name_blk));
-#endif
+    memcpy(nbp, &set[0], sizeof(name_blk));
 
 bad:
     if (set)
