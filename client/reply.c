@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v 1.8 1988-05-05 23:11:41 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v 1.9 1988-08-16 23:14:38 srz Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
@@ -11,7 +11,7 @@
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v 1.8 1988-05-05 23:11:41 srz Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v 1.9 1988-08-16 23:14:38 srz Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -177,9 +177,11 @@ repl(argc, argv)
 		    orig_trn, &txn_no, &code);
 	if (code != 0) {
 		ss_perror(sci_idx, code, "while adding transaction\n");
+		close(fd);
 		goto abort;
 	}
  
+	close(fd);
 	(void) printf("Transaction [%04d] entered in the %s meeting.",
 		       txn_no, dsc_public.mtg_name);
 
