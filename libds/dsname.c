@@ -1,13 +1,13 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v 1.11 1987-07-17 02:17:42 spook Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v 1.12 1987-08-08 02:27:59 spook Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
  */
 
 #ifndef lint
-static char *rcsid_dsname_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v 1.11 1987-07-17 02:17:42 spook Exp $";
+static char *rcsid_dsname_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v 1.12 1987-08-08 02:27:59 spook Exp $";
 #endif lint
 
 /*
@@ -46,6 +46,8 @@ static char disrcbuf[MAXPATHLEN]; /* user's MEETINGS file */
 static char *disrcfile = NULL;	/* pointer to above */
 static char *me = NULL;		/* user's own user_id field */
 
+static char mtgs[] = "/.meetings";
+
 /*
  * Attempt to locate user's .meetings file.  This is intended to be
  * used as a test routine from an application.
@@ -64,35 +66,37 @@ int find_rc_filename()
 	struct passwd *pw = NULL;
 	register char *cp;
 
+	if (disrcfile)
+		return 0;
+
 	pw = getpwuid(getuid());
-	if (!pw) {
-		log_warning(NO_SUCH_USER,
-        "You do not appear to have an account on this machine");
+	if (!pw)
 		return NO_SUCH_USER;
-	}
 	me = malloc(strlen(pw->pw_name)+2+
 		    strlen(local_realm()));
 	strcpy(me, pw->pw_name);
 	strcat(me, "@");
 	strcat(me, local_realm());
-	if ((cp = getenv("MEETINGS")) && !access(cp, R_OK|W_OK)) {
-		strncpy(disrcbuf, cp, MAXPATHLEN-1);
+
+	cp = getenv("MEETINGS");
+	if (cp)
+		strcpy(disrcbuf, cp);
+	if (!cp) {
+		cp = getenv("HOME");
+		if (cp) {
+			strcpy(disrcbuf, cp);
+			strcat(disrcbuf, mtgs);
+		}
+	}
+	if (!cp) {
+		strcpy(disrcbuf, pw->pw_dir);
+		strcat(disrcbuf, mtgs);
+	}
+	if (!access(disrcbuf, R_OK|W_OK)) {
 		disrcfile = disrcbuf;
-		return 0;
-	} else if ((cp = getenv("HOME")) 
-	   &&  (strncpy(disrcbuf, cp, MAXPATHLEN-1))
-	   &&  (strncat(disrcbuf, "/.meetings", MAXPATHLEN-1))
-	   &&  (!access(disrcbuf, R_OK|W_OK))) {
-		disrcfile = disrcbuf;
-		return 0;
-	} else {
-		strncpy (disrcbuf, pw -> pw_dir, MAXPATHLEN-1);
-		strncat (disrcbuf, "/.meetings", MAXPATHLEN-1);
-		disrcfile = disrcbuf;
-		if (access(disrcbuf, R_OK|W_OK))
-			return NO_MTGS_FILE;
 		return 0;
 	}
+	return errno;
 }
 
 static int set_rc_filename(auser_id, buf, len)
@@ -123,7 +127,7 @@ static int set_rc_filename(auser_id, buf, len)
 		return NO_SUCH_USER;
 	}
 	strncpy(buf, pw->pw_dir, len);
-	strncat(buf, "/.meetings", len - strlen(buf));
+	strncat(buf, mtgs, len - strlen(buf));
 	return (access(buf, R_OK)? NO_MTGS_FILE : 0);
 }
 
@@ -427,6 +431,8 @@ dsc_get_mtg (user_id, name, nbp, result)
 	bcopy(&set[0], nbp, sizeof(name_blk));
 }
 
+static char format[] = "%d:%d:%d:%s:%s:%s:%s\n";
+
 dsc_update_mtg_set(user_id, set, num, result)
 	char *user_id;		/* input */
 	name_blk *set;		/* array of name_blk's */
@@ -440,8 +446,6 @@ dsc_update_mtg_set(user_id, set, num, result)
 	char *new_name;
 	FILE *new_file;
 	char *old_name;
-
-	static char *format = "%d:%d:%d:%s:%s:%s:%s\n";
 
 	if (*result = setdbent(user_id)) {
 		if (*result != NO_MTGS_FILE &&
