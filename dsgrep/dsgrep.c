@@ -8,7 +8,7 @@
 
 #ifndef lint
 #ifndef SABER
-static char *RCSid = "$Id: dsgrep.c,v 1.17 2001-02-28 20:43:54 ghudson Exp $";
+static char *RCSid = "$Id: dsgrep.c,v 1.18 2001-04-10 01:54:45 ghudson Exp $";
 #endif
 #endif
 
@@ -32,7 +32,6 @@ static char *RCSid = "$Id: dsgrep.c,v 1.17 2001-02-28 20:43:54 ghudson Exp $";
 
 extern tfile unix_tfile();
 extern tfile mem_tfile();
-extern char *malloc(),*calloc();
 
 int verbose_errors;
 int bsize;
