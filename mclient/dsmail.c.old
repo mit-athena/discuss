@@ -5,6 +5,9 @@
  *        $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/dsmail.c.old,v $
  *
  *        $Log: not supported by cvs2svn $
+ * Revision 1.4  87/07/17  03:34:57  tytso
+ * Bugfixes made, added -p option, removed zippy stuff
+ * 
  * Revision 1.3  87/05/02  02:12:58  tytso
  * Replaced the regexp and options parsing code with the UNIX
  * library routines.  Cleaned up code.  Added -A (all headers)
@@ -15,6 +18,9 @@
 #include <stdio.h>
 #include <strings.h>
 #include <ctype.h>
+#include <sys/file.h>
+
+#include "tfile.h"
 
 #define DSPIPE		"/usr/sipb/bin/dspipe"
 #define DEFAULT_SUBJECT "No subject found in mail header"
@@ -22,7 +28,7 @@
 #define LISTLEN 40
 
 #ifndef	lint
-static char rcsid[] = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/dsmail.c.old,v 1.4 1987-07-17 03:34:57 tytso Exp $";
+static char rcsid[] = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/dsmail.c.old,v 1.5 1987-10-24 04:26:44 wesommer Exp $";
 #endif
 
 char *malloc();
@@ -43,15 +49,22 @@ char *subjlist[] = {
 	"subject",NULL
 };
 
+char *inreplyto[] = {
+	"in-reply-to",NULL
+};
+
+
 char *progname;
 char *save[LISTLEN],*reject[LISTLEN];
 char *usr_mtg = "";
 int 	dodefs=0,
 	allfields=0,
-	debug=0;
+	debug;
 char *optarg;
 int optind;
 char *dspipeloc;
+extern tfile unix_tfile();
+int reply_to;
 
 void PRS();
 void MakeLowerCase();
@@ -78,6 +91,8 @@ main(argc,argv)
 		if (fchmod(fileno(f),0600))
 			perror("chmod temp file");
 	}
+	if (debug) printf("start of text->");
+	reply_to = 0;
 	
 	if (fgets(line,BUFFLEN,stdin)==NULL)
 		exit(0);
@@ -99,6 +114,13 @@ main(argc,argv)
 					subject=malloc(strlen(line)-i+1);
 					(void) strcpy(subject,line+i);
 				}	
+			} else if (list_compare(key, inreplyto)) {
+				char *cp;
+				if ((cp = index(line,'[')) && index(cp, ']')) {
+					cp++;
+					if (isdigit(*cp))
+						reply_to = atoi(cp);
+				}
 			}
 		}
 		if ((ok_prev && iscont) || (!iscont && CheckField(key))) {
@@ -117,7 +139,13 @@ main(argc,argv)
 	while (fgets(line,BUFFLEN,stdin)!=NULL) {
 		fprintf(f,"%s",line);
 	}
-	PipeToMeeting(f,(subject==NULL) ? DEFAULT_SUBJECT : subject);
+	if (fflush(f) == EOF) {
+		fprintf(stderr, "dsmail: Unable to write to temporary file\n");
+		exit(1);
+	}
+	
+	PipeToMeeting(f,(subject==NULL) ? DEFAULT_SUBJECT : subject,
+		      reply_to);
  bye:
 	if (!debug)
 		(void) unlink(filename); 
@@ -125,35 +153,43 @@ main(argc,argv)
 	
 }
 
-void PipeToMeeting(f,subject)
+void PipeToMeeting(f,subject, reply_to)	/* Pipes? I don't see any pipes here.. */
 	char *subject;
 	FILE *f;
+	int reply_to;
 {
-	char command[384], line[255];
 	int len;
-	FILE *dspipe;
+	char module[100];
+	int result;
+	tfile transaction;
+	int trn_no;
+	
+	strcpy(module, "discuss@");
+	gethostname(&module[8], sizeof(module)-8);
+	init_rpc();
+	set_module(module, &result);
+	if (result) {
+		fprintf(stderr, "Can't connect to discuss server: %s\n",
+			error_message(result));
+		exit(1);
+	}
+
+	rewind(f); lseek(fileno(f), 0, L_SET);
+	transaction = unix_tfile(fileno(f));
 
 	len=strlen(subject);
 	if (len && (subject[--len] == '\n'))
 		subject[len]='\0';
-	(void) sprintf(command,"%s %s -t \"%s\"",dspipeloc,usr_mtg,subject);
 	if (debug) {
-		printf("<----------------- End of Text\n");
-		printf("pipe to: %s\n",command);
-		return;
+		printf("subject is ``%s''\nreplying to %d in %s\n",
+		       subject, reply_to, usr_mtg);
+	} 
+	add_trn(usr_mtg, transaction, subject, reply_to, &trn_no, &result);
+	if (result) {
+		fprintf(stderr, "Can't enter transaction into %s: %s\n",
+			usr_mtg, error_message(result));
+		exit(1);
 	}
-	if (rewind(f) == -1)
-		perror("rewind");
-	if ((dspipe = popen(command,"w")) == NULL)
-		{
-			fprintf(stderr,"Can't fork to %s",DSPIPE);
-			exit(1);
-		}
-
-	while (fgets(line,BUFFLEN,f))
-		(void) fputs(line,dspipe);
-
-	(void) pclose(dspipe);
 	(void) fclose(f);
 }
 
