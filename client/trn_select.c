@@ -1,9 +1,12 @@
 /*
  *
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/trn_select.c,v 1.8 1987-01-18 22:40:37 spook Exp $
+ * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/trn_select.c,v 1.9 1987-07-17 00:48:49 srz Exp $
  * $Locker:  $
  *
  */
+#ifndef lint
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/trn_select.c,v 1.9 1987-07-17 00:48:49 srz Exp $";
+#endif lint
 
 #define	MIN(a,b)	((a)<(b)?(a):(b))
 #define	MAX(a,b)	((a)>(b)?(a):(b))
