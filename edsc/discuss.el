@@ -1,5 +1,5 @@
 ;;;	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v $
-;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.6 1988-11-08 06:24:10 raeburn Exp $
+;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.7 1988-11-08 06:50:38 raeburn Exp $
 ;;;
 ;;;  Emacs lisp code to remote control a "discuss" shell process to
 ;;;  provide an emacs-based interface to the discuss conferencing system.
@@ -8,6 +8,12 @@
 ;;;  Written by Stan Zanarotti and Bill Sommerfeld.
 ;;;
 ;;;  $Log: not supported by cvs2svn $
+; Revision 1.6  88/11/08  06:24:10  raeburn
+; Removed some old comments; made "C-u M-x discuss" not list meetings,
+; but accept meeting name; caused quit to send "(quit)" and disown
+; process before killing buffer.  Also defined discuss-version function
+; and variable with RCS id, misc other tweaks.
+; 
 ; Revision 1.5  88/10/29  01:47:34  balamac
 ; Added randrp support.
 ; 
@@ -161,6 +167,8 @@ a	Add meeting.  Not implemented yet."
   (setq discuss-current-transaction 0)
   (make-local-variable 'discuss-highest-seen)
   (setq discuss-highest-seen 0)
+  (make-local-variable 'discuss-output-last-file)
+  (setq discuss-output-last-file nil)
   (run-hooks 'discuss-trn-hooks))
 
 
@@ -271,9 +279,10 @@ a	Add meeting.  Not implemented yet."
 	(switch-to-buffer discuss-cur-mtg-buf)
 	(discuss-trn-mode)))
   (switch-to-buffer discuss-cur-mtg-buf)
-  (setq discuss-current-meeting meeting)
   (discuss-send-cmd (format "(gmi %s)\n" meeting)
-		    'discuss-end-of-goto 'discuss-read-form))
+		    'discuss-end-of-goto 'discuss-read-form)
+  (setq discuss-current-meeting meeting)
+  (setq discuss-output-last-file (concat discuss-current-meeting ".trans")))
 
 (defun discuss-end-of-goto ()
   (let ((last (nth 4 discuss-form))
@@ -374,7 +383,7 @@ a	Add meeting.  Not implemented yet."
 	  (= discuss-current-transaction 0))
       (error "Not looking at transactions")
     (let ((nref (nth 4 discuss-current-transaction-info)))
-      (if (= prev 0)
+      (if (= nref 0)
 	  (error "No next reference.")
 	(discuss-show-trn nref)))))
 
@@ -516,7 +525,8 @@ a	Add meeting.  Not implemented yet."
 
 ; run this at each load
 (defun discuss-initialize nil
-  (setq discuss-version "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.6 1988-11-08 06:24:10 raeburn Exp $")
+  (setq discuss-version
+	"$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.7 1988-11-08 06:50:38 raeburn Exp $")
 
 ;;; Keymaps, here at the end, where the trash belongs..
 
@@ -565,15 +575,15 @@ a	Add meeting.  Not implemented yet."
 
 ;;; discuss-trn-output mostly stolen from rmail-output...
 ;;; converted by [eichin:19881026.1505EST]
-(defvar discuss-output-last-file "discuss.out"
-  "*Default file for discuss saves")
+;(defvar discuss-output-last-file nil
+;  "*Default file for discuss saves")
 
 (defun discuss-trn-output (file-name)
   "Append this message to file named FILE-NAME."
   (interactive
    (list
     (read-file-name
-     (concat "Output message to Unix mail file: (default "
+     (concat "Append to: (default "
 	     (file-name-nondirectory discuss-output-last-file)
 	     ") ")
      (file-name-directory discuss-output-last-file)
