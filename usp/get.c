@@ -145,7 +145,8 @@ USPStream   *us;
 USPString   *str;
 {
     USPCardinal	sl;			/* string length */
-    char 	*sptr, c;
+    register char *sptr, c;
+    register char *dptr;
     Boolean     oddp = FALSE;
     unsigned    actual;
 
@@ -164,59 +165,41 @@ USPString   *str;
     }
     sl = ntohs(sl);
     if(sl & 1) oddp = TRUE;
-    if(! (*str = (USPString) calloc(sl + 1, sizeof(char)))) {
+    if(! (*str = (USPString) malloc(sl + 1))) {
 	errno = UENOMEM;
 	return(ERROR);
     }
-    sptr = *str;
+    dptr = sptr = *str;
 
-    /* need to get string 1 char at a time in order to de-netasciify */
+    if (get_from_sub_block (us, sptr, sl + oddp, &actual) == ERROR) {
+	cfree (*str);
+	*str = NULL;
+	return (ERROR);
+    }
+    if (actual != sl + oddp) {
+	errno = UEPREMEOB;
+	return ERROR;
+    }
+    /* de-netasciify */
 
-    while(sl != 0) {
-	if(get_from_sub_block(us, &c, sizeof(Byte), &actual) == ERROR) {
-	    cfree(*str);
-	    return(ERROR);
-	}
-	if(actual != sizeof(Byte)) {
-	    errno = UEPREMEOB;
-	    return(ERROR);
-	}
-	--sl;
-	if(c == '\r') {
-	    if(get_from_sub_block(us, &c, sizeof(Byte), &actual) == ERROR) { 
-		cfree(*str);
-		return(ERROR);
-	    }
-	    if(actual != sizeof(Byte)) {
-		errno = UEPREMEOB;
-		return(ERROR);
-	    }
-	    --sl;
+    while (actual > 0) {
+	--actual;
+	c = *sptr++;
+	if(c == '\r' && actual > 0) {
+	    --actual;
+	    c = *sptr++;
 	    if(c == '\012') {
-		*sptr++ = '\n';
+		*dptr++ = '\n';
+	    } else {
+		*dptr++ = '\r';
 	    }
-	    else {
-		*sptr++ = '\r';
-	    }
-	}
-	else {
-	    *sptr++ = c;
+	} else {
+	    *dptr++ = c;
 	}
     }
-    *sptr = '\0';
+    *dptr = '\0';
 
     /* if length is odd, discard the last byte */
-
-    if(oddp) {
-	if(get_from_sub_block(us, &c, sizeof(Byte), &actual) == ERROR) { 
-	    cfree(*str);
-	    return(ERROR);
-	}
-	if(actual != sizeof(Byte)) {
-	    errno = UEPREMEOB;
-	    return(ERROR);
-	}
-    }
     return(SUCCESS);
 }
 

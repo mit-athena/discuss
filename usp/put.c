@@ -111,7 +111,11 @@ USPStream    *us;
 USPString    str;
 {
     USPCardinal	sl = 0, ssl; 
-    char 	*sptr = str, nl = '\012', cr = '\r', zero = '\0';
+    register char *sptr = str, *stptr;
+    register int c;
+    char zero = '\0';
+    static char crlf[] = "\r\n";
+    static char crnul[] = "\r\0";
 
     errno = 0;
     if(! us->us_out_sending_p) { 
@@ -135,28 +139,32 @@ USPString    str;
 	return(ERROR);
     }
     sptr = str;
-    while(*sptr) {
-	if(*sptr == '\n') {
-	    if(put_into_sub_block(us, &cr, (unsigned) 1) == ERROR) { 
+    stptr = sptr;
+    while((c = *sptr) != '\0') {
+	if (c == '\n') {
+	    if (put_into_sub_block (us, stptr, sptr-stptr-1) == ERROR) {
+		return (ERROR);
+	    }
+	    if(put_into_sub_block(us, crlf, sizeof (crnul)) == ERROR) { 
 		return(ERROR);
 	    }
-	    if(put_into_sub_block(us, &nl, (unsigned) 1) == ERROR) { 
+	    stptr = sptr+1;
+	} else if (c == '\r') {
+	    if (put_into_sub_block (us, stptr, sptr-stptr-1) == ERROR) {
+		return (ERROR);
+	    }
+	    if(put_into_sub_block(us, crnul, sizeof (crnul)) == ERROR) { 
 		return(ERROR);
 	    }
-	}
-	else {
-	    if(put_into_sub_block(us, sptr, (unsigned) 1) == ERROR) { 
-		return(ERROR);
-	    }
-	    if(*sptr == '\r') {
-		if(put_into_sub_block(us, &zero, (unsigned) 1) == ERROR) { 
-		    return(ERROR);
-		}
-	    }
+	    stptr = sptr+1;
 	}
 	++sptr;
     }
-    
+    if (stptr - sptr) {
+	if (put_into_sub_block (us, stptr, sptr-stptr) == ERROR) {
+	    return (ERROR);
+	}	
+    }
     /* pad odd length strings */
     
     if(sl & 1) {
