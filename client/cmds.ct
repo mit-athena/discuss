@@ -34,6 +34,9 @@
 	request		list_meetings, "List meetings.",
 			list_meetings, lsm;
 
+	request		add_mtg, "Add meeting.",
+			add_mtg, am;
+
 	request		ss_abort_subsystem, "Quit.",
 			quit, exit, q;
 
