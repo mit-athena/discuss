@@ -1,10 +1,13 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.11 1987-07-20 20:56:26 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.12 1987-09-17 02:34:28 spook Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.11  87/07/20  20:56:26  srz
+ * Changed name of whoami to dwhoami (too generic of a name)
+ * 
  * Revision 1.10  87/07/08  01:59:44  wesommer
  * Added whoami(), dsc_whoami() (the server support was always there.
  * 
@@ -32,7 +35,7 @@
  */
 
 #ifndef lint
-static char *rcsid_interface_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.11 1987-07-20 20:56:26 srz Exp $";
+static char *rcsid_interface_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.12 1987-09-17 02:34:28 spook Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -72,7 +75,6 @@ select_meeting(nbp, code_ptr)
 {
 	register meeting *mp;
 	extern int errno;
-	int is_fatal;
 	static int initialized = 0;
 
 	*code_ptr = 0;
@@ -111,14 +113,8 @@ select_meeting(nbp, code_ptr)
 	} else {
 		/*XXX should move mp to head of list.. but not yet */
 	}
-	set_module (mp->module, &is_fatal, code_ptr);
+	set_module (mp->module, code_ptr);
 	cmtg = mp;
-	if (*code_ptr && !is_fatal) {
-		char buf[100];
-		sprintf(buf, "while connecting to %s", mp->module);
-		log_warning(*code_ptr, buf);
-		*code_ptr = 0;
-	}
 }
 
 dsc_add_trn(nbp, text, subject, reply_trn, result_trn, code_ptr)
