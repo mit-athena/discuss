@@ -1,8 +1,11 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v 1.4 1987-04-12 00:11:21 spook Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v 1.5 1987-04-19 22:17:18 srz Exp $
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.4  87/04/12  00:11:21  spook
+ * Removed unused variables.
+ * 
  * Revision 1.3  87/04/08  08:32:13  wesommer
  * Fixed the error message once again.
  * 
@@ -15,7 +18,7 @@
  */
 
 #ifndef lint
-static char *rcsid_ckm_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v 1.4 1987-04-12 00:11:21 spook Exp $";
+static char *rcsid_ckm_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v 1.5 1987-04-19 22:17:18 srz Exp $";
 #endif lint
 
 #include <strings.h>
@@ -49,7 +52,7 @@ do_mtg(mtg_name)
 		/* Test to see if we are attending this meeting */
 		if (dsc_public.attending && !strcmp(dsc_public.host, nbp ->hostname) && !strcmp(dsc_public.path, nbp->pathname)) {
 			updated = (dsc_public.highest_seen < dsc_public.m_info.last);
-		} else if (nbp->date_attended) {
+		} else {
 			dsc_updated_mtg(nbp, &updated, &code);
 			if (code) {
 				fprintf(stderr,
@@ -58,9 +61,6 @@ do_mtg(mtg_name)
 					error_message(code));
 				continue;
 			}
-		} else {
-			updated = 0;
-			code = 0;
 		}
 		if (code) {
 			fprintf(stderr, "Error checking meeting %s: %s\n",

@@ -1,8 +1,11 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v 1.9 1987-04-08 03:55:00 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v 1.10 1987-04-19 22:16:56 srz Exp $
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.9  87/04/08  03:55:00  wesommer
+ * Don't ignore code from dsc_expand_mtg_set.
+ * 
  * Revision 1.8  87/03/22  04:38:12  spook
  * Changes for new interfaces.
  * 
@@ -19,7 +22,7 @@
  */
 
 #ifndef lint
-static char *rcsid_lsm_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v 1.9 1987-04-08 03:55:00 wesommer Exp $";
+static char *rcsid_lsm_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v 1.10 1987-04-19 22:16:56 srz Exp $";
 #endif lint
 
 
@@ -122,7 +125,7 @@ do_mtg(mtg_name)
 		if (dsc_public.attending && !strcmp(dsc_public.host, nbp ->hostname) && !strcmp(dsc_public.path, nbp->pathname)) {
 		     updated = (dsc_public.highest_seen < dsc_public.m_info.last);
 		     this_mtg = TRUE;
-		} else if (nbp->date_attended) {
+		} else {
 		     this_mtg = FALSE;
 		     dsc_updated_mtg(nbp, &updated, &code);
 		     if (code) {
@@ -130,10 +133,6 @@ do_mtg(mtg_name)
 				  nbp -> aliases[0], error_message(code));
 			  continue;
 		     }
-		} else {
-			this_mtg = FALSE;
-			updated = 0;
-			code = 0;
 		}
 		if (code) {
 			fprintf(stderr, "Error checking meeting %s: %s\n",
