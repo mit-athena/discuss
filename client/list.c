@@ -2,13 +2,16 @@
  *
  * List request for DISCUSS
  *
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.6 1986-10-19 10:00:05 spook Exp $
+ * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.7 1986-10-29 10:26:34 srz Exp $
  * $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v $
  * $Locker:  $
  *
  * Copyright (C) 1986 by the MIT Student Information Processing Board
  *
  * $Log: not supported by cvs2svn $
+ * Revision 1.6  86/10/19  10:00:05  spook
+ * Changed to use dsc_ routines; eliminate refs to rpc.
+ * 
  * Revision 1.5  86/10/14  22:59:06  spook
  * Checking meeting info on each request.
  * 
@@ -38,10 +41,13 @@
 #include "globals.h"
 
 char *ctime(), *malloc();
-int	time_now, time_sixmonthsago, time_plusthreemonths;
-int idl, sci_idx;
-int	new_trn_no;
-trn_info t_info;
+static int	time_now, time_sixmonthsago, time_plusthreemonths;
+static int idl, sci_idx;
+static trn_info t_info;
+static list_it(),delete_it(),retrieve_it();
+static int performed;				/* true if trn was acted upon */
+static int barred;				/* true if access was denied
+						   sometime */
 
 static
 list_it(i)
@@ -51,20 +57,27 @@ list_it(i)
 	char *cp;
 	error_code code;
 
-	if (new_trn_no == -1) {
-		new_trn_no = i;
-		cur_trans = i;
-	}
-	dsc_get_trn_info(cur_mtg, i, &t_info, &code);
+	dsc_get_trn_info(dsc_public.mtg_uid, i, &t_info, &code);
 	if (code == DELETED_TRN) {
 		code = 0;
 		goto punt;
 		/* should check -idl flag */
 	}
+	else if (code == NO_ACCESS) {
+	        code = 0;
+	        barred = TRUE;
+		goto punt;
+	}
 	else if (code != 0) {
 		ss_perror(sci_idx, code,
 			  "Can't read trn info");
 		goto punt;
+	}
+	else {						/* success */
+	     if (!performed) {
+		  performed = TRUE;
+		  dsc_public.current = i;		/* current = first */
+	     }
 	}
 	cp = ctime(&t_info.date_entered);
 	if((t_info.date_entered < time_sixmonthsago) ||
@@ -89,7 +102,7 @@ list_it(i)
 	}
 	(void) printf(" [%04d]%c%5s %s %-15s %-20s\n",
 		      t_info.current,
-		      (t_info.current == cur_trans)?'*':' ',
+		      (t_info.current == dsc_public.current)?'*':' ',
 		      buffer,
 		      newtime,
 		      t_info.author,
@@ -105,34 +118,114 @@ list(sci_arg, argc, argv)
 	int argc;
 	char **argv;
 {
+	(void) time(&time_now); 
+	time_sixmonthsago = time_now - 6*30*24*60*60; 
+	time_plusthreemonths = time_now + 6*30*24*60*60;
+
+	map_trns(sci_arg, argc, argv, "all", list_it);
+	return;
+}
+
+static 
+delete_it(i)
+int i;
+{
+     int code;
+
+     dsc_delete_trn(dsc_public.mtg_uid, i, &code);
+     if (code == NO_ACCESS) {
+	  barred = TRUE;
+     } else if (code == 0) {
+	  performed = TRUE;
+     } else if (code != DELETED_TRN) {
+	  (void) fprintf(stderr, "Error deleting transaction %d: %s\n",
+			 i, error_message(code));
+	  if (code != EXPUNGED_TRN)
+	       return(code);				/* stop now */
+     }
+
+     return(0);
+}
+
+
+del_trans(sci_arg, argc, argv)
+	int sci_arg;
+	int argc;
+	char **argv;
+{
+	map_trns(sci_arg, argc, argv, "current", delete_it);
+	dsc_public.current = 0;
+	return;
+}
+
+static
+retrieve_it(i)
+int i;
+{
+     int code;
+
+     dsc_retrieve_trn(dsc_public.mtg_uid, i, &code);
+     if (code == NO_ACCESS) {
+	  barred = TRUE;
+     } else if (code == 0) {
+	  performed = TRUE;
+	  dsc_public.current = i;
+     } else if (code != TRN_NOT_DELETED) {
+	  (void) fprintf(stderr, "Error retrieving transaction %d: %s\n",
+			 i, error_message(code));
+	  return(code);
+     }
+     return (0);
+}
+
+
+
+ret_trans(sci_arg, argc, argv)
+	int sci_arg;
+	int argc;
+	char **argv;
+{
+	map_trns(sci_arg, argc, argv, "current", retrieve_it);
+	return;
+}
+
+map_trns(sci_arg, argc, argv, defalt, proc)
+	int sci_arg;
+	int argc;
+	char **argv;
+	char *defalt;
+	void (*proc)();
+{
 	int txn_no;
 	int code;
 	int i;
 	selection_list *trn_list;
 
-	new_trn_no = -1;
 	sci_idx = sci_arg;
-	(void) time(&time_now); 
-	time_sixmonthsago = time_now - 6*30*24*60*60; 
-	time_plusthreemonths = time_now + 6*30*24*60*60;
 
-	if (cur_mtg == (char *)NULL) {
+	if (!dsc_public.attending) {
 		ss_perror(sci_idx, 0, "No current meeting.\n");
 		return;
 	}
-	dsc_get_mtg_info(cur_mtg, &m_info, &code);
+	dsc_get_mtg_info(dsc_public.mtg_uid, &dsc_public.m_info, &code);
 	if (code != 0) {
 		(void) ss_perror(sci_idx, code, "Can't get meeting info");
 		return;
 	}
-	txn_no = m_info.first;
+	txn_no = dsc_public.m_info.first;
 
-	dsc_get_trn_info(cur_mtg, cur_trans, &t_info, &code);
+	dsc_get_trn_info(dsc_public.mtg_uid, dsc_public.current, &t_info, &code);
 	if (code != 0)
-		t_info.current = -1;
+		t_info.current = 0;
+	else {
+	     free(t_info.subject);
+	     t_info.subject = NULL;
+	     free(t_info.author);
+	     t_info.author = NULL;
+	}
 
 	if (argc == 1) {
-		trn_list = trn_select(&t_info, "first:last",
+		trn_list = trn_select(&t_info, defalt,
 				      (selection_list *)NULL, &code);
 		if (code) {
 			ss_perror(sci_idx, code, "");
@@ -153,7 +246,14 @@ list(sci_arg, argc, argv)
 		}
 	}
 
-	sl_map(list_it, trn_list);
-	if (new_trn_no == -1)
-		(void) fprintf(stderr, "list: No transactions selected\n");
+	performed = FALSE;
+	barred = FALSE;
+
+	sl_map(proc, trn_list);
+	if (!performed)
+	     if (barred)
+		  ss_perror(sci_idx, NO_ACCESS, "");
+	     else
+		  (void) fprintf(stderr, "%s: No transactions selected\n", ss_name(sci_idx));
 }
+
