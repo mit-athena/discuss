@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.10 1988-01-05 01:37:54 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.11 1988-03-06 19:53:28 srz Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
@@ -11,6 +11,9 @@
  *		  in-memory superblock, and to open & close meetings.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.10  88/01/05  01:37:54  srz
+ * Really ifdef'd zephyr.
+ * 
  * Revision 1.9  88/01/05  01:08:02  rfrench
  * #ifdef'd ZEPHYR stuff
  * 
@@ -43,7 +46,7 @@
  */
 
 #ifndef lint
-static char *rcsid_coreutil_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.10 1988-01-05 01:37:54 srz Exp $";
+static char *rcsid_coreutil_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.11 1988-03-06 19:53:28 srz Exp $";
 #endif lint
 
 #include "../include/types.h"
@@ -234,11 +237,11 @@ int read_super()
 	     read (u_control_f, (char *) &super, sizeof (super));
      }
 
-     if (super.version != MTG_SUPER_1)
-	  return (NEW_VERSION);
-
      if (super.unique != MTG_SUPER_UNIQUE)
 	  return (INCONSISTENT);
+
+     if (super.version != MTG_SUPER_1)
+	  return (NEW_VERSION);
 
      super_long_name = malloc ((unsigned)super.long_name_len);
      super_chairman = malloc ((unsigned)super.chairman_len);
@@ -360,11 +363,11 @@ chain_blk *cb;
 	  read (u_control_f, (char *) cb, sizeof (chain_blk));
      }
 
-     if (cb -> version != CHAIN_BLK_1)
-	  return (NEW_VERSION);
-
      if (cb -> unique != CHAIN_BLK_UNIQUE || cb -> current != trn)
 	  return (INCONSISTENT);
+
+     if (cb -> version != CHAIN_BLK_1)
+	  return (NEW_VERSION);
 
      return (0);
 }
@@ -404,11 +407,11 @@ char **th_subject, **th_author;
      lseek (u_trn_f, (long)trn_addr, 0);
      read (u_trn_f, (char *) th, sizeof (trn_hdr));
 
-     if (th -> version != TRN_HDR_1)
-	  return(NEW_VERSION);
-
      if (th -> unique != TRN_HDR_UNIQUE)
 	  return (INCONSISTENT);
+
+     if (th -> version != TRN_HDR_1)
+	  return(NEW_VERSION);
 
      if (th_subject != 0) {
 	  *th_subject = malloc ((unsigned)(th -> subject_len));
