@@ -8,7 +8,7 @@
 /*
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/res_module.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/res_module.c,v 1.10 1990-12-01 22:40:09 eichin Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/res_module.c,v 1.11 1991-09-04 11:35:11 lwvanels Exp $
  *
  * resolve_module () --
  *	Can you say "Put all the configuration into one file?"  Can you
@@ -20,6 +20,9 @@
  *	the remote function is executed as a subprocess.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.10  90/12/01  22:40:09  eichin
+ * added SERVER_LOCAL usage if hostname is ""
+ * 
  * Revision 1.9  90/06/03  16:44:03  raeburn
  * jtkohl's patches to DTRT wrt Kerberos realm determination
  * 
@@ -36,7 +39,7 @@
 
 #ifndef lint
 static char rcsid_res_module_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/res_module.c,v 1.10 1990-12-01 22:40:09 eichin Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/res_module.c,v 1.11 1991-09-04 11:35:11 lwvanels Exp $";
 #endif lint
 
 #include "rpc_et.h"
@@ -67,6 +70,38 @@ char *local_host_name ();
 const char *local_realm ();
 
 static int service_port = 0;
+
+/* sys/param.h for MAXPATHLEN */
+#include <sys/param.h>
+/* sys/types.h and sys/stat.h for stat() */
+#include <sys/types.h>
+#include <sys/stat.h>
+static char *path_search(base)
+    char *base;			/* filename to search for */
+{
+    char *getenv();
+    char *path=getenv("PATH");
+    static char val[MAXPATHLEN];
+    char *valp;
+    struct stat s;
+    
+    if(!path) return 0;
+    while(*path) {
+	valp = val;
+	while(*path && (*path != ':')) {
+	    *(valp++) = *(path++);
+	}
+	if(*path == ':') path++;
+	*(valp++) = '/';
+	strcpy(valp,base);
+	if(0 == stat(val,&s)) {
+	    if((s.st_mode & (S_IEXEC|S_IFREG)) == (S_IEXEC|S_IFREG)) {
+		return val;
+	    }
+	}
+    }
+    return 0;
+}
 
 void resolve_module (modname, port, hostp, servp, result)
     char *modname;		/* name to translate */
@@ -171,6 +206,17 @@ void resolve_module (modname, port, hostp, servp, result)
     if (myhnamep[0] == 0) {
 	*port = 0;
 	*servp = SERVER_LOCAL;
+	if(SERVER_LOCAL[0] != '/') {
+	    /* path search for disserve */
+	    char *pathval=path_search(SERVER_LOCAL);
+	    if(pathval) {
+		*servp = pathval;
+	    } else {
+		/* should perhaps inaugurate a new error type? */
+		*result = RPC_MOD_UNKNOWN;
+		return;
+	    }
+	}
 	*hostp = myhnamep;
 	*result = 0;
 	return;
@@ -189,7 +235,7 @@ void resolve_module (modname, port, hostp, servp, result)
 
     /* otherwise, we have to generate the port number */
     if (service_port == 0) {
-	sp = getservbyname (SERVICE_NAME, 0);
+	sp = getservbyname (SERVICE_NAME, "tcp");
 	if (!sp) {
 	    *result = RPC_SERV_UNKNOWN;
 	    return;
