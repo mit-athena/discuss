@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss_utils.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss_utils.c,v 1.6 1986-10-19 09:58:52 spook Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss_utils.c,v 1.7 1986-10-27 16:29:04 wesommer Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board.
@@ -8,6 +8,9 @@
  *	Utility routines.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.6  86/10/19  09:58:52  spook
+ * Changed to use dsc_ routines; eliminate refs to rpc.
+ * 
  * Revision 1.5  86/09/13  20:31:56  srz
  * Include file fix
  * 
@@ -22,7 +25,7 @@
  */
 
 #ifndef lint
-static char *rcsid_discuss_utils_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss_utils.c,v 1.6 1986-10-19 09:58:52 spook Exp $";
+static char *rcsid_discuss_utils_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss_utils.c,v 1.7 1986-10-27 16:29:04 wesommer Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -34,15 +37,12 @@ static char *rcsid_discuss_utils_c = "$Header: /afs/dev.mit.edu/source/repositor
 #include "../include/interface.h"
 #include "../include/config.h"
 #include "../include/discuss_err.h"
+#include "globals.h"
 
 extern ss_request_table discuss_cmds;
-extern int current_trans;
-extern char *cur_mtg;
 extern char *temp_file;
 extern char *pgm;
 extern char *malloc(), *getenv(), *ctime();
-extern mtg_info m_info;
-extern char buffer[BUFSIZ];
 
 output_trans(txn_no, tf, code)
 	trn_nums txn_no;
@@ -55,7 +55,7 @@ output_trans(txn_no, tf, code)
 	trn_info tinfo;
 
 	*code = 0;
-	dsc_get_trn_info(cur_mtg, txn_no, &tinfo, code);
+	dsc_get_trn_info(dsc_public.mtg_uid, txn_no, &tinfo, code);
 	if (*code != 0) return;
 
 	(void) strcpy (newtime, ctime (&(tinfo.date_entered)));
@@ -67,7 +67,8 @@ output_trans(txn_no, tf, code)
 		plural = "";
      
 	(void) sprintf (line, "[%04d] %s %s %s (%d line%s)\n",
-			tinfo.current, tinfo.author, m_info.long_name,
+			tinfo.current, tinfo.author,
+			dsc_public.m_info.long_name,
 			&newtime[4], tinfo.num_lines, plural);
 	twrite (tf, line, strlen (line), code);
 	if (tinfo.subject [0] != '\0') {
@@ -75,7 +76,7 @@ output_trans(txn_no, tf, code)
 		twrite (tf, tinfo.subject, strlen (tinfo.subject), code);
 		twrite (tf, "\n", 1, code);
 	}
-	dsc_get_trn(cur_mtg, txn_no, tf, code);
+	dsc_get_trn(dsc_public.mtg_uid, txn_no, tf, code);
 	if (*code != 0) return;
 
 	if (tinfo.pref == 0 && tinfo.nref == 0)
