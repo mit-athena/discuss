@@ -29,3 +29,6 @@ typedef struct {
 #define	DSC_ST_CHANGED (0x0001)
 #define DSC_ST_DELETED (0x0002)
 
+extern void dsc_destroy_name_blk();
+extern void dsc_destroy_mtg_set();
+extern void dsc_copy_name_blk();
