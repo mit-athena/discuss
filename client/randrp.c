@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/randrp.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/randrp.c,v 1.4 1988-04-23 16:03:17 balamac Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/randrp.c,v 1.5 1988-09-24 00:45:41 balamac Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1988 by the Student Information Processing Board
@@ -10,7 +10,7 @@
  */
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/randrp.c,v 1.4 1988-04-23 16:03:17 balamac Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/randrp.c,v 1.5 1988-09-24 00:45:41 balamac Exp $";
 #endif lint
 
 #include "types.h"
@@ -30,7 +30,8 @@ randrp(argc, argv, sci_idx)
 	void srandom(), gettimeofday();
 	int getpid();
 	struct timeval tv;
-	int code;
+	int randrp_retry = 15;
+	int i, code;
 	int active_transactions;
 	long rnd_num;
 	int rnd_trn;
@@ -87,18 +88,29 @@ randrp(argc, argv, sci_idx)
 	gettimeofday(&tv, (struct timezone *) NULL);
 	srandom(tv.tv_sec ^ tv.tv_usec ^ pid);
 
-	do {
-		rnd_num = random();
-		active_transactions =
-			(dsc_public.m_info.last - dsc_public.m_info.first);
-		if (active_transactions != 0) {
-			rnd_trn = (dsc_public.m_info.first +
-				   (rnd_num % active_transactions));
-		} else {
-			rnd_trn = dsc_public.m_info.first;
-		}
-		dsc_get_trn_info(&dsc_public.nb, rnd_trn, &t_info, &code);
-	} while (code != 0);
+	/* improved randomization routine...
+	   The idea here is to look for the first transaction in a chain.
+	   Try randrp_retry times.  If we find one before then, fine.
+	   If not, use the last txn found.  This increases the distribution
+	   of randrp subject lines.
+
+	   BAL 9/24/88  */
+
+	for (i=1;i<=randrp_retry;i++) {
+		do {
+			rnd_num = random();
+			active_transactions =
+				(dsc_public.m_info.last - dsc_public.m_info.first);
+			if (active_transactions != 0) {
+				rnd_trn = (dsc_public.m_info.first +
+					   (rnd_num % active_transactions));
+			} else {
+				rnd_trn = dsc_public.m_info.first;
+			}
+			dsc_get_trn_info(&dsc_public.nb, rnd_trn, &t_info, &code);
+		} while (code != 0);
+		if (!t_info.pref) break;
+	}
 		
 	if ((editor != NULL) && !noeditor) {
 		(void) sprintf(buffer, "reply -editor %s %d", editor, rnd_trn);
