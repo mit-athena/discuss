@@ -16,20 +16,23 @@
  *	command line, in which case they are used as meeting announcements.
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.27 1992-10-27 16:19:01 probe Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.28 1993-04-28 10:58:33 miki Exp $
  *	$Locker:  $
  *
  */
 
 #ifndef lint
 static char rcsid_addmtg_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.27 1992-10-27 16:19:01 probe Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.28 1993-04-28 10:58:33 miki Exp $";
 #endif lint
 
 #include <string.h>
 #include <stdio.h>
 #include <netdb.h>
 #include <sys/file.h>
+#ifdef SOLARIS
+#include <fcntl.h>
+#endif
 #include <discuss/discuss.h>
 #include "globals.h"
 #include "ss.h"
