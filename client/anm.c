@@ -7,17 +7,20 @@
  */
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/anm.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/anm.c,v 1.6 1989-06-02 23:34:45 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/anm.c,v 1.7 1993-04-28 11:07:52 miki Exp $
  *
  */
 
 #ifndef lint
 static char rcsid_anm_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/anm.c,v 1.6 1989-06-02 23:34:45 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/anm.c,v 1.7 1993-04-28 11:07:52 miki Exp $";
 #endif lint
 
 #include <stdio.h>
 #include <sys/file.h>
+#ifdef SOLARIS
+#include <fcntl.h>
+#endif
 #include "ss.h"
 #include <discuss/discuss.h>
 #include "config.h"
