@@ -9,8 +9,11 @@
  * dsc_enter.c - enter a transaction from a file into discuss.
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsc_enter.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsc_enter.c,v 1.5 1993-04-28 11:46:55 miki Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsc_enter.c,v 1.6 1994-03-25 16:43:41 miki Exp $
  *	$Log: not supported by cvs2svn $
+ * Revision 1.5  93/04/28  11:46:55  miki
+ * ported to Solaris2.1
+ * 
  * Revision 1.4  89/06/03  00:20:45  srz
  * Added standard copyright notice.
  * 
@@ -21,13 +24,14 @@
 
 #ifndef	lint
 static char rcsid[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsc_enter.c,v 1.5 1993-04-28 11:46:55 miki Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsc_enter.c,v 1.6 1994-03-25 16:43:41 miki Exp $";
 #endif
 
 #include <stdio.h>
 #ifdef SOLARIS
 #include <string.h>
 #include <sys/fcntl.h>
+#include <regexpr.h>
 #else
 #include <strings.h>
 #endif
@@ -47,9 +51,10 @@ extern int errno;
 extern char *malloc();
 extern char *mktemp();
 extern long lseek();
+#ifndef SOLARIS
 extern char *re_comp();
 extern int re_exec();
-
+#endif
 #define DEFAULT_SUBJECT "No subject found in mail header"
 
 char *dsc_enter_deflist[] = {
@@ -190,7 +195,7 @@ dsc_enter_filter(source, mtg_host, mtg_path, accept_headers,
 				/*
 				 * Look for a trn number between [].
 				 */
-				if ((cp = index(line,'[')) && index(cp, ']')) {
+				if ((cp = strchr(line,'[')) && strchr(cp, ']')) {
 					cp++;
 					if (isdigit(*cp))
 						reply_to = atoi(cp);
@@ -251,14 +256,22 @@ out:
 static bool list_compare(s,list)
 	char *s,**list;
 {
-	char *err;
+	char *retval;
 
 	while (*list!=NULL) {
-		err=re_comp(*list++);
-		if (err) return FALSE; /* XXX */
+#ifdef SOLARIS
+                retval = compile(*list++, NULL, NULL);
+                if (regerrno) return FALSE;
+                if (step(s, retval))
+                        return(TRUE);
+#else 
+
+		retval=re_comp(*list++);
+		if (retval) return FALSE; /* XXX */
 
 		if (re_exec(s))
 			return(TRUE);
+#endif
 	}
 	return(FALSE);
 }
