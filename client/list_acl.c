@@ -1,10 +1,13 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list_acl.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list_acl.c,v 1.8 1988-08-10 21:15:03 raeburn Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list_acl.c,v 1.9 1989-01-05 01:20:31 raeburn Exp $
  *
- *	Copyright (C) 1986 by the Massachusetts Institute of Technology
+ *	Copyright (C) 1986, 1988 by the Massachusetts Institute of Technology
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.8  88/08/10  21:15:03  raeburn
+ * Changed type names of acl code.
+ * 
  * Revision 1.7  88/02/15  00:58:51  wesommer
  * Saber/lint fixes.
  * 
@@ -35,14 +38,12 @@
 
 #ifndef lint
 static char rcsid_list_acl_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list_acl.c,v 1.8 1988-08-10 21:15:03 raeburn Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list_acl.c,v 1.9 1989-01-05 01:20:31 raeburn Exp $";
 #endif lint
 
-#include <strings.h>
+#include <string.h>
 #include <stdio.h>
-#include "types.h"
-#include "interface.h"
-#include "acl.h"
+#include <discuss/discuss.h>
 #include "globals.h"
 
 extern char *malloc(), *error_message(), *local_realm();

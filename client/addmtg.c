@@ -9,25 +9,22 @@
  *	command line, in which case they are used as meeting announcements.
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.20 1988-03-12 11:04:01 raeburn Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.21 1989-01-05 01:16:01 raeburn Exp $
  *	$Locker:  $
  *
  */
 
 #ifndef lint
-static char *rcsid_addmtg_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.20 1988-03-12 11:04:01 raeburn Exp $";
+static char rcsid_addmtg_c[] =
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.21 1989-01-05 01:16:01 raeburn Exp $";
 #endif lint
 
-#include <strings.h>
+#include <string.h>
 #include <stdio.h>
 #include <netdb.h>
 #include <sys/file.h>
-#include "tfile.h"
-#include "types.h"
-#include "interface.h"
+#include <discuss/discuss.h>
 #include "globals.h"
-#include "dsc_et.h"
-#include "discuss_err.h"
 #include "ss.h"
 
 extern char *malloc(), *calloc();
