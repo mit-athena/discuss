@@ -5,9 +5,12 @@
  *		This file handles the caller's side of the connection.
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/rpcall.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/rpcall.c,v 1.9 1987-04-11 00:06:04 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/rpcall.c,v 1.10 1988-07-28 10:52:12 srz Exp $
  *	$Locker:  $
  *	$Log: not supported by cvs2svn $
+ * Revision 1.9  87/04/11  00:06:04  srz
+ * Added RCS junk
+ * 
  * Revision 1.8  87/03/18  12:24:35  srz
  * Better handling of unknown rpc's.
  * 
@@ -20,7 +23,7 @@
  *
  */
 #ifndef lint
-static char *rcsid_rpcall_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/rpcall.c,v 1.9 1987-04-11 00:06:04 srz Exp $";
+static char *rcsid_rpcall_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/rpcall.c,v 1.10 1988-07-28 10:52:12 srz Exp $";
 #endif lint
 
 /* INCLUDES */
@@ -250,7 +253,11 @@ register int *code;				/* return code */
 	       else
 		    server_name++;
 	       execl(service_id, server_name, 0);
-	       panic ("Can't exec");
+	       {
+		    char buf[100];
+		    sprintf(buf, "Can't exec %s", service_id);
+		    panic (buf);
+	       }
 	  } else {
 	       (void) close (sv[1]);
 	       us = USP_associate (sv[0]);
