@@ -3,7 +3,7 @@ CFLAGS=	-g
 
 all:	testrpc pmtg dspipe mkds discuss rmds tags
 
-discuss: discuss.o cmds.o discuss_utils.o pager.o libss.a $(LIBS)
+discuss: discuss.o cmds.o discuss_utils.o pager.o trn_expr.o libss.a $(LIBS)
 	cc $(CFLAGS) -o discuss discuss.o cmds.o discuss_utils.o pager.o libss.a $(LIBS)
 
 tags:	TAGS
@@ -40,3 +40,8 @@ clean:
 	ld -r -n -s $*.o
 	mv a.out $*.o
 	rm $*.c
+
+.y.o:	
+	yacc $*.y
+	mv y.tab.c $*.c
+	cc $(CFLAGS) -c $*.c
