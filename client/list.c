@@ -2,19 +2,21 @@
  *
  * List request for DISCUSS
  *
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.16 1987-11-09 23:45:54 raeburn Exp $
+ * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.17 1988-12-03 01:39:27 raeburn Exp $
  * $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v $
  * $Locker:  $
  *
- * Copyright (C) 1986 by the MIT Student Information Processing Board
+ * Copyright (C) 1986, 1988 by the MIT Student Information Processing Board
  *
  */
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.16 1987-11-09 23:45:54 raeburn Exp $";
+static char rcsid_discuss_c[] =
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.17 1988-12-03 01:39:27 raeburn Exp $";
 #endif lint
 
 #include <stdio.h>
-#include <strings.h>
+#include <string.h>
+#include <sys/param.h>		/* for MIN() */
 #include "discuss_err.h"
 #include "ss.h"
 #include "tfile.h"
@@ -24,21 +26,21 @@ static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athe
 #include "globals.h"
 
 char *ctime(), *malloc(), *local_realm(), *error_message(), *short_time();
-static int	time_now, time_sixmonthsago, time_plusthreemonths;
 static trn_info t_info;
 static list_it(),delete_it(),retrieve_it();
 static int performed;		/* true if trn was acted upon */
 static int barred;		/* true if access was denied sometime */
 static int only_initial;
+static int long_subjects;
 
 void map_trns();
 
-static
-list_it(i)
+static list_it(i)
 	int i;
 {
-	char newtime[26];
+	char newtime[26], nlines[10];
 	char *cp;
+	int max_len;
 	int code;
 
 	dsc_get_trn_info(&dsc_public.nb, i, &t_info, &code);
@@ -54,7 +56,7 @@ list_it(i)
 	}
 	else if (code != 0) {
 		ss_perror(sci_idx, code,
-			  "Can't read trn info");
+			  "Can't read transaction info");
 		goto punt;
 	}
 
@@ -64,8 +66,8 @@ list_it(i)
 	}
 
 	if (!performed) {
-		performed = TRUE;
-		dsc_public.current = i;		/* current = first */
+	    performed = TRUE;
+	    dsc_public.current = i; /* current = first */
 	}
 
 	strcpy(newtime, short_time(&t_info.date_entered));
@@ -75,42 +77,58 @@ list_it(i)
 	if ((cp=index(t_info.author, '@')) != NULL)
 		if (!strcmp(cp+1, local_realm()))
 			*cp = '\0';
-	
-	if (strlen(t_info.author) > 15) {
+
+	(void) sprintf (nlines, "(%d)", t_info.num_lines);
+	(void) sprintf (buffer, " [%04d]%c",
+			t_info.current,
+			(t_info.current == dsc_public.current) ? '*' : ' ');
+	(void) strncat (buffer, "     ",
+			MIN (5, 13-strlen (buffer)) - strlen (nlines));
+
+	if (strlen(t_info.author) > 15)
 		(void) strcpy(&t_info.author[12], "...");
-	}
-	(void) sprintf(buffer, "(%d)", t_info.num_lines);
-	if (strlen(t_info.subject) > 35) {
-	     (void) strcpy(&t_info.subject[32], "...");
-	}
-	(void) printf(" [%04d]%c%5s %s %-15s %-20s\n",
-		      t_info.current,
-		      (t_info.current == dsc_public.current)?'*':' ',
-		      buffer,
-		      newtime,
-		      t_info.author,
-		      t_info.subject);
+
+	(void) sprintf (buffer + strlen (buffer), "%s %s %-15s ",
+			nlines, newtime, t_info.author);
+	max_len = 80 - strlen (buffer);
+
+	if (!long_subjects && strlen (t_info.subject) > max_len)
+	    (void) strcpy (&t_info.subject [max_len - 3], "...");
+
+	(void) printf ("%s%s\n", buffer, t_info.subject);
+
  punt:
 	(void) free (t_info.author);
 	(void) free (t_info.subject);
 	return(code);
 }
 
-list(argc, argv)
-	int argc;
+list (argc, argv, sci_idx)
+	int argc, sci_idx;
 	char **argv;
 {
-	(void) time(&time_now); 
-	time_sixmonthsago = time_now - 6*30*24*60*60; 
-	time_plusthreemonths = time_now + 6*30*24*60*60;
+	char **ap, **ap2, **nargv;
+	int ac;
+	long_subjects = 0;
 
-	map_trns(argc, argv, "all", list_it);
+	for (ap = argv; *ap; ap++)
+	    ;
+	nargv = (char **) calloc (ap - argv + 1, sizeof (char *));
+	ac = 0;
+	for (ap = argv, ap2 = nargv; *ap; ap++) {
+	    if (!strcmp (*ap, "-long_subjects") || !strcmp (*ap, "-lsj"))
+		long_subjects = 1;
+	    else
+		*ap2++ = *ap, ac++;
+	}
+	*ap2 = (char *) NULL;
+	map_trns(ac, nargv, "all", list_it);
+	free (ap2);
 	return;
 }
 
-static 
-delete_it(i)
-int i;
+static delete_it (i)
+    int i;
 {
      int code;
 
@@ -143,9 +161,8 @@ del_trans(argc, argv)
 	return;
 }
 
-static
-retrieve_it(i)
-int i;
+static retrieve_it (i)
+    int i;
 {
      int code;
 
@@ -177,8 +194,7 @@ ret_trans(argc, argv)
 	return;
 }
 
-void
-map_trns(argc, argv, defalt, proc)
+void map_trns(argc, argv, defalt, proc)
 	int argc;
 	char **argv;
 	char *defalt;
@@ -198,7 +214,7 @@ map_trns(argc, argv, defalt, proc)
 		return;
 	}
 
-	dsc_get_trn_info(&dsc_public.nb, dsc_public.current,
+	dsc_get_trn_info (&dsc_public.nb, dsc_public.current,
 			 &t_info, &code);
 	if (code != 0)
 		t_info.current = 0;
@@ -218,9 +234,10 @@ map_trns(argc, argv, defalt, proc)
 			trn_list = trn_select(&t_info, argv[i],
 					      trn_list, &code);
 			if (code) {
-				ss_perror(sci_idx, code, argv[i]);
-				sl_free(trn_list);
-				return;
+			    sprintf (buffer, "``%s''", argv[i]);
+			    ss_perror(sci_idx, code, buffer);
+			    sl_free(trn_list);
+			    return;
 			}
 		}
 	}
@@ -228,7 +245,7 @@ map_trns(argc, argv, defalt, proc)
 		trn_list = trn_select(&t_info, defalt,
 				      (selection_list *)NULL, &code);
 		if (code) {
-			ss_perror(sci_idx, code, "");
+			ss_perror(sci_idx, code, defalt);
 			free(trn_list);
 			return;
 		}
