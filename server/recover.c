@@ -5,17 +5,18 @@
  *	      privileged procedures of create_mtg, and the like.
  *
  */
-#include "../include/types.h"
-#include "../include/dsc_et.h"
-#include "../include/tfile.h"
-#include "../include/interface.h"
-#include "mtg.h"
 
 #include <stdio.h>
 #include <strings.h>
 #include <sys/types.h>
 #include <sys/file.h>
 #include <sys/stat.h>
+
+#include <discuss/types.h>
+#include <discuss/dsc_et.h>
+#include <discuss/tfile.h>
+#include <discuss/interface.h>
+#include "mtg.h"
 
 #define NULL 0
 #define MAX_TRNS 1000
@@ -35,7 +36,7 @@ static int found_eof = 0;
 tfile unix_tfile ();
 char *malloc();
 
-extern rpc_caller[];
+extern char rpc_caller[];
 extern int has_privs;
 
 main (argc, argv)
