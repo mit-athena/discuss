@@ -24,12 +24,17 @@ struct proc_table {
 #define RETRIEVE_TRN 4
 #define CREATE_MTG 5
 #define OLD_GET_MTG_INFO 6
-#define GET_MTG_INFO 12
 #define START_MTG_INFO 7
 #define NEXT_MTG_INFO 8
 #define GET_TRN 9
 #define REMOVE_MTG 10
 #define UPDATED_MTG 11
+#define GET_MTG_INFO 12
+#define GET_ACL 13
+#define GET_ACCESS 14
+#define SET_ACCESS 15
+#define DELETE_ACCESS 16
+#define WHO_AM_I 17
 
 #define REPLY_TYPE 440
 #define PROC_BASE 400
