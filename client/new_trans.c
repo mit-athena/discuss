@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v 1.20 1989-01-05 00:48:34 raeburn Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v 1.21 1989-03-29 00:33:30 srz Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
@@ -12,7 +12,7 @@
 
 #ifndef lint
 static char rcsid_discuss_c[] =
-     "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v 1.20 1989-01-05 00:48:34 raeburn Exp $";
+     "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v 1.21 1989-03-29 00:33:30 srz Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -108,18 +108,19 @@ new_trans(argc, argv)
 	  if (strncmp(myname, "???", 3) == 0) {
 		printf("Entry will be anonymous.\n");
 	  }
-	  free(myname);
-	  myname = NULL;
      }
+     free(myname);
+     myname = NULL;
 
      (void) printf("Subject: ");
-     if (gets(subject) == (char *)NULL) {
+     if (fgets(subject,BUFSIZ,stdin) == (char *)NULL) {
 	  clearerr(stdin);
 	  if (interrupt) goto punt;
 	  ss_perror(sci_idx, errno, "Error reading subject.");
 	  goto punt;
      }
      if (interrupt) goto punt;
+     subject[strlen(subject)-1] = '\0';		/* Get rid of NL */
 
      (void) unlink(temp_file);
      if ((code = edit(temp_file, editor)) != 0) {
