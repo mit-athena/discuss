@@ -1,9 +1,12 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v 1.13 1989-02-25 16:54:47 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v 1.14 1989-06-03 00:27:03 srz Exp $
  *	$Locker:  $
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.13  89/02/25  16:54:47  srz
+ * Added declaration of interrupt.
+ * 
  * Revision 1.12  87/10/24  02:39:01  wesommer
  * Robustified.
  * 
@@ -39,20 +42,23 @@
  */
 
 #ifndef lint
-static char rcsid_mkds_c[] = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v 1.13 1989-02-25 16:54:47 srz Exp $";
+static char rcsid_mkds_c[] =
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v 1.14 1989-06-03 00:27:03 srz Exp $";
 #endif lint
 
-#include "tfile.h"
+#include <discuss/discuss.h>
+#if 0
 #include "dsc_et.h"
 #include "config.h"
 #include "interface.h"
 #include "rpc.h"
 #include "globals.h"
+#endif
 #include <sys/time.h>
 #include <sys/file.h>
 #include <stdio.h>
 #include <ctype.h>
-#include <strings.h>
+#include <string.h>
 #include <netdb.h>
 #include <pwd.h>
 #include <errno.h>
