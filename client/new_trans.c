@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v 1.14 1988-02-07 01:13:17 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v 1.15 1988-02-15 00:57:56 wesommer Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
@@ -12,7 +12,7 @@
 
 #ifndef lint
 static char rcsid_discuss_c[] =
-     "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v 1.14 1988-02-07 01:13:17 srz Exp $";
+     "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v 1.15 1988-02-15 00:57:56 wesommer Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -39,6 +39,7 @@ static char rcsid_discuss_c[] =
 
 extern tfile	unix_tfile();
 extern char *gets(), *error_message();
+extern void flag_interrupts(), dont_flag_interrupts();
 
 new_trans(argc, argv)
      int argc;

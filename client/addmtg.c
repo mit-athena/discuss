@@ -9,13 +9,13 @@
  *	command line, in which case they are used as meeting announcements.
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.18 1988-02-07 01:43:18 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.19 1988-02-15 01:00:21 wesommer Exp $
  *	$Locker:  $
  *
  */
 
 #ifndef lint
-static char *rcsid_addmtg_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.18 1988-02-07 01:43:18 srz Exp $";
+static char *rcsid_addmtg_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.19 1988-02-15 01:00:21 wesommer Exp $";
 #endif lint
 
 #include <strings.h>
@@ -28,6 +28,7 @@ static char *rcsid_addmtg_c = "$Header: /afs/dev.mit.edu/source/repository/athen
 #include "globals.h"
 #include "dsc_et.h"
 #include "discuss_err.h"
+#include "ss.h"
 
 extern char *malloc(), *calloc();
 extern tfile unix_tfile();

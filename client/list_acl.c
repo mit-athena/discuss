@@ -1,10 +1,13 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list_acl.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list_acl.c,v 1.6 1987-03-24 14:02:47 spook Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list_acl.c,v 1.7 1988-02-15 00:58:51 wesommer Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.6  87/03/24  14:02:47  spook
+ * Changes for new interfaces..
+ * 
  * Revision 1.5  87/02/21  20:11:08  wesommer
  * Major changes:
  * 	Fix bug introduced by KR (la USER, not la MEETING; the current
@@ -28,7 +31,7 @@
  */
 
 #ifndef lint
-static char *rcsid_list_acl_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list_acl.c,v 1.6 1987-03-24 14:02:47 spook Exp $";
+static char *rcsid_list_acl_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list_acl.c,v 1.7 1988-02-15 00:58:51 wesommer Exp $";
 #endif lint
 
 #include <strings.h>
@@ -38,7 +41,7 @@ static char *rcsid_list_acl_c = "$Header: /afs/dev.mit.edu/source/repository/ath
 #include "acl.h"
 #include "globals.h"
 
-extern char *malloc(), *error_message();
+extern char *malloc(), *error_message(), *local_realm();
 
 list_acl(argc, argv)
 	int argc;

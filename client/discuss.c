@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.38 1988-02-07 23:10:53 balamac Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.39 1988-02-15 00:57:45 wesommer Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
@@ -12,7 +12,7 @@
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.38 1988-02-07 23:10:53 balamac Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.39 1988-02-15 00:57:45 wesommer Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -127,7 +127,7 @@ main(argc, argv)
 		}
 	}
 
-	if (!0) {
+	{
 		register char *user = getpwuid(getuid())->pw_name;
 		register char *realm = local_realm();
 

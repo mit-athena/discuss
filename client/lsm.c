@@ -1,11 +1,11 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v 1.17 1988-01-24 16:20:19 raeburn Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v 1.18 1988-02-15 00:58:33 wesommer Exp $
  *
  */
 
 #ifndef lint
-static char *rcsid_lsm_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v 1.17 1988-01-24 16:20:19 raeburn Exp $";
+static char *rcsid_lsm_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v 1.18 1988-02-15 00:58:33 wesommer Exp $";
 #endif lint
 
 
@@ -17,14 +17,18 @@ static char *rcsid_lsm_c = "$Header: /afs/dev.mit.edu/source/repository/athena/b
 #include "dsc_et.h"
 #include "rpc_et.h"
 #include <errno.h>
+#include "ss.h"
 
 extern char *malloc(), *calloc(), *ctime(), *error_message();
+extern void flag_interrupts(), dont_flag_interrupts();
+
 
 int print_header, long_output;
 static char last_host[140], last_path[140];
 static char *auser_id;
 static int fast;
 
+/* this function should probably be void */
 int do_line(nbp, code, updated)
 	register name_blk *nbp;
 	int code, updated;
@@ -71,6 +75,7 @@ int do_line(nbp, code, updated)
 		strcpy(last_host,nbp->hostname);
 		strcpy(last_path,nbp->pathname);
 	}
+	return 0;
 }
 
 static

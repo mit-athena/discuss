@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/goto.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/goto.c,v 1.6 1988-01-24 11:33:18 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/goto.c,v 1.7 1988-02-15 00:57:31 wesommer Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
@@ -11,7 +11,7 @@
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/goto.c,v 1.6 1988-01-24 11:33:18 wesommer Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/goto.c,v 1.7 1988-02-15 00:57:31 wesommer Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -185,12 +185,11 @@ leave_mtg()
      dsc_public.highest_seen = 0;
      dsc_public.attending = FALSE;
      dsc_public.host = (char *)NULL;
-
+     dsc_public.path = (char *)NULL;
+     
      /* Don't forget the women and children... */
      FREE(dsc_public.mtg_name);
      dsc_public.mtg_name = (char *)NULL;
-     FREE(dsc_public.m_info.chairman);
-     dsc_public.m_info.chairman = (char *)NULL;
-     FREE(dsc_public.m_info.location);
-     dsc_public.m_info.location = (char *)NULL;
+
+     dsc_destroy_mtg_info(&dsc_public.m_info);
 }
