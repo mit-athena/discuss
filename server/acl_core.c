@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v 1.9 1988-10-08 01:36:18 raeburn Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v 1.10 1989-01-04 22:27:42 raeburn Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
@@ -8,6 +8,9 @@
  *	Originally written for the discuss system by Bill Sommerfeld
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.9  88/10/08  01:36:18  raeburn
+ * Minor changes: include files, type names.
+ * 
  * Revision 1.8  88/05/31  17:43:49  srz
  * Bill's changes broke expunge.  Fixed to work if has_privs is set.
  * 
@@ -37,23 +40,20 @@
  * 
  */
 
-#include "../include/types.h"
-#include "../include/dsc_et.h"
-#include "../include/acl.h"
-#include "../include/internal.h"
+#include <discuss/types.h>
+#include <discuss/dsc_et.h>
+#include <discuss/acl.h>
+#include "internal.h"
 #include <sys/file.h>
 #include <errno.h>
 #include <stdio.h>
 #include <sys/param.h>
-#include <strings.h>
-
-#ifndef __STDC__
-#define const
-#endif
+#include <string.h>
+#include "ansi.h"
 
 #ifndef lint
 static const char rcsid_acl_core_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v 1.9 1988-10-08 01:36:18 raeburn Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v 1.10 1989-01-04 22:27:42 raeburn Exp $";
 #endif lint
 
 extern dsc_acl *mtg_acl;
