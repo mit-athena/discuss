@@ -57,4 +57,8 @@
 
 	ec	YOU_TWIT,
 		"Chairman cannot remove his own access"
+
+	ec	NO_SUCH_USER,
+		"No such user on this system"
+
 	end
