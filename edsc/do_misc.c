@@ -120,7 +120,7 @@ char *fix_principal(principal)
 {
 	strcpy(edsc_principal_buf, principal);
 	if (strcmp(edsc_principal_buf,"*") != 0 &&
-	    index(edsc_principal_buf, '@') == 0) {
+	    strchr(edsc_principal_buf, '@') == 0) {
 		strcat(edsc_principal_buf, "@");
 		strcat(edsc_principal_buf, local_realm());
 	}
@@ -355,7 +355,7 @@ static list_it(t_infop, f, long_subjects)
 	/*
 	 * If author ends with current realm, punt the realm.
 	 */
-	if ((cp=index(t_infop->author, '@')) != NULL)
+	if ((cp=strchr(t_infop->author, '@')) != NULL)
 		if (!strcmp(cp+1, local_realm()))
 			*cp = '\0';
 
