@@ -852,7 +852,7 @@ int *result;
 	  mtg_acl = acl_create ();
 	  acl_add_access(mtg_acl, chairman, "acdorsw");	/* add chairman */
 	  if (public)
-	       acl_add_access(mtg_acl, "*", "arosw");	/* public mtg */
+	       acl_add_access(mtg_acl, "*", "a  orsw");	/* public mtg */
      } else 
 	  mtg_acl = acl_copy(new_acl);
 
