@@ -1,7 +1,7 @@
 /*
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/conv_mgr.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/conv_mgr.c,v 1.7 1987-09-17 02:32:24 spook Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/conv_mgr.c,v 1.8 1988-10-16 13:53:59 raeburn Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
@@ -10,13 +10,19 @@
  *		  stream for the given module.
  *
  */
+
+#ifndef __STDC__
+#define const
+#endif
+
 #ifndef lint
-static char *rcsid_conv_mgr_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/conv_mgr.c,v 1.7 1987-09-17 02:32:24 spook Exp $";
+static const char rcsid_conv_mgr_c[] =
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/conv_mgr.c,v 1.8 1988-10-16 13:53:59 raeburn Exp $";
 #endif lint
 
 #include <errno.h>
-#include <strings.h>
-#include "rpc.h"
+#include <string.h>
+#include <discuss/rpc.h>
 #define NULL 0
 
 char *malloc (), *realloc();
@@ -63,15 +69,16 @@ get_module ()
  *
  *
  */
-set_module (module,result)
+set_module (module,fatal_error,result)
 char *module;
-int *result;
+int *fatal_error,*result;
 {
      char *hostname, *service_id;
      int port,i;
      rpc_conversation rc;
      struct conv *convp;
 
+     *fatal_error = 0;
      *result = 0;
 
      /* check to see if we've set up the module table */
@@ -96,9 +103,10 @@ int *result;
 
      /* Now loop through all, looking for module names for comparison */
      for (i = 0; i < num_convs; i++) {
-	  if (!strcmp (module, conv_base[i].module)) {	/* match */
-	       if (conv_base[i].result != 0) {		/* errored out before */
+	  if (!strcmp (module, conv_base[i].module)) { /* match */
+	       if (conv_base[i].result != 0) { /* errored out before */
 		    *result = conv_base[i].result;
+		    *fatal_error = 1;
 		    return;
 	       }
 	       set_rpc (conv_base[i].rc);
@@ -109,36 +117,42 @@ int *result;
 
      /* not found -- we're going to have to resolve the module name. */
      resolve_module (module, &port, &hostname, &service_id, result);
-     if (*result)
+     if (*result) {
+	  *fatal_error = 1;
 	  return;
+     }
 
      /* Check through conversations, looking for resolved module */
      for (i = 0; i < num_convs; i++) {
 	  convp = &conv_base [i];
 	  if (convp -> port == port && !namcmp (hostname, convp -> hostname)
-	      && !strcmp (service_id, convp -> service_id)) {  /* found match, record */
-	       if (conv_base[i].result != 0) {		/* errored out */
-		    *result = conv_base[i].result;
-		    return;
-	       }
-	       rc = convp -> rc;
-	       set_rpc (rc);
-	       goto create_entry;
+	      && !strcmp (service_id, convp -> service_id)) {
+	      /* found match, record */
+	      if (conv_base[i].result != 0) {		/* errored out */
+		  *result = conv_base[i].result;
+		  *fatal_error = 1;
+		  return;
+	      }
+	      rc = convp -> rc;
+	      set_rpc (rc);
+	      goto create_entry;
 	  }
      }
 
      /* Not found.  Create the rpc conversation */
      rc = open_rpc (hostname, port, service_id, result);
      if (rc == NULL) {
-	  if (*result == EINTR) {    /* control-C: don't create conversation */
+	  *fatal_error = 1;
+	  if (*result == EINTR) {		/* control-C: don't create conversation */
 	       return;
 	  }
      }
 
 create_entry:
      if (num_convs == max_convs) {
-	  max_convs += 2;
-	  conv_base = (struct conv *) realloc (conv_base, max_convs * sizeof (struct conv));
+	 max_convs += 2;
+	 conv_base = (struct conv *) realloc (conv_base,
+					      max_convs*sizeof (struct conv));
      }
 
      cur_conv = num_convs++;
