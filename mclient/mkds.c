@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v 1.6 1987-04-08 15:46:22 spook Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v 1.7 1987-04-08 21:40:57 rfrench Exp $
  *	$Locker:  $
  *
  *	$Log: not supported by cvs2svn $
@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static char *rcsid_mkds_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v 1.6 1987-04-08 15:46:22 spook Exp $";
+static char *rcsid_mkds_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v 1.7 1987-04-08 21:40:57 rfrench Exp $";
 #endif lint
 
 #include "tfile.h"
@@ -51,7 +51,7 @@ char *argv[];
 	extern tfile unix_tfile();
 	name_blk nb;
 	char long_name[100],short_name[100],module[50],mtg_path[100];
-	char temp_file[64],temp_file2[64],tempbfr[256];
+	char temp_file[64],tempbfr[256];
 	char ann_mtg[100],subject[100];
 	int public = 0,error = 1,result,remove=0,delmtg=0;
 	int fd,txn_no,fatal_err;
@@ -64,7 +64,6 @@ char *argv[];
 	nb.user_id = malloc(132);
 
 	(void) sprintf(temp_file,"/tmp/mtg%d.%d",getuid(),getpid());
-	(void) sprintf(temp_file2,"/tmp/mtga%d.%d",getuid(),getpid());
 
 	whoami = rindex(argv[0],'/');
 	if (whoami)
@@ -178,7 +177,6 @@ char *argv[];
 	  "This transaction will serve as an introduction to the meeting.\n");
 
 	(void) unlink(temp_file);
-	(void) unlink(temp_file2);
 
 	if (edit(temp_file, getenv("EDITOR"))) {
 		(void) fprintf(stderr,
@@ -209,21 +207,6 @@ char *argv[];
 		error = 0;
 		goto kaboom;
 	}
-	fp = fopen(temp_file2,"w");
-	if (!fp) {
-		fprintf(stderr,"Can't open temporary file\n");
-		goto kaboom;
-	}
-	fprintf(fp,"  Meeting Name:  %s\n",long_name);
-	fprintf(fp,"  Host:          %s\n", nb.hostname);
-	fprintf(fp,"  Pathname:      %s\n", nb.pathname);
-	fprintf(fp,"  Participation: %s\n",public?"Public":"Private");
-	fprintf(fp,"\n");
-	fp2 = fopen(temp_file,"r");
-	while (fgets(tempbfr,256,fp2))
-		fprintf(fp,"%s",tempbfr);
-	(void) fclose(fp);
-	(void) fclose(fp2);
 
 	for (;;) {
 		printf("\nAnnounce in what meeting? ");
@@ -234,20 +217,22 @@ char *argv[];
 		printf("Meeting not found in search path.\n");
 	}
 
-	fd = open(temp_file2,O_RDONLY,0);
+	fd = open(temp_file,O_RDONLY,0);
 	if (fd < 0) {
-		(void) fprintf(stderr,"Can't open temporary file.\n");
+		(void) fprintf(stderr,"Temporary file disappeared!\n");
 		goto kaboom;
 	}
+
 	tf = unix_tfile(fd);
 
-	(void) sprintf(subject,"%s meeting",long_name);
-	dsc_add_trn(&nb, tf, subject, 0, &txn_no, &result);
+	dsc_announce_mtg(&nb, long_name, public, tf, &txn_no, &result);
+
 	if (result) {
 		(void) fprintf(stderr,"Error adding transation: %s\n",
 			error_message(result));
 		goto kaboom;
 	}
+
 	(void) printf("Transaction [%04d] entered in the %s meeting.\n",
 		      txn_no, nb.aliases[0]);
 
