@@ -1,14 +1,17 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.1 1986-11-24 20:18:55 rfrench Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.2 1986-12-03 15:06:02 rfrench Exp $
  *	$Locker:  $
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.1  86/11/24  20:18:55  rfrench
+ * Initial revision
+ * 
  *
  */
 
 #ifndef lint
-static char *rcsid_addmtg_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.1 1986-11-24 20:18:55 rfrench Exp $";
+static char *rcsid_addmtg_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.2 1986-12-03 15:06:02 rfrench Exp $";
 #endif lint
 
 #include <strings.h>
@@ -32,7 +35,7 @@ add_mtg(sci_idx, argc, argv)
      int code,have_names;
      char *user,*realm;
      trn_info t_info;
-     selection_list *trn_list;
+     selection_list *trn_list,*trn_temp;
 
      used = (int *)malloc(sizeof(int)*argc);
      bzero(used, sizeof(int)*argc); /* bletch */
@@ -68,10 +71,11 @@ add_mtg(sci_idx, argc, argv)
 	     else {
 		     trn_list = (selection_list *)NULL;
 		     for (;i<argc;i++) {
-			     trn_list = trn_select(&t_info,argv[i],
+			     trn_temp = trn_select(&t_info,argv[i],
 						   trn_list,&code);
 			     if (code)
 				     break;
+			     trn_list = trn_temp;
 			     used[i] = 1;
 		     }
 	     }
@@ -168,6 +172,7 @@ int trn_no;
 	FILE *fp;
 	name_blk nb;
 
+	printf("Tran #%d\n",trn_no);
 	unlink(temp_file);
 	fd = open(temp_file,O_WRONLY|O_CREAT,0700);
 	tf = unix_tfile(fd);
@@ -202,15 +207,13 @@ int trn_no;
 	strcpy(nb.unique_id,tempbfr+17);
 	strcpy(nb.user,"");
 	update_mtg_set(host,"",&nb,1,&code);
-	if (code) {
+	if (code)
 		fprintf(stderr,"Error getting meeting name: Tran %d\n",trn_no);
-		return;
-	}
-	return;
+	return (0);
 
  not_ann:
 
 	fprintf(stderr,"Transation %04d is not a meeting announcement\n",
 		trn_no);
-	return;
+	return (0);
 }
