@@ -1,11 +1,11 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v 1.16 1988-01-24 11:32:40 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v 1.17 1988-01-24 16:20:19 raeburn Exp $
  *
  */
 
 #ifndef lint
-static char *rcsid_lsm_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v 1.16 1988-01-24 11:32:40 wesommer Exp $";
+static char *rcsid_lsm_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v 1.17 1988-01-24 16:20:19 raeburn Exp $";
 #endif lint
 
 
@@ -158,7 +158,7 @@ list_meetings (argc, argv)
 		     auser = "discuss";
 		     used[i] = 1;
 		}
-		else if (!strcmp(argv[i],"-f") || !strcmp(argv[i], "-fast") || !strcmp(argv[i], "-brief") || !strcmp("-bf"))
+		else if (!strcmp(argv[i],"-f") || !strcmp(argv[i], "-fast") || !strcmp(argv[i], "-brief") || !strcmp(argv[i], "-bf"))
 		     fast = 1;
 		else if (*argv[i] == '-') {
 			fprintf(stderr,
