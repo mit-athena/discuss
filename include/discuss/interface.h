@@ -69,6 +69,7 @@ typedef struct {
 	date_times date_modified;	/* last modification of meeting */
 
 	bool public_flag;		/* if mtg is public */
+	char *access_modes;		/* Access modes we have to this mtg. */
 } mtg_info;
 
 
