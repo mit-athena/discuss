@@ -1,9 +1,9 @@
 #
-# $Id: Imakefile,v 1.2 1991-07-30 10:00:44 lwvanels Exp $
+# $Id: Imakefile,v 1.3 1996-09-08 20:58:40 ghudson Exp $
 #
 
 OBJS=	main.o block.o get.o put.o internal.o
-USPET=	../../ets/usp_et.o
+USPET=	../ets/usp_et.o
 
 ProfiledObjectRule()
 
