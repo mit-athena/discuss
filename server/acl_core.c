@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v 1.3 1987-02-04 15:53:41 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v 1.4 1987-03-17 02:26:11 srz Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
@@ -8,6 +8,9 @@
  *	Originally written for the discuss system by Bill Sommerfeld
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.3  87/02/04  15:53:41  srz
+ * uid_t lossage
+ * 
  * Revision 1.2  86/11/22  06:19:08  spook
  * Changed to make lint happy.
  * 
@@ -26,12 +29,13 @@
 #include <strings.h>
 
 #ifndef lint
-static char *rcsid_acl_core_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v 1.3 1987-02-04 15:53:41 srz Exp $";
+static char *rcsid_acl_core_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v 1.4 1987-03-17 02:26:11 srz Exp $";
 #endif lint
 
 extern Acl *mtg_acl;
 extern char rpc_caller [];
 extern int errno;
+extern int has_privs;
 
 /*
  * Routines provided:
@@ -88,7 +92,7 @@ get_acl(mtg_name, code, list)
 	}
 
 	*code = 0;
-	*list = mtg_acl;
+	*list = acl_copy(mtg_acl);
 	return;
 }
 
@@ -142,7 +146,7 @@ set_access(mtg_name, princ_name, modes, code)
 	}
 
 	/* step 3: modify ACL in core */
-	if (!acl_check(acl,rpc_caller,"c")) {
+	if (!has_privs && !acl_check(acl,rpc_caller,"c")) {
 		*code = NO_ACCESS;
 		locked_abort(mtg_name, lockfd, acl_name, acl);
 		goto punt;
@@ -185,7 +189,7 @@ delete_access(mtg_name, princ_name, code)
 	}
 
 	/* step 3: modify ACL in core */
-	if (!acl_check(acl,rpc_caller,"c")) {
+	if (!has_privs && !acl_check(acl,rpc_caller,"c")) {
 		*code = NO_ACCESS;
 		locked_abort(mtg_name, lockfd, acl_name, acl);
 		return;
