@@ -12,7 +12,6 @@
 
 #include <discuss/types.h>
 #include <discuss/tfile.h>
-#include <discuss/discuss_err.h>
 #include <discuss/dsc_et.h>
 #include <discuss/acl.h>
 #include <discuss/interface.h>
