@@ -7,12 +7,15 @@
  */
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v 1.12 1993-04-29 17:05:47 miki Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v 1.13 1994-03-25 17:21:23 miki Exp $
  *
  *	Routines for use in a server to edit access control lists remotely.
  *	Originally written for the discuss system by Bill Sommerfeld
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.12  93/04/29  17:05:47  miki
+ * ported to Solaris2.1
+ * 
  * Revision 1.11  89/06/03  00:41:41  srz
  * Added standard copyright notice.
  * 
@@ -63,17 +66,10 @@
 #include "ansi.h"
 #ifdef SOLARIS
 #include <fcntl.h>
-/*
- * flock operations.
- */
-#define LOCK_SH               1       /* shared lock */
-#define LOCK_EX               2       /* exclusive lock */
-#define LOCK_NB               4       /* don't block when locking */
-#define LOCK_UN               8       /* unlock */
 #endif
 #ifndef lint
 static const char rcsid_acl_core_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v 1.12 1993-04-29 17:05:47 miki Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v 1.13 1994-03-25 17:21:23 miki Exp $";
 #endif lint
 
 extern dsc_acl *mtg_acl;
@@ -288,6 +284,10 @@ locked_open_mtg(mtg_name, lockfd, acl_name, acl)
 	int mtg_name_len = strlen (mtg_name);
 	int result;
 	int u_acl_f;
+#ifdef SOLARIS
+    struct flock lock;
+#endif
+
 	
 	*lockfd = -1;
 	u_acl_f = -1;
@@ -301,7 +301,15 @@ locked_open_mtg(mtg_name, lockfd, acl_name, acl)
 		result = errno;
 		goto punt;
 	}
+#ifdef SOLARIS
+      lock.l_type = F_WRLCK;
+      lock.l_start = 0;
+      lock.l_whence = 0;
+      lock.l_len = 0;
+      if (fcntl(*lockfd, F_SETLK, &lock) != 0)  {
+#else
 	if((flock(*lockfd, LOCK_EX)) != 0) { /* may block... */
+#endif
 		result = errno;
 		goto punt;
 	}
