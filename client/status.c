@@ -2,13 +2,16 @@
  *
  * Status request for DISCUSS
  *
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/status.c,v 1.5 1986-12-07 16:05:19 rfrench Exp $
+ * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/status.c,v 1.6 1986-12-07 17:49:54 wesommer Exp $
  * $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/status.c,v $
  * $Locker:  $
  *
  * Copyright (C) 1986 by the MIT Student Information Processing Board
  *
  * $Log: not supported by cvs2svn $
+ * Revision 1.5  86/12/07  16:05:19  rfrench
+ * Globalized sci_idx
+ * 
  * Revision 1.4  86/12/07  00:39:56  rfrench
  * Killed ../include
  * 
@@ -30,6 +33,7 @@
 #include "interface.h"
 #include "config.h"
 #include "globals.h"
+#include "acl.h"
 
 status(argc, argv)
 	int argc;

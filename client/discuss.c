@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.22 1986-12-07 16:04:23 rfrench Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.23 1986-12-07 17:49:30 wesommer Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
@@ -9,6 +9,9 @@
  *	ss library for the command interpreter.
  *
  *      $Log: not supported by cvs2svn $
+ * Revision 1.22  86/12/07  16:04:23  rfrench
+ * Globalized sci_idx
+ * 
  * Revision 1.21  86/12/07  00:29:25  rfrench
  * Killed ../include
  * 
@@ -80,7 +83,7 @@
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.22 1986-12-07 16:04:23 rfrench Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.23 1986-12-07 17:49:30 wesommer Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -94,6 +97,7 @@ static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athe
 #include "config.h"
 #include "rpc.h"
 #include "globals.h"
+#include "acl.h"
 
 #ifdef	lint
 #define	DONT_USE(var)	var=var;
@@ -167,7 +171,7 @@ main(argc, argv)
 		ss_perror(sci_idx, code, "creating invocation");
 		exit(1);
 	}
-	ss_add_info_dir(sci_idx, INFO_DIR, &code);
+	(void) ss_add_info_dir(sci_idx, INFO_DIR, &code);
 	if (code) {
 		ss_perror(sci_idx, code, INFO_DIR);
 	}
@@ -177,7 +181,7 @@ main(argc, argv)
 
 	temp_file = malloc(64);
 	pgm = malloc(64);
-	(void) sprintf(temp_file, "/tmp/mtg%d.%d", getuid(), getpid());
+	(void) sprintf(temp_file, "/tmp/mtg%d.%d", (int)getuid(), getpid());
 
 	if (initial_meeting != (char *)NULL) {
 		(void) sprintf(buffer, "goto %s", initial_meeting);
@@ -186,12 +190,12 @@ main(argc, argv)
 			ss_perror(sci_idx, code, initial_meeting);
 	}
 	if (initial_request != (char *)NULL) {
-		ss_execute_line(sci_idx, initial_request, &code);
+		(void) ss_execute_line(sci_idx, initial_request, &code);
 		if (code != 0)
 			ss_perror(sci_idx, code, initial_request);
 	}
 	if (!quit || code)
-		ss_listen (sci_idx, &code);
+		(void) ss_listen (sci_idx, &code);
 	(void) unlink(temp_file);
 	leave_mtg();				/* clean up after ourselves */
 }
@@ -202,7 +206,8 @@ repl(argc, argv)
 	int argc;
 	char **argv;
 {
-	int fd, txn_no, orig_trn;
+	int fd;
+	trn_nums txn_no, orig_trn;
 	tfile tf;
 	selection_list *trn_list;
 	trn_info t_info;
@@ -231,18 +236,18 @@ repl(argc, argv)
 			      (selection_list *)NULL, &code);
 	if (code) {
 	     ss_perror(sci_idx, code, "");
-	     free(trn_list);
+	     free((char *) trn_list);
 	     return;
 	}
 
 	if (trn_list -> low != trn_list -> high) {
 	     ss_perror(sci_idx, 0, "Cannot reply to range");
-	     free(trn_list);
+	     free((char *)trn_list);
 	     return;
 	}
 
 	orig_trn = trn_list -> low;
-	free(trn_list);
+	free((char *)trn_list);
 
 	dsc_get_trn_info(dsc_public.mtg_uid, orig_trn, &t_info, &code);
 	if (code != 0) {
@@ -312,7 +317,7 @@ goto_mtg(argc, argv)
 
 	leave_mtg();
 
-	dsc_public.mtg_name = malloc(strlen(argv[1])+1);
+	dsc_public.mtg_name = (char *)malloc(strlen(argv[1])+1);
 	strcpy(dsc_public.mtg_name, argv[1]);
 
 	get_mtg_unique_id ("", "", dsc_public.mtg_name, &dsc_public.nb, &code);
@@ -367,7 +372,7 @@ leave_mtg()
 	  return;
      }
 
-     dsc_public.nb.date_attended = time(0);
+     dsc_public.nb.date_attended = time((long *)0);
      dsc_public.nb.last = dsc_public.highest_seen;
      update_mtg_set ("", "", &dsc_public.nb, 1, &code);
 
