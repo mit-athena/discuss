@@ -4,7 +4,7 @@
 ;;;    	For copying information, see the file mit-copyright.h in this release.
 ;;;
 ;;;	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v $
-;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.21 1991-01-04 19:30:46 bjaspan Exp $
+;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.22 1991-02-01 17:45:59 tytso Exp $
 ;;;
 ;;;  Emacs lisp code to remote control a "discuss" shell process to
 ;;;  provide an emacs-based interface to the discuss conferencing system.
@@ -13,6 +13,9 @@
 ;;;  Written by Stan Zanarotti, Bill Sommerfeld and Theodore Ts'o.
 ;;;
 ;;;  $Log: not supported by cvs2svn $
+; Revision 1.21  91/01/04  19:30:46  bjaspan
+; added doc for l and F to discuss-trn-mode.
+; 
 ; Revision 1.20  91/01/03  22:23:31  bjaspan
 ; added discuss-set-seen-and-leave-mtg and discuss-catchup
 ; 
@@ -287,17 +290,17 @@ a	Add meeting."
   "Enter discuss mode for emacs and list meetings."
   (interactive "P")
   (message "Starting discuss....")
-  (let ((old-buffer (current-buffer)))
-    (if (not (and (get-buffer discuss-main-buffer)
-		  (buffer-name (get-buffer discuss-main-buffer))
-		  (> (length discuss-meeting-list) 0)))
-	(progn
-	  (switch-to-buffer (get-buffer-create discuss-main-buffer))
-	  (discuss-mtgs-mode)
-	  (if arg
-	      (message "Hit `g' and enter a meeting name.")	      
-	    (discuss-lsm)))
-      (switch-to-buffer discuss-main-buffer))))
+  (if (not (and (get-buffer discuss-main-buffer)
+		(buffer-name (get-buffer discuss-main-buffer))
+		(> (length discuss-meeting-list) 0)))
+      (progn
+	(switch-to-buffer (get-buffer-create discuss-main-buffer))
+	(discuss-mtgs-mode)
+	(setq discuss-meeting-list nil)
+	(if arg
+	    (message "Hit `g' and enter a meeting name.")	      
+	  (discuss-lsm)))
+    (switch-to-buffer discuss-main-buffer)))
 
 ;;; Entry points typically entered through key sequences.
 
@@ -1176,7 +1179,7 @@ discuss server while we spin-block."
 ; run this at each load
 (defun discuss-initialize nil
   (setq discuss-version
-	"$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.21 1991-01-04 19:30:46 bjaspan Exp $")
+	"$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.22 1991-02-01 17:45:59 tytso Exp $")
 
 ;;;
 ;;; Lots of autoload stuff....
@@ -1351,12 +1354,11 @@ discuss server while we spin-block."
 					"\\(,\\|$\\)")
 			     nil t))
 	(progn
-	  (ding)
-	  (message "Can't find meeting %s." meeting))
+;	  (ding)
+	  (message "Couldn't update changed flag for meeting %s." meeting))
       (progn
 	(beginning-of-line)
 	(forward-char 1)
 	(let ((buffer-read-only nil))
 	  (insert-char \032 1)
 	  (delete-char 1))))))
-
