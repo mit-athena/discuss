@@ -4,7 +4,7 @@
 ;;;    	For copying information, see the file mit-copyright.h in this release.
 ;;;
 ;;;	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss-acl.el,v $
-;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss-acl.el,v 1.1 1991-04-29 13:28:50 bjaspan Exp $
+;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss-acl.el,v 1.2 1996-04-12 21:44:09 ghudson Exp $
 ;;;
 ;;;  Emacs lisp code to deal with ACL manipulation in discuss meetings
 ;;;  Written by Theodore Ts'o
@@ -23,10 +23,10 @@
 the discuss subsystem.
 All normal editing commands are turned off.
 Instead, these commands are available:
-
-SPC	Scroll to next screen of this transaction.
-DEL	Scroll to previous screen of this transaction.
-q       Quit looking at the ACL"
+\\[describe-mode]	List available commands.
+\\[scroll-up]	Scroll to next screen of this transaction.
+\\[scroll-down]	Scroll to previous screen of this transaction.
+\\[discuss-acl-quit]	Quit looking at the ACL"
   (interactive)
   (kill-all-local-variables)
   (setq major-mode 'discuss-acl-mode)
@@ -78,6 +78,7 @@ q       Quit looking at the ACL"
     nil
   (setq discuss-acl-mode-map (make-keymap))
   (suppress-keymap discuss-acl-mode-map)
+  (define-key discuss-acl-mode-map "?" 'describe-mode)
   (define-key discuss-acl-mode-map " " 'scroll-up)
   (define-key discuss-acl-mode-map "\177" 'scroll-down)
   (define-key discuss-acl-mode-map "q" 'discuss-acl-quit)
