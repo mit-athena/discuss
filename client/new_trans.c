@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v 1.15 1988-02-15 00:57:56 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v 1.16 1988-04-22 21:24:18 srz Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
@@ -12,7 +12,7 @@
 
 #ifndef lint
 static char rcsid_discuss_c[] =
-     "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v 1.15 1988-02-15 00:57:56 wesommer Exp $";
+     "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v 1.16 1988-04-22 21:24:18 srz Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -27,9 +27,6 @@ static char rcsid_discuss_c[] =
 #include "globals.h"
 #include "acl.h"
 #include "discuss_err.h"
-#ifdef	ZEPHYR
-#include "zephyr.h"
-#endif	/* ZEPHYR */
 
 #ifdef	lint
 #define	USE(var)	var=var;
@@ -53,11 +50,6 @@ new_trans(argc, argv)
      char *myname = NULL;
      int code;
      char *editor = NULL;
-     char announcement[1024];
-#ifdef	ZEPHYR
-     ZNotice_t notice;
-     char buf[1024];
-#endif	/* ZEPHYR */
 
      USE(sci_idx);
 
@@ -153,27 +145,8 @@ new_trans(argc, argv)
 	  goto punt;
      }
 
-     (void) sprintf(announcement,
-		    "Transaction [%04d] entered in the %s meeting.",
+     (void) printf("Transaction [%04d] entered in the %s meeting.",
 		    txn_no, dsc_public.mtg_name);
-#ifdef	ZEPHYR
-     notice.z_kind = UNSAFE;
-     notice.z_port = 0;
-     notice.z_class = "discuss";
-     notice.z_class_inst = buf;
-     (void) sprintf(buf, "%s:%s", dsc_public.nb.hostname,
-		    dsc_public.nb.pathname);
-     
-     notice.z_opcode = "new_trn";
-     notice.z_sender = 0;
-     notice.z_recipient = "";
-     notice.z_message = announcement;
-     notice.z_message_len = strlen(announcement)+1;
-
-     ZInitialize();
-     ZSendNotice(&notice, ZNOAUTH);
-#endif	/* ZEPHYR */
-     (void) puts(announcement);
 
      if (dsc_public.current == 0)
 	 dsc_public.current = txn_no;
