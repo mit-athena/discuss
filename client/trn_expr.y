@@ -1,4 +1,4 @@
-%token INTEGER NREF PREF FIRST LAST NEXT PREV FREF LREF CUR NEW ALL
+%token INTEGER NREF PREF FIRST LAST NEXT PREV FREF LREF CUR NEW ALL AREF
 %left '+' '-'
 %{
 #include <ctype.h>
@@ -8,6 +8,7 @@
 static trn_info *trnexpr_curtrn;
 static mtg_info *trnexpr_curmtg;
 static int trnexpr_low, trnexpr_high;
+static int trnexpr_aref;
 static char *cp;
 static int trnexpr_err;
 %}
@@ -29,6 +30,12 @@ range	: trn_no
 	        { trnexpr_low = trnexpr_curmtg->first;
 		  trnexpr_high = trnexpr_curmtg->last;
 		}
+	| AREF
+	        { trnexpr_low = trnexpr_curtrn->current;
+		  trnexpr_high = trnexpr_curtrn->current;
+		  trnexpr_aref = 1;
+		}
+
 	;	  
 sep	: ':'
 	| ','
@@ -107,6 +114,9 @@ static yylex()
 	} else if (match(cp, "all")) {
 	        cp += 3;
 		return(ALL);
+	} else if (match(cp, "aref")) {
+		cp += 4;
+		return(AREF);
 	} else if (match(cp, "next")) {
 		cp += 4;
 		yylval=trnexpr_curtrn->next;
@@ -158,21 +168,24 @@ static yylex()
 	} else return (*cp++);
 }
 
-int trnexpr_parse(mtg, trn, string, lorange, highrange) 
+int trnexpr_parse(mtg, trn, string, lorange, highrange, flags) 
         mtg_info *mtg;
   	trn_info *trn;
 	char *string;
-	int *lorange, *highrange;
+	int *lorange, *highrange, *flags;
 {
 	cp = string;
 	trnexpr_curmtg = mtg;
 	trnexpr_curtrn = trn;
+	trnexpr_aref = 0;
 	trnexpr_err = 0;
 	(void) yyparse();
 	if(lorange)
 		*lorange = trnexpr_low;
 	if(highrange)
 		*highrange = trnexpr_high;
+	if(flags)
+		*flags = (trnexpr_aref) ? flag_AREF : 0;
 	return(trnexpr_err);
 }
 
