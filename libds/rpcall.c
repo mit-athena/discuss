@@ -4,6 +4,11 @@
  *	  	protocol over a TCP connection.
  *		This file handles the caller's side of the connection.
  *
+ *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/rpcall.c,v $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/rpcall.c,v 1.6 1987-03-09 23:52:18 spook Exp $
+ *	$Locker:  $
+ *	$Log: not supported by cvs2svn $
+ *
  */
 
 /* INCLUDES */
@@ -15,9 +20,9 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
-#include "../include/tfile.h"
-#include "../include/rpc.h"
-#include "../include/config.h"
+#include "tfile.h"
+#include "rpc.h"
+#include "config.h"
 
 /* DEFINES */
 
@@ -36,7 +41,6 @@ int rpc_err;
 
 /* argument list info */
 static int procno;				/* procedure number */
-static char *myhostname = NULL;
 
 /* connections & socket info */
 static USPStream *us = NULL;
@@ -124,9 +128,7 @@ unsigned short b;
 sendfile(tf)
 tfile tf;
 {
-     int tfs,j,numleft;
-     char buffer[512];
-     char *bptr;
+     int tfs;
 
      tfs = tfsize (tf);
      if (USP_put_long_integer(us, tfs) != SUCCESS) {
@@ -155,8 +157,6 @@ char *dest;
  */
 init_rpc ()
 {
-     struct hostent *hp;
-
      init_rpc_err_tbl();
      init_usp_err_tbl();
 }
@@ -271,6 +271,10 @@ int *code;				/* return code */
      
      conv = USP_associate (s);
      us = conv;
+     if (!us) {
+	     *code = errno;
+	     return(NULL);
+     }
 
      get_authenticator(service_id, 0, &authp, &authl, code);
      if (! *code) {
@@ -386,7 +390,6 @@ tfile tf;
 recvdata(tf)
 tfile tf;
 {
-     int tfs;
      char buffer[508];
      USPCardinal bt;
      unsigned actual;
@@ -420,11 +423,14 @@ tfile tf;
  done:
      USP_flush_block(us);
 }
+
 /*
  *
  * panic -- just a printf
  *
  */
+
+static
 panic(str)
 char *str;
 {
