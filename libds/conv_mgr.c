@@ -1,7 +1,7 @@
 /*
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/conv_mgr.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/conv_mgr.c,v 1.3 1987-04-11 00:05:50 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/conv_mgr.c,v 1.4 1987-05-03 01:02:55 srz Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
@@ -10,10 +10,13 @@
  *		  stream for the given module.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.3  87/04/11  00:05:50  srz
+ * Added RCS junk
+ * 
  *
  */
 #ifndef lint
-static char *rcsid_conv_mgr_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/conv_mgr.c,v 1.3 1987-04-11 00:05:50 srz Exp $";
+static char *rcsid_conv_mgr_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/conv_mgr.c,v 1.4 1987-05-03 01:02:55 srz Exp $";
 #endif lint
 
 #include "rpc.h"
@@ -30,6 +33,7 @@ struct conv {
      char *hostname;
      char *service_id;
      rpc_conversation rc;
+     int result;
 };
 
 /* variables for managing conversation table */
@@ -97,7 +101,12 @@ int *fatal_error,*result;
 
      /* Now loop through all, looking for module names for comparison */
      for (i = 0; i < num_convs; i++) {
-	  if (!strcmp (module, conv_base[i].module)) {	 /* match */
+	  if (!strcmp (module, conv_base[i].module)) {	/* match */
+	       if (conv_base[i].result != 0) {		/* errored out before */
+		    *result = conv_base[i].result;
+		    *fatal_error = 1;
+		    return;
+	       }
 	       set_rpc (conv_base[i].rc);
 	       cur_conv = i;
 	       return;
@@ -116,9 +125,14 @@ int *fatal_error,*result;
 	  convp = &conv_base [i];
 	  if (convp -> port == port && !namcmp (hostname, convp -> hostname)
 	      && !strcmp (service_id, convp -> service_id)) {  /* found match, record */
-		   rc = convp -> rc;
-		   set_rpc (rc);
-		   goto create_entry;
+	       if (conv_base[i].result != 0) {		/* errored out */
+		    *result = conv_base[i].result;
+		    *fatal_error = 1;
+		    return;
+	       }
+	       rc = convp -> rc;
+	       set_rpc (rc);
+	       goto create_entry;
 	  }
      }
 
@@ -126,7 +140,6 @@ int *fatal_error,*result;
      rc = open_rpc (hostname, port, service_id, result);
      if (rc == NULL) {
 	  *fatal_error = 1;
-	  return;				/* error code is set */
      }
 
 create_entry:
@@ -138,6 +151,11 @@ create_entry:
      cur_conv = num_convs++;
      convp = &conv_base [cur_conv];
      convp -> rc = rc;
+     convp -> result = 0;
+     if (rc == NULL) {			/* error opening, but 'remember' it */
+	  convp -> result = *result;
+	  cur_conv = -1;
+     }
      convp -> hostname = malloc (strlen (hostname)+1);
      strcpy (convp -> hostname, hostname);
      convp -> service_id = malloc (strlen (service_id)+1);
@@ -185,3 +203,4 @@ flush_convs ()
      max_convs = 0;
      cur_conv = -1;
 }
+
