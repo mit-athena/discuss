@@ -39,8 +39,10 @@
 	request		list, "List transactions.",
 			list, ls;
 
-	request		nlist, "New list command.",
-			nlist, nls, (dont_list);
+# ****NOTE **** Before you re-enable this, change the name from nlist(), since
+#this conflicts with the libc routine nlist() 
+#	request		nlist, "New list command.",
+#			nlist, nls, (dont_list);
 
 	request		ss_help, "Show help file on topic.",
 			help;
