@@ -1,11 +1,14 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/rn.c,v $
- *	$Author: raeburn $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/rn.c,v 1.6 1989-01-05 01:58:44 raeburn Exp $
+ *	$Author: srz $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/rn.c,v 1.7 1989-05-08 02:47:31 srz Exp $
  *
  *	Copyright (C) 1987 by the Massachusetts Institute of Technology
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.6  89/01/05  01:58:44  raeburn
+ * replaced included header files with <discuss/discuss.h>
+ * 
  * Revision 1.5  88/04/21  16:04:46  srz
  * Added ^R to redisplay current transaction (courtesy of jik)
  * 
@@ -27,7 +30,7 @@
 
 #ifndef lint
 static char rcsid_update_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/rn.c,v 1.6 1989-01-05 01:58:44 raeburn Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/rn.c,v 1.7 1989-05-08 02:47:31 srz Exp $";
 #endif /* lint */
 
 #include <discuss/discuss.h>
@@ -111,7 +114,7 @@ first_meeting:
 		        printf("\n");
 			switch (cmd) {
 			case 'q':
-				goto punt;
+				goto done;
 			case ' ':
 			case 'n':
 				if (dsc_public.current == 0)
