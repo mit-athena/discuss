@@ -1,20 +1,21 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/announce.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/announce.c,v 1.4 1987-07-17 02:22:00 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/announce.c,v 1.5 1988-10-16 13:51:04 raeburn Exp $
  *	$Locker:  $
  *
  */
 
 #ifndef lint
-static char *rcsid_announce_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/announce.c,v 1.4 1987-07-17 02:22:00 srz Exp $";
+static char rcsid_announce_c[] =
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/announce.c,v 1.5 1988-10-16 13:51:04 raeburn Exp $";
 #endif lint
 
 #include <stdio.h>
 #include <sys/file.h>
-#include "tfile.h"
-#include "interface.h"
-#include "dsname.h"
-#include "dsc_et.h"
+#include <discuss/tfile.h>
+#include <discuss/interface.h>
+#include <discuss/dsname.h>
+#include <discuss/dsc_et.h>
 
 #define min(x,y) ((x)<(y)?(x):(y))
 
