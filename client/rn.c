@@ -7,10 +7,13 @@
  */
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/rn.c,v $
- *	$Author: probe $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/rn.c,v 1.13 1993-03-07 06:25:39 probe Exp $
+ *	$Author: miki $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/rn.c,v 1.14 1994-03-25 16:32:55 miki Exp $
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.13  93/03/07  06:25:39  probe
+ * Yet one more syntax error fixed.
+ * 
  * Revision 1.12  93/03/07  06:24:04  probe
  * Fixed a couple syntax errors introduced in the last patch.
  * 
@@ -53,7 +56,7 @@
 
 #ifndef lint
 static char rcsid_update_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/rn.c,v 1.13 1993-03-07 06:25:39 probe Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/rn.c,v 1.14 1994-03-25 16:32:55 miki Exp $";
 #endif /* lint */
 
 #include <discuss/discuss.h>
@@ -288,7 +291,7 @@ more_break(prompt, cmds)
 			buf[0] = 'q';
 			break;
 		}
-		if (index(cmds, buf[0]))
+		if (strchr(cmds, buf[0]))
 			break;
 		write(1, "\7", 1);
 	}

@@ -16,14 +16,14 @@
  *	command line, in which case they are used as meeting announcements.
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.28 1993-04-28 10:58:33 miki Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.29 1994-03-25 16:32:25 miki Exp $
  *	$Locker:  $
  *
  */
 
 #ifndef lint
 static char rcsid_addmtg_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.28 1993-04-28 10:58:33 miki Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.29 1994-03-25 16:32:25 miki Exp $";
 #endif lint
 
 #include <string.h>
@@ -161,14 +161,14 @@ add_mtg(argc, argv)
 	if (user[0] != '\0')
 		strcpy(auser_id, user);
 	{
-		register char *at = index(auser_id, '@');
+		register char *at = strchr(auser_id, '@');
 		if (at) *at = '\0';
 	}
 	strcat(auser_id, "@");
 	if (realm[0] != '\0')
 		strcat(auser_id, realm);
 	else
-		strcat(auser_id, index(user_id, '@')+1);
+		strcat(auser_id, strchr(user_id, '@')+1);
 
 	if (!have_names) {
 		(void) fprintf(stderr,
@@ -182,7 +182,7 @@ add_mtg(argc, argv)
 	/* add the meeting names we're given */
 	for (i = 1; i < argc; i++) {
 	     if (!used[i]) {
-		  if ((pathp = index (argv[i], ':')) != NULL) {
+		  if ((pathp = strchr (argv[i], ':')) != NULL) {
 		       hostp = argv[i];
 		       *pathp++ = '\0';	
 		       sprintf(cerror, "Adding meeting %s:%s", hostp,pathp);
@@ -344,9 +344,9 @@ int *code;
 	  }
 	  goto punt;
      }
-     short_name = rindex(path,'/');
+     short_name = strrchr(path,'/');
      if (!short_name)
-	  short_name = rindex(path,':');
+	  short_name = strrchr(path,':');
      nbp -> aliases = (char **)calloc(3, sizeof(char *));
      nbp -> aliases[0] = malloc(strlen(m_info.long_name)+1);
      strcpy(nbp -> aliases[0], m_info.long_name);
@@ -441,14 +441,14 @@ del_mtg(argc, argv)
 	if (user[0] != '\0')
 		strcpy(auser_id, user);
 	{
-		register char *at = index(auser_id, '@');
+		register char *at = strchr(auser_id, '@');
 		if (at) *at = '\0';
 	}
 	strcat(auser_id, "@");
 	if (realm[0] != '\0')
 		strcat(auser_id, realm);
 	else
-		strcat(auser_id, index(user_id, '@')+1);
+		strcat(auser_id, strchr(user_id, '@')+1);
 
 	if (!have_names) {
 		(void) fprintf(stderr,

@@ -7,9 +7,12 @@
  */
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list_acl.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list_acl.c,v 1.10 1989-06-02 23:37:37 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list_acl.c,v 1.11 1994-03-25 16:33:45 miki Exp $
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.10  89/06/02  23:37:37  srz
+ * Added standard copyright notice.
+ * 
  * Revision 1.9  89/01/05  01:20:31  raeburn
  * replaced included header files with <discuss/discuss.h>
  * 
@@ -46,7 +49,7 @@
 
 #ifndef lint
 static char rcsid_list_acl_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list_acl.c,v 1.10 1989-06-02 23:37:37 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list_acl.c,v 1.11 1994-03-25 16:33:45 miki Exp $";
 #endif lint
 
 #include <string.h>
@@ -127,7 +130,7 @@ set_acl(argc, argv)
 	if(!strcmp("null", argv[1])) modes = "";
 	else modes = argv[1];
 
-	if (strcmp(argv[2],"*") != 0 && index(argv[2], '@') == 0) {
+	if (strcmp(argv[2],"*") != 0 && strchr(argv[2], '@') == 0) {
 		strcpy(buf, argv[2]);
 		strcat(buf, "@");
 		strcat(buf, local_realm());
@@ -156,7 +159,7 @@ del_acl(argc, argv)
 	}
 
         while(++argv,--argc) {
-		if (strcmp(*argv,"*") != 0 && index(*argv, '@') == 0) {
+		if (strcmp(*argv,"*") != 0 && strchr(*argv, '@') == 0) {
 			strcpy(buf, *argv);
 			strcat(buf, "@");
 			strcat(buf, local_realm());
