@@ -1,5 +1,5 @@
 ;;;	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v $
-;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.7 1988-11-08 06:50:38 raeburn Exp $
+;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.8 1988-11-08 07:28:26 raeburn Exp $
 ;;;
 ;;;  Emacs lisp code to remote control a "discuss" shell process to
 ;;;  provide an emacs-based interface to the discuss conferencing system.
@@ -8,6 +8,10 @@
 ;;;  Written by Stan Zanarotti and Bill Sommerfeld.
 ;;;
 ;;;  $Log: not supported by cvs2svn $
+; Revision 1.7  88/11/08  06:50:38  raeburn
+; Fixed nref code not to reference variable "prev"; changed
+; output-transaction routine to default to <mtg-name>.trans.
+; 
 ; Revision 1.6  88/11/08  06:24:10  raeburn
 ; Removed some old comments; made "C-u M-x discuss" not list meetings,
 ; but accept meeting name; caused quit to send "(quit)" and disown
@@ -68,7 +72,7 @@ meetings")
 (defvar discuss-cont nil
   "Internal hook to call when discuss subprocess is done.")
 
-(defvar discuss-in-process nil
+(defvar discuss-in-progress nil
   "t if a request to the slave subprocess is outstanding")
 
 (defvar discuss-form nil
@@ -249,7 +253,7 @@ a	Add meeting.  Not implemented yet."
     ; go bash discuss-shell-buffer
     (set-buffer discuss-shell-buffer)
     (let ((proc (get-buffer-process (buffer-name))))
-      (send-string proc "(quit)")
+      (send-string proc "(quit)\n")
       (set-process-buffer proc nil)	; Fly, be free!
       (kill-buffer discuss-shell-buffer)
       (setq discuss-shell-buffer nil)))
@@ -285,21 +289,20 @@ a	Add meeting.  Not implemented yet."
   (setq discuss-output-last-file (concat discuss-current-meeting ".trans")))
 
 (defun discuss-end-of-goto ()
-  (let ((last (nth 4 discuss-form))
-	(highest-seen (nth 11 discuss-form)))
+  (let ((last (nth 4 discuss-form)))
+    (setq discuss-highest-seen (nth 11 discuss-form))
     (message "%s meeting: %d new, %d last."
 	     (cadr discuss-form)
-	     (- last highest-seen)
+	     (- last discuss-highest-seen)
 	     last)
     (set-buffer discuss-cur-mtg-buf)
     (setq discuss-current-meeting-info discuss-form)
-    (setq discuss-highest-seen highest-seen)
     (cond ((not (zerop discuss-current-transaction)) nil)
 	  ((zerop (nth 3 discuss-form)) (error "Empty meeting."))
-	  ((or (zerop highest-seen) (>= highest-seen last))
+	  ((or (zerop discuss-highest-seen) (>= discuss-highest-seen last))
 	   (discuss-show-trn last))
 	  (t (discuss-send-cmd (format "(nut %d %s)\n"
-				       highest-seen
+				       discuss-highest-seen
 				       discuss-current-meeting)
 			       'discuss-next-goto
 			       'discuss-read-form)))))
@@ -526,7 +529,7 @@ a	Add meeting.  Not implemented yet."
 ; run this at each load
 (defun discuss-initialize nil
   (setq discuss-version
-	"$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.7 1988-11-08 06:50:38 raeburn Exp $")
+	"$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.8 1988-11-08 07:28:26 raeburn Exp $")
 
 ;;; Keymaps, here at the end, where the trash belongs..
 
