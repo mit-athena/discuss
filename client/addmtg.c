@@ -1,12 +1,12 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.13 1987-06-27 01:51:14 spook Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.14 1987-07-07 21:31:57 srz Exp $
  *	$Locker:  $
  *
  */
 
 #ifndef lint
-static char *rcsid_addmtg_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.13 1987-06-27 01:51:14 spook Exp $";
+static char *rcsid_addmtg_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.14 1987-07-07 21:31:57 srz Exp $";
 #endif lint
 
 #include <strings.h>
@@ -16,6 +16,7 @@ static char *rcsid_addmtg_c = "$Header: /afs/dev.mit.edu/source/repository/athen
 #include "types.h"
 #include "interface.h"
 #include "globals.h"
+#include "dsc_et.h"
 
 extern char *malloc(), *calloc();
 extern tfile unix_tfile();
@@ -218,9 +219,14 @@ int trn_no;
 	nb.aliases = (char **)NULL;
 	dsc_get_mtg_info(&nb, &m_info, &code);
 	if (code) {
-		sprintf(cerror,
-			"Can't get meeting info for transaction [%04d]",
-			trn_no);
+	        if (code == NO_ACCESS) {
+		        sprintf(cerror,
+				"Error adding meeting in transaction [%04d]",trn_no);
+		        code = CANT_ATTEND;		/* friendlier error msg */
+		} else
+		        sprintf(cerror,
+				"Can't get meeting info for transaction [%04d]",
+				trn_no);
 		goto lose;
 	}
 
@@ -258,6 +264,8 @@ add_the_mtg(host,nb,tran,code)
 
 	dsc_get_mtg_info(nb, &dsc_temp.m_info,code);
 	if (*code) {
+	        if (*code == NO_ACCESS)
+		        *code = CANT_ATTEND;		/* friendlier error msg */
 		if (tran)
 			sprintf(cerror,"Transaction [%04d] ",tran);
 		else
@@ -357,6 +365,11 @@ del_mtg(argc, argv)
 				ss_perror(sci_idx, code, argv[i]);
 				continue;
 			}
+			/* If we're attending the meeting we're deleting,
+			   we leave it, so than we don't accidentally
+			   add it again when we leave it */
+			if (dsc_public.attending && !strcmp (nb.aliases[0], dsc_public.nb.aliases[0]))
+			     leave_mtg();
 			nb.status |= DSC_ST_DELETED;
 			dsc_update_mtg_set(auser_id, &nb, 1, &code);
 			if (code) {
