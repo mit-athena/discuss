@@ -46,7 +46,7 @@ int procno;
      bool b1;
      tfile t1,mem_tfile();
      int result;
-     Acl *list;
+     dsc_acl *list;
      trn_info tinfo;
      mtg_info minfo;
 
@@ -316,9 +316,9 @@ mtg_info *minfo;
  *	send_acl -- Send an access control list.
  */
 send_acl(acl)
-	Acl *acl;
+	dsc_acl *acl;
 {
-	register acl_entry *ae;
+	register dsc_acl_entry *ae;
 	register int n;
 
 	if (!acl) {
