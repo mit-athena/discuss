@@ -11,13 +11,16 @@
 /*
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/stubs.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/stubs.c,v 1.9 1987-10-06 02:36:45 spook Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/stubs.c,v 1.10 1988-10-16 14:04:50 raeburn Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
  * stubs.c -- These are stubs that handle the calling of routines.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.9  87/10/06  02:36:45  spook
+ * Fixed error detected by High C compiler.
+ * 
  * Revision 1.8  87/07/20  20:57:47  srz
  * Changed name of whoami to dwhoami (too generic of a name)
  * 
@@ -33,19 +36,19 @@
  *
  */
 #ifndef lint
-static char *rcsid_stubs_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/stubs.c,v 1.9 1987-10-06 02:36:45 spook Exp $";
+static char *rcsid_stubs_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/stubs.c,v 1.10 1988-10-16 14:04:50 raeburn Exp $";
 #endif lint
 
 /* Derived from CORE.PAS 06/21/86 by SRZ */
 
-#include "../include/interface.h"
-#include "../include/rpc.h"
-#include "../include/tfile.h"
-#include "../include/acl.h"
+#include <discuss/interface.h>
+#include <discuss/rpc.h>
+#include <discuss/tfile.h>
+#include <discuss/acl.h>
 
 extern bool recvbool();
 extern char *recvstr();
-Acl *recv_acl();
+dsc_acl *recv_acl();
 
 static char discuss[] = "discuss";
 
@@ -324,9 +327,8 @@ int *result;
 get_acl(mtg_name, result, list)
 	char *mtg_name;
 	int *result;		/* RETURN */
-	Acl **list;		/* RETURN */
+	dsc_acl **list;		/* RETURN */
 {
-
 	startsend(GET_ACL);
 	rpccheck;
 	sendstr(mtg_name);
@@ -481,20 +483,20 @@ mtg_info *minfo;
      minfo -> access_modes = recvstr ();
 }
 
-Acl *
-recv_acl()
+dsc_acl *recv_acl()
 {
         char *malloc();
 	/* The following code would lose points in 6.170... */
-	register Acl *result = (Acl *) malloc(sizeof(Acl));
-	register acl_entry *ae;
+	register dsc_acl *result = (dsc_acl *) malloc(sizeof(dsc_acl));
+	register dsc_acl_entry *ae;
 	register unsigned int len;
 	len = recvint();
 	result->acl_length = len;
 	if (len > 1000) /* Bogus! */ {
 		/*XXX Put some error checking in here */
 	}
-	result->acl_entries = (acl_entry *) malloc(sizeof(acl_entry) * len);
+	result->acl_entries =
+	    (dsc_acl_entry *) malloc(sizeof(dsc_acl_entry) * len);
 	for (ae = result->acl_entries; len; --len, ++ae) {
 		ae->modes = recvstr();	
 		ae->principal = recvstr();
