@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.in,v 1.1 1999-02-02 20:40:04 kcr Exp $
+# $Id: Makefile.in,v 1.2 1999-02-02 22:36:42 kcr Exp $
 #
 
 SHELL=/bin/sh
@@ -25,10 +25,10 @@ LIBS=../server/acl.o ../libds/libdsk.a ../usp/libusp.a @KRB4_LIBS@ @LIBS@
 ALL_CFLAGS=-I../include ${CPPFLAGS} ${CFLAGS} ${DEFS}
 
 OBJS	= edsc.o parse.o time.o do_quote.o do_trn.o do_mtg.o do_misc.o\
-	do_cache.o version.o $(MACHOBJS)
+	do_cache.o version.o
 
 SRCS	= edsc.c parse.c time.c do_quote.c do_trn.c do_mtg.c do_misc.c\
-	do_cache.c $(MACHSRCS)
+	do_cache.c version.c
 
 .c.o:
 	${CC} -c ${ALL_CFLAGS} $<
@@ -36,7 +36,7 @@ SRCS	= edsc.c parse.c time.c do_quote.c do_trn.c do_mtg.c do_misc.c\
 all: edsc
 
 clean:
-	rm -f edsc *.o
+	rm -f edsc *.o version.h
 
 depend:
 
@@ -50,6 +50,10 @@ install:
 	${INSTALL} -m 444 ${srcdir}/discuss-misc.el ${DESTDIR}${lispdir}
 	${INSTALL} -m 444 ${srcdir}/discuss.el ${DESTDIR}${lispdir}
 
-edsc: newvers.sh $(OBJS)
+version.h: ${SRCS} newvers.sh
 	sh newvers.sh
+
+edsc: $(OBJS)
 	${CC} ${LDFLAGS} -o edsc ${OBJS} ${LIBS}
+
+version.o: version.c version.h
