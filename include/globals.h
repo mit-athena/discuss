@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/include/globals.h,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/include/globals.h,v 1.9 1987-02-08 04:11:59 spook Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/include/globals.h,v 1.10 1987-03-22 04:48:49 spook Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
@@ -21,7 +21,8 @@ struct _dsc_pub {
      trn_nums current;
      trn_nums highest_seen;
      bool attending;
-     char *mtg_uid;				/* meeting uid */
+     char *host;
+     char *path;
      char *mtg_name;				/* meeting name (user) */
      name_blk nb;
      mtg_info m_info;
