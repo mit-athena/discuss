@@ -7,12 +7,15 @@
  */
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tmem.c,v $
- *	$Author: srz $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tmem.c,v 1.3 1989-06-03 00:22:16 srz Exp $
+ *	$Author: miki $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tmem.c,v 1.4 1994-03-25 16:45:04 miki Exp $
  *
  *	tfile module for ``memory'' tfiles. 
  * 
  *	$Log: not supported by cvs2svn $
+ * Revision 1.3  89/06/03  00:22:16  srz
+ * Added standard copyright notice.
+ * 
  * Revision 1.2  89/06/03  00:13:07  srz
  * Ken's changes.
  * 
@@ -23,7 +26,7 @@
 
 #ifndef lint
 static char rcsid_tmem_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tmem.c,v 1.3 1989-06-03 00:22:16 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tmem.c,v 1.4 1994-03-25 16:45:04 miki Exp $";
 #endif lint
 
 #include <errno.h>
@@ -49,9 +52,17 @@ static int iovmove (direct, iovpp, buf, len)
 	while (len > 0) {
 		count = min (iovp->iov_len, len);
 		if (direct == SCATTER) 
+#ifdef POSIX
+			memmove (iovp->iov_base, buf, count);
+#else
 			bcopy (buf, iovp->iov_base, count);
+#endif
 		else
+#ifdef POSIX
+			memmove (buf, iovp->iov_base,  count);
+#else
 			bcopy (iovp->iov_base, buf, count);
+#endif
 		len -= count;
 		moved += count;
 		buf += count;
