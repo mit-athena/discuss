@@ -50,7 +50,7 @@ create an initial .meetings file. */
 
 /* Server to exec (assumed to be in SERVERDIR) */
 #ifndef SERVER
-#define SERVER "/usr/athena/lib/disserve"
+#define SERVER "/usr/athena/etc/disserve"
 #endif
 #ifndef SERVER_LOCAL
 /* this one is path-searched if it doesn't begin with slash... */
@@ -77,7 +77,7 @@ create an initial .meetings file. */
 
 /* Place where dsmail can find dspipe */
 #ifndef DSPIPE
-#define DSPIPE "/usr/local/dspipe"
+#define DSPIPE "/usr/athena/bin/dspipe"
 #endif
 
 /* dsc_setup command */
