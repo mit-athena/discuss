@@ -146,7 +146,11 @@ unsigned        len;
 	   as a sub-block.  Thhen flush <us_outbuf> and put more bytes of
 	   <buf> into it */
 
+#ifdef POSIX
+      memmove(us->us_outbuf + us->us_nsent_sub_block_bytes, buf, avail);
+#else
 	bcopy(buf, us->us_outbuf + us->us_nsent_sub_block_bytes, avail);
+#endif
 	len -= avail;
 	buf += avail;
 	us->us_nsent_sub_block_bytes += avail;
@@ -159,7 +163,11 @@ unsigned        len;
 
     /* put rest of <buf> into <us->us_outbuf> */
 
+#ifdef POSIX
+     memmove(us->us_outbuf + us->us_nsent_sub_block_bytes, buf, len);
+#else
     bcopy(buf, us->us_outbuf + us->us_nsent_sub_block_bytes, len);
+#endif
     us->us_nsent_sub_block_bytes += len;
     return(SUCCESS);
 }
