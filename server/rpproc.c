@@ -9,11 +9,14 @@
 /*
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/rpproc.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/rpproc.c,v 1.6 1988-10-08 01:41:53 raeburn Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/rpproc.c,v 1.7 1989-01-29 13:38:23 srz Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.6  88/10/08  01:41:53  raeburn
+ * Ensured that /dev/null file descriptor really is 1.
+ * 
  * Revision 1.5  88/07/04  08:06:10  raeburn
  * Fixed names used in Kerberos library, to be compatible with new
  * library.
@@ -46,14 +49,14 @@
 #include <netdb.h>
 #include <errno.h>
 #include <pwd.h>
-#include <strings.h>
+#include <string.h>
 #ifdef KERBEROS
 #include <krb.h>
 #endif
-#include "../include/tfile.h"
-#include "../include/rpc.h"
-#include "../include/types.h"
-#include "../include/config.h"
+#include <discuss/tfile.h>
+#include "rpc.h"
+#include <discuss/types.h>
+#include "config.h"
 
 #define SUCCESS 1
 #define ERROR   -1
@@ -272,7 +275,7 @@ recvit (code)
 {
     USPCardinal bt;
     int procno;
-    
+
     if (USP_rcv_blk(us, &bt) != SUCCESS) {
 	if (errno = ECONNRESET) {		/* he went away, so do we */
 	    *code = errno;
@@ -280,9 +283,9 @@ recvit (code)
 	*code = errno;
 	return;
     }
-    
+
     procno = bt - PROC_BASE;
-    
+
     if (procno == 0) {
 	*code = RPC_PROTOCOL;
 	return;
@@ -293,7 +296,7 @@ recvit (code)
 	*code = 0;
 	return;
     }
-    
+
     rpc_err = 0;
     dispatch (procno);
     *code = rpc_err;
