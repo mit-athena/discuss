@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v 1.6 1988-02-07 12:57:15 balamac Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v 1.7 1988-04-22 21:21:03 srz Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
@@ -11,7 +11,7 @@
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v 1.6 1988-02-07 12:57:15 balamac Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v 1.7 1988-04-22 21:21:03 srz Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -25,9 +25,6 @@ static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athe
 #include "rpc.h"
 #include "globals.h"
 #include "acl.h"
-#ifdef	ZEPHYR
-#include "zephyr.h"
-#endif	/* ZEPHYR */
 
 /* EXTERNAL ROUTINES */
 
@@ -50,12 +47,7 @@ repl(argc, argv)
 	char *trans = NULL;
 	char *mtg = NULL;
 	char *myname = NULL;
-#ifdef	ZEPHYR
-	ZNotice_t notice;
-	char buf[1024];
-#endif	/* ZEPHYR */
-	char announcement[1024];
-	
+
 	while (++argv, --argc) {
 		if (!strcmp (*argv, "-meeting") || !strcmp (*argv, "-mtg")) {
 			if (argc==1) {
@@ -102,6 +94,12 @@ repl(argc, argv)
 
 	if (!dsc_public.attending) {
 		ss_perror(sci_idx, 0, "No current meeting.\n");
+		return;
+	}
+	dsc_get_mtg_info(&dsc_public.nb,
+			 &dsc_public.m_info, &code);
+	if (code != 0) {
+		(void) ss_perror(sci_idx, code, "Can't get meeting info");
 		return;
 	}
 
@@ -188,28 +186,8 @@ repl(argc, argv)
 		goto abort;
 	}
  
-	(void) sprintf(announcement,
-		       "Transaction [%04d] entered in the %s meeting.",
+	(void) printf("Transaction [%04d] entered in the %s meeting.",
 		       txn_no, dsc_public.mtg_name);
-#ifdef	ZEPHYR
-	notice.z_kind = UNSAFE;
-	notice.z_port = 0;
-	notice.z_class = "discuss";
-	notice.z_class_inst = buf;
-	(void) sprintf(buf, "%s:%s", dsc_public.nb.hostname,
-		       dsc_public.nb.pathname);
-
-	notice.z_opcode = "reply";
-	notice.z_sender = 0;
-	notice.z_recipient = "";
-	notice.z_message = announcement;
-	notice.z_message_len = strlen(announcement)+1;
-	
-	ZInitialize();
-	ZSendNotice(&notice, ZNOAUTH);
-#endif	/* ZEPHYR */
-
-	(void) printf("%s\n", announcement);
 
 	dsc_public.current = orig_trn;
 
