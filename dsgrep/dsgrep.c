@@ -8,7 +8,7 @@
 
 #ifndef lint
 #ifndef SABER
-static char *RCSid = "$Id: dsgrep.c,v 1.14 1999-04-28 01:51:46 danw Exp $";
+static char *RCSid = "$Id: dsgrep.c,v 1.15 1999-05-12 17:34:01 danw Exp $";
 #endif
 #endif
 
@@ -153,8 +153,7 @@ main(argc,argv)
     for(i=optind;i<argc;i++) {
       dsc_expand_mtg_set(NULL,argv[i],&tmp_mtg,&n_meetings,&result);
       if ((n_meetings == 0) && (result == 0)) {
-	fprintf(stderr,"dsgrep: no such meeting %s in %s\n",argv[i],
-		meetings_file);
+	fprintf(stderr,"dsgrep: no such meeting %s\n",argv[i]);
 	continue;
       }
       if (result != 0) {
