@@ -1,10 +1,13 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.7 1987-01-12 04:15:47 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.8 1987-03-22 04:21:46 spook Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.7  87/01/12  04:15:47  wesommer
+ * Replaced an fprintf(stderr, ...) with a call to log_warning.
+ * 
  * Revision 1.6  87/01/09  20:51:00  srz
  * Added modules to rpc mechanism.
  * 
@@ -20,42 +23,47 @@
  */
 
 #ifndef lint
-static char *rcsid_interface_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.7 1987-01-12 04:15:47 wesommer Exp $";
+static char *rcsid_interface_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.8 1987-03-22 04:21:46 spook Exp $";
 #endif lint
 
 #include <stdio.h>
-#include "../include/tfile.h"
-#include "../include/interface.h"
-#include "../include/acl.h"
+#include "tfile.h"
+#include "interface.h"
+#include "acl.h"
+#include <errno.h>
+#include "dsname.h"
+
+/* for linked list of meetings */
+
+#define same_str(s1,s2)		((s1==s2)||!strcmp(s1,s2))
+/* note -- first must be (name_blk *), second must be (meeting *) */
+#define	same_mtg(nbp,mtg)\
+	(same_str(nbp->hostname,mtg->host)&&same_str(nbp->pathname,mtg->path))
 
 typedef struct _meeting {
 	struct _meeting *next;
 	struct _meeting *prev;
-	char *unique_id;
-	char *name;
+	char *host, *path;
 	char *module;
 } meeting;
 
 extern char *malloc();
-extern char *new_string();
 
-static int initialized = 0;
 static meeting *meeting_list = (meeting *)NULL;
 meeting *cmtg = (meeting *) NULL;
-#define	mtg_name (cmtg->name)
+#define	mtg_name (cmtg->path)
 
 #define	FREE(ptr) { if (ptr) free(ptr); }
 
 static
-select_meeting(mtg_uid, code_ptr)
-	char *mtg_uid;
+select_meeting(nbp, code_ptr)
+	name_blk *nbp;
 	int *code_ptr;
 {
-	char *host, *path;
-	char *current_host;
 	register meeting *mp;
 	extern int errno;
 	int is_fatal;
+	static int initialized = 0;
 
 	*code_ptr = 0;
 	if (!initialized) {
@@ -67,26 +75,23 @@ select_meeting(mtg_uid, code_ptr)
 	 * Is the current meeting one which we've talked to recently?
 	 */
 	for (mp = meeting_list; mp; mp = mp->next) {
-		if (mp->unique_id == mtg_uid 
-		|| !strcmp(mp->unique_id, mtg_uid))
+		if (same_mtg(nbp, mp))
 			break;
 	}
 	if (!mp) {
-		get_mtg_location(mtg_uid, &host, &path, code_ptr);
-		if (*code_ptr) return;
-
 		if (!(mp = (meeting *)malloc(sizeof (meeting)))) {
 		        *code_ptr = errno;
 			return;
 		}
 
-		mp -> module = malloc (strlen (host) + 9);
+		mp -> module = malloc (strlen (nbp->hostname) + 9);
 		strcpy (mp -> module , "discuss@");
-		strcpy (&(mp -> module [8]), host);
-		FREE(host);
+		strcpy (&(mp -> module [8]), nbp->hostname);
 
- 		mp->unique_id = new_string(mtg_uid);
-		mp->name = path;
+ 		mp->host = malloc(strlen(nbp->hostname)+1);
+		strcpy(mp->host, nbp->hostname);
+		mp->path = malloc(strlen(nbp->pathname)+1);
+		strcpy(mp->path, nbp->pathname);
 		/* link 'em up.. */
 		mp->next = meeting_list;
 		mp->prev = NULL;
@@ -99,52 +104,52 @@ select_meeting(mtg_uid, code_ptr)
 	set_module (mp->module, &is_fatal, code_ptr);
 	cmtg = mp;
 	if (*code_ptr && !is_fatal) {
-	     char buf[100];
-	     sprintf(buf, "while connecting to %s", mp->module);
-	     log_warning(*code_ptr, buf);
-	     *code_ptr = 0;
+		char buf[100];
+		sprintf(buf, "while connecting to %s", mp->module);
+		log_warning(*code_ptr, buf);
+		*code_ptr = 0;
 	}
 }
 
-dsc_add_trn(mtg_uid, text, subject, reply_trn, result_trn, code_ptr)
-	char *mtg_uid;
+dsc_add_trn(nbp, text, subject, reply_trn, result_trn, code_ptr)
+	name_blk *nbp;
 	tfile text;
 	char *subject;
-	trn_nums reply_trn, result_trn;
+	trn_nums reply_trn, *result_trn;
 	int *code_ptr;
 {
-	select_meeting(mtg_uid, code_ptr);
+	select_meeting(nbp, code_ptr);
 	if (*code_ptr) return;
 	add_trn(mtg_name, text, subject, reply_trn, result_trn, code_ptr);
 }
 
-dsc_get_trn_info(mtg_uid, trn, info, code_ptr)
-	char *mtg_uid;
+dsc_get_trn_info(nbp, trn, info, code_ptr)
+	name_blk *nbp;
 	trn_nums trn;
 	trn_info *info;
 	int *code_ptr;
 {
-	select_meeting(mtg_uid, code_ptr);
+	select_meeting(nbp, code_ptr);
 	if (*code_ptr) return;
 	get_trn_info(mtg_name, trn, info, code_ptr);
 }
 
-dsc_delete_trn(mtg_uid, trn, code_ptr)
-	char *mtg_uid;
+dsc_delete_trn(nbp, trn, code_ptr)
+	name_blk *nbp;
 	trn_nums trn;
 	int *code_ptr;
 {
-	select_meeting(mtg_uid, code_ptr);
+	select_meeting(nbp, code_ptr);
 	if (*code_ptr) return;
 	delete_trn(mtg_name, trn, code_ptr);
 }
 
-dsc_retrieve_trn(mtg_uid, trn, code_ptr)
-	char *mtg_uid;
+dsc_retrieve_trn(nbp, trn, code_ptr)
+	name_blk *nbp;
 	trn_nums trn;
 	int *code_ptr;
 {
-	select_meeting(mtg_uid, code_ptr);
+	select_meeting(nbp, code_ptr);
 	if (*code_ptr) return;
 	retrieve_trn(mtg_name, trn, code_ptr);
 }
@@ -157,106 +162,88 @@ dsc_create_mtg(host, location, name, public, hidden, code_ptr)
 {
 	/* mumble */
 	/* hand back mtg_uid */
+	*code_ptr = EACCES;
 }
 
-dsc_get_mtg_info(mtg_uid, info, code_ptr)
-	char *mtg_uid;
+dsc_get_mtg_info(nbp, info, code_ptr)
+	name_blk *nbp;
 	mtg_info *info;
 	int *code_ptr;
 {
-	select_meeting(mtg_uid, code_ptr);
+	select_meeting(nbp, code_ptr);
 	if (*code_ptr) return;
 	get_mtg_info(mtg_name, info, code_ptr);
 }
 
 
-dsc_get_trn(mtg_uid, trn, dest, code_ptr)
-	char *mtg_uid;
+dsc_get_trn(nbp, trn, dest, code_ptr)
+	name_blk *nbp;
 	trn_nums trn;
 	tfile dest;
 	int *code_ptr;
 {
-	select_meeting(mtg_uid, code_ptr);
+	select_meeting(nbp, code_ptr);
 	if (*code_ptr) return;
 	get_trn(mtg_name, trn, dest, code_ptr);
 }
 
-dsc_remove_mtg(mtg_uid, code_ptr)
-	char *mtg_uid;
+dsc_remove_mtg(nbp, code_ptr)
+	name_blk *nbp;
 	int *code_ptr;
 {
-	select_meeting(mtg_uid, code_ptr);
+	select_meeting(nbp, code_ptr);
 	if (*code_ptr) return;
 	remove_mtg(mtg_name, code_ptr);
 }
 
-dsc_updated_mtg (mtg_uid, date_attended, last, updated, result)
-char *mtg_uid;
-int date_attended, last;
-bool *updated;
-int *result;
+dsc_updated_mtg (nbp, updated, result)
+	name_blk *nbp;
+	bool *updated;
+	int *result;
 {
-     select_meeting(mtg_uid, result);
-     if (*result) return;
-     updated_mtg(mtg_name, date_attended, last, updated, result);
+	select_meeting(nbp, result);
+	if (*result) return;
+	updated_mtg(mtg_name, nbp->date_attended, nbp->last, updated, result);
 }
 
-dsc_get_acl (mtg_uid, result, list)
-	char *mtg_uid;
+dsc_get_acl (nbp, result, list)
+	name_blk *nbp;
 	int *result;	
 	Acl **list;
 {	
-	select_meeting(mtg_uid, result);
+	select_meeting(nbp, result);
 	if(*result) return;
 	get_acl(mtg_name, result, list);
 }
 
-dsc_get_access (mtg_uid, princ, modes, result)
-	char *mtg_uid;
+dsc_get_access (nbp, princ, modes, result)
+	name_blk *nbp;
 	char *princ;
-	char *modes;
+	char **modes;
 	int *result;
 {
-	select_meeting(mtg_uid, result);
+	select_meeting(nbp, result);
 	if (*result) return;
 	get_access(mtg_name, princ, modes, result);
 }
 
-dsc_set_access (mtg_uid, princ, modes, result)
-	char *mtg_uid;
+dsc_set_access (nbp, princ, modes, result)
+	name_blk *nbp;
 	char *princ;
 	char *modes;
 	int *result;
 {
-	select_meeting(mtg_uid, result);
+	select_meeting(nbp, result);
 	if (*result) return;
 	set_access(mtg_name, princ, modes, result);
 }
 
-dsc_delete_access (mtg_uid, princ, result)
-	char *mtg_uid;
+dsc_delete_access (nbp, princ, result)
+	name_blk *nbp;
 	char *princ;
 	int *result;
 {
-	select_meeting(mtg_uid, result);
+	select_meeting(nbp, result);
 	if (*result) return;
 	delete_access(mtg_name, princ, result);
-}
-
-/*
- *
- * new_string (s)  --   Routine to create a copy of the given string, using
- *		      	malloc.
- *
- */
-char *new_string (s)
-char *s;
-{
-     int len;
-     char *newstr;
-
-     len = strlen (s) + 1;
-     newstr = malloc (len);
-     strcpy (newstr, s);
-     return (newstr);
 }

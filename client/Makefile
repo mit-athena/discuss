@@ -6,29 +6,17 @@ LFLAGS=	-uhv -I../include
 
 OBJS=	discuss.o edit.o output.o trn_expr.o list.o trn_select.o \
 	status.o new_trans.o print.o lsm.o addmtg.o list_acl.o \
-	interrupt.o \
+	interrupt.o goto.o reply.o \
 	cmds.o ../ets/discuss_err.o
 
 SRCS=	discuss.c edit.c output.c trn_expr.c list.c trn_select.c \
 	status.c new_trans.c print.c lsm.c addmtg.c list_acl.c \
-	interrupt.c
+	interrupt.c goto.c reply.c
 
-.SUFFIXES:	.ct .h .et
+.SUFFIXES:	.ct .h
 
 .ct.o:	
 	./make_commands $*.ct
-	cc -R -O -c $*.c
-	-rm -f $*.c
-
-.et.o:	# how to say that this regenerates .h files too?
-	../et/compile_et $*.et
-	cc -R -O -c $*.c
-	-rm -f $*.c
-
-.et.h:
-	../et/compile_et $*.et
-	cc -R -O -c $*.c
-	-rm -f $*.c
 
 .y.o:	
 	-rm -f $*.c $*.o
@@ -79,7 +67,7 @@ dist:	$(SRCS) Makefile make_commands libss.a trn_expr.y cmds.ct
 
 # 'make depend' code
 CFILES=	$(SRCS)
-depend: 
+depend: ${CFILES}
 	${CC} -M -I../include ${COPTS} ${CFILES} | \
 	sed -e ':loop' \
 	    -e 's/\.\.\/[^ /]*\/\.\./../' \
@@ -100,11 +88,11 @@ depend:
 
 discuss.o: discuss.c /usr/include/stdio.h /usr/include/sys/file.h
 discuss.o: /usr/include/signal.h /usr/include/strings.h /usr/include/sys/wait.h
-discuss.o: ./ss.h ./ss_err.h ../include/tfile.h ../include/interface.h
-discuss.o: ../include/types.h ../include/config.h ../include/rpc.h
-discuss.o: /usr/include/stdio.h ../include/usp.h ../include/usp_et.h
-discuss.o: ../include/rpc_et.h ../include/globals.h ../include/dsname.h
-discuss.o: ../include/acl.h ../include/types.h
+discuss.o: /usr/include/pwd.h ./ss.h ./ss_err.h ../include/tfile.h
+discuss.o: ../include/interface.h ../include/types.h ../include/config.h
+discuss.o: ../include/rpc.h /usr/include/stdio.h ../include/usp.h
+discuss.o: ../include/usp_et.h ../include/rpc_et.h ../include/globals.h
+discuss.o: ../include/dsname.h ../include/acl.h ../include/types.h
 edit.o: edit.c /usr/include/stdio.h /usr/include/sys/file.h
 edit.o: /usr/include/strings.h /usr/include/signal.h ./ss.h ./ss_err.h
 edit.o: ../include/tfile.h ../include/interface.h ../include/types.h
@@ -145,7 +133,7 @@ lsm.o: lsm.c /usr/include/strings.h /usr/include/stdio.h ../include/types.h
 lsm.o: ../include/interface.h ../include/types.h ../include/globals.h
 lsm.o: ../include/dsname.h
 addmtg.o: addmtg.c /usr/include/strings.h /usr/include/stdio.h
-addmtg.o: /usr/include/fcntl.h ../include/tfile.h ../include/types.h
+addmtg.o: /usr/include/sys/file.h ../include/tfile.h ../include/types.h
 addmtg.o: ../include/interface.h ../include/types.h ../include/globals.h
 addmtg.o: ../include/dsname.h
 list_acl.o: list_acl.c /usr/include/strings.h /usr/include/stdio.h
@@ -153,3 +141,17 @@ list_acl.o: ../include/types.h ../include/interface.h ../include/types.h
 list_acl.o: ../include/acl.h ../include/types.h ../include/globals.h
 list_acl.o: ../include/dsname.h
 interrupt.o: interrupt.c /usr/include/signal.h
+goto.o: goto.c /usr/include/stdio.h /usr/include/sys/file.h
+goto.o: /usr/include/signal.h /usr/include/strings.h /usr/include/sys/wait.h
+goto.o: ./ss.h ./ss_err.h ../include/tfile.h ../include/interface.h
+goto.o: ../include/types.h ../include/config.h ../include/rpc.h
+goto.o: /usr/include/stdio.h ../include/usp.h ../include/usp_et.h
+goto.o: ../include/rpc_et.h ../include/globals.h ../include/dsname.h
+goto.o: ../include/acl.h ../include/types.h
+reply.o: reply.c /usr/include/stdio.h /usr/include/sys/file.h
+reply.o: /usr/include/strings.h /usr/include/sys/wait.h ./ss.h ./ss_err.h
+reply.o: ../include/tfile.h ../include/interface.h ../include/types.h
+reply.o: ../include/config.h ../include/rpc.h /usr/include/stdio.h
+reply.o: ../include/usp.h ../include/usp_et.h ../include/rpc_et.h
+reply.o: ../include/globals.h ../include/dsname.h ../include/acl.h
+reply.o: ../include/types.h

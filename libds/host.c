@@ -36,8 +36,8 @@ register char *str1, *str2;
 
      while (*str1 && *str2) {
 	  if (*str1 == *str2) {
-	       *str1++,*str2++;
-	       continue;
+		  str1++;
+		  str2++;
 	  } else if (isalpha (*str1)) {
 	       c1 = *str1++;
 	       c2 = *str2++;
