@@ -1,6 +1,5 @@
 #include <stdio.h>
-#include "types.h"
-#include "interface.h"
+#include <discuss/discuss.h>
 #include "ss.h"
 #include "globals.h"
 

@@ -1,11 +1,14 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/rn.c,v $
- *	$Author: srz $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/rn.c,v 1.5 1988-04-21 16:04:46 srz Exp $
+ *	$Author: raeburn $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/rn.c,v 1.6 1989-01-05 01:58:44 raeburn Exp $
  *
  *	Copyright (C) 1987 by the Massachusetts Institute of Technology
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.5  88/04/21  16:04:46  srz
+ * Added ^R to redisplay current transaction (courtesy of jik)
+ * 
  * Revision 1.4  88/04/20  16:34:04  srz
  * Added catchup, loop for '?' on first prompt.
  * 
@@ -23,11 +26,11 @@
  */
 
 #ifndef lint
-static char *rcsid_update_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/rn.c,v 1.5 1988-04-21 16:04:46 srz Exp $";
-#endif lint
+static char rcsid_update_c[] =
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/rn.c,v 1.6 1989-01-05 01:58:44 raeburn Exp $";
+#endif /* lint */
 
-#include "types.h"
-#include "interface.h"
+#include <discuss/discuss.h>
 #include "globals.h"
 #include <stdio.h>
 #include <sys/types.h>
@@ -82,7 +85,6 @@ rn(argc, argv, ss_idx)
 	     case ' ':
 	     case 'n':
 		  goto first_meeting;
-		  break;
 	     case '?':
 		  printf("List of possible responses:\n\n");
 		  printf("<space>,n\tNext meeting\n");

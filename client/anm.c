@@ -1,19 +1,19 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/anm.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/anm.c,v 1.4 1987-06-27 01:58:52 spook Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/anm.c,v 1.5 1989-01-05 01:51:19 raeburn Exp $
  *
  */
 
 #ifndef lint
-static char *rcsid_anm_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/anm.c,v 1.4 1987-06-27 01:58:52 spook Exp $";
+static char rcsid_anm_c[] =
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/anm.c,v 1.5 1989-01-05 01:51:19 raeburn Exp $";
 #endif lint
 
-#include "sys/file.h"
+#include <stdio.h>
+#include <sys/file.h>
 #include "ss.h"
-#include "tfile.h"
-#include "interface.h"
+#include <discuss/discuss.h>
 #include "config.h"
-#include "rpc.h"
 #include "globals.h"
 
 extern char *error_message();
