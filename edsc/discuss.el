@@ -1,5 +1,5 @@
 ;;;	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v $
-;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.1 1988-10-24 22:32:58 srz Exp $
+;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.2 1988-10-26 15:17:01 eichin Exp $
 ;;;
 ;;;  Emacs lisp code to remote control a "discuss" shell process to
 ;;;  provide an emacs-based interface to the discuss conferencing system.
@@ -8,6 +8,9 @@
 ;;;  Written by Stan Zanarotti and Bill Sommerfeld.
 ;;;
 ;;;  $Log: not supported by cvs2svn $
+; Revision 1.1  88/10/24  22:32:58  srz
+; Initial revision
+; 
 ;;;	Revision 1.3  86/12/10  16:12:30  srz
 ;;;	Some different keybindings
 ;;;
@@ -49,7 +52,12 @@ meetings")
 
 ;;
 ;;  Determine pathname for subprocess.  Pretty gross, if you ask me.
-(defvar discuss-pathname (format "/mit/discuss/exl/edsc.%s"
+;(defvar discuss-pathname (format "/mit/discuss/exl/edsc.%s"
+;				 (if (equal emacs-build-system "paris")
+;				     "vax"
+;				   "rt"))
+;  "*Name of program to run as slave process for discuss.")
+(defvar discuss-pathname (format "/mit/discuss/%s/edsc"
 				 (if (equal emacs-build-system "paris")
 				     "vax"
 				   "rt"))
@@ -522,3 +530,33 @@ a	Add meeting.  Not implemented yet."
   (define-key discuss-trn-mode-map "?" 'describe-mode)
 ;  (define-key discuss-trn-mode-map "\C-d" 'discuss-trn-delete-backward)
 )
+
+;;; discuss-trn-output mostly stolen from rmail-output...
+;;; converted by [eichin:19881026.1505EST]
+(defvar discuss-output-last-file "discuss.out"
+  "*Default file for discuss saves")
+
+(defun discuss-trn-output (file-name)
+  "Append this message to file named FILE-NAME."
+  (interactive
+   (list
+    (read-file-name
+     (concat "Output message to Unix mail file: (default "
+	     (file-name-nondirectory discuss-output-last-file)
+	     ") ")
+     (file-name-directory discuss-output-last-file)
+     discuss-output-last-file)))
+  (setq file-name (expand-file-name file-name))
+  (setq discuss-output-last-file file-name)
+  (let ((discuss-trn-buf (current-buffer))
+	(tembuf (get-buffer-create " discuss-trn-output"))
+	(case-fold-search t))
+    (save-excursion
+      (set-buffer tembuf)
+      (erase-buffer)
+      (insert-buffer-substring discuss-trn-buf)
+      (goto-char (point-max))
+      (insert "\n")			;other modifying here as well
+      (append-to-file (point-min) (point-max) file-name))
+    (kill-buffer tembuf)))
+
