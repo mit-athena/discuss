@@ -37,7 +37,7 @@ tfile unix_tfile ();
 char *malloc();
 
 extern char rpc_caller[];
-extern int has_privs;
+extern int has_privs, use_zephyr;
 
 main (argc, argv)
 int argc;
@@ -46,6 +46,7 @@ char **argv;
      int i;
 
      has_privs = TRUE;
+     use_zephyr = 0;
 
      for (i = 1; i < argc; i++) {
 	  if (*argv[i] == '-') switch (argv[i][1]) {
