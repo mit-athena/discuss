@@ -1,10 +1,13 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.12 1987-09-17 02:34:28 spook Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.13 1987-10-23 23:44:10 wesommer Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.12  87/09/17  02:34:28  spook
+ * Removed is_fatal flag.
+ * 
  * Revision 1.11  87/07/20  20:56:26  srz
  * Changed name of whoami to dwhoami (too generic of a name)
  * 
@@ -35,7 +38,7 @@
  */
 
 #ifndef lint
-static char *rcsid_interface_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.12 1987-09-17 02:34:28 spook Exp $";
+static char *rcsid_interface_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.13 1987-10-23 23:44:10 wesommer Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -61,6 +64,7 @@ typedef struct _meeting {
 } meeting;
 
 extern char *malloc();
+extern int errno;
 
 static meeting *meeting_list = (meeting *)NULL;
 meeting *cmtg = (meeting *) NULL;
@@ -68,13 +72,58 @@ meeting *cmtg = (meeting *) NULL;
 
 #define	FREE(ptr) { if (ptr) free(ptr); }
 
+static meeting *create_mblock(host, path, code_ptr)
+	char *host, *path;
+	int *code_ptr;
+{
+	register meeting *mp;
+	
+	*code_ptr = 0;
+
+	if (!(mp = (meeting *)malloc(sizeof (meeting)))) {
+		*code_ptr = errno;
+		return NULL;
+	}
+
+	mp->path = NULL;	/* initialize, for later cleanup */
+	mp->host = NULL;	
+	
+	mp->module = malloc (strlen (host) + 9);
+	if (!mp->module) goto out;
+	
+	strcpy (mp->module , "discuss@");
+	strcpy (&(mp->module [8]), host);
+
+	mp->host = malloc(strlen(host)+1);
+	if (!mp->host) goto out;
+	strcpy(mp->host, host);
+
+	mp->path = malloc(strlen(path)+1);
+	if (!mp->path) goto out;
+	strcpy(mp->path, path);
+
+	/* link 'em up.. */
+	mp->next = meeting_list;
+	mp->prev = NULL;
+	if (meeting_list) meeting_list -> prev = mp;
+	meeting_list = mp;
+	return mp;
+	
+out:
+	*code_ptr = errno;
+	if (mp->host) free(mp->host);
+	if (mp->path) free(mp->path);
+	if (mp->module) free(mp->path);
+	free(mp);
+	return NULL;
+}
+
 static
 select_meeting(nbp, code_ptr)
 	name_blk *nbp;
 	int *code_ptr;
 {
 	register meeting *mp;
-	extern int errno;
 	static int initialized = 0;
 
 	*code_ptr = 0;
@@ -91,25 +140,9 @@ select_meeting(nbp, code_ptr)
 			break;
 	}
 	if (!mp) {
-		if (!(mp = (meeting *)malloc(sizeof (meeting)))) {
-		        *code_ptr = errno;
+		mp = create_mblock(nbp->hostname, nbp->pathname, code_ptr);
+		if (*code_ptr)
 			return;
-		}
-
-		mp -> module = malloc (strlen (nbp->hostname) + 9);
-		strcpy (mp -> module , "discuss@");
-		strcpy (&(mp -> module [8]), nbp->hostname);
-
- 		mp->host = malloc(strlen(nbp->hostname)+1);
-		strcpy(mp->host, nbp->hostname);
-		mp->path = malloc(strlen(nbp->pathname)+1);
-		strcpy(mp->path, nbp->pathname);
-		/* link 'em up.. */
-		mp->next = meeting_list;
-		mp->prev = NULL;
-		if (meeting_list) meeting_list -> prev = mp;
-		meeting_list = mp;
-
 	} else {
 		/*XXX should move mp to head of list.. but not yet */
 	}
@@ -160,16 +193,19 @@ dsc_retrieve_trn(nbp, trn, code_ptr)
 	retrieve_trn(mtg_name, trn, code_ptr);
 }
 
-char *
 dsc_create_mtg(host, location, name, public, hidden, code_ptr)
 	char *host, *location, *name;
 	bool public, hidden;
 	int *code_ptr;
 {
-	/* mumble */
-	/* hand back mtg_uid */
-	*code_ptr = EACCES;
-	return((char *)NULL);
+	register meeting *mp;
+	mp = create_mblock(host, location, code_ptr);
+	if (*code_ptr) return;
+	set_module(mp->module, code_ptr);
+	if (*code_ptr) return;
+	
+	create_mtg(location, name, public, code_ptr);
+	return;
 }
 
 dsc_get_mtg_info(nbp, info, code_ptr)
