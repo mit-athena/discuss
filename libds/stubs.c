@@ -11,13 +11,16 @@
 /*
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/stubs.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/stubs.c,v 1.8 1987-07-20 20:57:47 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/stubs.c,v 1.9 1987-10-06 02:36:45 spook Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
  * stubs.c -- These are stubs that handle the calling of routines.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.8  87/07/20  20:57:47  srz
+ * Changed name of whoami to dwhoami (too generic of a name)
+ * 
  * Revision 1.7  87/07/08  02:00:16  wesommer
  * Added whoami(), dsc_whoami() (the server support was always there.
  * 
@@ -30,7 +33,7 @@
  *
  */
 #ifndef lint
-static char *rcsid_stubs_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/stubs.c,v 1.8 1987-07-20 20:57:47 srz Exp $";
+static char *rcsid_stubs_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/stubs.c,v 1.9 1987-10-06 02:36:45 spook Exp $";
 #endif lint
 
 /* Derived from CORE.PAS 06/21/86 by SRZ */
@@ -398,7 +401,7 @@ dwhoami(ident, result)
 	char **ident;
 	int *result;
 {
-	int *result=0;
+	*result = 0;
 	startsend(WHO_AM_I);
 	rpccheck;
 	sendit(discuss);
