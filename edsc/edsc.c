@@ -8,7 +8,7 @@
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/edsc.c,v 1.4 1988-10-29 01:36:04 balamac Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/edsc.c,v 1.5 1989-05-19 19:17:15 srz Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -20,7 +20,7 @@ static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athe
 #include <pwd.h>
 #include <ctype.h>
 
-#include "discuss.h"
+#include <discuss/discuss.h>
 #include "config.h"
 
 char *malloc();
