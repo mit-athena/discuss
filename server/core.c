@@ -11,7 +11,7 @@
 /*
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.22 1988-09-23 17:15:21 raeburn Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.23 1988-10-08 01:27:54 srz Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
@@ -21,6 +21,9 @@
  *		callable routines.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.22  88/09/23  17:15:21  raeburn
+ * Needs internal.h too.
+ * 
  * Revision 1.21  88/09/23  17:05:04  raeburn
  * Changed type names in accordance with acl.h.
  * 
@@ -59,7 +62,7 @@
  *
  */
 #ifndef lint
-static char *rcsid_core_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.22 1988-09-23 17:15:21 raeburn Exp $";
+static char *rcsid_core_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.23 1988-10-08 01:27:54 srz Exp $";
 #endif lint
 
 
@@ -97,6 +100,7 @@ extern afile a_control_f;
 extern char rpc_caller [];
 extern int errno;
 extern int has_privs;
+extern int no_nuke;
 extern tfile abort_file;
 extern dsc_acl *mtg_acl;
 
@@ -164,11 +168,33 @@ int *result;
 	  }
      }
 
-     a_control_f = aopen (u_control_f);
-     nuclear = TRUE;
+     if (!no_nuke) {
+	  a_control_f = aopen (u_control_f);
+	  nuclear = TRUE;
+     }
 
      *result = read_super ();
      if (*result) { core_abort(); return; }
+
+     if (super.date_created == 0) {	/* Meeting has been expunged */
+	  write_super();
+
+	  if (!no_nuke) {
+	       aclose(a_control_f);
+	       nuclear = 0;
+	  }
+
+	  *result = open_mtg (mtg_name);
+	  if (*result) { core_abort (); return; }
+
+	  if (!no_nuke) {
+	       a_control_f = aopen (u_control_f);
+	       nuclear = TRUE;
+	  }
+
+	  *result = read_super ();
+	  if (*result) { core_abort(); return; }
+     }	  
 
      /* check reply_trn */
      if (reply_trn != 0) {
@@ -293,9 +319,11 @@ int *result;
      /* all done, start winding down */
      write_super();
 
-     fsync(u_trn_f);
-     aclose(a_control_f);
-     nuclear = 0;
+     if (!no_nuke) {
+	  fsync(u_trn_f);
+	  aclose(a_control_f);
+	  nuclear = 0;
+     }
 
      *result = 0;
      *result_trn = cb.current;
@@ -328,8 +356,10 @@ int *result;
 	  core_abort (); return;
      }
 
-     a_control_f = aopen (u_control_f);
-     nuclear = TRUE;
+     if (!no_nuke) {
+	  a_control_f = aopen (u_control_f);
+	  nuclear = TRUE;
+     }
 
      *result = read_super ();
      if (*result) { core_abort(); return; }
@@ -360,8 +390,10 @@ int *result;
 
      write_super();
 
-     aclose(a_control_f);
-     nuclear = 0;
+     if (!no_nuke) {
+	  aclose(a_control_f);
+	  nuclear = 0;
+     }
 
      *result = 0;
      return;
@@ -371,13 +403,6 @@ werror:
      *result = NO_WRITE;
      return;
 }
-
-
-
-
-
-
-
 
 /*
  *
@@ -502,8 +527,10 @@ int *result;
      *result = open_mtg (mtg_name);
      if (*result) return;
 
-     a_control_f = aopen (u_control_f);
-     nuclear = TRUE;
+     if (!no_nuke) {
+	  a_control_f = aopen (u_control_f);
+	  nuclear = TRUE;
+     }
 
      *result = read_super ();
      if (*result) { core_abort(); return; }
@@ -585,8 +612,10 @@ int *result;
 	  super.last = cb.prev;
 
      write_super ();
-     aclose (a_control_f);
-     nuclear = FALSE;
+     if (!no_nuke) {
+	  aclose (a_control_f);
+	  nuclear = FALSE;
+     }
 
      *result = 0;
      return;
@@ -617,8 +646,10 @@ int *result;
      *result = open_mtg (mtg_name);
      if (*result) return;
 
-     a_control_f = aopen (u_control_f);
-     nuclear = TRUE;
+     if (!no_nuke) {
+	  a_control_f = aopen (u_control_f);
+	  nuclear = TRUE;
+     }
 
      *result = read_super ();
      if (*result) { core_abort(); return; }
@@ -775,8 +806,10 @@ int *result;
 	  super.last = cb.current;
 
      write_super ();
-     aclose (a_control_f);
-     nuclear = FALSE;
+     if (!no_nuke) {
+	  aclose (a_control_f);
+	  nuclear = FALSE;
+     }
 
      *result = 0;
      return;
@@ -1150,6 +1183,10 @@ int *result;
      *result = 0;
      if (rmdir (mtg_name) < 0)
 	  *result = CANNOT_REMOVE;
+
+     *result = read_super();
+     super.date_created = 0;
+     write_super();
 
      close (u_trn_f);				/* bombs away */
      close (u_control_f);
