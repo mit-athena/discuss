@@ -34,8 +34,9 @@
 	request		list_meetings, "List meetings.",
 			list_meetings, lsm;
 
-	request		add_mtg, "Add meeting.",
-			add_mtg, am;
+	request		add_mtg,
+			"Add a meeting to list of those to be searched.",
+			add_meeting, add_mtg, am;
 
 	request		list_acl, "List access control list.",
 			list_acl, la;
