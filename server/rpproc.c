@@ -6,6 +6,19 @@
  *
  */
 
+/*
+ *
+ *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/rpproc.c,v $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/rpproc.c,v 1.4 1987-04-24 21:01:05 srz Exp $
+ *
+ *	Copyright (C) 1986 by the Massachusetts Institute of Technology
+ *
+ *	$Log: not supported by cvs2svn $
+ *
+ *
+ */
+
+
 #ifdef INETD
 #define ASSOC 1
 #endif
@@ -16,6 +29,8 @@
 
 /* Includes */
 
+#include <sys/ioctl.h>
+#include <fcntl.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <stdio.h>
@@ -112,6 +127,23 @@ int *code;
 	       return;
 	  }
      }
+
+#ifdef SUBPROC
+     {
+	  int s;
+	  for (s = 1; s < 10; s++)
+	       (void) close (s);
+     }
+     (void) open("/dev/null", 2);
+     (void) dup2(1, 2);
+     {
+	  int tt = open("/dev/tty", O_RDWR);
+	  if (tt > 0) {
+	       ioctl (tt, TIOCNOTTY, (char *)0);
+	       close(tt);
+	  }
+     }
+#endif
 
      snew = 0;
      us = USP_associate (snew);
