@@ -4,22 +4,20 @@
  *
  */
 
-#include "tfile.h"
-#include "interface.h"
-#include "dsc_et.h"
-#include "rpc.h"
+#include <discuss/discuss.h>
 #include <sys/file.h>
 #include <stdio.h>
-#include <strings.h>
+#include <string.h>
 
 tfile unix_tfile();
 mtg_info minfo;
 
 #ifndef	lint
-static char rcsid_pmtg_c[] = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/pmtg.c,v 1.1 1987-04-11 00:05:51 spook Exp $";
+static char rcsid_pmtg_c[] =
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/pmtg.c,v 1.2 1989-01-05 07:06:41 raeburn Exp $";
 #endif
 
-main (argc,argv)
+int main (argc,argv)
 	int argc;
 	char **argv;
 {
@@ -80,7 +78,7 @@ main (argc,argv)
 
 	tdestroy (tfstdout);
 	term_rpc ();
-	return;
+	return 0;
 
  lusage:
 	(void) fprintf (stderr, "Usage: pmtg {mtg_name}\n");
