@@ -1,13 +1,13 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v 1.13 1988-01-24 09:24:42 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v 1.14 1988-01-24 11:31:46 wesommer Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
  */
 
 #ifndef lint
-static char *rcsid_dsname_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v 1.13 1988-01-24 09:24:42 wesommer Exp $";
+static char *rcsid_dsname_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v 1.14 1988-01-24 11:31:46 wesommer Exp $";
 #endif lint
 
 /*
@@ -213,42 +213,38 @@ getdbent()
 	/* hostname of meeting */
 	if (current.hostname)
 		free(current.hostname);
-	current.hostname = ds(bufp);
-	cp = index(current.hostname, ':');
-	if (cp)
+	cp = index(bufp, ':');
+	if (cp == NULL) goto bad_fmt;
+	else {
 		*cp = '\0';
-	bufp = index(bufp, ':');
-	if (!bufp)
-		goto bad_fmt;
-	else
-		bufp++;
+		current.hostname = ds(bufp);
+		bufp = cp+1;
+	} 
 
 	/* pathname of meeting on remote host */
 	if (current.pathname)
 		free(current.pathname);
-	current.pathname = ds(bufp);
-	cp = index(current.pathname, ':');
-	if (cp)
+	cp = index(bufp, ':');
+	if (cp == NULL) goto bad_fmt;
+	else {
 		*cp = '\0';
-	bufp = index(bufp, ':');
-	if (!bufp)
-		goto bad_fmt;
-	else
-		bufp++;
+		current.pathname = ds(bufp);
+		bufp = cp+1;
+	}
 
 	/* list of aliases for meeting */
 	if (current.alias_list)
 		free(current.alias_list);
-	current.alias_list = ds(bufp);
-	cp = index(current.alias_list, ':');
-	if (cp)
+	cp = index(bufp, ':');
+	if (cp == NULL) goto bad_fmt;
+	else {
 		*cp = '\0';
-	bufp = index(bufp, ':');
-	if (!bufp)
-		goto bad_fmt;
-	else
-		bufp++;
+		current.alias_list = ds(bufp);
+		bufp = cp+1;
+	}
 
+	if (current.spare)
+		free(current.spare);
 	current.spare = ds(bufp);
 
 	return(1);
@@ -416,21 +412,98 @@ dsc_expand_mtg_set(user_id, name, set, num, result)
 		*result = r;
 }
 
+void dsc_copy_name_blk (src, dest)
+	register name_blk *src, *dest;
+{
+	char **cpp;
+	char **dpp;
+	int count;
+	
+	*dest = *src;
+	dest->hostname = ds(dest->hostname);
+	dest->pathname = ds(dest->pathname);
+	dest->user_id = ds(dest->user_id);
+	dest->spare = ds(dest->spare);
+
+	for (count=1, cpp = src->aliases; *cpp; cpp++) {
+		count++;
+	}
+	dpp = dest->aliases = (char **)malloc (count * sizeof (char *));
+	for (cpp = src->aliases; *cpp; cpp++, dpp++)
+		*dpp = ds (*cpp);
+	*dpp = NULL;
+}
+/*
+ * Free all allocated storage associated with *nbp;
+ * Note: this does not free the nbp itself.
+ */
+void dsc_destroy_name_blk(nbp)
+	name_blk *nbp;
+{
+	if (nbp->aliases) {
+		char **alp = nbp->aliases;
+		while (*alp) {
+			free (*alp);
+			alp++;
+		}
+		free (nbp->aliases);
+		nbp->aliases = 0;
+	}
+	if (nbp->hostname) {
+		free(nbp->hostname);
+		nbp->hostname = 0;
+	}
+	if (nbp->pathname) {
+		free(nbp->pathname);
+		nbp->pathname = 0;
+	}
+	if (nbp->spare) {
+		free(nbp->spare);
+		nbp->spare = 0;
+	}
+	if (nbp->user_id) {
+		free (nbp->user_id);
+		nbp->user_id = 0;
+	}
+}
+
+void dsc_destroy_mtg_set(nbp, count)
+	register name_blk *nbp;
+	register int count;
+{
+	register int i;
+
+	if (nbp == NULL) return;
+	for (i=0; i<count; i++)
+		dsc_destroy_name_blk(&nbp[i]);
+
+	free((char *)nbp);
+}
+
 dsc_get_mtg (user_id, name, nbp, result)
 	char *user_id;
 	char *name;
 	name_blk *nbp;
 	int *result;
 {
-	name_blk *set;
+	name_blk *set = NULL;
 	int num;
 	dsc_expand_mtg_set(user_id, name, &set, &num, result);
 	if (num == 0) {
 		if (!*result)
 			*result = NO_SUCH_MTG;
-		return;
+		goto bad;
+	} else if (num > 1) {
+		register int i;
+		for (i = 1; i < num; i++) {
+			dsc_destroy_name_blk(&set[i]);
+		}
 	}
 	bcopy(&set[0], nbp, sizeof(name_blk));
+
+bad:
+	if (set)
+		free((char *)set);
 }
 
 static char format[] = "%d:%d:%d:%s:%s:%s:%s\n";
@@ -491,6 +564,8 @@ dsc_update_mtg_set(user_id, set, num, result)
 				current.date_attended =
 					nbp -> date_attended;
 				current.status = nbp -> status;
+				if (current.alias_list != NULL)
+					free (current.alias_list);
 				current.alias_list = compress(nbp -> aliases);
 				current.spare = nbp->spare;
 				touched[i] = 1;
@@ -508,11 +583,16 @@ dsc_update_mtg_set(user_id, set, num, result)
 	/* clean up ones we haven't touched in memory yet */
 	for (i = 0, nbp = set; i < num; i++, nbp++) {
 		if (!touched[i]) {
+			char *temp = compress (nbp->aliases);
+			
 			if(fprintf(new_file, format,
-				nbp->status, nbp->date_attended, nbp->last,
-				nbp->hostname, nbp->pathname,
-				compress(nbp->aliases), current.spare) == EOF)
-			     goto punt;
+				   nbp->status, nbp->date_attended, nbp->last,
+				   nbp->hostname, nbp->pathname,
+				   temp, current.spare) == EOF) {
+				free (temp);
+				goto punt;
+			}
+			free (temp);
 		}
 	}
 	enddbent();
@@ -534,5 +614,4 @@ punt2:
 	free(touched);
 	*result = CANT_WRITE_TEMP;
 	return;
-	
 }
