@@ -2,8 +2,11 @@
  *
  * disserve.c -- Simple top level program for test.
  *
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/disserve.c,v 1.2 1988-10-08 01:38:16 raeburn Exp $
+ * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/disserve.c,v 1.3 1989-06-01 16:26:56 srz Exp $
  * $Log: not supported by cvs2svn $
+ * Revision 1.2  88/10/08  01:38:16  raeburn
+ * Added some syslog code.
+ * 
  */
 
 #include <stdio.h>
@@ -17,7 +20,11 @@ int main (argc,argv)
     int code;
 
 #ifndef SUBPROC
+#ifdef LOG_DAEMON
     openlog ("discuss", LOG_PID, LOG_DAEMON);
+#else
+    openlog ("discuss", LOG_PID);
+#endif
 #endif
     init_rpc("discuss",&code);
     if (code) {
