@@ -1,9 +1,10 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/include/discuss/acl.h,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/include/discuss/acl.h,v 1.1 1986-11-16 06:11:16 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/include/discuss/acl.h,v 1.2 1986-11-17 01:23:26 spook Exp $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
  *
+ *	$Log: not supported by cvs2svn $
  */
 
 
@@ -34,5 +35,3 @@ extern acl_replace_access();
 char *acl_get_access();
 char *acl_canon();
 acl_write();
-
-#include "acl_et.h"
