@@ -1,39 +1,40 @@
 LIBS= ../lib/libdsk.a ../ets/dsc_et.o ../lib/libusp.a \
-	../lib/libcom_err.a libss.a
+	../lib/libcom_err.a libss.a ../lib/libkrb.a ../lib/libdes.a
 
 CFLAGS=	-g
 
-OBJS=	discuss.o discuss_utils.o pager.o trn_expr.o list.o trn_select.o \
-	status.o new_trans.o print.o \
+OBJS=	discuss.o discuss_utils.o trn_expr.o list.o trn_select.o \
+	status.o new_trans.o print.o lsm.o \
 	cmds.o ../ets/discuss_err.o
 
-SRCS=	discuss.c discuss_utils.c pager.c trn_expr.c list.c trn_select.c \
-	status.c new_trans.c print.c
+SRCS=	discuss.c discuss_utils.c trn_expr.c list.c trn_select.c \
+	status.c new_trans.c print.c lsm.c
 
 .SUFFIXES:	.ct .h .et
 
 .ct.o:	
 	make_commands $*.ct
 	cc -R -O -c $*.c
-	rm -f $*.c
+	-rm -f $*.c
 
 .et.o:	# how to say that this regenerates .h files too?
 	../lib/compile_et $*.et
 	cc -R -O -c $*.c
-	rm -f $*.c
+	-rm -f $*.c
 
 .et.h:
 	../lib/compile_et $*.et
 	cc -R -O -c $*.c
-	rm -f $*.c
+	-rm -f $*.c
 
 .y.o:	
+	-rm -f $*.c $*.o
 	yacc $*.y
 	mv y.tab.c $*.c
 	cc $(CFLAGS) -c $*.c
 
 .c.o:
-	rm -f $*.o
+	-rm -f $*.o
 	cc $(CFLAGS) -c $*.c
 
 #
@@ -41,18 +42,19 @@ SRCS=	discuss.c discuss_utils.c pager.c trn_expr.c list.c trn_select.c \
 all:	discuss tags
 
 discuss: $(OBJS) $(LIBS)
-	cc $(CFLAGS) -o discuss $(OBJS) $(LIBS) -lkrb -ldes
+	-rm -f discuss
+	cc $(CFLAGS) -o discuss $(OBJS) $(LIBS)
 
 tags:	TAGS
 
 TAGS:	$(SRCS)
-	-etags $(SRCS)
 
 lint:	$(SRCS)
 	lint $(SRCS)
 
 clean:
-	rm -f *.o *~ \#* discuss
+	rm -f *.o *~ \#* *.bak
+	rm -f discuss trn_expr.c y.tab.c TAGS
 
 ./discuss_err.h: discuss_err.h
 
@@ -81,14 +83,14 @@ discuss.o: discuss.c /usr/include/stdio.h /usr/include/sys/file.h
 discuss.o: /usr/include/signal.h /usr/include/strings.h /usr/include/sys/wait.h
 discuss.o: ./../include/ss.h ./../include/ss_err.h ./../include/tfile.h
 discuss.o: ./../include/interface.h ./../include/types.h ./../include/config.h
-discuss.o: ./../include/dsname.h ./globals.h
+discuss.o: ./../include/dsname.h ./../include/rpc.h /usr/include/stdio.h
+discuss.o: ./../include/usp.h ./../include/rpc_et.h ./globals.h
 discuss_utils.o: discuss_utils.c /usr/include/stdio.h /usr/include/sys/file.h
 discuss_utils.o: /usr/include/strings.h /usr/include/signal.h ./../include/ss.h
 discuss_utils.o: ./../include/ss_err.h ./../include/tfile.h
 discuss_utils.o: ./../include/interface.h ./../include/types.h
 discuss_utils.o: ./../include/config.h ./../include/discuss_err.h
 discuss_utils.o: /usr/include/sys/wait.h
-pager.o: pager.c /usr/include/stdio.h
 trn_expr.o: trn_expr.c /usr/include/ctype.h ./../include/interface.h
 trn_expr.o: ./../include/types.h ./../include/discuss_err.h
 list.o: list.c /usr/include/stdio.h /usr/include/strings.h ./../include/ss.h
@@ -110,3 +112,5 @@ print.o: /usr/include/signal.h /usr/include/strings.h /usr/include/sys/wait.h
 print.o: ./../include/ss.h ./../include/ss_err.h ./../include/tfile.h
 print.o: ./../include/interface.h ./../include/types.h ./../include/config.h
 print.o: ./../include/dsc_et.h ./globals.h
+lsm.o: lsm.c /usr/include/strings.h /usr/include/stdio.h ./../include/types.h
+lsm.o: ./../include/dsname.h
