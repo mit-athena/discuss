@@ -2,13 +2,16 @@
  *
  * Status request for DISCUSS
  *
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/status.c,v 1.8 1987-04-10 23:50:25 srz Exp $
+ * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/status.c,v 1.9 1987-04-19 21:49:35 srz Exp $
  * $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/status.c,v $
  * $Locker:  $
  *
  * Copyright (C) 1986 by the MIT Student Information Processing Board
  *
  * $Log: not supported by cvs2svn $
+ * Revision 1.8  87/04/10  23:50:25  srz
+ * Added static RCS id.
+ * 
  * Revision 1.7  87/03/22  04:42:43  spook
  * *** empty log message ***
  * 
@@ -34,7 +37,7 @@
  *
  */
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/status.c,v 1.8 1987-04-10 23:50:25 srz Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/status.c,v 1.9 1987-04-19 21:49:35 srz Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -50,7 +53,7 @@ status(argc, argv)
 	int argc;
 	char **argv;
 {
-	printf("Discuss version %s\n", CURRENT_VERSION);
+	printf("Discuss version %s\n", dsc_version);
 	if (!dsc_public.attending) {
 		printf("No current meeting\n");
 		return;
