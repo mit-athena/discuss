@@ -15,7 +15,7 @@
 
 /*
  *
- *	$Id: rpproc.c,v 1.20 2000-10-14 17:46:53 ghudson Exp $
+ *	$Id: rpproc.c,v 1.21 2004-03-08 06:22:14 zacheiss Exp $
  *
  */
 
@@ -69,7 +69,6 @@ extern char *malloc();
 extern int errno;
 #ifdef KERBEROS
 static char serv_name[20];
-extern int krb_err_base;
 #endif /* KERBEROS */
 short recvshort();
 int rpc_err;
