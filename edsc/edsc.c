@@ -8,7 +8,7 @@
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/edsc.c,v 1.5 1989-05-19 19:17:15 srz Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/edsc.c,v 1.6 1989-05-19 20:02:27 srz Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -41,7 +41,6 @@ main(argc, argv)
      char *initial_meeting = (char *)NULL;
      char *cp,*op,delim,*args;
 
-     init_disc_err_tbl();
      init_dsc_err_tbl();
 
      temp_file = malloc(64);
