@@ -27,6 +27,7 @@
 static int tempf;
 static char *mtg_name = NULL, *location = NULL, *chairman = NULL, *trn_file = NULL;
 static char *backup_location = NULL;
+static char *future_location = NULL;
 static int found_eof = 0;
 static int error_occurred = 0;
 
@@ -36,12 +37,13 @@ char *malloc();
 extern char rpc_caller[];
 extern int has_privs;
 extern int errno;
+extern int no_nuke;
 
 main (argc, argv)
 int argc;
 char **argv;
 {
-     int i,n;
+     int i,n,low,high;
      mtg_info old_mtg_info,new_mtg_info;
      trn_info old_trn_info;
      int result;
@@ -49,6 +51,8 @@ char **argv;
      dsc_acl_entry *ae;
      char *new_modes;
      tfile tf;
+     char control_name[256];
+     int control_fd;
      
      init_dsc_err_tbl();
 
@@ -91,25 +95,17 @@ char **argv;
 	  exit (1);
      }
 
-     /* Before futzing with things, rename the meeting */
+     /* Create the new meeting */
      backup_location = malloc (strlen(location)+5);	/* be generous */
      strcpy (backup_location, location);
      strcat (backup_location, "~");
 
-     printf("Renaming meeting\n");
+     future_location = malloc (strlen(location)+5);	/* be generous */
+     strcpy (future_location, location);
+     strcat (future_location, "#");
+
+     printf("Creating new meeting\n");
      fflush(stdout);
-
-     if (rename (location, backup_location) < 0) {
-	  fprintf (stderr, "%s: %s while renaming meeting\n", location, error_message(errno));
-	  exit (1);
-     }
-
-     /* try to get mtg_info again, just because of caching open descriptors */
-     get_mtg_info (backup_location, &new_mtg_info, &result);
-     if (result != 0) {
-	  fprintf(stderr, "%s: %s while getting renamed mtg info\n", backup_location, error_message(result));
-	  exit (1);
-     }
 
      if (mtg_name == NULL) {
 	  mtg_name = old_mtg_info.long_name;
@@ -117,49 +113,41 @@ char **argv;
      if (chairman == NULL) {
 	  chairman = old_mtg_info.chairman;
      }
-     
-     /* Go through old acl, and only give people read access.  This will keep
-	concurrent things from losing (people will get access problems) */
-     for (ae = acl_list->acl_entries, n = acl_list->acl_length; n; --n, ++ae) {
-	  new_modes = (char *)acl_intersection(ae->modes,"rs");
-	  set_access(backup_location, ae->principal, new_modes, &result);
-	  if (result != 0) {
-	       fprintf(stderr, "%s: %s while setting acl\n", backup_location, error_message(result));
-	       exit (1);
-	  }
-	  free(new_modes);
-     }
+
      /* get acl's on old meeting, so we can make it new one */
-     get_acl (backup_location, &result, &new_acl_list);
+     get_acl (location, &result, &new_acl_list);
      if (result != 0) {
 	  fprintf(stderr, "%s: %s while getting acl\n", backup_location, error_message(result));
 	  exit (1);
      }
 
-     create_mtg_priv (location, mtg_name, old_mtg_info.public_flag,
+     create_mtg_priv (backup_location, mtg_name, old_mtg_info.public_flag,
 		      old_mtg_info.date_created, chairman,
 		      new_acl_list, &result);
      if (result != 0) {
 	  fprintf (stderr, "%s: %s while creating new meeting\n",
 		   location, error_message(result));
-	  /* XXX rename back */
 	  exit (1);
      }
-
+     
      /* now, do the actual expunging */
-
+     low = old_mtg_info.lowest;
+     high = old_mtg_info.highest;
      create_temp ();
 
-     for (i = old_mtg_info.lowest; i <= old_mtg_info.highest; i++) {
-	  get_trn_info (backup_location, i, &old_trn_info, &result);
+expunge_range:
+     for (i = low; i <= high; i++) {
+	  get_trn_info (location, i, &old_trn_info, &result);
 	  if (result != 0 && result != DELETED_TRN && result != EXPUNGED_TRN) {
 	       fprintf(stderr,
 		       "Error getting info for transaction [%04d]: %s\n",
 		       i, error_message(result));
 	       error_occurred = TRUE;
 	  } else if (result != 0) {		/* expunge it */
+	       no_nuke = TRUE;
 	       printf("Expunging transaction [%04d]\n", i);
-	       expunge_trn (location, i, &result);
+	       expunge_trn (backup_location, i, &result);
+	       no_nuke = FALSE;
 	       if (result != 0) {
 		    fprintf(stderr,
 			    "Error expunging transaction [%04d]: %s\n",
@@ -171,7 +159,7 @@ char **argv;
 	       lseek(tempf,0,0);
 	       tf = unix_tfile (tempf);
 
-	       get_trn (backup_location, i, tf, &result);
+	       get_trn (location, i, tf, &result);
 	       if (result != 0) {
 		    fprintf(stderr, "Error getting transaction [%04d]: %s\n",
 			    i, error_message(result));
@@ -185,10 +173,12 @@ char **argv;
 	       lseek(tempf,0,0);
 
 	       tf = unix_tfile (tempf);
-	       add_trn_priv (location, tf, old_trn_info.subject,
+	       no_nuke = TRUE;
+	       add_trn_priv (backup_location, tf, old_trn_info.subject,
 			     old_trn_info.pref, old_trn_info.current,
 			     old_trn_info.author, old_trn_info.date_entered,
 			     &n, &result);
+	       no_nuke = FALSE;
 	       if (result != 0) {
 		    fprintf(stderr,
 			    "Error getting info for transaction %d: %s\n", i,
@@ -200,28 +190,66 @@ char **argv;
 	  }
      }
 
-     /* All done, now reset modes to something useful */
-     for (ae = acl_list->acl_entries, n = acl_list->acl_length; n; --n, ++ae) {
-	  set_access(location, ae->principal, ae->modes, &result);
-	  if (result != 0) {
-	       fprintf(stderr, "%s: %s while setting acl entry %s to %s\n",
-		       location, ae->principal, ae->modes,
-		       error_message(result));
-	       exit (1);
+     /* Check if any new transactions have been added */
+     free(old_mtg_info.long_name);
+     free(old_mtg_info.chairman);
+     free(old_mtg_info.location);
+     get_mtg_info(location, &old_mtg_info, &result);
+     if (result != 0) {
+	  fprintf(stderr, "%s: %s while getting mtg info\n", location, error_message(result));
+	  error_occurred = TRUE;
+     } else if (old_mtg_info.highest > high) {		/* New transactions added */
+	  low = high+1;
+	  high = old_mtg_info.highest;
+	  goto expunge_range;
+     }
+
+     strcpy(control_name, location);
+     strcat(control_name, "/control");
+     if ((control_fd = open (control_name, O_RDWR, 0700)) < 0) {
+	  error_occurred = TRUE;
+     } else {
+	  flock(control_fd, LOCK_EX);		/* Hold meeting by the balls */
+	  free(old_mtg_info.long_name);
+	  free(old_mtg_info.chairman);
+	  free(old_mtg_info.location);
+
+	  no_nuke = TRUE;
+	  get_mtg_info(location, &old_mtg_info, &result);
+	  if (result != 0) {	       
+	       fprintf(stderr, "%s: %s while getting mtg info\n", location, error_message(result));
+	       error_occurred = TRUE;
+	       flock(control_fd,LOCK_UN);
+	       close(control_fd);
+	  } else if (old_mtg_info.highest > high) {		/* New transactions added */
+	       low = high + 1;
+	       high = old_mtg_info.highest;
+	       flock(control_fd,LOCK_UN);
+	       close(control_fd);
+	       goto expunge_range;
 	  }
      }
 
+     /* When we get here, we have the old meeting locked.  Now we do the move
+	as atomically as we can */
      if (!error_occurred) {
-	  remove_mtg (backup_location, &result);
+	  if (rename(location, future_location) < 0) {
+	       perror("rename of old meeting failed");
+	       exit (1);
+	  }
+	  if (rename(backup_location, location) < 0) {
+	       perror("rename of new meeting");
+	       exit (1);
+	  }
+	  remove_mtg (future_location, &result);
 	  if (result != 0) {
-	       fprintf(stderr, "%s: %s while removing backup meeting.\n",
+	       fprintf(stderr, "%s: %s while removing new meeting.\n",
 		       location, error_message(result));
 	       exit (1);
 	  }
      } else exit (1);				/* error occurred */
 
      exit (0);
-
 
 lusage:
      fprintf(stderr, "usage: expunge mtg_location {-c chairman} {-n name}\n");
