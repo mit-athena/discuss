@@ -8,7 +8,7 @@
 
 #ifndef lint
 #ifndef SABER
-static char *RCSid = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/dsgrep/dsgrep.c,v 1.10 1998-01-20 23:15:40 ghudson Exp $";
+static char *RCSid = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/dsgrep/dsgrep.c,v 1.11 1998-02-02 17:12:23 danw Exp $";
 #endif
 #endif
 
@@ -141,6 +141,7 @@ main(argc,argv)
     fprintf(stderr,"dsgrep: could not allocate memory\n");
     exit(1);
   }
+  sprintf(var, "MEETINGS=%s", meetings_file);
   if (putenv(var) == -1) {
     fprintf(stderr,"dsgrep: could not add environment variable\n");
     exit(1);
