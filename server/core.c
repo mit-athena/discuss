@@ -11,7 +11,7 @@
 /*
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.17 1987-10-23 23:49:15 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.18 1987-10-24 00:46:31 wesommer Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
@@ -21,6 +21,9 @@
  *		callable routines.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.17  87/10/23  23:49:15  wesommer
+ * Implemented access control on meeting creation.
+ * 
  * Revision 1.16  87/10/23  21:42:40  wesommer
  * This isn't Multics.
  * 
@@ -42,7 +45,7 @@
  *
  */
 #ifndef lint
-static char *rcsid_core_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.17 1987-10-23 23:49:15 wesommer Exp $";
+static char *rcsid_core_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.18 1987-10-24 00:46:31 wesommer Exp $";
 #endif lint
 
 
@@ -823,24 +826,21 @@ int *result;
      *result = 0;
      
      if (!has_privs) {
+	  int aclfd;
 	  strcpy (str, location);
-	  strcat (str, "/../.ds_acl");
+	  strcat (str, "/../acl");
 
-	  if (!access(str, R_OK)) { /* access is negative-true!! */
-	       int aclfd;
-	       if ((aclfd = open(str, O_RDONLY, 0700)) < 0) {
+	  if ((aclfd = open(str, O_RDONLY, 0700)) < 0) {
+	       *result = NO_ACCESS;
+	  } else {
+	       Acl *tmp_acl = acl_read(aclfd);
+	       (void) close(aclfd);
 
-		       *result = errno;
-	       } else {
-		    Acl *tmp_acl = acl_read(aclfd);
-		    (void) close(aclfd);
-
-		    if (tmp_acl == NULL ||
-			!acl_check(tmp_acl, rpc_caller, "a"))
-			 *result = NO_ACCESS;
-		    (void) acl_destroy(tmp_acl);
-	       }
-          } 
+	       if (tmp_acl == NULL ||
+		   !acl_check(tmp_acl, rpc_caller, "a"))
+		       *result = NO_ACCESS;
+	       (void) acl_destroy(tmp_acl);
+          }
 	  if (*result) {
 	       (void) rmdir(location); /* we don't care if this fails; */
 				       /* we can't do anything about it */
