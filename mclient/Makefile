@@ -1,9 +1,10 @@
 LIBS=	../lib/libdsk.a ../lib/libusp.a ../lib/libkrb.a ../lib/libdes.a ../lib/libcom_err.a
 CFLAGS=	-g -I../include
 
-SRCS=	pmtg.c dspipe.c mkds.c dlsm.c crmtgs.c disrc2meetings.sh dsc_setup.sh
+SRCS=	pmtg.c mkds.c crmtgs.c create_mtg_dir.c \
+	disrc2meetings.sh dsc_setup.sh
 
-PROGS=	pmtg dspipe mkds dlsm crmtgs rmds
+PROGS=	pmtg mkds crmtgs rmds create_mtg_dir
 
 SCRIPTS= disrc2meetings dsc_setup
 
@@ -51,6 +52,9 @@ rmds:	mkds
 	rm -f rmds
 	ln mkds rmds
 
+create_mtg_dir: create_mtg_dir.o
+	cc $(CFLAGS) -o create_mtg_dir create_mtg_dir.o
+
 dist: $(SRCS) Makefile
 	-mkdir ../dist/mclient
 	cp -p $(SRCS) ../dist/mclient/
@@ -79,16 +83,14 @@ depend:
 # the last constant line in the makefile should be...
 # DO NOT DELETE THIS LINE
 
-pmtg.o: pmtg.c ./../include/tfile.h ./../include/interface.h
-pmtg.o: ./../include/types.h ./../include/dsc_et.h ./../include/rpc.h
-pmtg.o: /usr/include/stdio.h ./../include/usp.h ./../include/usp_et.h
-pmtg.o: ./../include/rpc_et.h /usr/include/sys/file.h /usr/include/stdio.h
-pmtg.o: /usr/include/strings.h
-dspipe.o: dspipe.c ./../include/tfile.h ./../include/interface.h
-dspipe.o: ./../include/types.h ./../include/dsc_et.h ./../include/rpc.h
-dspipe.o: /usr/include/stdio.h ./../include/usp.h ./../include/usp_et.h
-dspipe.o: ./../include/rpc_et.h /usr/include/sys/file.h /usr/include/stdio.h
-dspipe.o: /usr/include/strings.h
+pmtg.o: pmtg.c ../include/tfile.h ../include/interface.h ../include/types.h
+pmtg.o: ../include/dsc_et.h ../include/rpc.h /usr/include/stdio.h
+pmtg.o: ../include/usp.h ../include/usp_et.h ../include/rpc_et.h
+pmtg.o: /usr/include/sys/file.h /usr/include/stdio.h /usr/include/strings.h
+dspipe.o: dspipe.c ../include/tfile.h ../include/interface.h ../include/types.h
+dspipe.o: ../include/dsc_et.h ../include/rpc.h /usr/include/stdio.h
+dspipe.o: ../include/usp.h ../include/usp_et.h ../include/rpc_et.h
+dspipe.o: /usr/include/sys/file.h /usr/include/stdio.h /usr/include/strings.h
 mkds.o: mkds.c ../include/tfile.h ../include/dsc_et.h ../include/config.h
 mkds.o: ../include/interface.h ../include/types.h ../include/rpc.h
 mkds.o: /usr/include/stdio.h ../include/usp.h ../include/usp_et.h
