@@ -1,21 +1,24 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.3 1986-11-11 17:00:20 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.4 1986-11-16 06:09:04 wesommer Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.3  86/11/11  17:00:20  wesommer
+ * Replaced version of select_meeting which keeps connections open..
+ * 
  */
 
 #ifndef lint
-static char *rcsid_interface_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.3 1986-11-11 17:00:20 wesommer Exp $";
+static char *rcsid_interface_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.4 1986-11-16 06:09:04 wesommer Exp $";
 #endif lint
 
 #include <stdio.h>
 #include "../include/rpc.h"
 #include "../include/tfile.h"
 #include "../include/interface.h"
-
+#include "../include/acl.h"
 
 typedef struct _connection{
 	struct _connection *next;
@@ -213,6 +216,48 @@ int *result;
      select_meeting(mtg_uid, result);
      if (*result) return;
      updated_mtg(mtg_name, date_attended, last, updated, result);
+}
+
+dsc_get_acl (mtg_uid, result, list)
+	char *mtg_uid;
+	int *result;	
+	Acl **list;
+{	
+	select_meeting(mtg_uid, result);
+	if(*result) return;
+	get_acl(mtg_name, result, list);
+}
+
+dsc_get_access (mtg_uid, princ, modes, result)
+	char *mtg_uid;
+	char *princ;
+	char *modes;
+	int *result;
+{
+	select_meeting(mtg_uid, result);
+	if (*result) return;
+	get_access(mtg_name, princ, result);
+}
+
+dsc_set_access (mtg_uid, princ, modes, result)
+	char *mtg_uid;
+	char *princ;
+	char *modes;
+	int *result;
+{
+	select_meeting(mtg_uid, result);
+	if (*result) return;
+	set_access(mtg_name, princ, modes, result);
+}
+
+dsc_delete_access (mtg_uid, princ, result)
+	char *mtg_uid;
+	char *princ;
+	int *result;
+{
+	select_meeting(mtg_uid, result);
+	if (*result) return;
+	delete_access(mtg_name, princ, result);
 }
 
 /*
