@@ -1,13 +1,14 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v 1.14 1988-01-24 11:31:46 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v 1.15 1988-02-07 00:52:49 raeburn Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
  */
 
 #ifndef lint
-static char *rcsid_dsname_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v 1.14 1988-01-24 11:31:46 wesommer Exp $";
+static char rcsid_dsname_c[] =
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v 1.15 1988-02-07 00:52:49 raeburn Exp $";
 #endif lint
 
 /*
@@ -21,6 +22,7 @@ static char *rcsid_dsname_c = "$Header: /afs/dev.mit.edu/source/repository/athen
 #include <sys/file.h>
 #include <sys/param.h>
 #include <errno.h>
+#include <assert.h>
 #include "config.h"
 #include "dsname.h"
 #include "dsc_et.h"
@@ -287,6 +289,7 @@ is_a_name(name)
 	register int len;
 	register char *ns = current.alias_list;
 
+	assert(name != (char *)NULL);
 	if (*name == '*')
 		return(1);
 	len = strlen(name);
@@ -309,7 +312,7 @@ expand(list)
 	char *list;
 {
         char *calloc();
-	register int num = 1;
+	register int num = 2;
 	register char *cp;
 	register char **rv, **rv1;
 	for (cp = list; cp;) {
@@ -372,6 +375,12 @@ dsc_expand_mtg_set(user_id, name, set, num, result)
 	*set = 0;
 	*num = 0;
 	*result = 0;
+
+	if (!name) {
+	    *result = EINVAL;
+	    *num = 0;
+	    return;
+	}
 	r = setdbent(user_id);
 	if (r) {
 		*result = r;
@@ -428,7 +437,7 @@ void dsc_copy_name_blk (src, dest)
 	for (count=1, cpp = src->aliases; *cpp; cpp++) {
 		count++;
 	}
-	dpp = dest->aliases = (char **)malloc (count * sizeof (char *));
+	dpp = dest->aliases = (char **)malloc ((count+1) * sizeof (char *));
 	for (cpp = src->aliases; *cpp; cpp++, dpp++)
 		*dpp = ds (*cpp);
 	*dpp = NULL;
@@ -441,7 +450,7 @@ void dsc_destroy_name_blk(nbp)
 	name_blk *nbp;
 {
 	if (nbp->aliases) {
-		char **alp = nbp->aliases;
+	        register char **alp = nbp->aliases;
 		while (*alp) {
 			free (*alp);
 			alp++;
@@ -488,6 +497,10 @@ dsc_get_mtg (user_id, name, nbp, result)
 {
 	name_blk *set = NULL;
 	int num;
+
+	if (!name) {
+	    *result = EINVAL;
+	}
 	dsc_expand_mtg_set(user_id, name, &set, &num, result);
 	if (num == 0) {
 		if (!*result)
@@ -522,6 +535,14 @@ dsc_update_mtg_set(user_id, set, num, result)
 	FILE *new_file;
 	char *old_name;
 
+	if (!num) {
+	    *result = 0;
+	    return;
+	}
+	else if (!set) {
+	    *result = EINVAL;
+	    return;
+	}
 	if (*result = setdbent(user_id)) {
 		if (*result != NO_MTGS_FILE &&
 		    *result != ENOENT)
@@ -546,19 +567,13 @@ dsc_update_mtg_set(user_id, set, num, result)
 	for (i = 0; i < num; i++)
 		touched[i] = 0;
 	
-	if (*result = setdbent(user_id)) {
-		if (*result != NO_MTGS_FILE &&
-		    *result != ENOENT)
-			return;
-		else *result = 0;
-	}
-
 	while ((r=getdbent()) != 0) {
 		if (r == -1)	/* if bad format, punt it */
 			continue;
 		/* walk through user structures, look for matching entries */
 		for (i = 0, nbp = set;  i < num; i++, nbp++) {
-			if (!strcmp (current.hostname, nbp -> hostname) && !strcmp(current.pathname, nbp->pathname)) {
+			if (!strcmp (current.hostname, nbp -> hostname) &&
+			    !strcmp(current.pathname, nbp->pathname)) {
 				/* match, update */
 				current.last = nbp -> last;
 				current.date_attended =
@@ -588,7 +603,7 @@ dsc_update_mtg_set(user_id, set, num, result)
 			if(fprintf(new_file, format,
 				   nbp->status, nbp->date_attended, nbp->last,
 				   nbp->hostname, nbp->pathname,
-				   temp, current.spare) == EOF) {
+				   temp, nbp->spare) == EOF) {
 				free (temp);
 				goto punt;
 			}
