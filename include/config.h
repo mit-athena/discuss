@@ -53,7 +53,8 @@ create an initial .meetings file. */
 #define SERVER "/usr/local/disserve"
 #endif
 #ifndef SERVER_LOCAL
-#define SERVER_LOCAL "/usr/local/disserve-fs"
+/* this one is path-searched if it doesn't begin with slash... */
+#define SERVER_LOCAL "disserve-fs"
 #endif
 #ifndef SERVER_NAME
 #define SERVER_NAME "disserve"
