@@ -1,10 +1,14 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.13 1987-10-23 23:44:10 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.14 1987-12-27 16:01:34 raeburn Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.13  87/10/23  23:44:10  wesommer
+ * Implemented dsc_create_mtg();
+ * Rearranged select_meeting to pull functionality into create_mblock();
+ * 
  * Revision 1.12  87/09/17  02:34:28  spook
  * Removed is_fatal flag.
  * 
@@ -38,7 +42,7 @@
  */
 
 #ifndef lint
-static char *rcsid_interface_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.13 1987-10-23 23:44:10 wesommer Exp $";
+static char *rcsid_interface_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.14 1987-12-27 16:01:34 raeburn Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -77,9 +81,15 @@ static meeting *create_mblock(host, path, code_ptr)
 	int *code_ptr;
 {
 	register meeting *mp;
+	static int initialized = 0;
 	
 	*code_ptr = 0;
 
+	if (!initialized) {
+		init_rpc();
+		meeting_list = (meeting *)NULL;
+		initialized = 1;
+	}
 	if (!(mp = (meeting *)malloc(sizeof (meeting)))) {
 		*code_ptr = errno;
 		return NULL;
@@ -124,14 +134,9 @@ select_meeting(nbp, code_ptr)
 	int *code_ptr;
 {
 	register meeting *mp;
-	static int initialized = 0;
 
 	*code_ptr = 0;
-	if (!initialized) {
-		init_rpc();
-		meeting_list = (meeting *)NULL;
-		initialized = 1;
-	}
+
 	/*
 	 * Is the current meeting one which we've talked to recently?
 	 */
