@@ -4,7 +4,7 @@
 ;;;    	For copying information, see the file mit-copyright.h in this release.
 ;;;
 ;;;	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v $
-;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.20 1991-01-03 22:23:31 bjaspan Exp $
+;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.21 1991-01-04 19:30:46 bjaspan Exp $
 ;;;
 ;;;  Emacs lisp code to remote control a "discuss" shell process to
 ;;;  provide an emacs-based interface to the discuss conferencing system.
@@ -13,6 +13,9 @@
 ;;;  Written by Stan Zanarotti, Bill Sommerfeld and Theodore Ts'o.
 ;;;
 ;;;  $Log: not supported by cvs2svn $
+; Revision 1.20  91/01/03  22:23:31  bjaspan
+; added discuss-set-seen-and-leave-mtg and discuss-catchup
+; 
 ; Revision 1.19  90/12/05  16:23:50  raeburn
 ; Removed one-second delay at startup.  Argument to `discuss' is now
 ; optional, and no longer causes reversion to previous buffer.  Error
@@ -258,6 +261,8 @@ r	Reply to this transaction.
 f	Forward this transaction via mail.
 t	Talk.  Enter a new transaction.
 c	Catch up.  Mark the rest of the transactions in this meeting as read.
+l	Mark transaction as highest-seen and leave meeting.
+F	Toggle the flag on the current transaction.
 a	Add meeting."
   (interactive)
   (kill-all-local-variables)
@@ -1171,7 +1176,7 @@ discuss server while we spin-block."
 ; run this at each load
 (defun discuss-initialize nil
   (setq discuss-version
-	"$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.20 1991-01-03 22:23:31 bjaspan Exp $")
+	"$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.21 1991-01-04 19:30:46 bjaspan Exp $")
 
 ;;;
 ;;; Lots of autoload stuff....
