@@ -1,5 +1,5 @@
 #
-# $Id: Imakefile,v 1.2 1994-08-24 03:11:32 cfields Exp $
+# $Id: Imakefile,v 1.3 1996-09-08 20:26:35 ghudson Exp $
 #
 
 # libzephyr.a needed only for Zephyr notifications
@@ -16,14 +16,78 @@ OBJS=	discuss.o edit.o output.o trn_expr.o list.o trn_select.o \
 	interrupt.o goto.o reply.o ckm.o anm.o time.o data.o \
 	cmds.o rn.o randrp.o catchup.o set.o ../ets/discuss_err.o
 
-create_dir($(INFODIR))
+# Pairs of symlink source and destination.
+INFOLINKS=	add_mtg.info add_meeting.info \
+		am.info add_meeting.info \
+		anm.info announce_meeting.info \
+		ann_mtg.info announce_meeting.info \
+		ckm.info check_meetings.info \
+		d.info delete.info \
+		da.info delete_acl.info \
+		dl.info delete.info \
+		enter.info talk.info \
+		exit.info quit.info \
+		g.info goto.info \
+		go.info goto.info \
+		la.info list_acl.info \
+		ls.info list.info \
+		lsm.info list_meetings.info \
+		next.info print.info \
+		nm.info next_meeting.info \
+		nref.info print.info \
+		p.info print.info \
+		pr.info print.info \
+		pref.info print.info \
+		prev.info print.info \
+		q.info quit.info \
+		read_new.info rn.info \
+		rp.info reply.info \
+		sa.info set_acl.info \
+		send.info talk.info \
+		spec.info transaction_specifiers.info \
+		specifiers.info transaction_specifiers.info \
+		swf.info switch_off.info \
+		swn.info switch_on.info \
+		w.info write.info
+
 cmd_table(cmds)
 SimpleProgram(discuss,$(OBJS),$(LIBS),$(ATHBINDIR))
+create_dir($(INFODIR))
+install_file(info/access.info,$(INFODIR))
+install_file(info/add_meeting.info,$(INFODIR))
+install_file(info/announce_meeting.info,$(INFODIR))
+install_file(info/check_meetings.info,$(INFODIR))
+install_file(info/del_mtg.info,$(INFODIR))
+install_file(info/delete.info,$(INFODIR))
+install_file(info/delete_acl.info,$(INFODIR))
+install_file(info/goto.info,$(INFODIR))
+install_file(info/help.info,$(INFODIR))
+install_file(info/list.info,$(INFODIR))
+install_file(info/list_acl.info,$(INFODIR))
+install_file(info/list_meetings.info,$(INFODIR))
+install_file(info/next_meeting.info,$(INFODIR))
+install_file(info/print.info,$(INFODIR))
+install_file(info/quit.info,$(INFODIR))
+install_file(info/reply.info,$(INFODIR))
+install_file(info/retrieve.info,$(INFODIR))
+install_file(info/rn.info,$(INFODIR))
+install_file(info/set.info,$(INFODIR))
+install_file(info/set_acl.info,$(INFODIR))
+install_file(info/status.info,$(INFODIR))
+install_file(info/switch_off.info,$(INFODIR))
+install_file(info/switch_on.info,$(INFODIR))
+install_file(info/talk.info,$(INFODIR))
+install_file(info/transaction_specifiers.info,$(INFODIR))
+install_file(info/write.info,$(INFODIR))
 
 install::
-	$(RM) -r $(DESTDIR)$(INFODIR)
-	mkdir $(DESTDIR)$(INFODIR)
-	cd info ; tar cf - . | (cd $(DESTDIR)$(INFODIR); tar xf -)
+	@set $(INFOLINKS); \
+	while [ $$# -ge 2 ]; do \
+		$(RM) $(DESTDIR)$(INFODIR)/$$1; \
+		echo ln -s $$2 $(DESTDIR)$(INFODIR)/$$1; \
+		ln -s $$2 $(DESTDIR)$(INFODIR)/$$1; \
+		shift 2; \
+	done
 
 clean::
 	rm -f *.o *~ \#* *.bak
