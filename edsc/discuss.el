@@ -4,7 +4,7 @@
 ;;;    	For copying information, see the file mit-copyright.h in this release.
 ;;;
 ;;;	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v $
-;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.17 1990-11-01 21:32:56 eichin Exp $
+;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.18 1990-11-05 14:46:02 eichin Exp $
 ;;;
 ;;;  Emacs lisp code to remote control a "discuss" shell process to
 ;;;  provide an emacs-based interface to the discuss conferencing system.
@@ -13,6 +13,10 @@
 ;;;  Written by Stan Zanarotti, Bill Sommerfeld and Theodore Ts'o.
 ;;;
 ;;;  $Log: not supported by cvs2svn $
+; Revision 1.17  90/11/01  21:32:56  eichin
+; changed cadr, caddr, cddr to functions - the macros were breaking
+; things in several places, particularly wrt byte-compiling.
+; 
 ; Revision 1.16  90/10/29  22:55:04  bjaspan
 ; fixed a stupid bug in discuss-delete-trn
 ; 
@@ -74,10 +78,13 @@
 ; 
 
 ;;
-;; WARNING --- HARDCODED PATHNAMES NEAR END OF FILE... search for "autoload".
+;; WARNING --- change discuss-source-dir when installing this file! 
 ;; 
 
 (provide 'discuss)
+
+(defvar discuss-source-dir "/mit/discuss/source/edsc"
+  "Source directory which this version of discuss is loaded from.")
 
 (defvar discuss-DWIM nil
   "If true, enable Do_What_I_Mean mode.  Allows the user to read discuss by
@@ -1116,40 +1123,38 @@ discuss server while we spin-block."
 ; run this at each load
 (defun discuss-initialize nil
   (setq discuss-version
-	"$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.17 1990-11-01 21:32:56 eichin Exp $")
+	"$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.18 1990-11-05 14:46:02 eichin Exp $")
 
 ;;;
 ;;; Lots of autoload stuff....
 ;;;
 
-(autoload 'discuss-talk "/afs/athena/user/t/tytso/em/discuss-enter.elc"
+(autoload 'discuss-talk (concat discuss-source-dir "/discuss-enter.elc")
 	  "Enter a new discuss transaction." t)
 
-(autoload 'discuss-reply "/afs/athena/user/t/tytso/em/discuss-enter.elc"
+(autoload 'discuss-reply (concat discuss-source-dir "/discuss-enter.elc")
 	  "Reply to an existing discuss transaction." t)
 
-(autoload 'discuss-randrp "/afs/athena/user/t/tytso/em/discuss-enter.elc"
+(autoload 'discuss-randrp (concat discuss-source-dir "/discuss-enter.elc")
 	  "Random reply in a meeting." t)
 
-(autoload 'discuss-ls "/afs/athena/user/t/tytso/em/discuss-ls.elc"
+(autoload 'discuss-ls (concat discuss-source-dir "/discuss-ls.elc")
 	  "List the headings of the transactions in a meeting." t)
 
-(autoload 'discuss-list-acl "/afs/athena/user/t/tytso/em/discuss-acl.elc"
+(autoload 'discuss-list-acl (concat discuss-source-dir "/discuss-acl.elc")
 	  "List the ACL of a meeting." t)
 
-(autoload 'discuss-forward "/afs/athena/user/t/tytso/em/discuss-misc.elc"
+(autoload 'discuss-forward (concat discuss-source-dir "/discuss-misc.elc")
 	  "Forward a transaction via mail." t)
 
-(autoload 'discuss-reply-by-mail "/afs/athena/user/t/tytso/em/discuss-misc.elc"
+(autoload 'discuss-reply-by-mail (concat discuss-source-dir "/discuss-misc.elc")
 	  "Forward a transaction via mail." t)
 
-(autoload 'discuss-add-mtg "/afs/athena/user/t/tytso/em/discuss-misc.elc"
+(autoload 'discuss-add-mtg (concat discuss-source-dir "/discuss-misc.elc")
 	  "Add a discuss meeting" t)
 
-(autoload 'discuss-del-mtg "/afs/athena/user/t/tytso/em/discuss-misc.elc"
+(autoload 'discuss-del-mtg (concat discuss-source-dir "/discuss-misc.elc")
 	  "Delete a discuss meeting" t)
-
-
 
 ;;; Keymaps, here at the end, where the trash belongs..
   
