@@ -20,10 +20,11 @@
 #include "../include/interface.h"
 #include "../include/rpc.h"
 #include "../include/tfile.h"
+#include "../include/acl.h"
 
 extern bool recvbool();
 extern char *recvstr();
-
+Acl *recv_acl();
 
 /*
  *
@@ -283,6 +284,96 @@ int *result;
      if (rpc_err) { *result = rpc_err; return; }
      return;
 }
+#define rpccheck if (rpc_err) { *result = rpc_err; return; }
+/*
+ * get_acl () -- Get access control list.
+ */
+get_acl(mtg_name, result, list)
+	char *mtg_name;
+	int *result;		/* RETURN */
+	Acl **list;		/* RETURN */
+{
+
+	startsend(GET_ACL);
+	rpccheck;
+	sendstr(mtg_name);
+	sendit("discuss");
+	rpccheck;
+	recvreply();
+	*result = recvint();
+	*list = recv_acl();
+	rpccheck;
+	return;
+}
+
+get_access(mtg_name, princ_name, modes, result)
+	char *mtg_name;
+	char *princ_name;
+	char **modes;		/* RETURN */
+	int *result;		/* RETURN */
+{
+	startsend(GET_ACCESS);
+	rpccheck;
+	sendstr(mtg_name);
+	sendstr(princ_name);
+	sendit("discuss");
+	rpccheck;
+	recvreply();
+	*modes = recvstr();
+	*result = recvint();
+	rpccheck;
+	return;
+}
+set_access(mtg_name, princ_name, modes, result)
+	char *mtg_name;
+	char *princ_name;
+	char *modes;
+	int *result;		/* RETURN */
+{
+	startsend(SET_ACCESS);
+	rpccheck;
+	sendstr(mtg_name);
+	sendstr(princ_name);
+	sendstr(modes);
+	sendit("discuss");
+	rpccheck;
+	recvreply();
+	*result = recvint();
+	rpccheck;
+	return;
+}
+
+delete_access(mtg_name, princ_name, result)
+	char *mtg_name;
+	char *princ_name;
+	int *result;		/* RETURN */
+{
+	startsend(DELETE_ACCESS);
+	rpccheck;
+	sendstr(mtg_name);
+	sendstr(princ_name);
+	sendit("discuss");
+	rpccheck;
+	recvreply();
+	*result = recvint();
+	rpccheck;
+	return;
+}
+
+whoami(ident)
+	char **ident;
+{
+	int *result=0;
+	startsend(WHO_AM_I);
+	rpccheck;
+	sendit("discuss");
+	rpccheck;
+	*ident = recvstr();
+	rpccheck;
+	return;
+}
+
+
 /*
  *
  * recv_trn_info -- recv a trn_info struct.
@@ -350,3 +441,23 @@ mtg_info *minfo;
      minfo -> access_modes = recvstr ();
 }
 
+Acl *
+recv_acl()
+{
+	/* The following code would lose points in 6.170... */
+	register Acl *result = (Acl *) malloc(sizeof(Acl));
+	register acl_entry *ae;
+	register unsigned int len;
+	len = recvint();
+	result->acl_length = len;
+	if (len > 1000) /* Bogus! */ {
+		/*XXX Put some error checking in here */
+	}
+	result->acl_entries = (acl_entry *) malloc(sizeof(acl_entry) * len);
+	for (ae = result->acl_entries; len; --len, ++ae) {
+		ae->modes = recvstr();	
+		ae->principal = recvstr();
+	}
+	return result;
+}
+		
