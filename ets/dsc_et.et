@@ -61,4 +61,7 @@
 	ec	NO_SUCH_USER,
 		"No such user on this system"
 
+	ec	CANT_WRITE_TEMP,
+		"Can't write temporary file"
+
 	end
