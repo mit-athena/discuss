@@ -972,6 +972,9 @@ int *result;
 
      close (u_trn_f);				/* bombs away */
      close (u_control_f);
+     close (u_acl_f);
+     acl_destroy(mtg_acl);
+     mtg_acl = NULL;
      current_mtg [0] = '\0';
 
      return;
