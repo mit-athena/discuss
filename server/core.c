@@ -11,7 +11,7 @@
 /*
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.19 1988-01-05 01:08:44 rfrench Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.20 1988-06-17 23:12:43 srz Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
@@ -21,6 +21,9 @@
  *		callable routines.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.19  88/01/05  01:08:44  rfrench
+ * #ifdef'd ZEPHYR stuff
+ * 
  * Revision 1.18  87/10/24  00:46:31  wesommer
  * Change acl name to "acl" instead of ".ds_acl"
  * Change default (if no acl file there) to be deny permission.
@@ -49,7 +52,7 @@
  *
  */
 #ifndef lint
-static char *rcsid_core_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.19 1988-01-05 01:08:44 rfrench Exp $";
+static char *rcsid_core_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.20 1988-06-17 23:12:43 srz Exp $";
 #endif lint
 
 
@@ -1196,6 +1199,8 @@ int *result;
      close(uf);
 
      *updated = (mysuper.last > last);
+     if (mysuper.highest < last)
+	  *result = NO_SUCH_TRN;
 
 punt:
      return;
