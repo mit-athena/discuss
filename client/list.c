@@ -2,7 +2,7 @@
  *
  * List request for DISCUSS
  *
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.15 1987-07-17 00:35:14 spook Exp $
+ * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.16 1987-11-09 23:45:54 raeburn Exp $
  * $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v $
  * $Locker:  $
  *
@@ -10,7 +10,7 @@
  *
  */
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.15 1987-07-17 00:35:14 spook Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.16 1987-11-09 23:45:54 raeburn Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -29,6 +29,7 @@ static trn_info t_info;
 static list_it(),delete_it(),retrieve_it();
 static int performed;		/* true if trn was acted upon */
 static int barred;		/* true if access was denied sometime */
+static int only_initial;
 
 void map_trns();
 
@@ -56,12 +57,17 @@ list_it(i)
 			  "Can't read trn info");
 		goto punt;
 	}
-	else {						/* success */
-	     if (!performed) {
-		  performed = TRUE;
-		  dsc_public.current = i;		/* current = first */
-	     }
+
+	if (t_info.pref && only_initial) {
+		code = 0;
+		goto punt;
 	}
+
+	if (!performed) {
+		performed = TRUE;
+		dsc_public.current = i;		/* current = first */
+	}
+
 	strcpy(newtime, short_time(&t_info.date_entered));
 	/*
 	 * If author ends with current realm, punt the realm.
@@ -108,6 +114,10 @@ int i;
 {
      int code;
 
+     if (only_initial) {
+	     ss_perror(sci_idx, 0, "flag '-initial' not accepted");
+	     return 1;
+     }
      dsc_delete_trn(&dsc_public.nb, i, &code);
      if (code == NO_ACCESS) {
 	  barred = TRUE;
@@ -139,6 +149,10 @@ int i;
 {
      int code;
 
+     if (only_initial) {
+	     ss_perror(sci_idx, 0, "flag '-initial' not accepted");
+	     return 1;
+     }
      dsc_retrieve_trn(&dsc_public.nb, i, &code);
      if (code == NO_ACCESS) {
 	  barred = TRUE;
@@ -170,7 +184,7 @@ map_trns(argc, argv, defalt, proc)
 	char *defalt;
 	int (*proc)();
 {
-	int code;
+	int i, code;
 	selection_list *trn_list;
 
 	if (!dsc_public.attending) {
@@ -195,25 +209,28 @@ map_trns(argc, argv, defalt, proc)
 	     t_info.author = NULL;
 	}
 
-	if (argc == 1) {
+	only_initial = 0;
+	trn_list = (selection_list *)NULL;
+	for (i = 1; i < argc; i++) {
+		if (!strcmp(argv[i], "-initial"))
+			only_initial = 1;
+		else {
+			trn_list = trn_select(&t_info, argv[i],
+					      trn_list, &code);
+			if (code) {
+				ss_perror(sci_idx, code, argv[i]);
+				sl_free(trn_list);
+				return;
+			}
+		}
+	}
+	if (trn_list == (selection_list *)NULL) {
 		trn_list = trn_select(&t_info, defalt,
 				      (selection_list *)NULL, &code);
 		if (code) {
 			ss_perror(sci_idx, code, "");
 			free(trn_list);
 			return;
-		}
-	}
-	else {
-		trn_list = (selection_list *)NULL;
-		while (argv++, argc-- > 1) {
-			trn_list = trn_select(&t_info, *argv,
-					      trn_list, &code);
-			if (code != 0) {
-				ss_perror(sci_idx, code, *argv);
-				sl_free(trn_list);
-				return;
-			}
 		}
 	}
 
