@@ -26,4 +26,6 @@ typedef struct {
 	int last;
 } server_name_blk;
 
-#define	DSC_ST_CHANGED	1
+#define	DSC_ST_CHANGED (0x0001)
+#define DSC_ST_DELETED (0x0002)
+
