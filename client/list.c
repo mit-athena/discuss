@@ -2,13 +2,16 @@
  *
  * List request for DISCUSS
  *
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.10 1986-12-07 16:04:34 rfrench Exp $
+ * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.11 1987-01-18 22:39:33 spook Exp $
  * $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v $
  * $Locker:  $
  *
  * Copyright (C) 1986 by the MIT Student Information Processing Board
  *
  * $Log: not supported by cvs2svn $
+ * Revision 1.10  86/12/07  16:04:34  rfrench
+ * Globalized sci_idx
+ * 
  * Revision 1.9  86/12/07  00:39:08  rfrench
  * Killed ../include
  * 
@@ -99,7 +102,7 @@ list_it(i)
 	 * If author ends with current realm, punt the realm.
 	 */
 	if ((cp=index(t_info.author, '@')) != NULL)
-		if (!strcmp(cp+1, REALM))
+		if (!strcmp(cp+1, local_realm()))
 			*cp = '\0';
 	
 	if (strlen(t_info.author) > 15) {
