@@ -11,7 +11,7 @@
 /*
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.21 1988-09-23 17:05:04 raeburn Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.22 1988-09-23 17:15:21 raeburn Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
@@ -21,6 +21,9 @@
  *		callable routines.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.21  88/09/23  17:05:04  raeburn
+ * Changed type names in accordance with acl.h.
+ * 
  * Revision 1.20  88/06/17  23:12:43  srz
  * Change update_mtg to return an error if the meeting appears to have
  * lost transactions.
@@ -56,7 +59,7 @@
  *
  */
 #ifndef lint
-static char *rcsid_core_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.21 1988-09-23 17:05:04 raeburn Exp $";
+static char *rcsid_core_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.22 1988-09-23 17:15:21 raeburn Exp $";
 #endif lint
 
 
@@ -69,6 +72,7 @@ static char *rcsid_core_c = "$Header: /afs/dev.mit.edu/source/repository/athena/
 #include "../include/tfile.h"
 #include "../include/atom.h"
 #include "../include/acl.h"
+#include "../include/internal.h"
 #include <errno.h>
 #include <sys/file.h>
 #include <sys/types.h>
