@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v 1.16 1988-04-22 21:24:18 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v 1.17 1988-05-05 23:14:10 srz Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
@@ -12,7 +12,7 @@
 
 #ifndef lint
 static char rcsid_discuss_c[] =
-     "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v 1.16 1988-04-22 21:24:18 srz Exp $";
+     "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v 1.17 1988-05-05 23:14:10 srz Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -156,6 +156,10 @@ new_trans(argc, argv)
      if (dsc_public.highest_seen == txn_no -1) {
 	  dsc_public.highest_seen = txn_no;
      }
+
+     /* update last */
+     dsc_public.m_info.last = txn_no;
+     dsc_public.m_info.highest = txn_no;
 punt:
      dont_flag_interrupts();
 }
