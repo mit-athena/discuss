@@ -9,14 +9,14 @@
  *
  * List request for DISCUSS
  *
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.30 1993-04-28 11:18:12 miki Exp $
+ * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.31 1994-03-25 16:26:09 miki Exp $
  * $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v $
  * $Locker:  $
  *
  */
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.30 1993-04-28 11:18:12 miki Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.31 1994-03-25 16:26:09 miki Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -74,7 +74,7 @@ int *codep;
 	/*
 	 * If author/signature ends with current realm, punt the realm.
 	 */
-	if ((cp=index(author, '@')) != NULL)
+	if ((cp=strchr(author, '@')) != NULL)
 		if (!strcmp(cp+1, local_realm()))
 			*cp = '\0';
 
