@@ -11,11 +11,11 @@
  */
 
 #include <discuss/discuss.h>
+#include <errno.h>
 
 extern char *user_id;
 extern tfile stdout_tf;
 extern int bit_bucket();
-extern int errno;
 extern char *do_quote();
 tfile unix_tfile();
 extern int cache_activated, cache_working;

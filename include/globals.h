@@ -6,13 +6,14 @@
  *
  */
 /*
- *	$Id: globals.h,v 1.21 1999-02-02 20:40:19 kcr Exp $
+ *	$Id: globals.h,v 1.22 2003-03-20 06:59:38 ghudson Exp $
  *
  *	Declarations of global variables for discuss.
  */
 
 #include <discuss/dsname.h>
 #include "discuss_err.h"
+#include <errno.h>
 
 /* Typedefs */
 

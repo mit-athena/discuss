@@ -9,7 +9,7 @@
 typedef unsigned short Boolean;
 typedef char Byte;
 
-extern int  errno;
+#include <errno.h>
 
 char    *calloc();
 
