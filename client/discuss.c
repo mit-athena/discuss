@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.19 1986-11-17 00:58:05 spook Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.20 1986-11-20 10:32:10 srz Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
@@ -9,6 +9,9 @@
  *	ss library for the command interpreter.
  *
  *      $Log: not supported by cvs2svn $
+ * Revision 1.19  86/11/17  00:58:05  spook
+ * Added some control arg processing.  (-ssn, -rq, -quit)
+ * 
  * Revision 1.18  86/11/16  06:16:09  wesommer
  * Added call to init_acl_err_tbl.
  * 
@@ -71,7 +74,7 @@
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.19 1986-11-17 00:58:05 spook Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.20 1986-11-20 10:32:10 srz Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -278,8 +281,8 @@ repl(sci_idx, argc, argv)
 	}
 	(void) printf("Transaction [%04d] entered in the %s meeting.\n",
 		      txn_no, dsc_public.mtg_name);
-	if (dsc_public.current == 0)
-		dsc_public.current = txn_no;
+
+	dsc_public.current = orig_trn;
 
 	/* and now a pragmatic definition of 'seen':  If you are up-to-date
 	   in a meeting, then you see transactions you enter. */
