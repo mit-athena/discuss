@@ -6,6 +6,7 @@
 
 #include <sys/types.h>
 #include <stdio.h>
+#include <strings.h>
 #include "gen.h"
 #include "usp.h"
 #include <netinet/in.h>
