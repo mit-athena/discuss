@@ -1,10 +1,23 @@
 /*
+ *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.2 1986-11-16 06:05:37 wesommer Exp $
+ *
+ *	Copyright (C) 1986 by the Massachusetts Institute of Technology
+ *
+ *
  *
  * coreutil.c  -- These contain lower-layer, utility type routines to
  *		  be used by core.  These include things to handle the
  *		  in-memory superblock, and to open & close meetings.
  *
+ *	$Log: not supported by cvs2svn $
  */
+
+
+#ifndef lint
+static char *rcsid_coreutil_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.2 1986-11-16 06:05:37 wesommer Exp $";
+#endif lint
+
 
 #include "../include/types.h"
 #include "../include/dsc_et.h"
@@ -27,7 +40,7 @@ afile a_control_f = NULL;			/* radioactive file descriptor */
 tfile abort_file = NULL;			/* close this on abort */
 bool  read_lock = FALSE;			/* have lock on u_control_f */
 Acl   *mtg_acl = NULL;				/* current mtg acl */
-
+int 	last_acl_mod;				/* last mod to ACL */
 mtg_super super;
 char *super_chairman;
 char *super_long_name;
@@ -70,15 +83,48 @@ char *mtg_name;
      int mtg_name_len;
      trn_base tb;
      int uid = geteuid();
+     struct stat sb;
 
      mtg_name_len = strlen (mtg_name);
      if (mtg_name[0] != '/' || mtg_name_len == 0 || mtg_name_len > 168 || mtg_name [mtg_name_len-1] == '/') {
 	  return (BAD_PATH);
      }
 
-     if (!strcmp (mtg_name, current_mtg))
-	  return (0);				/* that was easy */
+     strcpy (str, mtg_name);
+     strcat (str, "/acl");
 
+     if (!strcmp (mtg_name, current_mtg)) {
+	  /*
+	   * is acl stale? 
+	   */
+	  stat(str, &sb);
+	  if (sb.st_mtime <= last_acl_mod)
+		  return (0);				/* that was easy */
+	  /*
+	   * Ok, just revert the ACL.
+	   */
+	  acl_destroy(mtg_acl);
+	  if ((u_acl_f = open(str, O_RDONLY, 0700)) < 0) {
+		  if (errno == ENOENT)
+			  result = NO_SUCH_MTG;
+		  else if (errno == EACCES)
+			  result = NO_ACCESS;
+		  else
+			  result = BAD_PATH;
+		  goto punt;
+	  }
+	  if (!fis_owner (u_acl_f, uid)) {
+		  result = NO_ACCESS;
+		  goto punt;
+	  }
+
+	  mtg_acl = acl_read (u_acl_f);
+	  close(u_acl_f);
+	  u_acl_f = 0;
+	  fstat(u_acl_f, &sb);
+	  last_acl_mod = sb.st_mtime;
+	  return(0);
+     }
 
      if (current_mtg [0] != '\0') {		/* close previous meeting */
 	  if (nuclear)
@@ -90,9 +136,6 @@ char *mtg_name;
      }
 
      u_trn_f = u_control_f = u_acl_f = 0;
-
-     strcpy (str, mtg_name);
-     strcat (str, "/acl");
 
      if ((u_acl_f = open(str, O_RDONLY, 0700)) < 0) {
 	  if (errno == ENOENT)
@@ -109,6 +152,8 @@ char *mtg_name;
      }
 
      mtg_acl = acl_read (u_acl_f);
+     fstat(u_acl_f, &sb);
+     last_acl_mod = sb.st_mtime;
      close(u_acl_f);
      u_acl_f = 0;
 
