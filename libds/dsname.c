@@ -10,6 +10,7 @@
 #include <errno.h>
 #include <pwd.h>
 #include <sys/file.h>
+#include <sys/param.h>
 #include <stdio.h>
 #include "../include/dsname.h"
 
@@ -162,6 +163,49 @@ int *result;			/* standard code */
      *result = ENOENT;
      return;
 }
+/*
+ * Find name of .disrc file; search path is:
+ *	$DISRC environment variable
+ *	$HOME/.disrc
+ *	<pw->pw_dir>/.disrc
+ * This function is "sticky"; it only evaluates the filename once.
+ */
+
+static set_rc_filename(user, buf, len)
+     char *user, *buf;
+     int len;
+{
+     static char disrcbuf[MAXPATHLEN], *disrcfile = NULL;
+     struct passwd *pw;
+     register char *cp = NULL;
+     extern char *getenv();
+
+     if (!disrcfile) {
+	  if ((cp = getenv("DISRC")) && !access(cp, R_OK|W_OK)) {
+	       strncpy(disrcbuf, cp, MAXPATHLEN-1);
+	  } else if ((cp = getenv("HOME")) 
+		 &&  (strncpy(disrcbuf,cp, MAXPATHLEN-1))
+		 &&  (strncat(disrcbuf,"/.disrc", MAXPATHLEN-1))
+		 &&  (!access(disrcbuf, R_OK|W_OK))) {
+	       /* got it */
+	  } else {
+	       if (*user == '\0')			/* current user */
+		    pw = getpwuid(getuid());
+	       else
+		    pw = getpwnam(user);
+	       if (!pw) {
+		    printf("Who are you?\n"); /* XXX - use warning */
+		    strncpy(disrcbuf, "/tmp/.disrc");
+	       } else {
+		    strncpy (disrcbuf, pw -> pw_dir, MAXPATHLEN-1);
+		    strncat (disrcbuf, "/.disrc", MAXPATHLEN-1);
+	       }
+	  }
+	  disrcfile = disrcbuf;
+     }
+     strncpy(buf, disrcfile, len);	  
+}
+
 
 update_mtg_set(realm, user, set, num, result)
 char *realm, *user;		/* input */
@@ -172,19 +216,14 @@ int *result;			/* error code */
      name_blk *nbp;
      int i;
      char *touched;		/* array of booleans */
-     char old_name[140], new_name[140];
+     char old_name[MAXPATHLEN], new_name[MAXPATHLEN];
      FILE *new_file;
      struct passwd *pw;
      struct nment *nm;
 
      *result = 0;
 
-     if (*user == '\0')			/* current user */
-	  pw = getpwuid(getuid());
-     else
-	  pw = getpwnam(user);
-     strcpy (old_name, pw -> pw_dir);
-     strcat (old_name, "/.disrc");
+     set_rc_filename(user, old_name, sizeof(old_name));
 
      strcpy (new_name, old_name);
      strcat (new_name, "~");		/* emacsish, but who cares? */
@@ -288,16 +327,11 @@ char *user;
 {
      static char my_user[NB_USER_SZ] = "";
      static int got_my_user = 0;
-     char buffer[140];
+     char buffer[MAXPATHLEN];
      struct passwd *pw;
 
      if (nm_file == NULL || !got_my_user) {
-	  if (*user == '\0')			/* current user */
-	       pw = getpwuid(getuid());
-	  else
-	       pw = getpwnam(user);
-	  strcpy (buffer, pw -> pw_dir);
-	  strcat (buffer, "/.disrc");
+	  set_rc_filename(user, buffer, sizeof(buffer));
 	  nm_file = fopen (buffer, "r");
 	  if (nm_file != NULL) {
 	       got_my_user = 1;
