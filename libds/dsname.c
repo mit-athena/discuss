@@ -6,8 +6,7 @@
  *
  */
 /*
- *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v $
- *	$Id: dsname.c,v 1.25 1996-09-19 22:30:49 ghudson Exp $
+ *	$Id: dsname.c,v 1.26 1999-01-22 23:09:57 ghudson Exp $
  *
  */
 
@@ -34,7 +33,7 @@
 
 #ifndef lint
 static const char rcsid_dsname_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v 1.25 1996-09-19 22:30:49 ghudson Exp $";
+    "$Id: dsname.c,v 1.26 1999-01-22 23:09:57 ghudson Exp $";
 #endif
 
 extern char *malloc (), *local_realm (), *getenv ();

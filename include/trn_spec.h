@@ -6,8 +6,7 @@
  *
  */
 /*
- *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/include/trn_spec.h,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/include/trn_spec.h,v 1.2 1989-06-03 00:07:26 srz Exp $
+ *	$Id: trn_spec.h,v 1.3 1999-01-22 23:09:48 ghudson Exp $
  *
  *	Transaction specifiers, and things which use them.
  */

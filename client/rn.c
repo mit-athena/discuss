@@ -6,57 +6,13 @@
  *
  */
 /*
- *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/rn.c,v $
- *	$Author: miki $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/rn.c,v 1.14 1994-03-25 16:32:55 miki Exp $
+ *	$Id: rn.c,v 1.15 1999-01-22 23:09:33 ghudson Exp $
  *
- *	$Log: not supported by cvs2svn $
- * Revision 1.13  93/03/07  06:25:39  probe
- * Yet one more syntax error fixed.
- * 
- * Revision 1.12  93/03/07  06:24:04  probe
- * Fixed a couple syntax errors introduced in the last patch.
- * 
- * Revision 1.11  93/03/07  06:21:45  probe
- * ss_execute_line should not be called with read-only strings.
- * 
- * Revision 1.10  91/07/22  01:28:26  probe
- * POSIX integration
- * 
- * Revision 1.9  89/06/02  23:38:39  srz
- * Added standard copyright notice.
- * 
- * Revision 1.8  89/05/19  16:58:18  srz
- * Declared static functions in advance.
- * 
- * Revision 1.7  89/05/08  02:47:31  srz
- * jik's fix to stop printing twice.
- * 
- * Revision 1.6  89/01/05  01:58:44  raeburn
- * replaced included header files with <discuss/discuss.h>
- * 
- * Revision 1.5  88/04/21  16:04:46  srz
- * Added ^R to redisplay current transaction (courtesy of jik)
- * 
- * Revision 1.4  88/04/20  16:34:04  srz
- * Added catchup, loop for '?' on first prompt.
- * 
- * Revision 1.3  88/01/15  23:11:33  srz
- * Fixed bug where new meetings caused problems for "next"
- * 
- * Revision 1.2  87/11/07  02:50:38  srz
- * Added new commands ('r', 't', 'p', '?'), and fixed bug that Mark reported
- * about trying to reprint the same transaction over and over again when
- * quitting out of 'more'.
- * 
- * Revision 1.1  87/10/24  19:48:02  srz
- * Initial revision
- * 
  */
 
 #ifndef lint
 static char rcsid_update_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/rn.c,v 1.14 1994-03-25 16:32:55 miki Exp $";
+    "$Id: rn.c,v 1.15 1999-01-22 23:09:33 ghudson Exp $";
 #endif /* lint */
 
 #include <discuss/discuss.h>

@@ -6,85 +6,16 @@
  *
  */
 /*
- *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/edit.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/edit.c,v 1.14 1996-09-08 20:31:16 ghudson Exp $
- *	$Locker:  $
+ *	$Id: edit.c,v 1.15 1999-01-22 23:09:24 ghudson Exp $
  *
  *	Utility routines.
  *
- *	$Log: not supported by cvs2svn $
- *	Revision 1.13  1994/03/25 16:27:35  miki
- *	replaced calls to signal with calls to sigaction, for POSIX
- *
- * Revision 1.12  93/04/28  11:17:05  miki
- * ported to Solaris2.1
- * 
- * Revision 1.11  89/06/02  23:37:01  srz
- * Added standard copyright notice.
- * 
- * Revision 1.10  89/03/26  23:20:08  raeburn
- * Commented out extra text after #endif directive
- * 
- * Revision 1.9  89/01/24  19:34:14  srz
- * Protect the temporary file used in editing.
- * Mode 0700.
- * 
- * Revision 1.8  89/01/05  00:17:56  raeburn
- * replaced included header files with <discuss/discuss.h>
- * 
- * Revision 1.7  88/04/03  21:55:11  srz
- * Added check for interrupt in edit loop, so that won't have to
- * end transaction to have ^C work.
- * 
- * Revision 1.6  88/02/07  23:09:48  balamac
- * Added Fend options to the type-in prompter
- * 
- * Revision 1.5  86/12/14  12:02:53  spook
- * Fixed -editor/-no_editor so that it doesn't break other things..
- * 
- * Revision 1.4  86/12/08  00:44:09  wesommer
- * Added simple "line editor" function; changed calling sequence.
- * 
- * Revision 1.3  86/12/07  21:51:37  wesommer
- * Added -editor and -no_editor control args to permit use under emacs.
- * 
- * Revision 1.2  86/12/07  19:32:06  wesommer
- * [spook] Create file before entering.
- * 
- * Revision 1.1  86/12/07  01:30:14  rfrench
- * Initial revision
- * 
- * Revision 1.10  86/12/07  00:39:01  rfrench
- * Killed ../include
- * 
- * Revision 1.9  86/11/11  16:32:44  spook
- * Fixed to work with changes in et stuff
- * 
- * Revision 1.8  86/10/27  16:48:15  wesommer
- * Added form-feeds after each transaction.
- * 
- * Revision 1.7  86/10/27  16:29:04  wesommer
- * Damnit, folks, use RCS.  
- * 
- * Revision 1.6  86/10/19  09:58:52  spook
- * Changed to use dsc_ routines; eliminate refs to rpc.
- * 
- * Revision 1.5  86/09/13  20:31:56  srz
- * Include file fix
- * 
- * Revision 1.4  86/08/22  00:20:38  spook
- * new error-table stuff; separated routines
- * 
- * Revision 1.3  86/08/01  02:41:59  spook
- * Moved edit() from discuss.c; made edit() ignore SIGINT while waiting
- * for editor process to exit.
- * 
  *
  */
 
 #ifndef lint
 static char rcsid_discuss_utils_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/edit.c,v 1.14 1996-09-08 20:31:16 ghudson Exp $";
+    "$Id: edit.c,v 1.15 1999-01-22 23:09:24 ghudson Exp $";
 #endif /* lint */
 
 #include <stdio.h>

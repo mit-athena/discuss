@@ -9,114 +9,8 @@
  *
  * dsmail.c - Modifies/parses mail to discuss
  *
- *        $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/dsmail.c,v $
+ *        $Id: dsmail.c,v 1.10 1999-01-22 23:10:09 ghudson Exp $
  *
- *        $Log: not supported by cvs2svn $
- *        Revision 1.8  1998/04/16 22:17:33  ghudson
- *        From mhpower: prevent /tmp symlink attachs and check malloc return
- *        values.
- *
- *        Revision 1.7  1998/04/07 22:00:03  danw
- *        Add Message-ID and MIME headers to the list of default (-d) headers to keep
- *
- *        Revision 1.6  1997/12/17 00:31:38  ghudson
- *        Oops, REG_BASIC isn't universal.  (It's 0 where it is defined, so just
- *        punt it.)
- *
- *        Revision 1.5  1997/12/17 00:13:06  ghudson
- *        Use POSIX regexps.
- *
- *        Revision 1.4  1995/11/30 19:37:40  miki
- *        In Solaris2.4 sysexits.h migrated to /usr/include
- *
- * Revision 1.3  1995/07/31  21:43:53  cfields
- * Get sysexits.h from ucbinclude if SOLARIS, not SYSV.
- * Don't need the EX_CONFIG def in that ifdef; it happens later if necessary.
- *
- * Revision 1.2  1994/08/14  22:21:28  cfields
- * include /usr/ucbinclude/sysexits.h if SYSV
- * index to strchr
- * extern int regerrno --- why??? It's not used!
- * 7.7 checkin; changes by vrt
- *
- * Revision 1.1  94/04/08  12:37:12  vrt
- * Initial revision
- * 
- * Revision 1.23  93/07/14  02:14:35  srz
- * Check for DELETED_TRN on reply transaction.
- * 
- * Revision 1.22  1993/05/19  15:36:13  raeburn
- * Handle errors in setting up temp file properly.
- * Also, make RPC_NS_TIMEOUT a EX_TEMPFAIL ("try again later") error.
- *
- * Revision 1.21  1993/02/16  21:10:13  srz
- * Trim trailing white-space when comparing subjects.  If daemon does not have
- * access to read long name of meeting, use in-reply-to transaction number
- * regardless of meeting name.
- *
- * Revision 1.20  1993/02/09  23:47:04  srz
- * Fix continuation lines in header fields.  Add better In-reply-to: handling to
- * deal with "[xxxx] in meeting_name" syntax, not replying if meeting name does
- * not match.  Add -s option for subject matching.
- *
- * Revision 1.19  1992/09/11  19:45:36  srz
- * Enter transaction anyways if In-reply-to: transaction does not exist.
- *
- * Revision 1.18  1992/06/26  02:20:05  raeburn
- * getting in sync with current source tree
- *
- * Revision 1.17  92/01/10  00:03:58  srz
- * Haynes' fix for realloc stuff (on Suns).
- * 
- * Revision 1.16  91/07/27  02:27:28  srz
- * Added check in case EX_CONFIG wasn't defined.
- * 
- * Revision 1.15  91/07/05  20:48:09  bjaspan
- * ported to svr4
- * 
- * Revision 1.14  91/07/05  19:16:33  bjaspan
- * actually, I meant ucbinclude
- * 
- * Revision 1.13  91/07/05  19:12:47  bjaspan
- * use /usr/ucb/sysexits.h on svr4
- * 
- * Revision 1.12  91/05/29  16:54:27  raeburn
- * Discarded some unused code; use exit codes that sendmail will recognize, and
- * use SMTP codes in error messages printed.  Renamed PipeToMeeting to
- * SendToMeeting.  Some other minor changes dealing with initialization of
- * variables.  Deleted useless `p' option, added h to indicate that hostname
- * should be extracted from meeting name (not currently used, though).
- * 
- * Revision 1.11  90/02/24  18:46:12  srz
- * Added deriving signature from From: field.
- * 
- * Revision 1.10  89/06/03  00:30:54  srz
- * Added standard copyright notice.
- * 
- * Revision 1.9  89/04/17  17:09:21  srz
- * Added error table initialization.
- * 
- * Revision 1.8  89/01/05  07:13:11  raeburn
- * replaced included header files with <discuss/discuss.h>; also added
- * newline after message header
- * 
- * Revision 1.7  88/01/15  22:42:39  srz
- * set_module now returns fatal flag, again.
- * 
- * Revision 1.6  88/01/05  03:09:30  srz
- * Put location of DSPIPE into config.h
- * 
- * Revision 1.5  87/10/24  04:26:44  wesommer
- * Rewritten for speed and efficiency.  "popen" is a crock.
- * 
- * Revision 1.4  87/07/17  03:34:57  tytso
- * Bugfixes made, added -p option, removed zippy stuff
- * 
- * Revision 1.3  87/05/02  02:12:58  tytso
- * Replaced the regexp and options parsing code with the UNIX
- * library routines.  Cleaned up code.  Added -A (all headers)
- * option.
- * 
  */
 
 #include <stdio.h>
@@ -144,7 +38,7 @@
 
 #ifndef	lint
 static char rcsid[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/dsmail.c,v 1.9 1998-04-16 22:20:41 ghudson Exp $";
+    "$Id: dsmail.c,v 1.10 1999-01-22 23:10:09 ghudson Exp $";
 #endif
 
 char *malloc(), *realloc ();

@@ -6,33 +6,15 @@
  *
  */
 /*
- *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tmem.c,v $
- *	$Author: cfields $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tmem.c,v 1.6 1997-06-29 00:35:31 cfields Exp $
+ *	$Id: tmem.c,v 1.7 1999-01-22 23:10:02 ghudson Exp $
  *
  *	tfile module for ``memory'' tfiles. 
- * 
- *	$Log: not supported by cvs2svn $
- *	Revision 1.5  1996/09/19 22:30:54  ghudson
- *	BSD -> ANSI string and memory functions
- *
- *	Revision 1.4  1994/03/25 16:45:04  miki
- *	replaced bzero with memset
- *
- * Revision 1.3  89/06/03  00:22:16  srz
- * Added standard copyright notice.
- * 
- * Revision 1.2  89/06/03  00:13:07  srz
- * Ken's changes.
- * 
- * Revision 1.1  88/03/11  00:05:45  wesommer
- * Initial revision
  * 
  */
 
 #ifndef lint
 static char rcsid_tmem_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tmem.c,v 1.6 1997-06-29 00:35:31 cfields Exp $";
+    "$Id: tmem.c,v 1.7 1999-01-22 23:10:02 ghudson Exp $";
 #endif /* lint */
 
 #include <errno.h>

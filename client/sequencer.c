@@ -1,24 +1,12 @@
 /*
- *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/sequencer.c,v $
- *	$Author: ghudson $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/sequencer.c,v 1.4 1996-09-19 22:28:30 ghudson Exp $
+ *	$Id: sequencer.c,v 1.5 1999-01-22 23:09:33 ghudson Exp $
  *
  *	Copyright (C) 1987 by the Massachusetts Institute of Technology
  *
- *	$Log: not supported by cvs2svn $
- *	Revision 1.3  1993/03/07 06:22:02  probe
- *	ss_execute_line should not be called with read-only strings.
- *
- * Revision 1.2  91/07/22  01:29:03  probe
- * POSIX integration
- * 
- * Revision 1.1  91/07/05  00:48:53  probe
- * Initial revision
- * 
  */
 
 #ifndef lint
-static char *rcsid_sequencer_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/sequencer.c,v 1.4 1996-09-19 22:28:30 ghudson Exp $";
+static char *rcsid_sequencer_c = "$Id: sequencer.c,v 1.5 1999-01-22 23:09:33 ghudson Exp $";
 #endif lint
 
 #include "types.h"

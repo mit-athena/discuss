@@ -2,8 +2,7 @@
  *
  * tfile.h  -- Definition for internal 'tfile's.
  *
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/include/discuss/tfile.h,v 1.2 1991-09-04 11:33:58 lwvanels Exp $
- * $Log: not supported by cvs2svn $
+ * $Id: tfile.h,v 1.3 1999-01-22 23:09:52 ghudson Exp $
  */
 
 struct _tfile {

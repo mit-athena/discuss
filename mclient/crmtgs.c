@@ -6,29 +6,18 @@
  *
  */
 /*
- *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/crmtgs.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/crmtgs.c,v 1.4 1989-06-03 00:30:40 srz Exp $
+ *	$Id: crmtgs.c,v 1.5 1999-01-22 23:10:08 ghudson Exp $
  *
  *	Fill out a .meetings file with the primary name of all the
  *	meetings in it.  This requires that the meeting be accessible
  *	at this time; however, this program may be run several times
  *	to get it right..
  *
- *	$Log: not supported by cvs2svn $
- * Revision 1.3  89/01/05  07:14:35  raeburn
- * replaced included header files with <discuss/discuss.h>
- * 
- * Revision 1.2  88/09/23  23:55:27  raeburn
- * Added declaration of getenv(), to satisfy prototypes of functions.
- * 
- * Revision 1.1  87/04/08  04:00:53  wesommer
- * Initial revision
- * 
  */
 
 #ifndef lint
 static char rcsid_crmtgs_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/crmtgs.c,v 1.4 1989-06-03 00:30:40 srz Exp $";
+    "$Id: crmtgs.c,v 1.5 1999-01-22 23:10:08 ghudson Exp $";
 #endif /* lint */
 
 #include <discuss/discuss.h>

@@ -7,26 +7,15 @@
  */
 /*
  *
- *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tnet.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tnet.c,v 1.5 1989-06-03 00:22:24 srz Exp $
+ *	$Id: tnet.c,v 1.6 1999-01-22 23:10:02 ghudson Exp $
  *
  * tnet.c -- procedures to have tfiles go over the net.
  *
- *	$Log: not supported by cvs2svn $
- * Revision 1.4  89/01/04  20:49:11  raeburn
- * fixed include refs
- * 
- * Revision 1.3  87/07/17  03:11:26  spook
- * *** empty log message ***
- * 
- * Revision 1.2  87/04/11  00:06:25  srz
- * Added RCS junk
- * 
  *
  */
 #ifndef lint
 static char rcsid_tnet_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tnet.c,v 1.5 1989-06-03 00:22:24 srz Exp $";
+    "$Id: tnet.c,v 1.6 1999-01-22 23:10:02 ghudson Exp $";
 #endif lint
 
 #define min(A, B) ((A) < (B) ? (A) : (B))

@@ -11,7 +11,7 @@
  * Stan picked the names, not me..
  */
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/interrupt.c,v 1.5 1994-03-25 16:32:14 miki Exp $";
+static char *rcsid_discuss_c = "$Id: interrupt.c,v 1.6 1999-01-22 23:09:25 ghudson Exp $";
 #endif lint
 
 #include <signal.h>

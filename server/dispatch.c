@@ -10,19 +10,7 @@
  * dispatch.c  -- Procedure to do the dispatching on an RPC call.
  *		  This contains the procedure table.
  *
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/dispatch.c,v 1.11 1990-02-24 18:59:24 srz Exp $
- *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/dispatch.c,v $
- *	$Locker:  $
- *	$Log: not supported by cvs2svn $
- * Revision 1.10  89/06/03  00:42:47  srz
- * Added standard copyright notice.
- * 
- * Revision 1.9  89/01/29  17:16:38  srz
- * Added flag routines.
- * 
- * Revision 1.8  89/01/04  22:18:43  raeburn
- * Added RCS stuff and copyright, fixed include paths.
- * 
+ *	$Id: dispatch.c,v 1.12 1999-01-22 23:10:17 ghudson Exp $
  */
 
 #include "rpc.h"
@@ -33,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid_dispatch_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/dispatch.c,v 1.11 1990-02-24 18:59:24 srz Exp $";
+    "$Id: dispatch.c,v 1.12 1999-01-22 23:10:17 ghudson Exp $";
 #endif
 
 extern bool recvbool();

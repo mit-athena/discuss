@@ -20,7 +20,7 @@
 #include <string.h>
 #endif
 #ifndef	lint
-static char rcsid_create_mtg_dir_c[] = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/create_mtg_dir.c,v 1.6 1996-09-19 22:31:28 ghudson Exp $";
+static char rcsid_create_mtg_dir_c[] = "$Id: create_mtg_dir.c,v 1.7 1999-01-22 23:10:07 ghudson Exp $";
 #endif
 
 main(argc, argv)

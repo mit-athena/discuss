@@ -1,23 +1,14 @@
 /*
- *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tfpager.c,v $
- *	$Author: danw $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tfpager.c,v 1.3 1998-11-05 14:40:38 danw Exp $
+ *	$Id: tfpager.c,v 1.4 1999-01-22 23:10:01 ghudson Exp $
  *
  *	Copyright (C) 1987 by the Massachusetts Institute of Technology
  *
  *	An auto-paging tfile.
  *
- *	$Log: not supported by cvs2svn $
- *	Revision 1.2  1996/09/19 22:30:53  ghudson
- *	BSD -> ANSI string and memory functions
- *
- *	Revision 1.1  1993/10/12 05:58:26  probe
- *	Initial revision
- *
  */
 
 #ifndef lint
-static char *rcsid_tfpager_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tfpager.c,v 1.3 1998-11-05 14:40:38 danw Exp $";
+static char *rcsid_tfpager_c = "$Id: tfpager.c,v 1.4 1999-01-22 23:10:01 ghudson Exp $";
 #endif lint
 
 #include <stdio.h>

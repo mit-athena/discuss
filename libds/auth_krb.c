@@ -7,8 +7,7 @@
  */
 /*
  *
- *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/auth_krb.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/auth_krb.c,v 1.8 1996-09-19 22:30:47 ghudson Exp $
+ *	$Id: auth_krb.c,v 1.9 1999-01-22 23:09:55 ghudson Exp $
  *
  * auth_krb () -- Authentication procedure for kerberos.  This contains the
  *		  standard authentication for kerberos.
@@ -16,7 +15,7 @@
  */
 #ifndef lint
 static char *rcsid_auth_krb_c =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/auth_krb.c,v 1.8 1996-09-19 22:30:47 ghudson Exp $";
+    "$Id: auth_krb.c,v 1.9 1999-01-22 23:09:55 ghudson Exp $";
 #endif lint
 
 #include <string.h>

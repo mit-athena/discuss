@@ -9,14 +9,12 @@
  *
  * catchup request for DISCUSS
  *
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/catchup.c,v 1.6 1996-09-08 20:31:05 ghudson Exp $
- * $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/catchup.c,v $
- * $Locker:  $
+ * $Id: catchup.c,v 1.7 1999-01-22 23:09:21 ghudson Exp $
  *
  */
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/catchup.c,v 1.6 1996-09-08 20:31:05 ghudson Exp $";
+    "$Id: catchup.c,v 1.7 1999-01-22 23:09:21 ghudson Exp $";
 #endif lint
 
 #include <stdio.h>

@@ -6,9 +6,7 @@
  *
  */
 /*
- *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v 1.26 1996-09-08 20:31:24 ghudson Exp $
- *	$Locker:  $
+ *	$Id: new_trans.c,v 1.27 1999-01-22 23:09:27 ghudson Exp $
  *
  *	New-transaction routine for DISCUSS.  (Request 'talk'.)
  *
@@ -17,7 +15,7 @@
 
 #ifndef lint
 static char rcsid_discuss_c[] =
-     "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v 1.26 1996-09-08 20:31:24 ghudson Exp $";
+     "$Id: new_trans.c,v 1.27 1999-01-22 23:09:27 ghudson Exp $";
 #endif lint
 
 #include <stdio.h>

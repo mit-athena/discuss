@@ -3,8 +3,7 @@
 ;;;    	Developed by the MIT Student Information Processing Board (SIPB).
 ;;;    	For copying information, see the file mit-copyright.h in this release.
 ;;;
-;;;	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss-misc.el,v $
-;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss-misc.el,v 1.10 1998-05-31 20:38:11 danw Exp $
+;;;	$Id: discuss-misc.el,v 1.11 1999-01-22 23:09:43 ghudson Exp $
 ;;;
 ;;;  Emacs lisp code with random parts of the emacs discuss user interface
 ;;;  We may want to split out the mail functions into a separate file if

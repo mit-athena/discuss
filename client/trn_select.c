@@ -7,14 +7,13 @@
  */
 /*
  *
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/trn_select.c,v 1.15 1990-02-24 18:51:10 srz Exp $
- * $Locker:  $
+ * $Id: trn_select.c,v 1.16 1999-01-22 23:09:35 ghudson Exp $
  *
  */
 
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/trn_select.c,v 1.15 1990-02-24 18:51:10 srz Exp $";
+    "$Id: trn_select.c,v 1.16 1999-01-22 23:09:35 ghudson Exp $";
 #endif lint
 
 #define	MIN(a,b)	((a)<(b)?(a):(b))

@@ -7,112 +7,16 @@
  */
 /*
  *
- *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.36 1998-05-05 19:18:34 ghudson Exp $
+ *	$Id: core.c,v 1.37 1999-01-22 23:10:15 ghudson Exp $
  *
  *
  * core.c --    Routines that are the meat of discuss.  These provide user
  *		callable routines.
  *
- *	$Log: not supported by cvs2svn $
- *	Revision 1.35  1996/09/19 22:32:23  ghudson
- *	BSD -> ANSI string and memory functions
- *
- *	Revision 1.34  1994/03/25 17:21:46  miki
- *	chnaged index to strchr
- *
- * Revision 1.33  93/04/29  17:06:33  miki
- *  ported to Solaris2.1
- * 
- * Revision 1.32  92/11/08  23:00:49  probe
- * Avoid incompatible redeclarations (AIX 3.2)
- * 
- * Revision 1.31  92/07/14  17:37:03  mar
- * don't allow newline in subject line
- * compile under SVR4
- * rename /usr/spool/discuss/acl to /usr/spool/discuss/cacl for security
- * 	reasons.
- * 
- * Revision 1.33  92/05/28  23:44:09  srz
- * Disallow linefeeds in subjects.
- * 
- * Revision 1.32  91/08/12  20:32:19  srz
- * Changes acl to cacl for meeting creation to avoid submeeting
- * creation.
- * 
- * Revision 1.31  91/07/05  19:47:44  bjaspan
- * ported to svr4
- * 
- * Revision 1.30  90/09/11  19:02:59  srz
- * Added per-meeting Zephyr flag (to be patched for the moment).
- * 
- * Revision 1.29  90/03/19  13:38:51  srz
- * Fixed bug where rmds would cause reset connections as a sub-process.
- * 
- * Revision 1.28  90/02/24  18:58:08  srz
- * Added signatures to meetings.  This involves adding two routines,
- * add_trn2 and get_trn_info3, for storing and saving this information.
- * Signatures are glommed onto the end of the author, so we don't
- * have to change the meeting format.
- * 
- * Revision 1.27  89/08/09  22:39:05  srz
- * Added meeting forwarding.
- * 
- * Revision 1.26  89/06/03  00:42:11  srz
- * Added standard copyright notice.
- * 
- * Revision 1.25  89/01/29  17:17:12  srz
- * Added flag routines.
- * 
- * Revision 1.24  89/01/04  23:32:51  raeburn
- * fixed include paths
- * 
- * Revision 1.23  88/10/08  01:27:54  srz
- * Changes for new expunge.
- * 
- * Revision 1.22  88/09/23  17:15:21  raeburn
- * Needs internal.h too.
- * 
- * Revision 1.21  88/09/23  17:05:04  raeburn
- * Changed type names in accordance with acl.h.
- * 
- * Revision 1.20  88/06/17  23:12:43  srz
- * Change update_mtg to return an error if the meeting appears to have
- * lost transactions.
- * 
- * Revision 1.19  88/01/05  01:08:44  rfrench
- * #ifdef'd ZEPHYR stuff
- * 
- * Revision 1.18  87/10/24  00:46:31  wesommer
- * Change acl name to "acl" instead of ".ds_acl"
- * Change default (if no acl file there) to be deny permission.
- * 
- * Revision 1.17  87/10/23  23:49:15  wesommer
- * Implemented access control on meeting creation.
- * 
- * Revision 1.16  87/10/23  21:42:40  wesommer
- * This isn't Multics.
- * 
- * Revision 1.15  87/08/22  22:36:28  rfrench
- * Moved calling location of mtg_znotify -- write_super frees things!
- * 
- * Revision 1.14  87/08/22  18:12:51  rfrench
- * Added Zephyr notifications
- * 
- * Revision 1.13  87/07/16  19:30:46  srz
- * Changed deleted flag to general flags structure on the server.
- * 
- * Revision 1.12  87/04/11  23:48:31  spook
- * Removed unused variable.
- * 
- * Revision 1.11  87/04/11  00:10:00  srz
- * Added RCS junk
- * 
- *
  */
 #ifndef lint
 static char rcsid_core_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.36 1998-05-05 19:18:34 ghudson Exp $";
+    "$Id: core.c,v 1.37 1999-01-22 23:10:15 ghudson Exp $";
 #endif lint
 
 

@@ -6,14 +6,13 @@
  *
  */
 /*
- *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.27 1990-02-24 18:53:54 srz Exp $
+ *	$Id: interface.c,v 1.28 1999-01-22 23:09:58 ghudson Exp $
  *
  */
 
 #ifndef lint
 static char rcsid_interface_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.27 1990-02-24 18:53:54 srz Exp $";
+    "$Id: interface.c,v 1.28 1999-01-22 23:09:58 ghudson Exp $";
 static char copyright[] =
     "Copyright (C) 1989 by the Massachusetts Institute of Technology";
 #endif lint

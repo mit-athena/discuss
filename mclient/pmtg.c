@@ -21,7 +21,7 @@ mtg_info minfo;
 
 #ifndef	lint
 static char rcsid_pmtg_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/pmtg.c,v 1.5 1996-09-19 22:31:31 ghudson Exp $";
+    "$Id: pmtg.c,v 1.6 1999-01-22 23:10:11 ghudson Exp $";
 #endif
 
 int main (argc,argv)

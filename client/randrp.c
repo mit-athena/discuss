@@ -6,9 +6,7 @@
  *
  */
 /*
- *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/randrp.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/randrp.c,v 1.12 1996-11-26 21:53:45 ghudson Exp $
- *	$Locker:  $
+ *	$Id: randrp.c,v 1.13 1999-01-22 23:09:32 ghudson Exp $
  *
  *	Code for "randrp" request in discuss.
  *
@@ -16,7 +14,7 @@
 
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/randrp.c,v 1.12 1996-11-26 21:53:45 ghudson Exp $";
+    "$Id: randrp.c,v 1.13 1999-01-22 23:09:32 ghudson Exp $";
 #endif lint
 
 #include <discuss/discuss.h>

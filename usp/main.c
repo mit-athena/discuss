@@ -82,9 +82,7 @@
 */
 
 /*
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/usp/main.c,v 1.6 1998-07-25 21:06:27 ghudson Exp $
- * $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/usp/main.c,v $
- * $Locker:  $
+ * $Id: main.c,v 1.7 1999-01-22 23:10:21 ghudson Exp $
  */
 
 #include <stdio.h>
@@ -98,7 +96,7 @@
 #include "usp.h"
 
 static char rcsid[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/usp/main.c,v 1.6 1998-07-25 21:06:27 ghudson Exp $";
+    "$Id: main.c,v 1.7 1999-01-22 23:10:21 ghudson Exp $";
 
 /* connection operations */
 

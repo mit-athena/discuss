@@ -9,14 +9,7 @@
  *
  * disserve.c -- Simple top level program for test.
  *
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/disserve.c,v 1.4 1989-06-03 00:42:58 srz Exp $
- * $Log: not supported by cvs2svn $
- * Revision 1.3  89/06/01  16:26:56  srz
- * John Kohl's patch for Ultrix 3.0.
- * 
- * Revision 1.2  88/10/08  01:38:16  raeburn
- * Added some syslog code.
- * 
+ * $Id: disserve.c,v 1.5 1999-01-22 23:10:17 ghudson Exp $
  */
 
 #include <stdio.h>

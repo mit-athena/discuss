@@ -9,14 +9,12 @@
  *
  * List request for DISCUSS
  *
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.33 1998-07-25 21:21:46 ghudson Exp $
- * $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v $
- * $Locker:  $
+ * $Id: list.c,v 1.34 1999-01-22 23:09:26 ghudson Exp $
  *
  */
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.33 1998-07-25 21:21:46 ghudson Exp $";
+    "$Id: list.c,v 1.34 1999-01-22 23:09:26 ghudson Exp $";
 #endif lint
 
 #include <stdio.h>

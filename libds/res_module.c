@@ -7,8 +7,7 @@
  */
 /*
  *
- *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/res_module.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/res_module.c,v 1.13 1996-09-19 22:30:51 ghudson Exp $
+ *	$Id: res_module.c,v 1.14 1999-01-22 23:09:59 ghudson Exp $
  *
  * resolve_module () --
  *	Can you say "Put all the configuration into one file?"  Can you
@@ -19,34 +18,11 @@
  *	Note that if service name contains a '/' as the first character, then
  *	the remote function is executed as a subprocess.
  *
- *	$Log: not supported by cvs2svn $
- *	Revision 1.12  1996/06/26 07:21:10  ghudson
- *	Kerberos has nothing to do with maximum hostname sizes.  Use BUFSIZ,
- *	which is what resolvers sometimes use internally.
- *
- *	Revision 1.11  1991/09/04 11:35:11  lwvanels
- *	stuff not checked in when picked up for the release; local server stuff.
- *
- * Revision 1.10  90/12/01  22:40:09  eichin
- * added SERVER_LOCAL usage if hostname is ""
- * 
- * Revision 1.9  90/06/03  16:44:03  raeburn
- * jtkohl's patches to DTRT wrt Kerberos realm determination
- * 
- * Revision 1.8  89/06/03  00:21:31  srz
- * Added standard copyright notice.
- * 
- * Revision 1.7  89/05/19  18:12:21  srz
- * krb name changes, etc.
- * 
- * Revision 1.6  89/05/19  17:05:18  raeburn
- * *** empty log message ***
- * 
  */
 
 #ifndef lint
 static char rcsid_res_module_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/res_module.c,v 1.13 1996-09-19 22:30:51 ghudson Exp $";
+    "$Id: res_module.c,v 1.14 1999-01-22 23:09:59 ghudson Exp $";
 #endif lint
 
 #include "rpc_et.h"

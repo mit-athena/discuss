@@ -6,59 +6,11 @@
  *
  */
 /*
- *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v 1.18 1996-06-05 18:26:10 ghudson Exp $
+ *	$Id: acl_core.c,v 1.19 1999-01-22 23:10:14 ghudson Exp $
  *
  *	Routines for use in a server to edit access control lists remotely.
  *	Originally written for the discuss system by Bill Sommerfeld
  *
- *	$Log: not supported by cvs2svn $
- *	Revision 1.14  1994/08/24 03:46:36  cfields
- *	open for RDRW instead of RDONLY when want to lock
- *	Changes by vrt.
- *
- * Revision 1.13  94/03/25  17:21:23  miki
- * changed the calls to flock with calls to fcntl for SOLARIS
- * 
- * Revision 1.12  93/04/29  17:05:47  miki
- * ported to Solaris2.1
- * 
- * Revision 1.11  89/06/03  00:41:41  srz
- * Added standard copyright notice.
- * 
- * Revision 1.10  89/01/04  22:27:42  raeburn
- * Fixed includes
- * 
- * Revision 1.9  88/10/08  01:36:18  raeburn
- * Minor changes: include files, type names.
- * 
- * Revision 1.8  88/05/31  17:43:49  srz
- * Bill's changes broke expunge.  Fixed to work if has_privs is set.
- * 
- * Revision 1.7  87/10/24  07:01:03  wesommer
- * Rearrange to allow access routines to work on meeting-group acls as
- * well.
- * 
- * Revision 1.6  87/04/06  02:18:19  wesommer
- * Make sure that chair doesn't terminate himself.
- * 
- * Revision 1.5  87/03/25  15:03:51  srz
- * toma change:  Can look at own access control list entry without 's' to
- * the meeting.
- * 
- * Revision 1.4  87/03/17  02:26:11  srz
- * Changed set_acl not to return static storage.  Also, let has_privs
- * bypass access checks (in case of linked in programs)
- * 
- * Revision 1.3  87/02/04  15:53:41  srz
- * uid_t lossage
- * 
- * Revision 1.2  86/11/22  06:19:08  spook
- * Changed to make lint happy.
- * 
- * Revision 1.1  86/11/16  06:03:56  wesommer
- * Initial revision
- * 
  */
 
 #include <discuss/types.h>
@@ -74,7 +26,7 @@
 #include <fcntl.h>
 #ifndef lint
 static const char rcsid_acl_core_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v 1.18 1996-06-05 18:26:10 ghudson Exp $";
+    "$Id: acl_core.c,v 1.19 1999-01-22 23:10:14 ghudson Exp $";
 #endif lint
 
 extern dsc_acl *mtg_acl;

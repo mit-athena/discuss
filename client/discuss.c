@@ -6,9 +6,7 @@
  *
  */
 /*
- *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.56 1998-12-31 21:35:44 ghudson Exp $
- *	$Locker:  $
+ *	$Id: discuss.c,v 1.57 1999-01-22 23:09:23 ghudson Exp $
  *
  *	A simple shell-type user interface to discuss; uses Ken Raeburn's
  *	ss library for the command interpreter.
@@ -18,7 +16,7 @@
 
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.56 1998-12-31 21:35:44 ghudson Exp $";
+    "$Id: discuss.c,v 1.57 1999-01-22 23:09:23 ghudson Exp $";
 #endif lint
 
 #include <stdio.h>

@@ -8,12 +8,11 @@
 /* 
  * 
  * Created by: Mark W. Eichin <eichin@athena.mit.edu>
- * $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/do_quote.c,v $
- * $Author: srz $
+ * $Id: do_quote.c,v 1.2 1999-01-22 23:09:45 ghudson Exp $
  *
  */
 #ifndef lint
-static char rcsid_do_quote_c[] = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/do_quote.c,v 1.1 1989-06-02 23:43:18 srz Exp $";
+static char rcsid_do_quote_c[] = "$Id: do_quote.c,v 1.2 1999-01-22 23:09:45 ghudson Exp $";
 #endif lint
 
 char *malloc();

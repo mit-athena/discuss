@@ -24,7 +24,7 @@ tfile unix_tfile();
 char *mktemp();
 
 #ifndef	lint
-static char rcsid[] = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/dspipe.c,v 1.8 1996-09-19 22:31:29 ghudson Exp $";
+static char rcsid[] = "$Id: dspipe.c,v 1.9 1999-01-22 23:10:10 ghudson Exp $";
 #endif
 
 main (argc,argv)

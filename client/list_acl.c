@@ -6,50 +6,13 @@
  *
  */
 /*
- *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list_acl.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list_acl.c,v 1.11 1994-03-25 16:33:45 miki Exp $
+ *	$Id: list_acl.c,v 1.12 1999-01-22 23:09:26 ghudson Exp $
  *
- *	$Log: not supported by cvs2svn $
- * Revision 1.10  89/06/02  23:37:37  srz
- * Added standard copyright notice.
- * 
- * Revision 1.9  89/01/05  01:20:31  raeburn
- * replaced included header files with <discuss/discuss.h>
- * 
- * Revision 1.8  88/08/10  21:15:03  raeburn
- * Changed type names of acl code.
- * 
- * Revision 1.7  88/02/15  00:58:51  wesommer
- * Saber/lint fixes.
- * 
- * Revision 1.6  87/03/24  14:02:47  spook
- * Changes for new interfaces..
- * 
- * Revision 1.5  87/02/21  20:11:08  wesommer
- * Major changes:
- * 	Fix bug introduced by KR (la USER, not la MEETING; the current
- * meeting is always implied).
- *      Changed to default realm to local_realm if not present.
- *      da can now take multiple principal names.
- * 
- * Revision 1.4  86/12/07  16:04:45  rfrench
- * Globalized sci_idx
- * 
- * Revision 1.3  86/12/07  00:39:15  rfrench
- * Killed ../include
- * 
- * Revision 1.2  86/11/17  01:50:36  spook
- * Allow listing acl on meetings specified on command line even when
- * there is no current meeting.
- * 
- * Revision 1.1  86/11/16  06:16:59  wesommer
- * Initial revision
- * 
  */
 
 #ifndef lint
 static char rcsid_list_acl_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list_acl.c,v 1.11 1994-03-25 16:33:45 miki Exp $";
+    "$Id: list_acl.c,v 1.12 1999-01-22 23:09:26 ghudson Exp $";
 #endif lint
 
 #include <string.h>

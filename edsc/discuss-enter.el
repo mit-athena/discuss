@@ -1,5 +1,4 @@
-;;;	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss-enter.el,v $
-;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss-enter.el,v 1.11 1996-04-12 21:49:30 ghudson Exp $
+;;;	$Id: discuss-enter.el,v 1.12 1999-01-22 23:09:43 ghudson Exp $
 ;;;
 ;;;  Emacs lisp code to enter transaction into discuss.  Part of the
 ;;;  emacs-based interface to the discuss conferencing system.

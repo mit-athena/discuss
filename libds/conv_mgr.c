@@ -7,8 +7,7 @@
  */
 /*
  *
- *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/conv_mgr.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/conv_mgr.c,v 1.11 1989-06-03 00:20:36 srz Exp $
+ *	$Id: conv_mgr.c,v 1.12 1999-01-22 23:09:56 ghudson Exp $
  *
  * conv_mgr () -- File that contains procedure to handle conversations.  This
  *		  allows multiplexing of RPC stream, setting up the correct
@@ -22,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid_conv_mgr_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/conv_mgr.c,v 1.11 1989-06-03 00:20:36 srz Exp $";
+    "$Id: conv_mgr.c,v 1.12 1999-01-22 23:09:56 ghudson Exp $";
 #endif lint
 
 #include <errno.h>

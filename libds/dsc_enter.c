@@ -8,41 +8,12 @@
 /*
  * dsc_enter.c - enter a transaction from a file into discuss.
  *
- *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsc_enter.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsc_enter.c,v 1.11 1997-12-17 19:37:36 ghudson Exp $
- *	$Log: not supported by cvs2svn $
- *	Revision 1.10  1997/12/17 00:30:37  ghudson
- *	Oops, REG_BASIC isn't universal.  (It's 0 where it is defined, so just
- *	punt it.)
- *
- *	Revision 1.9  1997/12/17 00:12:41  ghudson
- *	Use POSIX regexps.
- *
- *	Revision 1.8  1996/09/19 22:30:48  ghudson
- *	BSD -> ANSI string and memory functions
- *
- *	Revision 1.7  1994/08/15 17:36:45  cfields
- *	Removed Solaris specific regexp code.
- *	7.7 checkin; changes by miki
- *
- * Revision 1.6  94/03/25  16:43:41  miki
- * replace bcopy with memmove for POSIX platforms; replaced bzero with memset and ind
- * with strchr
- * 
- * Revision 1.5  93/04/28  11:46:55  miki
- * ported to Solaris2.1
- * 
- * Revision 1.4  89/06/03  00:20:45  srz
- * Added standard copyright notice.
- * 
- * Revision 1.3  88/10/16  13:56:18  raeburn
- * Changed include format.
- * 
+ *	$Id: dsc_enter.c,v 1.12 1999-01-22 23:09:56 ghudson Exp $
  */
 
 #ifndef	lint
 static char rcsid[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsc_enter.c,v 1.11 1997-12-17 19:37:36 ghudson Exp $";
+    "$Id: dsc_enter.c,v 1.12 1999-01-22 23:09:56 ghudson Exp $";
 #endif
 
 #include <stdio.h>

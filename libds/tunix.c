@@ -7,30 +7,15 @@
  */
 /*
  *
- *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tunix.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tunix.c,v 1.6 1998-01-20 23:11:00 ghudson Exp $
+ *	$Id: tunix.c,v 1.7 1999-01-22 23:10:03 ghudson Exp $
  *
  * tunix.c -- procedures to have tfiles work from unix files.
  *
- *	$Log: not supported by cvs2svn $
- *	Revision 1.5  1989/06/03 00:22:33  srz
- *	Added standard copyright notice.
- *
- * Revision 1.4  89/01/04  20:47:00  raeburn
- * Fixed include reference
- * 
- * Revision 1.3  87/07/18  00:01:38  srz
- * Added control operation to tfile's.  First control operation:  FORCE_NL,
- * which forces a NL onto a tfile if it isn't already there.
- * 
- * Revision 1.2  87/04/11  00:06:29  srz
- * Added RCS junk
- * 
  *
  */
 #ifndef lint
 static char rcsid_tunix_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tunix.c,v 1.6 1998-01-20 23:11:00 ghudson Exp $";
+    "$Id: tunix.c,v 1.7 1999-01-22 23:10:03 ghudson Exp $";
 #endif lint
 
 #define min(A, B) ((A) < (B) ? (A) : (B))

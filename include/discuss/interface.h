@@ -14,14 +14,7 @@
  * with the core discuss routines.  The exact protocol between the two 
  * has not been defined, although something ala RPC should be investiaged
  *
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/include/discuss/interface.h,v 1.6 1990-02-24 19:04:37 srz Exp $
- * $Log: not supported by cvs2svn $
- * Revision 1.5  89/01/29  17:14:08  srz
- * Added trn_info2, new flag routines.
- * 
- * Revision 1.4  89/01/29  13:18:38  srz
- * Ken's changes.
- * 
+ * $Id: interface.h,v 1.7 1999-01-22 23:09:51 ghudson Exp $
  */
 
 #include <discuss/types.h>

@@ -6,8 +6,7 @@
  *
  */
 /*
- *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/include/globals.h,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/include/globals.h,v 1.19 1989-06-03 00:07:04 srz Exp $
+ *	$Id: globals.h,v 1.20 1999-01-22 23:09:48 ghudson Exp $
  *
  *	Declarations of global variables for discuss.
  */

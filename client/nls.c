@@ -2,15 +2,13 @@
  *
  * List request for DISCUSS
  *
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/nls.c,v 1.4 1996-09-19 22:28:28 ghudson Exp $
- * $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/nls.c,v $
- * $Locker:  $
+ * $Id: nls.c,v 1.5 1999-01-22 23:09:28 ghudson Exp $
  *
  * Copyright (C) 1986 by the MIT Student Information Processing Board
  *
  */
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/nls.c,v 1.4 1996-09-19 22:28:28 ghudson Exp $";
+static char *rcsid_discuss_c = "$Id: nls.c,v 1.5 1999-01-22 23:09:28 ghudson Exp $";
 #endif lint
 
 #include <stdio.h>

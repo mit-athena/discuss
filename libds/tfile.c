@@ -7,26 +7,15 @@
  */
 /*
  *
- *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tfile.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tfile.c,v 1.5 1989-06-03 00:22:07 srz Exp $
+ *	$Id: tfile.c,v 1.6 1999-01-22 23:10:01 ghudson Exp $
  *
  * tfile.c -- a new implementation of tfile's.
  *
- *	$Log: not supported by cvs2svn $
- * Revision 1.4  89/06/03  00:12:58  srz
- * Ken's changes.
- * 
- * Revision 1.3  87/07/18  00:01:19  srz
- * Added control operation to tfile's.
- * 
- * Revision 1.2  87/04/11  00:06:21  srz
- * Added RCS junk
- * 
  *
  */
 #ifndef lint
 static char rcsid_tfile_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tfile.c,v 1.5 1989-06-03 00:22:07 srz Exp $";
+    "$Id: tfile.c,v 1.6 1999-01-22 23:10:01 ghudson Exp $";
 #endif lint
 
 #include <stdio.h>

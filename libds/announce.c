@@ -6,15 +6,13 @@
  *
  */
 /*
- *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/announce.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/announce.c,v 1.7 1993-04-28 11:34:09 miki Exp $
- *	$Locker:  $
+ *	$Id: announce.c,v 1.8 1999-01-22 23:09:54 ghudson Exp $
  *
  */
 
 #ifndef lint
 static char rcsid_announce_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/announce.c,v 1.7 1993-04-28 11:34:09 miki Exp $";
+    "$Id: announce.c,v 1.8 1999-01-22 23:09:54 ghudson Exp $";
 #endif lint
 
 #include <stdio.h>

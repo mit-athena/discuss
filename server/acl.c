@@ -6,58 +6,11 @@
  *
  */
 /*
- *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl.c,v 1.14 1996-09-19 22:32:20 ghudson Exp $
+ *	$Id: acl.c,v 1.15 1999-01-22 23:10:13 ghudson Exp $
  *
  * 	Routines for the manipulation of access control lists in core,
  *	along with routines to move them to and from files.
  *
- *	$Log: not supported by cvs2svn $
- *	Revision 1.13  1994/03/25 17:21:04  miki
- *	replaced index with strchr
- *
- * Revision 1.12  89/06/03  00:41:20  srz
- * Added standard copyright notice.
- * 
- * Revision 1.11  89/01/04  22:20:45  raeburn
- * Fixed include path: internal.h doesn't need to be in the discuss
- * subdirectory.
- * 
- * Revision 1.10  88/09/23  17:03:09  raeburn
- * Changed type names in accordance with acl.h; used "const" where
- * appropriate.  Also changed include files to use <discuss/discuss.h>
- * and <discuss/internal.h>.
- * 
- * Revision 1.9  87/10/24  07:02:44  wesommer
- * A bit more robustness.
- * 
- * Revision 1.8  87/10/24  00:53:39  wesommer
- * Robustify the acl_read routine.
- * 
- * Revision 1.7  87/07/20  21:23:25  wesommer
- * Removed fdclose (kludge), added checking to acl_write() to detect
- * disk full conditions.
- * 
- * Revision 1.6  87/03/17  02:25:19  srz
- * Added expunging.  added acl_copy, and fixed acl_canon to deal with
- * spaces without barfing.
- * 
- * Revision 1.5  86/12/08  23:30:56  wesommer
- * Changed acl_canon() to line up columns.
- * 
- * Revision 1.4  86/12/04  10:18:57  srz
- * You !#@$% C programmers don't know what negative subscripts are! ;-)
- * 
- * Revision 1.3  86/11/22  06:17:45  spook
- * Changed to make lint happy; also punted duplicate boolean types.
- * 
- * Revision 1.2  86/11/16  06:01:47  wesommer
- * Implemented acl_replace_access.
- * Redefined acl_delete_access and diked out the old one.
- * Implemented acl_canon (canonicalizes ACL mode string).
- * Implemented modularity-violating fdclose (blech) so we can use stdio 
- * with fdopen in acl_{read,write} and not lose FILE *'s to a storage leak.
- * 
  */
 
 #ifndef __STDC__
@@ -66,7 +19,7 @@
 
 #ifndef lint
 static const char rcsid_acl_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl.c,v 1.14 1996-09-19 22:32:20 ghudson Exp $";
+    "$Id: acl.c,v 1.15 1999-01-22 23:10:13 ghudson Exp $";
 #endif lint
 
 #include <stdio.h>

@@ -6,110 +6,13 @@
  *
  */
 /*
- *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.29 1998-12-22 21:25:32 rbasch Exp $
+ *	$Id: coreutil.c,v 1.30 1999-01-22 23:10:16 ghudson Exp $
  *
  *
  * coreutil.c  -- These contain lower-layer, utility type routines to
  *		  be used by core.  These include things to handle the
  *		  in-memory superblock, and to open & close meetings.
  *
- *	$Log: not supported by cvs2svn $
- *	Revision 1.28  1998/05/05 19:18:38  ghudson
- *	From kretch: add support for byte-swapping when a meeting was written out
- *	on a platform with the opposite endianness.
- *
- *	Revision 1.27  1997/01/28 11:08:51  ghudson
- *	From kretch and srz: use F_SETLKW instead of F_SETLK when setting locks,
- *	so we wait instead of bombing out.  In start_read(), use a non-exclusive
- *	lock.
- *
- *	Revision 1.26  1994/06/04 15:14:46  cfields
- *	But declare it if ZEPHYR isn't defined.
- *	This is not the best fix necessarily, but it's known safe to me.
- *
- * Revision 1.25  94/06/04  15:04:22  cfields
- * Zephyr headers now include stdlib.h, so we don't need to declare
- * malloc. (char * conflicts with void *)
- * 
- * Revision 1.24  94/03/25  17:22:07  miki
- * changed the calls to flock with calls to fcntl for SOLARIS
- * chnaged bzero into memset
- * 
- * Revision 1.23  93/04/29  17:06:50  miki
- *  ported to Solaris2.1
- * 
- * Revision 1.22  90/02/24  20:05:09  srz
- * Hmmm.  Should not exceed array bounds, should we?
- * 
- * Revision 1.21  90/02/24  18:56:30  srz
- * Changed read_trn to return the signature (if it exists), and changed
- * mtg_znotify to handle the signature if it exists.
- * 
- * Revision 1.20  89/09/01  11:54:13  srz
- * Defined use_zephyr variable, even when ZEPHYR is not defined.
- * 
- * Revision 1.19  89/09/01  11:51:18  srz
- * Fixed memory leak, and cut connection between super_chairman and access.
- * 
- * Revision 1.18  89/08/09  22:39:43  srz
- * Added meeting forwarding.
- * 
- * Revision 1.17  89/06/03  00:42:34  srz
- * Added standard copyright notice.
- * 
- * Revision 1.16  89/06/03  00:36:43  srz
- * Include file fixups, more efficient Zephyr service.
- * 
- * Revision 1.15  88/10/13  01:26:29  discuss
- * Fixed Zephyr stuff.  Can you say, "Insufficient documentation?"  -srz
- * 
- * Revision 1.14  88/10/08  03:28:49  srz
- * Attempt at fixing Zephyr (doesn't work).
- * 
- * Revision 1.13  88/10/08  01:28:26  srz
- * Changes for new expunge.  Fix to Zephyr stuff.
- * 
- * Revision 1.12  88/09/23  17:07:33  raeburn
- * Changed type names in accordance with acl.h.  Included include/internal.h.
- * 
- * Revision 1.11  88/03/06  19:53:28  srz
- * Reversed order of checking magic number and version, so that
- * INCONSISTENT is returned instead of NEW_VERSION when that
- * is trully the case.
- * 
- * Revision 1.10  88/01/05  01:37:54  srz
- * Really ifdef'd zephyr.
- * 
- * Revision 1.9  88/01/05  01:08:02  rfrench
- * #ifdef'd ZEPHYR stuff
- * 
- * Revision 1.8  87/08/22  18:12:30  rfrench
- * Added Zephyr notifications
- * 
- * Revision 1.7  87/03/25  15:04:31  srz
- * toma change:  Expanded has_mtg_access to take more modes as arguments
- * 
- * Revision 1.6  87/03/17  02:24:10  srz
- * Added expunging.  An ACL change will require meeting to be reopened, in
- * case an expunge is taking place.  Also added has_privs, which allows
- * wheel access for programs that are linked in.
- * 
- * Revision 1.5  87/03/11  18:00:27  srz
- * Made sure that write's were error checked.
- * 
- * Revision 1.4  87/02/04  15:48:18  srz
- * When there is a choice between making lint happy or cc happy, I tend
- * to prefer 'cc'.  uid_t is not in 4.2 BSD.
- * 
- * Revision 1.3  86/11/22  06:25:42  spook
- * Changed to make lint happy.
- * 
- * Revision 1.2  86/11/16  06:05:37  wesommer
- * Changed open_mtg to stat(2) the acl file before assuming that it's 
- * up to date, and revert the acl from there if the in-core version
- * is stale.
- * 
  */
 
 #ifndef lint
@@ -117,7 +20,7 @@
 const
 #endif
 static char rcsid_coreutil_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.29 1998-12-22 21:25:32 rbasch Exp $";
+    "$Id: coreutil.c,v 1.30 1999-01-22 23:10:16 ghudson Exp $";
 #endif /* lint */
 
 #include <discuss/types.h>

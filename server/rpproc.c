@@ -15,47 +15,7 @@
 
 /*
  *
- *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/rpproc.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/rpproc.c,v 1.15 1998-04-14 19:46:06 ghudson Exp $
- *
- *	$Log: not supported by cvs2svn $
- *	Revision 1.14  1998/03/24 22:26:24  ghudson
- *	/usr/spool -> /var/spool
- *
- *	Revision 1.13  1997/06/02 17:23:05  ghudson
- *	From mhpower: fix a buffer overrun.
- *
- *	Revision 1.12  1996/09/19 22:32:25  ghudson
- *	BSD -> ANSI string and memory functions
- *
- *	Revision 1.11  1994/03/25 17:22:48  miki
- *	replaced bcopy with memmove for POSIX
- *
- * Revision 1.10  90/06/21  01:16:24  srz
- * Change the NOTTY of the controlling terminal to simply setting our
- * process group;  this is a better way of avoiding tty signals since the
- * open of /dev/tty can block in some circumstances.
- * 
- * Revision 1.9  89/06/03  00:43:37  srz
- * Added standard copyright notice.
- * 
- * Revision 1.8  89/01/29  17:16:57  srz
- * Add new kerberos ticket support.
- * 
- * Revision 1.7  89/01/29  13:38:23  srz
- * Ken's changes.
- * 
- * Revision 1.6  88/10/08  01:41:53  raeburn
- * Ensured that /dev/null file descriptor really is 1.
- * 
- * Revision 1.5  88/07/04  08:06:10  raeburn
- * Fixed names used in Kerberos library, to be compatible with new
- * library.
- * 
- * Revision 1.4  87/04/24  21:01:05  srz
- * Have subprocess close the tty, so that random signals can't get sent.
- * 
- *
+ *	$Id: rpproc.c,v 1.16 1999-01-22 23:10:18 ghudson Exp $
  *
  */
 

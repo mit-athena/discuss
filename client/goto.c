@@ -6,9 +6,7 @@
  *
  */
 /*
- *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/goto.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/goto.c,v 1.18 1996-09-19 22:28:27 ghudson Exp $
- *	$Locker:  $
+ *	$Id: goto.c,v 1.19 1999-01-22 23:09:24 ghudson Exp $
  *
  *	Code for "goto" request in discuss.
  *
@@ -16,7 +14,7 @@
 
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/goto.c,v 1.18 1996-09-19 22:28:27 ghudson Exp $";
+    "$Id: goto.c,v 1.19 1999-01-22 23:09:24 ghudson Exp $";
 #endif lint
 
 #include <stdio.h>

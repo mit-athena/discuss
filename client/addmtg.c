@@ -15,15 +15,13 @@
  *	Or the user could put some transaction specifiers on the
  *	command line, in which case they are used as meeting announcements.
  *
- *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.30 1996-09-08 20:31:01 ghudson Exp $
- *	$Locker:  $
+ *	$Id: addmtg.c,v 1.31 1999-01-22 23:09:20 ghudson Exp $
  *
  */
 
 #ifndef lint
 static char rcsid_addmtg_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.30 1996-09-08 20:31:01 ghudson Exp $";
+    "$Id: addmtg.c,v 1.31 1999-01-22 23:09:20 ghudson Exp $";
 #endif lint
 
 #include <string.h>

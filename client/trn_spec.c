@@ -1,6 +1,5 @@
 /*
- *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/trn_spec.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/trn_spec.c,v 1.4 1996-09-19 22:28:32 ghudson Exp $
+ *	$Id: trn_spec.c,v 1.5 1999-01-22 23:09:36 ghudson Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
@@ -27,20 +26,10 @@
  *	If this were LISP, I would wind up turning tg_next_trn into something
  *	which called eval..  but it isn't.  Sorry.
  *
- * 	$Log: not supported by cvs2svn $
- * 	Revision 1.3  1991/09/04 11:29:35  lwvanels
- * 	unchecked in stuff in release
- *
- * Revision 1.2  87/07/08  19:06:42  wesommer
- * Another intermediate version.
- * 
- * Revision 1.1  87/04/10  23:42:37  srz
- * Initial revision
- *
  */
 
 #ifndef lint
-static char *rcsid_trn_spec_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/trn_spec.c,v 1.4 1996-09-19 22:28:32 ghudson Exp $";
+static char *rcsid_trn_spec_c = "$Id: trn_spec.c,v 1.5 1999-01-22 23:09:36 ghudson Exp $";
 #endif lint
 
 #include "interface.h"

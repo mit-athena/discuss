@@ -6,14 +6,13 @@
  *
  */
 /*
- *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v 1.24 1996-09-08 20:31:20 ghudson Exp $
+ *	$Id: lsm.c,v 1.25 1999-01-22 23:09:27 ghudson Exp $
  *
  */
 
 #ifndef lint
 static char rcsid_lsm_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v 1.24 1996-09-08 20:31:20 ghudson Exp $";
+    "$Id: lsm.c,v 1.25 1999-01-22 23:09:27 ghudson Exp $";
 #endif lint
 
 #include <string.h>

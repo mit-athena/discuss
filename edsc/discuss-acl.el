@@ -3,8 +3,7 @@
 ;;;    	Developed by the MIT Student Information Processing Board (SIPB).
 ;;;    	For copying information, see the file mit-copyright.h in this release.
 ;;;
-;;;	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss-acl.el,v $
-;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss-acl.el,v 1.2 1996-04-12 21:44:09 ghudson Exp $
+;;;	$Id: discuss-acl.el,v 1.3 1999-01-22 23:09:42 ghudson Exp $
 ;;;
 ;;;  Emacs lisp code to deal with ACL manipulation in discuss meetings
 ;;;  Written by Theodore Ts'o

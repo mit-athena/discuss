@@ -11,58 +11,12 @@
  *	  	protocol over a TCP connection.
  *		This file handles the caller's side of the connection.
  *
- *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/rpcall.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/rpcall.c,v 1.19 1998-07-25 21:06:12 ghudson Exp $
- *	$Locker:  $
- *	$Log: not supported by cvs2svn $
- *	Revision 1.18  1996/09/19 22:30:52  ghudson
- *	BSD -> ANSI string and memory functions
- *
- *	Revision 1.17  1994/03/25 16:45:22  miki
- *	replace bcopy with memmove for POSIX platforms; replaced bzero with memset and
- *	ndex with strchr
- *
- * Revision 1.16  92/11/08  22:58:54  probe
- * Avoid incompatible redeclarations (AIX 3.2)
- * 
- * Revision 1.15  89/06/03  00:21:41  srz
- * Added standard copyright notice.
- * 
- * Revision 1.14  89/06/03  00:12:42  srz
- * Ken's changes.
- * 
- * Revision 1.13  89/01/04  20:36:24  raeburn
- * Fixed return type of open_rpc and case statement syntax; fixed
- * include paths.
- * 
- * Revision 1.12  88/10/16  14:53:22  raeburn
- * Added function type definitions; handled different errors from
- * gethostbyname; moved static "panic" to top (to avoid implicit
- * declaration).
- * 
- * Revision 1.11  88/10/16  14:03:54  raeburn
- * revised include format
- *
- * Revision 1.10  88/07/28  10:52:12  srz
- * Added better error message when can't exec subprocess.
- *
- * Revision 1.9  87/04/11  00:06:04  srz
- * Added RCS junk
- *
- * Revision 1.8  87/03/18  12:24:35  srz
- * Better handling of unknown rpc's.
- *
- * Revision 1.7  87/03/10  00:07:23  wesommer
- * Added cleanup routines and error exit path for open connection.
- *
- * Revision 1.6  87/03/09  23:52:18  spook
- * Removed some unused variables; added an error check.
- *
+ *	$Id: rpcall.c,v 1.20 1999-01-22 23:10:00 ghudson Exp $
  *
  */
 #ifndef lint
 static char rcsid_rpcall_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/rpcall.c,v 1.19 1998-07-25 21:06:12 ghudson Exp $";
+    "$Id: rpcall.c,v 1.20 1999-01-22 23:10:00 ghudson Exp $";
 #endif lint
 
 /* INCLUDES */

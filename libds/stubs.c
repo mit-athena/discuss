@@ -7,48 +7,15 @@
  */
 /*
  *
- *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/stubs.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/stubs.c,v 1.15 1990-02-24 18:53:16 srz Exp $
+ *	$Id: stubs.c,v 1.16 1999-01-22 23:10:00 ghudson Exp $
  *
  * stubs.c -- These are stubs that handle the calling of routines.
  *
- *	$Log: not supported by cvs2svn $
- * Revision 1.14  89/06/03  00:21:54  srz
- * Added standard copyright notice.
- * 
- * Revision 1.13  89/03/27  00:33:07  srz
- * Null out fields, so that callers can FREE() fields of trn_info & mtg_info
- * after calling.
- * 
- * Revision 1.12  89/01/29  17:17:59  srz
- * Added flag routines, and version check.
- * 
- * Revision 1.11  89/01/04  20:52:00  raeburn
- * Still fixing includes..
- * 
- * Revision 1.10  88/10/16  14:04:50  raeburn
- * Changed includes and type names.
- * 
- * Revision 1.9  87/10/06  02:36:45  spook
- * Fixed error detected by High C compiler.
- * 
- * Revision 1.8  87/07/20  20:57:47  srz
- * Changed name of whoami to dwhoami (too generic of a name)
- * 
- * Revision 1.7  87/07/08  02:00:16  wesommer
- * Added whoami(), dsc_whoami() (the server support was always there.
- * 
- * Revision 1.6  87/06/27  01:10:55  spook
- * *** empty log message ***
- * 
- * Revision 1.5  87/04/11  00:06:13  srz
- * Added RCS junk
- * 
  *
  */
 #ifndef lint
 static char rcsid_stubs_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/stubs.c,v 1.15 1990-02-24 18:53:16 srz Exp $";
+    "$Id: stubs.c,v 1.16 1999-01-22 23:10:00 ghudson Exp $";
 #endif lint
 
 /* Derived from CORE.PAS 06/21/86 by SRZ */

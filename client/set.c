@@ -9,15 +9,13 @@
  *
  * set request for Discuss
  *
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/set.c,v 1.5 1989-06-02 23:38:47 srz Exp $
- * $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/set.c,v $
- * $Locker:  $
+ * $Id: set.c,v 1.6 1999-01-22 23:09:34 ghudson Exp $
  *
  */
 
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/set.c,v 1.5 1989-06-02 23:38:47 srz Exp $";
+    "$Id: set.c,v 1.6 1999-01-22 23:09:34 ghudson Exp $";
 #endif /* lint */
 
 #include <stdio.h>

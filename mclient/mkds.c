@@ -6,69 +6,13 @@
  *
  */
 /*
- *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v 1.20 1998-12-22 21:25:26 rbasch Exp $
- *	$Locker:  $
+ *	$Id: mkds.c,v 1.21 1999-01-22 23:10:10 ghudson Exp $
  *
- *	$Log: not supported by cvs2svn $
- *	Revision 1.19  1998/03/24 22:26:23  ghudson
- *	/usr/spool -> /var/spool
- *
- *	Revision 1.18  1994/03/25 16:55:49  miki
- *	replaced rindex with strrchr
- *
- * Revision 1.17  93/05/20  12:54:08  miki
- * ported to Solaris2.1
- * 
- * Revision 1.16  90/12/01  22:41:38  eichin
- * initialized nbsrc.spare, added "%" as a local meeting name
- * 
- * Revision 1.15  89/06/03  00:31:10  srz
- * Added standard copyright notice.
- * 
- * Revision 1.14  89/06/03  00:27:03  srz
- * Ken's include file changes.
- * 
- * Revision 1.13  89/02/25  16:54:47  srz
- * Added declaration of interrupt.
- * 
- * Revision 1.12  87/10/24  02:39:01  wesommer
- * Robustified.
- * 
- * Allowed to work on non-local meetings.
- * 
- * Revision 1.11  87/04/25  10:12:03  spook
- * Changed not to break if announcement of new meeting fails.
- * 
- * Revision 1.10  87/04/12  00:13:47  spook
- * Removed unused variables.
- * 
- * Revision 1.9  87/04/10  23:18:01  spook
- * Added checks for EOF on input.
- * 
- * Revision 1.8  87/04/09  00:12:43  rfrench
- * Fixed small bug in new interface.
- * 
- * Revision 1.7  87/04/08  21:40:57  rfrench
- * Changed interface to deal with new dsc_announce_mtg function.
- * 
- * Revision 1.5  87/03/22  04:51:58  spook
- * Rewritten for new interfaces.
- * 
- * Revision 1.4  87/02/12  21:40:57  spook
- * Rob's changes; removed "../include" stuff, other frobs.
- * 
- * Revision 1.3  86/12/05  20:06:12  rfrench
- * General cleanup; default directory /usr/spool/discuss
- * 
- * Revision 1.2  86/11/24  20:07:21  rfrench
- * Initial (working) revision
- * 
  */
 
 #ifndef lint
 static char rcsid_mkds_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v 1.20 1998-12-22 21:25:26 rbasch Exp $";
+    "$Id: mkds.c,v 1.21 1999-01-22 23:10:10 ghudson Exp $";
 #endif lint
 
 #include <discuss/discuss.h>
