@@ -9,14 +9,14 @@
  *	command line, in which case they are used as meeting announcements.
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.21 1989-01-05 01:16:01 raeburn Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.22 1989-03-29 00:58:29 srz Exp $
  *	$Locker:  $
  *
  */
 
 #ifndef lint
 static char rcsid_addmtg_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.21 1989-01-05 01:16:01 raeburn Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.22 1989-03-29 00:58:29 srz Exp $";
 #endif lint
 
 #include <string.h>
@@ -30,6 +30,8 @@ static char rcsid_addmtg_c[] =
 extern char *malloc(), *calloc();
 extern tfile unix_tfile();
 int add_mtg_it();
+
+static int mtgs_added;
 
 name_blk *set;
 int num;
@@ -59,6 +61,7 @@ add_mtg(argc, argv)
 	   as transaction specifiers for the current meeting.  If no
 	   arguments are given, then we default to the current transaction */
 	if (dsc_public.attending) {
+		dsc_destroy_mtg_info(&dsc_public.m_info);
 		dsc_get_mtg_info(&dsc_public.nb,
 				 &dsc_public.m_info,&code);	/* get mtg info for trn mapping */
 		if (code) {
@@ -70,15 +73,13 @@ add_mtg(argc, argv)
 				 dsc_public.current, &t_info, &code);
 		if (code)
 			t_info.current = 0;
-		else dsc_destroy_trn_info (&t_info);
-		t_info.subject = NULL;
-		t_info.author = NULL;
+		dsc_destroy_trn_info (&t_info);
 		if (argc == 1) {
 			trn_list = trn_select(&t_info, "current",
 					      (selection_list *)NULL, &code);
 			if (code) {
 				ss_perror(sci_idx, code, "");
-				free((char *)trn_list);
+				sl_free(trn_list);
 				goto punt;
 			}
 			used[1] = 1;
@@ -93,7 +94,15 @@ add_mtg(argc, argv)
 				used[i] = 1;
 			}
 		}
-		(void) sl_map(add_mtg_it,trn_list);
+		mtgs_added = FALSE;
+		(void) sl_map(add_mtg_it,trn_list,FALSE);
+		sl_free(trn_list);
+		if (!mtgs_added)		/* Check if we had args */
+		     for (i = 1; i <argc; i++)
+			  if (used[i]) {
+			       ss_perror(sci_idx, 0, "No transactions selected");
+			       break;
+			  }
 		have_names = 1;
 	}
 
@@ -195,34 +204,43 @@ punt:
 }
 
 static
-add_mtg_it(trn_no)
-int trn_no;
+add_mtg_it(t_infop, codep)
+trn_info2 *t_infop;
+int *codep;
 {
-     int code;
      char cerror[80];
      name_blk nb;
 
-     parse_mtg_info (&dsc_public.nb, trn_no, &nb, &code);
-     if (code != 0) {
-	  if (code == DISC_NOT_ANNOUNCEMENT) {
-	       sprintf (cerror, "Transaction [%04d] is not a properly formatted meeting announcement", trn_no);
+     mtgs_added = TRUE;
+     if (*codep != 0) {
+	  sprintf (cerror, "Transaction [%04d]", t_infop->current);
+	  ss_perror(sci_idx, *codep, cerror);
+	  *codep = 0;
+	  return;
+     }
+
+     parse_mtg_info (&dsc_public.nb, t_infop->current, &nb, codep);
+     if (*codep != 0) {
+	  if (*codep == DISC_NOT_ANNOUNCEMENT) {
+	       sprintf (cerror, "Transaction [%04d] is not a properly formatted meeting announcement", t_infop->current);
 	       ss_perror (sci_idx, 0, cerror);
 	  } else {
-	       sprintf (cerror, "Transaction [%04d]", trn_no);
-	       ss_perror(sci_idx, code, cerror);
+	       sprintf (cerror, "Transaction [%04d]", t_infop->current);
+	       ss_perror(sci_idx, *codep, cerror);
 	  }
-	  return(0);
+	  return;
      }
      
-     add_the_mtg (&nb, &code);
-     if (code != 0 && code != DISC_ACTION_NOT_PERFORMED) {
-	  sprintf (cerror, "Error adding meeting in transaction [%04d]", trn_no);
-	  ss_perror(sci_idx, code, cerror);
-     } else if (code != DISC_ACTION_NOT_PERFORMED)
-	  printf ("Transaction [%04d] Meeting %s (%s) added.\n", trn_no, nb.aliases[0], nb.aliases[1]);
+     add_the_mtg (&nb, codep);
+     if (*codep != 0 && *codep != DISC_ACTION_NOT_PERFORMED) {
+	  sprintf (cerror, "Error adding meeting in transaction [%04d]", t_infop->current);
+	  ss_perror(sci_idx, *codep, cerror);
+     } else if (*codep != DISC_ACTION_NOT_PERFORMED)
+	  printf ("Transaction [%04d] Meeting %s (%s) added.\n", t_infop->current, nb.aliases[0], nb.aliases[1]);
      
      dsc_destroy_name_blk (&nb);
-     return(0);
+     *codep = 0;
+     return;
 }
 
 parse_mtg_info(mtg_nbp, trn_no, result_nbp, code)
