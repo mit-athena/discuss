@@ -1,9 +1,12 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.7 1987-03-22 05:21:50 spook Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.8 1987-04-06 16:00:56 spook Exp $
  *	$Locker:  $
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.7  87/03/22  05:21:50  spook
+ * Rewritten for new interfaces and new format.
+ * 
  * Revision 1.6  87/02/04  16:10:26  srz
  * Changed fcntl.h -> file.h
  * 
@@ -26,7 +29,7 @@
  */
 
 #ifndef lint
-static char *rcsid_addmtg_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.7 1987-03-22 05:21:50 spook Exp $";
+static char *rcsid_addmtg_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.8 1987-04-06 16:00:56 spook Exp $";
 #endif lint
 
 #include <strings.h>
@@ -205,8 +208,10 @@ int trn_no;
 	tclose(tf,&dummy);
 	tdestroy(tf);
 
-	if (code)
-		return (0); /* Ignore transaction non-existant */
+	if (code) {
+		sprintf(cerror, "Can't read transaction [%04d]", trn_no);
+		goto lose;
+	}
 	
 	fp = fopen(temp_file,"r");
 	if (!fp)
@@ -235,8 +240,12 @@ int trn_no;
 	strcpy(nb.user_id, user_id);
 	nb.aliases = (char **)NULL;
 	dsc_get_mtg_info(&nb, &m_info, &code);
-	if (code)
-		return(0);
+	if (code) {
+		sprintf(cerror,
+			"Can't get meeting info for transaction [%04d]",
+			trn_no);
+		goto lose;
+	}
 
 	short_name = rindex(tempbfr,'/');
 	if (!short_name)
@@ -247,15 +256,16 @@ int trn_no;
 	nb.aliases[1] = malloc(strlen(short_name));
 	strcpy(nb.aliases[1],short_name+1);
 	nb.aliases[2] = (char *)NULL;
-	add_the_mtg(host,&nb,long_name,trn_no,&code);
-	return (0); /* Ignore errors! */
+	(void) add_the_mtg(host,&nb,long_name,trn_no,&code);
+	return(0);		/* add_the_mtg prints error messages */
 
  not_ann:
-
+	code = 0;
 	sprintf(cerror,
 		"Transaction [%04d] is not a properly formatted meeting announcement",
 		trn_no);
-	ss_perror(sci_idx,0,cerror);
+ lose:
+	ss_perror(sci_idx, code, cerror);
 	return (0);
 }
 
