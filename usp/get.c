@@ -172,7 +172,7 @@ USPString   *str;
     dptr = sptr = *str;
 
     if (get_from_sub_block (us, sptr, sl + oddp, &actual) == ERROR) {
-	cfree (*str);
+	free (*str);
 	*str = NULL;
 	return (ERROR);
     }

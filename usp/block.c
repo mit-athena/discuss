@@ -117,8 +117,8 @@ USPCardinal *bt;
 	}
 	sprintf(usp_internal_string, "Internal error \"%s\" (%s), detected by %s \"%s\"",
 		what_string, info, who_string, module_name);
-	cfree((char *) info);
-	cfree((char *) module_name);
+	free((char *) info);
+	free((char *) module_name);
 	return(ERROR);
     }
 

@@ -82,7 +82,7 @@
 */
 
 /*
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/usp/main.c,v 1.4 1996-09-19 22:35:40 ghudson Exp $
+ * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/usp/main.c,v 1.5 1997-12-06 20:42:36 ghudson Exp $
  * $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/usp/main.c,v $
  * $Locker:  $
  */
@@ -98,7 +98,7 @@
 #include "usp.h"
 
 static char rcsid[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/usp/main.c,v 1.4 1996-09-19 22:35:40 ghudson Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/usp/main.c,v 1.5 1997-12-06 20:42:36 ghudson Exp $";
 
 /* connection operations */
 
@@ -196,15 +196,15 @@ int	s;
      write_desc = s;
 #endif
      if(write_desc == ERROR) {
-	 cfree((char *) us);
+	 free((char *) us);
 	 return(NULL);
      }
      if(! (us->us_read = fdopen(s, "r"))) {
-	 cfree((char *) us);
+	 free((char *) us);
 	 return(NULL);
      }
      if(! (us->us_write = fdopen(write_desc, "w"))) {
-	 cfree((char *) us);
+	 free((char *) us);
 	 return(NULL);
      }
      us->us_in_receiving_p = FALSE;
@@ -263,6 +263,6 @@ USPStream *us;
     if(fclose(us->us_write) == EOF) { 
 	status = ERROR;
     }
-    cfree((char *) us);
+    free((char *) us);
     return(status);
 }
