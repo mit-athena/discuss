@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.37 1988-01-15 22:44:43 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.38 1988-02-07 23:10:53 balamac Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
@@ -12,7 +12,7 @@
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.37 1988-01-15 22:44:43 srz Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.38 1988-02-07 23:10:53 balamac Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -55,8 +55,6 @@ char	*local_realm();
 static char	buf[BUFSIZ];
 char	*buffer;
 
-#define DEFAULT_EDITOR "/bin/ed"
-
 main(argc, argv)
 	int argc;
 	char **argv;
@@ -71,9 +69,7 @@ main(argc, argv)
 
 	signal(SIGPIPE, SIG_IGN);
 	buffer = &buf[0];
-	editor_path = getenv ("EDITOR");
-	if (!editor_path)
-		editor_path = DEFAULT_EDITOR;
+	editor_path = getenv ("DISCUSS_EDITOR");
 
 	while (++argv, --argc) {
 		if (!strcmp(*argv, "-prompt")) {
