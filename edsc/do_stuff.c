@@ -13,7 +13,7 @@
 #include <sys/wait.h>
 #include <ctype.h>
 #include <sys/time.h>
-#include "discuss.h"
+#include <discuss/discuss.h>
 
 extern char *user_id;
 extern tfile stdout_tf;
