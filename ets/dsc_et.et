@@ -64,4 +64,7 @@
 	ec	CANT_WRITE_TEMP,
 		"Can't write temporary file"
 
+	ec	CANT_ATTEND,
+		"Insufficent access to attend meeting"
+
 	end
