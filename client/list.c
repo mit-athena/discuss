@@ -2,7 +2,7 @@
  *
  * List request for DISCUSS
  *
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.22 1989-03-28 15:54:59 raeburn Exp $
+ * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.23 1989-03-28 23:07:55 srz Exp $
  * $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v $
  * $Locker:  $
  *
@@ -11,7 +11,7 @@
  */
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.22 1989-03-28 15:54:59 raeburn Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.23 1989-03-28 23:07:55 srz Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -119,7 +119,7 @@ list (argc, argv, sci_idx)
 	}
 	*ap2 = (char *) NULL;
 	map_trns(ac, nargv, "all", list_it, FALSE);
-	free (ap2);
+	free (nargv);
 	return;
 }
 
