@@ -9,8 +9,12 @@
  * dsc_enter.c - enter a transaction from a file into discuss.
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsc_enter.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsc_enter.c,v 1.6 1994-03-25 16:43:41 miki Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsc_enter.c,v 1.7 1994-08-15 17:36:45 cfields Exp $
  *	$Log: not supported by cvs2svn $
+ * Revision 1.6  94/03/25  16:43:41  miki
+ * replace bcopy with memmove for POSIX platforms; replaced bzero with memset and ind
+ * with strchr
+ * 
  * Revision 1.5  93/04/28  11:46:55  miki
  * ported to Solaris2.1
  * 
@@ -24,7 +28,7 @@
 
 #ifndef	lint
 static char rcsid[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsc_enter.c,v 1.6 1994-03-25 16:43:41 miki Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsc_enter.c,v 1.7 1994-08-15 17:36:45 cfields Exp $";
 #endif
 
 #include <stdio.h>
@@ -51,10 +55,9 @@ extern int errno;
 extern char *malloc();
 extern char *mktemp();
 extern long lseek();
-#ifndef SOLARIS
 extern char *re_comp();
 extern int re_exec();
-#endif
+
 #define DEFAULT_SUBJECT "No subject found in mail header"
 
 char *dsc_enter_deflist[] = {
@@ -259,19 +262,12 @@ static bool list_compare(s,list)
 	char *retval;
 
 	while (*list!=NULL) {
-#ifdef SOLARIS
-                retval = compile(*list++, NULL, NULL);
-                if (regerrno) return FALSE;
-                if (step(s, retval))
-                        return(TRUE);
-#else 
-
 		retval=re_comp(*list++);
 		if (retval) return FALSE; /* XXX */
 
 		if (re_exec(s))
 			return(TRUE);
-#endif
+
 	}
 	return(FALSE);
 }
