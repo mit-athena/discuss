@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v 1.17 1988-02-18 07:35:44 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v 1.18 1988-10-16 14:00:54 raeburn Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
@@ -8,7 +8,7 @@
 
 #ifndef lint
 static char rcsid_dsname_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v 1.17 1988-02-18 07:35:44 wesommer Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v 1.18 1988-10-16 14:00:54 raeburn Exp $";
 #endif lint
 
 /*
@@ -23,9 +23,10 @@ static char rcsid_dsname_c[] =
 #include <sys/param.h>
 #include <errno.h>
 #include <assert.h>
-#include "config.h"
-#include "dsname.h"
-#include "dsc_et.h"
+#include <discuss/config.h>
+#include <discuss/dsname.h>
+#include <discuss/dsc_et.h>
+#include "../include/ansi.h"
 
 /*
  * Format of data file:
@@ -102,8 +103,8 @@ int find_rc_filename()
 }
 
 static int set_rc_filename(auser_id, buf, len)
-	char *auser_id, *buf;
-	int len;
+    const char *auser_id, *buf;
+    int len;
 {
 	struct passwd *pw = NULL;
 	register char *cp = NULL;
@@ -137,14 +138,32 @@ static int set_rc_filename(auser_id, buf, len)
  * ds() -- duplicate a string
  */
 
-static char *
-ds(s)
-	register char *s;
+static char * ds(s)
+    const char *s;
 {
-	register int len = strlen(s) + 1;
-	register char *ns = malloc(len);
-	bcopy(s, ns, len);
-	return(ns);
+    register int len = strlen(s) + 1;
+    register char *ns = malloc(len);
+    bcopy(s, ns, len);
+    return(ns);
+}
+
+static void clear_current () {
+    if (current.hostname) {
+	free (current.hostname);
+	current.hostname = (char *) NULL;
+    }
+    if (current.pathname) {
+	free (current.pathname);
+	current.pathname = (char *) NULL;
+    }
+    if (current.alias_list) {
+	free (current.alias_list);
+	current.alias_list = (char *) NULL;
+    }
+    if (current.spare) {
+	free (current.spare);
+	current.spare = (char *) NULL;
+    }
 }
 
 static void
@@ -158,6 +177,7 @@ enddbent()
 		free(db_user_id);
 		db_user_id = (char *)NULL;
 	}
+	clear_current ();
 }
 
 /*
@@ -254,7 +274,7 @@ getdbent()
 
 static int
 setdbent(user_id)
-	char *user_id;
+	const char *user_id;
 {
 	char *auid;
 	register int code;
@@ -376,6 +396,8 @@ dsc_expand_mtg_set(user_id, name, set, num, result)
 	*num = 0;
 	*result = 0;
 
+	if (!user_id)
+	    user_id = "";
 	if (!name) {
 	    *result = EINVAL;
 	    *num = 0;
@@ -522,8 +544,8 @@ bad:
 
 static char format[] = "%d:%d:%d:%s:%s:%s:%s\n";
 
-dsc_update_mtg_set(user_id, set, num, result)
-	char *user_id;		/* input */
+void dsc_update_mtg_set(user_id, set, num, result)
+	char const *user_id;	/* input */
 	name_blk *set;		/* array of name_blk's */
 	int num;		/* number in set */
 	int *result;		/* error code */
@@ -597,7 +619,9 @@ dsc_update_mtg_set(user_id, set, num, result)
 			current.alias_list, current.spare) == EOF)
 		     goto punt;
 	}
-	
+
+	clear_current ();
+
 	/* clean up ones we haven't touched in memory yet */
 	for (i = 0, nbp = set; i < num; i++, nbp++) {
 		if (!touched[i]) {
