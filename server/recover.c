@@ -29,7 +29,6 @@
 #include "mtg.h"
 
 #define NULL 0
-#define MAX_TRNS 20000
 #define min(a, b) (a < b ? a : b)
 
 static trn_base tb;
@@ -40,7 +39,7 @@ static int trnfsize;
 static int num_trns;
 static int current_pos;
 static char *mtg_name, *location, *chairman, *trn_file;
-static int trn_pos[MAX_TRNS];
+static int *trn_pos;
 static int found_eof;
 static int do_byteswap;
 static char *temp_dir = "/tmp";
@@ -156,8 +155,9 @@ char **argv;
 	for unique. */
      read_last_trn();				/* read last_trn into th */
 
-     if (th.current > MAX_TRNS) {
-	  fprintf (stderr, "More transactions than expected: %d\n", th.current);
+     trn_pos = (int *) malloc (sizeof(int) * th.current);
+     if (trn_pos == NULL) {
+	  fprintf (stderr, "Can't allocate memory for transaction positions\n");
 	  exit(1);
      }
 
