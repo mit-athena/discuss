@@ -9,6 +9,10 @@
 #include <pwd.h>
 #include <strings.h>
 
+#ifndef	lint
+static char rcsid_create_mtg_dir_c[] = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/create_mtg_dir.c,v 1.2 1987-04-11 00:05:25 spook Exp $";
+#endif
+
 main(argc, argv)
 	int argc;
 	char **argv;

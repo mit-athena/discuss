@@ -8,10 +8,13 @@
 #include <strings.h>
 #include <ctype.h>
 
+#ifndef	lint
+static char rcsid[] = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/dsmail.c.old,v 1.2 1987-04-11 00:05:42 spook Exp $";
+#endif
+
 #define DSPIPE		"nullpipe"
 char *mktemp();
 FILE *popen();
-
 
 char *zippy[] = {
 	"[Yy]ow!","[Ss]narl","[Zz]ippy",NULL 
