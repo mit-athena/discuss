@@ -7,7 +7,7 @@
  */
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.21 1990-02-24 18:56:30 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.22 1990-02-24 20:05:09 srz Exp $
  *
  *
  * coreutil.c  -- These contain lower-layer, utility type routines to
@@ -15,6 +15,10 @@
  *		  in-memory superblock, and to open & close meetings.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.21  90/02/24  18:56:30  srz
+ * Changed read_trn to return the signature (if it exists), and changed
+ * mtg_znotify to handle the signature if it exists.
+ * 
  * Revision 1.20  89/09/01  11:54:13  srz
  * Defined use_zephyr variable, even when ZEPHYR is not defined.
  * 
@@ -86,7 +90,7 @@
 const
 #endif
 static char rcsid_coreutil_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.21 1990-02-24 18:56:30 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.22 1990-02-24 20:05:09 srz Exp $";
 #endif /* lint */
 
 #include <discuss/types.h>
@@ -664,7 +668,7 @@ void mtg_znotify(mtg_name, subject, author, signature)
 	register dsc_acl_entry *ae;
 	register int n;
 	ZNotice_t notice;
-	char *msglst[4],bfr[30],fullpath[256];
+	char *msglst[5],bfr[30],fullpath[256];
 	int code, list_size;
 
 	if (!use_zephyr)
