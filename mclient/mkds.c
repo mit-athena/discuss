@@ -1,10 +1,13 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v 1.1 1986-11-24 20:03:31 rfrench Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v 1.2 1986-11-24 20:07:21 rfrench Exp $
+ *	$Locker:  $
+ *
+ *	$Log: not supported by cvs2svn $
  */
 
 #ifndef lint
-static char *rcsid_mkds_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v 1.1 1986-11-24 20:03:31 rfrench Exp $";
+static char *rcsid_mkds_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v 1.2 1986-11-24 20:07:21 rfrench Exp $";
 #endif lint
 
 #include "../include/tfile.h"
