@@ -1,11 +1,11 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v 1.15 1988-01-24 11:33:04 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v 1.16 1988-04-15 14:18:02 srz Exp $
  *
  */
      
 #ifndef lint
-static char *rcsid_ckm_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v 1.15 1988-01-24 11:33:04 wesommer Exp $";
+static char *rcsid_ckm_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v 1.16 1988-04-15 14:18:02 srz Exp $";
 #endif lint
 
 #include <strings.h>
@@ -28,7 +28,9 @@ do_mtg(mtg_name)
      register name_blk *nbp;
      int n_matches, i, code;
      bool updated;
+     bool cur_mtg_updated = 0;
      char last_host[140], last_path[140];
+
      
      dsc_expand_mtg_set(user_id, mtg_name, &set, &n_matches, &code);
      if (!n_matches)
@@ -43,18 +45,20 @@ do_mtg(mtg_name)
 	  nbp = &set[i];
 	  /* Test to see if we are attending this meeting */
 	  if (dsc_public.attending 
-	  && !strcmp(dsc_public.host, nbp ->hostname)
-  	  && !strcmp(dsc_public.path, nbp->pathname)) {
+	  && !strcmp(dsc_public.path, nbp->pathname)
+  	  && !strcmp(dsc_public.host, nbp ->hostname)) {
 	       dsc_get_mtg_info(&dsc_public.nb,
 				&dsc_public.m_info, &code);
 	       updated = (dsc_public.highest_seen < dsc_public.m_info.last);
+	       cur_mtg_updated = updated;
+	       code = 0;
 	  } else {
 	       dsc_updated_mtg(nbp, &updated, &code);
 	       if (interrupt)
 		    break;
 	  }
-	  if (strcmp(last_host,nbp->hostname) || 
-	      strcmp(last_path, nbp->pathname)) {
+	  if (strcmp(last_path, nbp->pathname) || 
+	      strcmp(last_host, nbp->hostname)) {
 	       strcpy(last_host,nbp->hostname);
 	       strcpy(last_path,nbp->pathname);
 	       if (updated && !code)
@@ -68,8 +72,11 @@ do_mtg(mtg_name)
 		    print_header = 0;
 	  }
      }
-     if (!interrupt)
-	     dsc_update_mtg_set(user_id, set, n_matches, &code);
+     if (!interrupt) {
+	  dsc_update_mtg_set(user_id, set, n_matches, &code);
+	  if (cur_mtg_updated)
+		dsc_public.nb.status |= DSC_ST_CHANGED;
+     }
      dsc_destroy_mtg_set(set, n_matches);
      return(0);
 }
