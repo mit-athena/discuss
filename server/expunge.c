@@ -217,6 +217,7 @@ expunge_range:
 			    error_message(result));
 		    error_occurred = TRUE;
 	       }
+	       tdestroy(tf);
 	       free(old_trn_info.author);
 	       free(old_trn_info.subject);
 	       free(old_trn_info.signature);
