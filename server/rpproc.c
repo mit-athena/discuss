@@ -15,7 +15,7 @@
 
 /*
  *
- *	$Id: rpproc.c,v 1.18 1999-02-08 14:47:19 danw Exp $
+ *	$Id: rpproc.c,v 1.18.6.1 2000-10-14 17:44:11 ghudson Exp $
  *
  */
 
@@ -451,6 +451,8 @@ sendint(i)
 sendstr(str)
     char *str;
 {
+    it (str == NULL)
+      str = "";
     if (USP_put_string(us, str) != SUCCESS) {
 	rpc_err = rpc_err_base + errno;
 	return;
