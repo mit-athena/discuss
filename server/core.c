@@ -7,7 +7,7 @@
  */
 /*
  *
- *	$Id: core.c,v 1.38 1999-02-02 20:40:40 kcr Exp $
+ *	$Id: core.c,v 1.39 1999-02-08 14:47:18 danw Exp $
  *
  *
  * core.c --    Routines that are the meat of discuss.  These provide user
@@ -16,8 +16,8 @@
  */
 #ifndef lint
 static char rcsid_core_c[] =
-    "$Id: core.c,v 1.38 1999-02-02 20:40:40 kcr Exp $";
-#endif lint
+    "$Id: core.c,v 1.39 1999-02-08 14:47:18 danw Exp $";
+#endif /* lint */
 
 
 /* Derived from CORE.PAS 06/21/86 by SRZ */

@@ -13,8 +13,8 @@
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Id: edsc.c,v 1.13 1999-02-02 20:40:06 kcr Exp $";
-#endif lint
+static char *rcsid_discuss_c = "$Id: edsc.c,v 1.14 1999-02-08 14:47:05 danw Exp $";
+#endif /* lint */
 
 #include <stdio.h>
 #include <sys/file.h>

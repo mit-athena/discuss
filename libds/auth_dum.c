@@ -7,15 +7,15 @@
  */
 /*
  *
- *	$Id: auth_dum.c,v 1.4 1999-01-22 23:09:55 ghudson Exp $
+ *	$Id: auth_dum.c,v 1.5 1999-02-08 14:47:08 danw Exp $
  *
  * auth_dum () -- Authentication procedure for non-kerberos sites.
  *		  Just returns an empty string.
  *
  */
 #ifndef lint
-static char *rcsid__c = "$Id: auth_dum.c,v 1.4 1999-01-22 23:09:55 ghudson Exp $";
-#endif lint
+static char *rcsid__c = "$Id: auth_dum.c,v 1.5 1999-02-08 14:47:08 danw Exp $";
+#endif /* lint */
 
 get_authenticator (service_id, checksum, authp, authl, result)
 char *service_id;

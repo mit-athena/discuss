@@ -15,7 +15,7 @@
 
 /*
  *
- *	$Id: rpproc.c,v 1.17 1999-02-02 20:40:43 kcr Exp $
+ *	$Id: rpproc.c,v 1.18 1999-02-08 14:47:19 danw Exp $
  *
  */
 
@@ -70,7 +70,7 @@ extern int errno;
 #ifdef KERBEROS
 static char serv_name[20];
 extern int krb_err_base;
-#endif KERBEROS
+#endif /* KERBEROS */
 short recvshort();
 int rpc_err;
 extern tfile net_tfile ();
@@ -293,7 +293,7 @@ punt_kerberos:
 	 USP_end_block(us);
     }
 }
-#endif KERBEROS
+#endif /* KERBEROS */
 
 /*
  *
@@ -320,7 +320,7 @@ recvit (code)
 	 *code = 0;
 	 return;
     }
-#endif KERBEROS
+#endif /* KERBEROS */
 
     procno = bt - PROC_BASE;
 

@@ -1,13 +1,13 @@
 /*
- *	$Id: sequencer.c,v 1.6 1999-02-02 20:39:51 kcr Exp $
+ *	$Id: sequencer.c,v 1.7 1999-02-08 14:46:54 danw Exp $
  *
  *	Copyright (C) 1987 by the Massachusetts Institute of Technology
  *
  */
 
 #ifndef lint
-static char *rcsid_sequencer_c = "$Id: sequencer.c,v 1.6 1999-02-02 20:39:51 kcr Exp $";
-#endif lint
+static char *rcsid_sequencer_c = "$Id: sequencer.c,v 1.7 1999-02-08 14:46:54 danw Exp $";
+#endif /* lint */
 
 #include "types.h"
 #include "interface.h"

@@ -11,13 +11,13 @@
  *	  	protocol over a TCP connection.
  *		This file handles the caller's side of the connection.
  *
- *	$Id: rpcall.c,v 1.21 1999-02-02 20:40:28 kcr Exp $
+ *	$Id: rpcall.c,v 1.22 1999-02-08 14:47:11 danw Exp $
  *
  */
 #ifndef lint
 static char rcsid_rpcall_c[] =
-    "$Id: rpcall.c,v 1.21 1999-02-02 20:40:28 kcr Exp $";
-#endif lint
+    "$Id: rpcall.c,v 1.22 1999-02-08 14:47:11 danw Exp $";
+#endif /* lint */
 
 /* INCLUDES */
 

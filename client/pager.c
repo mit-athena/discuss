@@ -3,8 +3,8 @@
  * descriptor.
  */
 #ifndef lint
-static char *rcsid_discuss_c = "$Id: pager.c,v 1.3 1999-01-22 23:09:29 ghudson Exp $";
-#endif lint
+static char *rcsid_discuss_c = "$Id: pager.c,v 1.4 1999-02-08 14:46:52 danw Exp $";
+#endif /* lint */
 
 #include <stdio.h>
 

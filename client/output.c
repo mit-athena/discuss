@@ -6,7 +6,7 @@
  *
  */
 /*
- *	$Id: output.c,v 1.15 1999-01-22 23:09:29 ghudson Exp $
+ *	$Id: output.c,v 1.16 1999-02-08 14:46:51 danw Exp $
  *
  *	Utility routines.
  *
@@ -14,8 +14,8 @@
 
 #ifndef lint
 static char rcsid_discuss_utils_c[] =
-    "$Id: output.c,v 1.15 1999-01-22 23:09:29 ghudson Exp $";
-#endif lint
+    "$Id: output.c,v 1.16 1999-02-08 14:46:51 danw Exp $";
+#endif /* lint */
 
 #include <stdio.h>
 #include <sys/file.h>

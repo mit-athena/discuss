@@ -9,13 +9,13 @@
  *
  * List request for DISCUSS
  *
- * $Id: list.c,v 1.34 1999-01-22 23:09:26 ghudson Exp $
+ * $Id: list.c,v 1.35 1999-02-08 14:46:49 danw Exp $
  *
  */
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Id: list.c,v 1.34 1999-01-22 23:09:26 ghudson Exp $";
-#endif lint
+    "$Id: list.c,v 1.35 1999-02-08 14:46:49 danw Exp $";
+#endif /* lint */
 
 #include <stdio.h>
 #include <string.h>

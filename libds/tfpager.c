@@ -1,5 +1,5 @@
 /*
- *	$Id: tfpager.c,v 1.4 1999-01-22 23:10:01 ghudson Exp $
+ *	$Id: tfpager.c,v 1.5 1999-02-08 14:47:13 danw Exp $
  *
  *	Copyright (C) 1987 by the Massachusetts Institute of Technology
  *
@@ -8,8 +8,8 @@
  */
 
 #ifndef lint
-static char *rcsid_tfpager_c = "$Id: tfpager.c,v 1.4 1999-01-22 23:10:01 ghudson Exp $";
-#endif lint
+static char *rcsid_tfpager_c = "$Id: tfpager.c,v 1.5 1999-02-08 14:47:13 danw Exp $";
+#endif /* lint */
 
 #include <stdio.h>
 #include <errno.h>
@@ -206,7 +206,7 @@ crank()
 	struct winsize ws;
 
 	if (ioctl(fileno(stdout), TIOCGWINSZ, &ws) < 0) {
-#endif TIOCGWINSZ
+#endif /* TIOCGWINSZ */
 		ysize = tgetnum("li");
 		xsize = tgetnum("co");
 #ifdef TIOCGWINSZ
@@ -216,7 +216,7 @@ crank()
 		if ((xsize = ws.ws_col) == 0)
 			xsize = tgetnum("co");
 	}
-#endif TIOCGWINSZ
+#endif /* TIOCGWINSZ */
 	ysize--;
 }       
 int init_tfpager()
@@ -248,7 +248,7 @@ int init_tfpager()
 		auto_wrap = tgetflag("am");
 #ifdef SIGWINCH
 		signal(SIGWINCH, crank);		
-#endif SIGWINCH
+#endif /* SIGWINCH */
 		crank();
 		code = 0;
 	} 

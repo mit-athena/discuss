@@ -8,12 +8,12 @@
 /* 
  * 
  * Created by: Mark W. Eichin <eichin@athena.mit.edu>
- * $Id: do_quote.c,v 1.2 1999-01-22 23:09:45 ghudson Exp $
+ * $Id: do_quote.c,v 1.3 1999-02-08 14:47:04 danw Exp $
  *
  */
 #ifndef lint
-static char rcsid_do_quote_c[] = "$Id: do_quote.c,v 1.2 1999-01-22 23:09:45 ghudson Exp $";
-#endif lint
+static char rcsid_do_quote_c[] = "$Id: do_quote.c,v 1.3 1999-02-08 14:47:04 danw Exp $";
+#endif /* lint */
 
 char *malloc();
 /*

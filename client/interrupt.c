@@ -11,8 +11,8 @@
  * Stan picked the names, not me..
  */
 #ifndef lint
-static char *rcsid_discuss_c = "$Id: interrupt.c,v 1.7 1999-02-02 20:39:47 kcr Exp $";
-#endif lint
+static char *rcsid_discuss_c = "$Id: interrupt.c,v 1.8 1999-02-08 14:46:48 danw Exp $";
+#endif /* lint */
 
 #include <signal.h>
 #if HAVE_SIGACTION

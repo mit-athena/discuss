@@ -1,5 +1,5 @@
 /*
- *	$Id: trn_spec.c,v 1.5 1999-01-22 23:09:36 ghudson Exp $
+ *	$Id: trn_spec.c,v 1.6 1999-02-08 14:46:56 danw Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
@@ -29,8 +29,8 @@
  */
 
 #ifndef lint
-static char *rcsid_trn_spec_c = "$Id: trn_spec.c,v 1.5 1999-01-22 23:09:36 ghudson Exp $";
-#endif lint
+static char *rcsid_trn_spec_c = "$Id: trn_spec.c,v 1.6 1999-02-08 14:46:56 danw Exp $";
+#endif /* lint */
 
 #include "interface.h"
 #include "globals.h"

@@ -9,13 +9,13 @@
  *
  * catchup request for DISCUSS
  *
- * $Id: catchup.c,v 1.7 1999-01-22 23:09:21 ghudson Exp $
+ * $Id: catchup.c,v 1.8 1999-02-08 14:46:46 danw Exp $
  *
  */
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Id: catchup.c,v 1.7 1999-01-22 23:09:21 ghudson Exp $";
-#endif lint
+    "$Id: catchup.c,v 1.8 1999-02-08 14:46:46 danw Exp $";
+#endif /* lint */
 
 #include <stdio.h>
 #include <string.h>

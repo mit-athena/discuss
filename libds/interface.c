@@ -6,16 +6,16 @@
  *
  */
 /*
- *	$Id: interface.c,v 1.28 1999-01-22 23:09:58 ghudson Exp $
+ *	$Id: interface.c,v 1.29 1999-02-08 14:47:10 danw Exp $
  *
  */
 
 #ifndef lint
 static char rcsid_interface_c[] =
-    "$Id: interface.c,v 1.28 1999-01-22 23:09:58 ghudson Exp $";
+    "$Id: interface.c,v 1.29 1999-02-08 14:47:10 danw Exp $";
 static char copyright[] =
     "Copyright (C) 1989 by the Massachusetts Institute of Technology";
-#endif lint
+#endif /* lint */
 
 #include <stdio.h>
 #include <string.h>

@@ -6,7 +6,7 @@
  *
  */
 /*
- *	$Id: new_trans.c,v 1.28 1999-02-02 20:39:48 kcr Exp $
+ *	$Id: new_trans.c,v 1.29 1999-02-08 14:46:50 danw Exp $
  *
  *	New-transaction routine for DISCUSS.  (Request 'talk'.)
  *
@@ -15,8 +15,8 @@
 
 #ifndef lint
 static char rcsid_discuss_c[] =
-     "$Id: new_trans.c,v 1.28 1999-02-02 20:39:48 kcr Exp $";
-#endif lint
+     "$Id: new_trans.c,v 1.29 1999-02-08 14:46:50 danw Exp $";
+#endif /* lint */
 
 #include <stdio.h>
 #include <sys/file.h>
@@ -33,9 +33,9 @@ static char rcsid_discuss_c[] =
 
 #ifdef	lint
 #define	USE(var)	var=var;
-#else	lint
+#else	/* lint */
 #define	USE(var)	;
-#endif	lint
+#endif	/* lint */
 
 extern tfile	unix_tfile();
 extern char *gets(), *error_message();

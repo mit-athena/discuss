@@ -6,7 +6,7 @@
  *
  */
 /*
- *	$Id: randrp.c,v 1.14 1999-02-02 20:39:50 kcr Exp $
+ *	$Id: randrp.c,v 1.15 1999-02-08 14:46:53 danw Exp $
  *
  *	Code for "randrp" request in discuss.
  *
@@ -14,8 +14,8 @@
 
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Id: randrp.c,v 1.14 1999-02-02 20:39:50 kcr Exp $";
-#endif lint
+    "$Id: randrp.c,v 1.15 1999-02-08 14:46:53 danw Exp $";
+#endif /* lint */
 
 #include <discuss/discuss.h>
 #include "globals.h"

@@ -2,14 +2,14 @@
  *
  * List request for DISCUSS
  *
- * $Id: nls.c,v 1.5 1999-01-22 23:09:28 ghudson Exp $
+ * $Id: nls.c,v 1.6 1999-02-08 14:46:51 danw Exp $
  *
  * Copyright (C) 1986 by the MIT Student Information Processing Board
  *
  */
 #ifndef lint
-static char *rcsid_discuss_c = "$Id: nls.c,v 1.5 1999-01-22 23:09:28 ghudson Exp $";
-#endif lint
+static char *rcsid_discuss_c = "$Id: nls.c,v 1.6 1999-02-08 14:46:51 danw Exp $";
+#endif /* lint */
 
 #include <stdio.h>
 #include <string.h>
@@ -95,7 +95,7 @@ nlist(argc, argv)
 	if ((code = tg_next_trn(tg)) == 0) {
 #ifdef notdef
 		dsc_public.current = tg->current;
-#endif notdef
+#endif /* notdef */
 		list_it(&tg->tinfo);
 		while (!interrupt && (code = tg_next_trn(tg)) == 0) {
 			if (interrupt) break;

@@ -7,7 +7,7 @@
  */
 /*
  *
- *	$Id: res_module.c,v 1.15 1999-02-02 20:40:27 kcr Exp $
+ *	$Id: res_module.c,v 1.16 1999-02-08 14:47:10 danw Exp $
  *
  * resolve_module () --
  *	Can you say "Put all the configuration into one file?"  Can you
@@ -22,8 +22,8 @@
 
 #ifndef lint
 static char rcsid_res_module_c[] =
-    "$Id: res_module.c,v 1.15 1999-02-02 20:40:27 kcr Exp $";
-#endif lint
+    "$Id: res_module.c,v 1.16 1999-02-08 14:47:10 danw Exp $";
+#endif /* lint */
 
 #include "rpc_et.h"
 #include "config.h"
@@ -45,7 +45,7 @@ static void ExpandHost ();
 #ifndef SNAME_SZ
 #define SNAME_SZ 30
 #define REALM_SZ 30
-#endif SNAME_SZ
+#endif /* SNAME_SZ */
 
 #define NULL 0
 
@@ -242,7 +242,7 @@ void resolve_module (modname, port, hostp, servp, result)
 	strcat (service_id, realmp);
     else
 	strcat (service_id, realm);
-#endif KERBEROS
+#endif /* KERBEROS */
     *hostp = myhnamep;
     *servp = service_id;
     *result = 0;
@@ -306,7 +306,7 @@ const char *local_realm ()
 	krb_get_lrealm (realm, 1);
 
     return (realm);
-#else KERBEROS
+#else /* KERBEROS */
     return (REALM);
-#endif KERBEROS
+#endif /* KERBEROS */
 }

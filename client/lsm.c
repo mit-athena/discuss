@@ -6,14 +6,14 @@
  *
  */
 /*
- *	$Id: lsm.c,v 1.25 1999-01-22 23:09:27 ghudson Exp $
+ *	$Id: lsm.c,v 1.26 1999-02-08 14:46:50 danw Exp $
  *
  */
 
 #ifndef lint
 static char rcsid_lsm_c[] =
-    "$Id: lsm.c,v 1.25 1999-01-22 23:09:27 ghudson Exp $";
-#endif lint
+    "$Id: lsm.c,v 1.26 1999-02-08 14:46:50 danw Exp $";
+#endif /* lint */
 
 #include <string.h>
 #include <stdio.h>

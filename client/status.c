@@ -9,13 +9,13 @@
  *
  * Status request for DISCUSS
  *
- * $Id: status.c,v 1.16 1999-01-22 23:09:34 ghudson Exp $
+ * $Id: status.c,v 1.17 1999-02-08 14:46:54 danw Exp $
  *
  */
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Id: status.c,v 1.16 1999-01-22 23:09:34 ghudson Exp $";
-#endif lint
+    "$Id: status.c,v 1.17 1999-02-08 14:46:54 danw Exp $";
+#endif /* lint */
 
 #include <stdio.h>
 #include <ctype.h>

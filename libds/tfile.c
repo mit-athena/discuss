@@ -7,7 +7,7 @@
  */
 /*
  *
- *	$Id: tfile.c,v 1.6 1999-01-22 23:10:01 ghudson Exp $
+ *	$Id: tfile.c,v 1.7 1999-02-08 14:47:12 danw Exp $
  *
  * tfile.c -- a new implementation of tfile's.
  *
@@ -15,8 +15,8 @@
  */
 #ifndef lint
 static char rcsid_tfile_c[] =
-    "$Id: tfile.c,v 1.6 1999-01-22 23:10:01 ghudson Exp $";
-#endif lint
+    "$Id: tfile.c,v 1.7 1999-02-08 14:47:12 danw Exp $";
+#endif /* lint */
 
 #include <stdio.h>
 #include <errno.h>

@@ -8,14 +8,14 @@
 /*
  *	Print-related requests for DISCUSS.
  *
- *	$Id: print.c,v 1.26 1999-02-02 20:39:49 kcr Exp $
+ *	$Id: print.c,v 1.27 1999-02-08 14:46:52 danw Exp $
  *
  */
 
 
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Id: print.c,v 1.26 1999-02-02 20:39:49 kcr Exp $";
+    "$Id: print.c,v 1.27 1999-02-08 14:46:52 danw Exp $";
 #endif /* lint */
 
 #include <stdio.h>
@@ -36,9 +36,9 @@ static char rcsid_discuss_c[] =
 
 #ifdef	lint
 #define	USE(var)	var=var;
-#else	lint
+#else	/* lint */
 #define	USE(var)	;
-#endif	lint
+#endif	/* lint */
 
 #define max(a, b) ((a) > (b) ? (a) : (b))
 

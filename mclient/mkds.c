@@ -6,14 +6,14 @@
  *
  */
 /*
- *	$Id: mkds.c,v 1.22 1999-02-02 20:40:33 kcr Exp $
+ *	$Id: mkds.c,v 1.23 1999-02-08 14:47:15 danw Exp $
  *
  */
 
 #ifndef lint
 static char rcsid_mkds_c[] =
-    "$Id: mkds.c,v 1.22 1999-02-02 20:40:33 kcr Exp $";
-#endif lint
+    "$Id: mkds.c,v 1.23 1999-02-08 14:47:15 danw Exp $";
+#endif /* lint */
 
 #include <discuss/discuss.h>
 #if 0

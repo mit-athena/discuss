@@ -74,7 +74,7 @@ static yyerror(msg)
 {
 #ifdef	lint
 	msg = msg;
-#endif	lint
+#endif	/* lint */
 	trnexpr_err = DISC_INVALID_TRN_SPECS;
 }
 
@@ -217,4 +217,4 @@ main(argc, argv)
 		argv++;
 	}
 }
-#endif notdef
+#endif /* notdef */

@@ -6,7 +6,7 @@
  *
  */
 /*
- *	$Id: acl.c,v 1.15 1999-01-22 23:10:13 ghudson Exp $
+ *	$Id: acl.c,v 1.16 1999-02-08 14:47:17 danw Exp $
  *
  * 	Routines for the manipulation of access control lists in core,
  *	along with routines to move them to and from files.
@@ -19,8 +19,8 @@
 
 #ifndef lint
 static const char rcsid_acl_c[] =
-    "$Id: acl.c,v 1.15 1999-01-22 23:10:13 ghudson Exp $";
-#endif lint
+    "$Id: acl.c,v 1.16 1999-02-08 14:47:17 danw Exp $";
+#endif /* lint */
 
 #include <stdio.h>
 #include <string.h>
@@ -208,7 +208,7 @@ cleanup:
 	}
 
 }	       
-#endif notdef
+#endif /* notdef */
 acl_replace_access(list, principal, modes)
     dsc_acl *list;
     const char *principal;
@@ -450,7 +450,7 @@ main()
 	acl_write(fd, a);
 	(void) close(fd);
 }
-#endif TESTS
+#endif /* TESTS */
 
 static void panic(s)
 	char *s;

@@ -7,7 +7,7 @@
  */
 /*
  *
- *	$Id: host.c,v 1.7 1999-01-22 23:09:58 ghudson Exp $
+ *	$Id: host.c,v 1.8 1999-02-08 14:47:09 danw Exp $
  *
  * host.c () -- Program to return the default hostname, internet style.  
  *		Placed here because UNIX is too brain-damaged to have this
@@ -16,8 +16,8 @@
  *
  */
 #ifndef lint
-static char *rcsid_host_c = "$Id: host.c,v 1.7 1999-01-22 23:09:58 ghudson Exp $";
-#endif lint
+static char *rcsid_host_c = "$Id: host.c,v 1.8 1999-02-08 14:47:09 danw Exp $";
+#endif /* lint */
 
 #include <string.h>
 #include <netdb.h>

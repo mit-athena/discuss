@@ -7,7 +7,7 @@
  */
 /*
  *
- *	$Id: stubs.c,v 1.16 1999-01-22 23:10:00 ghudson Exp $
+ *	$Id: stubs.c,v 1.17 1999-02-08 14:47:12 danw Exp $
  *
  * stubs.c -- These are stubs that handle the calling of routines.
  *
@@ -15,8 +15,8 @@
  */
 #ifndef lint
 static char rcsid_stubs_c[] =
-    "$Id: stubs.c,v 1.16 1999-01-22 23:10:00 ghudson Exp $";
-#endif lint
+    "$Id: stubs.c,v 1.17 1999-02-08 14:47:12 danw Exp $";
+#endif /* lint */
 
 /* Derived from CORE.PAS 06/21/86 by SRZ */
 

@@ -15,14 +15,14 @@
  *	Or the user could put some transaction specifiers on the
  *	command line, in which case they are used as meeting announcements.
  *
- *	$Id: addmtg.c,v 1.32 1999-02-02 20:39:45 kcr Exp $
+ *	$Id: addmtg.c,v 1.33 1999-02-08 14:46:45 danw Exp $
  *
  */
 
 #ifndef lint
 static char rcsid_addmtg_c[] =
-    "$Id: addmtg.c,v 1.32 1999-02-02 20:39:45 kcr Exp $";
-#endif lint
+    "$Id: addmtg.c,v 1.33 1999-02-08 14:46:45 danw Exp $";
+#endif /* lint */
 
 #include <string.h>
 #include <stdio.h>

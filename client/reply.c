@@ -6,7 +6,7 @@
  *
  */
 /*
- *	$Id: reply.c,v 1.21 1999-01-22 23:09:32 ghudson Exp $
+ *	$Id: reply.c,v 1.22 1999-02-08 14:46:53 danw Exp $
  *
  *	Code for "reply" request in discuss.
  *
@@ -15,8 +15,8 @@
 
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Id: reply.c,v 1.21 1999-01-22 23:09:32 ghudson Exp $";
-#endif lint
+    "$Id: reply.c,v 1.22 1999-02-08 14:46:53 danw Exp $";
+#endif /* lint */
 
 #include <stdio.h>
 #include <sys/file.h>

@@ -7,7 +7,7 @@
  */
 /*
  *
- *	$Id: tunix.c,v 1.7 1999-01-22 23:10:03 ghudson Exp $
+ *	$Id: tunix.c,v 1.8 1999-02-08 14:47:13 danw Exp $
  *
  * tunix.c -- procedures to have tfiles work from unix files.
  *
@@ -15,8 +15,8 @@
  */
 #ifndef lint
 static char rcsid_tunix_c[] =
-    "$Id: tunix.c,v 1.7 1999-01-22 23:10:03 ghudson Exp $";
-#endif lint
+    "$Id: tunix.c,v 1.8 1999-02-08 14:47:13 danw Exp $";
+#endif /* lint */
 
 #define min(A, B) ((A) < (B) ? (A) : (B))
 #define NIL 0

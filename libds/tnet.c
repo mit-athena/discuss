@@ -7,7 +7,7 @@
  */
 /*
  *
- *	$Id: tnet.c,v 1.6 1999-01-22 23:10:02 ghudson Exp $
+ *	$Id: tnet.c,v 1.7 1999-02-08 14:47:13 danw Exp $
  *
  * tnet.c -- procedures to have tfiles go over the net.
  *
@@ -15,8 +15,8 @@
  */
 #ifndef lint
 static char rcsid_tnet_c[] =
-    "$Id: tnet.c,v 1.6 1999-01-22 23:10:02 ghudson Exp $";
-#endif lint
+    "$Id: tnet.c,v 1.7 1999-02-08 14:47:13 danw Exp $";
+#endif /* lint */
 
 #define min(A, B) ((A) < (B) ? (A) : (B))
 #define NIL 0

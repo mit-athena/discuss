@@ -7,14 +7,14 @@
  */
 /*
  *
- * $Id: trn_select.c,v 1.16 1999-01-22 23:09:35 ghudson Exp $
+ * $Id: trn_select.c,v 1.17 1999-02-08 14:46:55 danw Exp $
  *
  */
 
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Id: trn_select.c,v 1.16 1999-01-22 23:09:35 ghudson Exp $";
-#endif lint
+    "$Id: trn_select.c,v 1.17 1999-02-08 14:46:55 danw Exp $";
+#endif /* lint */
 
 #define	MIN(a,b)	((a)<(b)?(a):(b))
 #define	MAX(a,b)	((a)>(b)?(a):(b))

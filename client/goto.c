@@ -6,7 +6,7 @@
  *
  */
 /*
- *	$Id: goto.c,v 1.20 1999-02-02 20:39:47 kcr Exp $
+ *	$Id: goto.c,v 1.21 1999-02-08 14:46:48 danw Exp $
  *
  *	Code for "goto" request in discuss.
  *
@@ -14,8 +14,8 @@
 
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Id: goto.c,v 1.20 1999-02-02 20:39:47 kcr Exp $";
-#endif lint
+    "$Id: goto.c,v 1.21 1999-02-08 14:46:48 danw Exp $";
+#endif /* lint */
 
 #include <stdio.h>
 #include <sys/file.h>
@@ -30,9 +30,9 @@ static char rcsid_discuss_c[] =
 
 #ifdef	lint
 #define	DONT_USE(var)	var=var;
-#else	lint
+#else	/* lint */
 #define	DONT_USE(var)	;
-#endif	lint
+#endif	/* lint */
 
 #define	FREE(ptr)	{ if (ptr) free(ptr); }
 #ifndef max

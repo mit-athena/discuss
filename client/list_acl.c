@@ -6,14 +6,14 @@
  *
  */
 /*
- *	$Id: list_acl.c,v 1.12 1999-01-22 23:09:26 ghudson Exp $
+ *	$Id: list_acl.c,v 1.13 1999-02-08 14:46:49 danw Exp $
  *
  */
 
 #ifndef lint
 static char rcsid_list_acl_c[] =
-    "$Id: list_acl.c,v 1.12 1999-01-22 23:09:26 ghudson Exp $";
-#endif lint
+    "$Id: list_acl.c,v 1.13 1999-02-08 14:46:49 danw Exp $";
+#endif /* lint */
 
 #include <string.h>
 #include <stdio.h>
