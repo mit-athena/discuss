@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.31 1987-04-19 21:49:10 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.32 1987-07-14 16:30:51 wesommer Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
@@ -8,104 +8,11 @@
  *	A simple shell-type user interface to discuss; uses Ken Raeburn's
  *	ss library for the command interpreter.
  *
- *      $Log: not supported by cvs2svn $
- * Revision 1.30  87/04/12  08:13:38  wesommer
- * Cleaned up error message for "bad control arg".
- * 
- * Revision 1.29  87/04/08  03:54:00  wesommer
- * Added new-user setup hooks.
- * 
- * Revision 1.28  87/03/22  04:33:23  spook
- * *** empty log message ***
- * 
- * Revision 1.26  86/12/14  12:04:11  spook
- * Fix implementation of -editor, -no_editor that was breaking things
- * elsewhere...
- * 
- * Revision 1.25  86/12/08  00:43:30  wesommer
- * Implemented -editor, -no_editor control args for program, 
- * similar args and -mtg arg for repl.
- * 
- * Revision 1.24  86/12/07  21:51:10  wesommer
- * Added -editor and -no_editor control args to permit use under emacs.
- * 
- * Revision 1.23  86/12/07  17:49:30  wesommer
- * Lint fixes.
- * 
- * Revision 1.22  86/12/07  16:04:23  rfrench
- * Globalized sci_idx
- * 
- * Revision 1.21  86/12/07  00:29:25  rfrench
- * Killed ../include
- * 
- * Revision 1.20  86/11/20  10:32:10  srz
- * Reply sets current right
- * 
- * Revision 1.19  86/11/17  00:58:05  spook
- * Added some control arg processing.  (-ssn, -rq, -quit)
- * 
- * Revision 1.18  86/11/16  06:16:09  wesommer
- * Added call to init_acl_err_tbl.
- * 
- * Revision 1.17  86/11/11  01:49:11  wesommer
- * Added access control warning on reply.
- * Added access control flags on entry to meetings: chairmen are told
- * such, and if reply or write access are lacking, the user is told
- * "read-only", "reply-only" or "no replies".
- * 
- * Revision 1.16  86/10/29  10:25:23  srz
- * Clean up global variables.
- * Moves delete and retrieve over to list.c
- * Added leave, and have goto/leave record meeting changes
- * Reply takes transaction number.
- * 
- * Revision 1.15  86/10/19  09:58:03  spook
- * Changed to use dsc_ routines; eliminate refs to rpc.
- * 
- * Revision 1.14  86/09/16  21:52:10  wesommer
- * Close off RPC connections so we don't lose file descriptors.
- * 
- * Revision 1.13  86/09/16  21:33:42  srz
- * bug fixes of last checkout.
- * 
- * Revision 1.12  86/09/13  20:41:42  srz
- * Added name resolving to goto_mtg
- * 
- * Revision 1.11  86/09/10  18:57:03  wesommer
- * Made to work with kerberos; meeting names are now longer.
- * 
- * Revision 1.10  86/09/10  17:20:11  wesommer
- * Ken, please use RCS..
- * 
- * Revision 1.9  86/08/23  21:42:48  spook
- * moved timecheck for list into list module
- * 
- * Revision 1.8  86/08/22  00:19:19  spook
- * using new error-table stuff; moved some code out to other
- * modules
- * 
- * Revision 1.7  86/08/07  13:40:44  spook
- * replaced "/projects/discuss/client/info" with #define from config.h
- * 
- * Revision 1.6  86/08/02  14:01:11  wesommer
- * Fixed to ignore SIGPIPE if the pager goes away.
- * 
- * Revision 1.5  86/08/01  02:41:35  spook
- * Moved edit() to discuss_utils.c.
- * 
- * Revision 1.4  86/07/31  15:56:08  wesommer
- * Fixed up some brain-damage surrounding the prt_trans/write_trans
- * interactions.
- *      "If you're using longjmp, you're doing something wrong"
- *                              - Jim Gettys
- * write_trans no longer takes an sci_idx as its argument; it has an
- * additional last argument, which is an error code.
- * 
  */
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.31 1987-04-19 21:49:10 srz Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.32 1987-07-14 16:30:51 wesommer Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -134,23 +41,18 @@ static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athe
 
 extern ss_request_table discuss_cmds;
 
-/* GLOBAL VARIABLES */
-
-struct _dsc_pub dsc_public = {0, 0, 0, (char *)NULL, (char *)NULL };
-
-char	dsc_version [] = "1.2";
-char	*temp_file = (char *)NULL;
-char	*pgm = (char *)NULL;
-char	buf[BUFSIZ];
-char	*buffer = &buf[0];
+char	dsc_version[] = "1.2 EXL";
 int	sci_idx;
-char	*user_id = (char *)NULL;
+
+extern char *temp_file, *pgm, *user_id;
 
 /* EXTERNAL ROUTINES */
 
 char	*malloc(), *getenv(), *gets(), *ctime();
 tfile	unix_tfile();
 char	*local_realm();
+static char	buf[BUFSIZ];
+char	*buffer;
 
 #define DEFAULT_EDITOR "/bin/ed"
 
@@ -166,6 +68,7 @@ main(argc, argv)
 	bool quit = FALSE;	/* quit after processing request */
 	bool flame = FALSE;	/* Have we flamed them for multiple  */
 
+	buffer = &buf[0];
 	editor_path = getenv ("EDITOR");
 	if (!editor_path)
 		editor_path = DEFAULT_EDITOR;
@@ -226,15 +129,14 @@ main(argc, argv)
 		}
 	}
 
-	if (!user_id) {
+	if (!0) {
 		register char *user = getpwuid(getuid())->pw_name;
 		register char *realm = local_realm();
-		register char *uid = malloc((unsigned)
-					    (strlen(user)+strlen(realm)+2));
-		strcpy(uid, user);
-		strcat(uid, "@");
-		strcat(uid, realm);
-		user_id = uid;
+
+		user_id = malloc((unsigned)(strlen(user)+strlen(realm)+2));
+		strcpy(user_id, user);
+		strcat(user_id, "@");
+		strcat(user_id, realm);
 	}
 
 	sci_idx = ss_create_invocation(subsystem_name, dsc_version,
@@ -256,25 +158,32 @@ main(argc, argv)
 	(void) sprintf(temp_file, "/tmp/mtg%d.%d", (int)getuid(), getpid());
 
 	if (code = find_rc_filename()) {
-		register char *prompt;
-		ss_perror(sci_idx, code, "");
-		fprintf(stderr, "\n\
+	     register char *prompt;
+	     ss_perror(sci_idx, code, "");
+	     fprintf(stderr, "\n\
 If you are using discuss for the first time, or if you have only used the\n\
 experimental version of discuss, you need to run the 'dsc_setup'\n\
 command from the shell.\n\n");
-		fflush(stderr);
-		prompt = "Run dsc_setup now? (y or n) ";
-		while (getyn(prompt, 'y')) {
-			printf("\nRunning setup...\n");
-			system("dsc_setup");
-			if (code = find_rc_filename()) {
-				ss_perror(sci_idx, code, "");
-				prompt = 
-		  "\nThat didn't seem to work; try again? (y or n)";
-			} else break;
-		}
+	     fflush(stderr);
+	     prompt = "Run dsc_setup now? (y or n) ";
+	     while (getyn(prompt, 'y')) {
+		  printf("\nRunning dsc_setup...\n");
+		  system("dsc_setup");
+		  if (code = find_rc_filename()) {
+		       ss_perror(sci_idx, code, "");
+		       prompt =
+			    "\nThat didn't seem to work; try again? (y or n)";
+		  } else break;
+	     }
+	     if (code)
+		  log_warning(code, "- continuing anyway");
 	}
-	if (code) log_warning(code, "- continuing anyway");
+	else if (!quit) {
+	     printf("Discuss version %s.  Type '?' for a list of commands.\n",
+		    dsc_version);
+	     if (!initial_meeting)
+		  printf("\n");
+	}
 
 	if (initial_meeting != (char *)NULL) {
 		(void) sprintf(buffer, "goto %s", initial_meeting);
