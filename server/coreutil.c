@@ -7,7 +7,7 @@
  */
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.26 1994-06-04 15:14:46 cfields Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.27 1997-01-28 11:08:51 ghudson Exp $
  *
  *
  * coreutil.c  -- These contain lower-layer, utility type routines to
@@ -15,6 +15,10 @@
  *		  in-memory superblock, and to open & close meetings.
  *
  *	$Log: not supported by cvs2svn $
+ *	Revision 1.26  1994/06/04 15:14:46  cfields
+ *	But declare it if ZEPHYR isn't defined.
+ *	This is not the best fix necessarily, but it's known safe to me.
+ *
  * Revision 1.25  94/06/04  15:04:22  cfields
  * Zephyr headers now include stdlib.h, so we don't need to declare
  * malloc. (char * conflicts with void *)
@@ -104,7 +108,7 @@
 const
 #endif
 static char rcsid_coreutil_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.26 1994-06-04 15:14:46 cfields Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.27 1997-01-28 11:08:51 ghudson Exp $";
 #endif /* lint */
 
 #include <discuss/types.h>
@@ -409,11 +413,11 @@ start_read()
 
      if (!no_nuke) {
 #ifdef SOLARIS
-          lock.l_type = F_WRLCK;
+          lock.l_type = F_RDLCK;
           lock.l_start = 0;
           lock.l_whence = 0;
           lock.l_len = 0;
-          if (fcntl(u_control_f, F_SETLK, &lock) < 0) 
+          if (fcntl(u_control_f, F_SETLKW, &lock) < 0) 
 #else
 	  if (flock (u_control_f, LOCK_SH) < 0)
 #endif

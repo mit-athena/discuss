@@ -259,7 +259,7 @@ expunge_range:
           lock.l_start = 0;
           lock.l_whence = 0;
           lock.l_len = 0;
-          fcntl(control_fd, F_SETLK, &lock);
+          fcntl(control_fd, F_SETLKW, &lock);
 #else
 	  flock(control_fd, LOCK_EX);		/* Hold meeting by the balls */
 #endif

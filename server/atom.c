@@ -79,7 +79,7 @@ int d;
     lock.l_start = 0;
     lock.l_whence = 0;
     lock.l_len = 0;
-    if (fcntl(d, F_SETLK, &lock)) 
+    if (fcntl(d, F_SETLKW, &lock)) 
       	  return (NULL);
 #else
      if (flock(d, LOCK_EX) < 0)
