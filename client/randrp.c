@@ -7,7 +7,7 @@
  */
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/randrp.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/randrp.c,v 1.9 1989-06-02 23:38:22 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/randrp.c,v 1.10 1994-03-25 16:25:07 miki Exp $
  *	$Locker:  $
  *
  *	Code for "randrp" request in discuss.
@@ -16,13 +16,18 @@
 
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/randrp.c,v 1.9 1989-06-02 23:38:22 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/randrp.c,v 1.10 1994-03-25 16:25:07 miki Exp $";
 #endif lint
 
 #include <discuss/discuss.h>
 #include "globals.h"
 #include <stdio.h>
 #include <sys/time.h>
+#ifdef SOLARIS
+#define random lrand48
+#define srandom srand48
+#endif
+
 
 randrp(argc, argv, sci_idx)
 	int argc;
