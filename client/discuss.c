@@ -27,7 +27,8 @@ main(argc, argv)
 	time_sixmonthsago = time_now - 6*30*24*60*60; 
 
 	sci = ss_create_invocation("discuss", "0.1", (char *)NULL,
-				   &discuss_cmds, (char *)NULL, &zcode);
+				   &discuss_cmds, 
+				   "/projects/discuss/client/info", &zcode);
 	if (zcode != (CODE)0) {
 		ss_perror(sci, zcode, "creating invocation");
 		exit(1);
