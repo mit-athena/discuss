@@ -1,13 +1,16 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/announce.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/announce.c,v 1.1 1987-04-08 21:41:30 rfrench Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/announce.c,v 1.2 1987-04-09 00:12:23 rfrench Exp $
  *	$Locker:  $
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.1  87/04/08  21:41:30  rfrench
+ * Initial revision
+ * 
  */
 
 #ifndef lint
-static char *rcsid_announce_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/announce.c,v 1.1 1987-04-08 21:41:30 rfrench Exp $";
+static char *rcsid_announce_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/announce.c,v 1.2 1987-04-09 00:12:23 rfrench Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -18,9 +21,8 @@ static char *rcsid_announce_c = "$Header: /afs/dev.mit.edu/source/repository/ath
 
 #define min(x,y) ((x)<(y)?(x):(y))
 
-dsc_announce_mtg (nbp, long_name, public, tf, txn_no, code_ptr)
-name_blk *nbp;
-char *long_name;
+dsc_announce_mtg (nbpsrc, nbpdest, public, tf, txn_no, code_ptr)
+name_blk *nbpsrc, *nbpdest;
 int public;
 tfile tf;
 int *txn_no;
@@ -42,9 +44,9 @@ int *code_ptr;
 		*code_ptr = CANT_WRITE_TEMP;
 		return;
 	}
-	fprintf(fp,"  Meeting Name:  %s\n", long_name);
-	fprintf(fp,"  Host:          %s\n", nbp->hostname);
-	fprintf(fp,"  Pathname:      %s\n", nbp->pathname);
+	fprintf(fp,"  Meeting Name:  %s\n", nbpsrc->aliases[0]);
+	fprintf(fp,"  Host:          %s\n", nbpsrc->hostname);
+	fprintf(fp,"  Pathname:      %s\n", nbpsrc->pathname);
 	fprintf(fp,"  Participation: %s\n", public?"Public":"Private");
 	fprintf(fp,"\n");
 	fclose(fp);
@@ -76,6 +78,6 @@ int *code_ptr;
 	}
 	tf2 = unix_tfile(fd);
 
-	(void) sprintf(subject,"%s meeting",long_name);
-	dsc_add_trn(nbp, tf2, subject, 0, txn_no, code_ptr);
+	(void) sprintf(subject,"%s meeting",nbpsrc->aliases[0]);
+	dsc_add_trn(nbpdest, tf2, subject, 0, txn_no, code_ptr);
 }
