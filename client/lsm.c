@@ -1,12 +1,12 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v 1.21 1989-01-05 01:07:34 raeburn Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v 1.22 1989-03-29 00:32:36 srz Exp $
  *
  */
 
 #ifndef lint
 static char rcsid_lsm_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v 1.21 1989-01-05 01:07:34 raeburn Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v 1.22 1989-03-29 00:32:36 srz Exp $";
 #endif lint
 
 #include <string.h>
@@ -188,5 +188,6 @@ list_meetings (argc, argv)
 	dont_flag_interrupts();
 
 punt:
+	free(auser_id);
 	free((char *)used);
 }

@@ -1,12 +1,12 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v 1.18 1989-01-05 01:36:14 raeburn Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v 1.19 1989-03-29 00:32:43 srz Exp $
  *
  */
      
 #ifndef lint
 static char rcsid_ckm_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v 1.18 1989-01-05 01:36:14 raeburn Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v 1.19 1989-03-29 00:32:43 srz Exp $";
 #endif lint
 
 #include <string.h>
@@ -47,6 +47,7 @@ do_mtg(mtg_name)
 	  if (dsc_public.attending 
 	  && !strcmp(dsc_public.path, nbp->pathname)
   	  && !strcmp(dsc_public.host, nbp ->hostname)) {
+	       dsc_destroy_mtg_info(&dsc_public.m_info);
 	       dsc_get_mtg_info(&dsc_public.nb,
 				&dsc_public.m_info, &code);
 	       updated = (dsc_public.highest_seen < dsc_public.m_info.last);

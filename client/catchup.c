@@ -2,7 +2,7 @@
  *
  * catchup request for DISCUSS
  *
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/catchup.c,v 1.3 1989-01-05 02:11:06 raeburn Exp $
+ * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/catchup.c,v 1.4 1989-03-29 00:32:30 srz Exp $
  * $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/catchup.c,v $
  * $Locker:  $
  *
@@ -11,7 +11,7 @@
  */
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/catchup.c,v 1.3 1989-01-05 02:11:06 raeburn Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/catchup.c,v 1.4 1989-03-29 00:32:30 srz Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -31,6 +31,7 @@ catchup(argc, argv)
 		ss_perror(sci_idx, 0, "No current meeting.\n");
 		return;
 	}
+	dsc_destroy_mtg_info(&dsc_public.m_info);
 	dsc_get_mtg_info(&dsc_public.nb,
 			 &dsc_public.m_info, &code);
 	if (code != 0) {
@@ -61,6 +62,7 @@ set_seen(argc, argv)
 	  return;
      }
 
+     dsc_destroy_mtg_info(&dsc_public.m_info);
      dsc_get_mtg_info(&dsc_public.nb, &dsc_public.m_info, &code);
      if (code != 0) {
 	  (void) ss_perror(sci_idx, code, "Can't get meeting info");
@@ -70,29 +72,24 @@ set_seen(argc, argv)
      dsc_get_trn_info(&dsc_public.nb, dsc_public.current, &t_info, &code);
      if (code != 0)
 	  t_info.current = 0;
-     else {
-	  free(t_info.subject);			/* don't need these */
-	  t_info.subject = NULL;
-	  free(t_info.author);
-	  t_info.author = NULL;
-     }
+     dsc_destroy_trn_info(&t_info);
 
      trn_list = trn_select(&t_info, argv[1],
 			      (selection_list *)NULL, &code);
      if (code) {
 	  ss_perror(sci_idx, code, "");
-	  free((char *) trn_list);
+	  sl_free(trn_list);
 	  return;
      }
      
      if (trn_list -> low != trn_list -> high) {
 	  ss_perror(sci_idx, 0, "Cannot set seen to range");
-	  free((char *)trn_list);
+	  sl_free(trn_list);
 	  return;
      }
      
      set_trn = trn_list -> low;
-     free((char *)trn_list);
+     sl_free(trn_list);
 
      dsc_public.highest_seen = set_trn;
      dsc_public.current = dsc_public.highest_seen;

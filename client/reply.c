@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v 1.12 1989-01-05 01:32:35 raeburn Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v 1.13 1989-03-29 00:32:22 srz Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
@@ -12,7 +12,7 @@
 
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v 1.12 1989-01-05 01:32:35 raeburn Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/reply.c,v 1.13 1989-03-29 00:32:22 srz Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -100,35 +100,30 @@ repl(argc, argv)
 	dsc_get_trn_info(&dsc_public.nb, dsc_public.current, &t_info, &code);
 	if (code != 0)
 		t_info.current = 0;
-	else {
-	     free(t_info.subject);			/* don't need these */
-	     t_info.subject = NULL;
-	     free(t_info.author);
-	     t_info.author = NULL;
-	}
+	dsc_destroy_trn_info(&t_info);
 
 	trn_list = trn_select(&t_info, trans ? trans : "current" ,
 			      (selection_list *)NULL, &code);
 	if (code) {
 	     ss_perror(sci_idx, code, "");
-	     free((char *) trn_list);
+	     sl_free((char *) trn_list);
 	     goto abort2;
 	}
 
 	if (trn_list -> low != trn_list -> high) {
 	     ss_perror(sci_idx, 0, "Cannot reply to range");
-	     free((char *)trn_list);
+	     sl_free((char *)trn_list);
 	     goto abort2;
 	}
 
 	orig_trn = trn_list -> low;
-	free((char *)trn_list);
+	sl_free((char *)trn_list);
 
 	dsc_get_trn_info(&dsc_public.nb, orig_trn, &t_info, &code);
 
 	if (code != 0) {
 		ss_perror(sci_idx, code, "");
-		goto abort2;
+		goto abort;
 	}
 
 	if(!acl_is_subset("a", dsc_public.m_info.access_modes)) {
@@ -145,9 +140,9 @@ repl(argc, argv)
 		if (strncmp(myname, "???", 3) == 0) {
 			printf("Reply will be anonymous.\n");
 		}
-		free(myname);
-		myname = NULL;
 	}
+	free(myname);
+	myname = NULL;
 	
 	if (strncmp(t_info.subject, "Re: ", 4)) {
 		char *new_subject = malloc((unsigned)strlen(t_info.subject)+5);
@@ -199,8 +194,7 @@ repl(argc, argv)
 	dsc_public.m_info.highest = txn_no;
 
 abort:
-	free(t_info.subject);
-	free(t_info.author);
+	dsc_destroy_trn_info(&t_info);
 abort2:
 	dont_flag_interrupts();
 }

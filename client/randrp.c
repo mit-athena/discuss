@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/randrp.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/randrp.c,v 1.6 1989-01-05 02:05:39 raeburn Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/randrp.c,v 1.7 1989-03-29 00:32:10 srz Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1988 by the Student Information Processing Board
@@ -11,7 +11,7 @@
 
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/randrp.c,v 1.6 1989-01-05 02:05:39 raeburn Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/randrp.c,v 1.7 1989-03-29 00:32:10 srz Exp $";
 #endif lint
 
 #include <discuss/discuss.h>
@@ -108,6 +108,7 @@ randrp(argc, argv, sci_idx)
 				rnd_trn = dsc_public.m_info.first;
 			}
 			dsc_get_trn_info(&dsc_public.nb, rnd_trn, &t_info, &code);
+			dsc_destroy_trn_info(&t_info);
 		} while (code != 0);
 		if (!t_info.pref) break;
 	}

@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/goto.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/goto.c,v 1.12 1989-01-05 01:24:53 raeburn Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/goto.c,v 1.13 1989-03-29 00:32:50 srz Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986, 1988 by the Student Information Processing
@@ -12,7 +12,7 @@
 
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/goto.c,v 1.12 1989-01-05 01:24:53 raeburn Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/goto.c,v 1.13 1989-03-29 00:32:50 srz Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -160,14 +160,10 @@ done:
 	while (code == DELETED_TRN) {
 	    dsc_get_trn_info (&dsc_public.nb, dsc_public.current,
 			      &t_info, &code);
-	    if (code == 0) {
-		free(t_info.subject); /* don't need these */
-		t_info.subject = NULL;
-		free(t_info.author);
-		t_info.author = NULL;
-	    } else if (code == DELETED_TRN)
+	    dsc_destroy_trn_info(&t_info);
+	    if (code == DELETED_TRN)
 		dsc_public.current--;
-	    else {
+	    else if (code != 0) {
 		ss_perror(sci_idx, code,
 			  "Looking for non-deleted transaction");
 		break;
@@ -206,8 +202,8 @@ void leave_mtg()
     if (!code) {
 	if (dsc_public.highest_seen == dsc_public.m_info.last)
 	    dsc_public.nb.status &= ~ DSC_ST_CHANGED;
-	dsc_destroy_mtg_info (&minfo);
     }
+    dsc_destroy_mtg_info (&minfo);
     dsc_update_mtg_set (user_id, &dsc_public.nb, 1, &code);
     
     dsc_destroy_name_blk (&dsc_public.nb);
