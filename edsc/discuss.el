@@ -11,7 +11,7 @@
 ;;;    	For copying information, see the file mit-copyright.h in this release.
 ;;;
 ;;;	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v $
-;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.32 1992-04-16 18:24:47 lwvanels Exp $
+;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.33 1992-07-13 16:47:54 lwvanels Exp $
 ;;;
 ;;;  Emacs lisp code to remote control a "discuss" shell process to
 ;;;  provide an emacs-based interface to the discuss conferencing system.
@@ -20,6 +20,14 @@
 ;;;  Written by Stan Zanarotti, Bill Sommerfeld and Theodore Ts'o.
 ;;;
 ;;;  $Log: not supported by cvs2svn $
+; Revision 1.32  1992/04/16  18:24:47  lwvanels
+; [tytso]
+; Ripped out caching code which was in version 1; requires edsc protocol
+; version 2.4 or greater, which will take care of the discuss transaction
+; cache.
+; This also solves the problem with edsc spinning occasionally, waiting
+; for input.  [changes.74#1612]
+;
 ; Revision 1.31  1991/07/30  20:06:59  lwvanels
 ; top dir now /usr/athena/lib/elisp
 ; don't explicitly look for .elc files
@@ -151,17 +159,17 @@ user.")
 discuss-delete-trn.")
 
 (defvar discuss-mtgs-mode-map nil
-  "Keymap used by the meetings-list mode of the discuss subsystem")
+  "Keymap used by the meetings-list mode of the discuss subsystem.")
 
 (defvar discuss-list-mode-map nil
-  "Keymap used by the transaction-list mode of the discuss subsystem")
+  "Keymap used by the transaction-list mode of the discuss subsystem.")
 
 (defvar discuss-trn-mode-map nil
-  "Keymap used by the transaction mode of the discuss subsystem")
+  "Keymap used by the transaction mode of the discuss subsystem.")
 
 (defvar discuss-main-buffer "*meetings*"
   "Name of main buffer for discuss, which holds a list of the current
-meetings")
+meetings.")
 
 (defvar discuss-version nil "Version of discuss code loaded.")
 (defun discuss-version nil (interactive) (message discuss-version))
@@ -176,7 +184,7 @@ meetings")
   "Internal hook to call when discuss subprocess returns an error.")
 
 (defvar discuss-in-progress nil
-  "t if a request to the slave subprocess is outstanding")
+  "t if a request to the slave subprocess is outstanding.")
 
 (defvar discuss-form nil
   "Lisp form returned by the subprocess.")
@@ -185,10 +193,10 @@ meetings")
   "Meeting list.")
 
 (defvar discuss-meeting-completion-list nil
-  "Meeting list changed into the right format for completion-read")
+  "Meeting list changed into the right format for completion-read.")
 
 (defvar discuss-show-num 0
-  "Current discuss transaction number")
+  "Current discuss transaction number.")
 
 (defvar discuss-meeting nil
   "Buffer-local variable containing the name of the meeting of a discuss
@@ -200,10 +208,10 @@ buffer.")
 transaction buffer.")
 
 (defvar discuss-cur-mtg-buf nil
-  "Name of buffer for current Discuss meeting")
+  "Name of buffer for current Discuss meeting.")
 
 (defvar discuss-cur-direction 0
-  "Current discuss direction")
+  "Current discuss direction.")
 
 (defvar discuss-async t
   "*Run discuss commands asynchronously.
@@ -229,12 +237,10 @@ request completed successfully.")
 This looks a lot like RMAIL.  This works by using ``edsc'' as a subjob.
 
 The following commands are available:
-n	go to next line.
-p	go to previous line.
-SPC     go to next meeting that has unread transactions
-DEL     go to previous meeting has unread transactions
-l	list meetings.
-g	go to meeting listed on line.
+SPC,n   go to next meeting that has unread transactions
+DEL,p   go to previous meeting has unread transactions
+l	list meetings
+g	go to meeting listed on line
 a	add meeting
 d	delete meeting
 c	mark a meeting as read (catch up)
@@ -285,7 +291,7 @@ M-l	Move to Last transaction in a chain.
 g	Goto transaction.
 d	Delete transaction (and move forwards).
 C-d	Delete transaction (and move backwards).
-R	Retrieve transaction
+R	Retrieve transaction.
 q       Quit meeting.
 r	Reply to this transaction.
 f	Forward this transaction via mail.
@@ -332,7 +338,7 @@ a	Add meeting."
 ;;; Entry points typically entered through key sequences.
 
 (defun discuss-list-meetings ()
-  "List discuss meetings"
+  "List discuss meetings."
   (interactive)
   (message "Listing meetings..."
   (switch-to-buffer (get-buffer discuss-main-buffer))
@@ -430,7 +436,7 @@ a	Add meeting."
   (bury-buffer discuss-main-buffer))
 
 (defun discuss-goto (&optional meeting)
-  "Go to a meeting"
+  "Go to a meeting."
   (interactive (list (if (or current-prefix-arg
 			     (not (equal (buffer-name) discuss-main-buffer))
 			     (= (point) 1))
@@ -520,7 +526,7 @@ a	Add meeting."
 ;;; This should be cleaned up.  -- TYT
 ;;;
 (defun discuss-stat (&optional meeting)
-  "Go to a meeting"
+  "Go to a meeting."
   (interactive (list (if (eq (current-buffer) discuss-cur-mtg-buf)
 			 discuss-meeting
 		       (if (or current-prefix-arg
@@ -595,7 +601,7 @@ a	Add meeting."
 	  ))))
 
 (defun discuss-update ()
-  "Update Discuss display to show new transactions"
+  "Update Discuss display to show new transactions."
   (interactive)
   (discuss-send-cmd (format "(gmi %s)\n" discuss-meeting)
 		    'discuss-end-of-update 'discuss-read-form))
@@ -716,7 +722,7 @@ a	Add meeting."
     (discuss-show-trn last)))
 
 (defun discuss-toggle-trn-flag ()
-  "Toggle the per-transaction flag"
+  "Toggle the per-transaction flag."
   (interactive)
   (let ((old-flag (nth 13 discuss-current-transaction-info)))
     (if old-flag
@@ -750,7 +756,7 @@ the argument or the current transaction and leaves the meeting."
     (discuss-leave-mtg)))
 
 (defun discuss-leave-mtg ()
-  "Leave the current discuss meeting"
+  "Leave the current discuss meeting."
   (interactive)
   (if (buffer-name discuss-cur-mtg-buf)
       (progn
@@ -868,6 +874,7 @@ the argument or the current transaction and leaves the meeting."
   (discuss-show-trn discuss-current-transaction))
 
 (defun discuss-retrieve-trn (trn-num)
+  "Retrieve a deleted transaction."
   (interactive "nTransaction to retrieve: ")
   (setq discuss-current-transaction trn-num)
   (message "Retrieving %d...." trn-num)
@@ -939,7 +946,7 @@ Flushes the discuss cache and destroys the edsc process."
 	discuss-in-progress nil))
 
 (defun discuss-send-cmd (cmd &optional end-func filter-func unwind-func)
-  "Send an command to the edsc process"
+  "Send an command to the edsc process."
   (if (not discuss-process)
       (let ((process-connection-type nil))
 	(if (not (file-exists-p discuss-pathname))
@@ -1060,7 +1067,7 @@ discuss server while we spin-block."
 ; run this at each load
 (defun discuss-initialize nil
   (setq discuss-version
-	"$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.32 1992-04-16 18:24:47 lwvanels Exp $")
+	"$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.33 1992-07-13 16:47:54 lwvanels Exp $")
 
 ;;;
 ;;; Lots of autoload stuff....
@@ -1215,12 +1222,13 @@ discuss server while we spin-block."
     (set-buffer buffer)))
 
 (defun discuss-forward-meeting (&optional quiet)
+  "Find the next changed meeting in the discuss *meetings* buffer, or wrap."
   (interactive)
   (let ((discuss-DWIM nil))
     (discuss-next-meeting quiet)))
 
 (defun discuss-prev-meeting ()
-  "Find the next changed meeting in the discuss *meetings* buffer, or wrap."
+  "Find the previous changed meeting in the discuss *meetings* buffer, or wrap."
   (interactive)
   (beginning-of-line)
   (if (not (re-search-backward "^ c " nil t))
