@@ -1,9 +1,14 @@
 /*
- *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/randrp.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/randrp.c,v 1.8 1989-05-04 02:58:17 srz Exp $
- *	$Locker:  $
  *
- *	Copyright (C) 1988 by the Student Information Processing Board
+ *    Copyright (C) 1989 by the Massachusetts Institute of Technology
+ *    Developed by the MIT Student Information Processing Board (SIPB).
+ *    For copying information, see the file mit-copyright.h in this release.
+ *
+ */
+/*
+ *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/randrp.c,v $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/randrp.c,v 1.9 1989-06-02 23:38:22 srz Exp $
+ *	$Locker:  $
  *
  *	Code for "randrp" request in discuss.
  *
@@ -11,7 +16,7 @@
 
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/randrp.c,v 1.8 1989-05-04 02:58:17 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/randrp.c,v 1.9 1989-06-02 23:38:22 srz Exp $";
 #endif lint
 
 #include <discuss/discuss.h>

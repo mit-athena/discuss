@@ -1,4 +1,11 @@
 /*
+ *
+ *    Copyright (C) 1989 by the Massachusetts Institute of Technology
+ *    Developed by the MIT Student Information Processing Board (SIPB).
+ *    For copying information, see the file mit-copyright.h in this release.
+ *
+ */
+/*
  *  addmtg () --
  *  	The add_meeting command in discuss.  This request adds a
  *	meeting to the user's list of meetings.  There are several
@@ -9,14 +16,14 @@
  *	command line, in which case they are used as meeting announcements.
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.23 1989-05-19 00:43:27 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.24 1989-06-02 23:34:12 srz Exp $
  *	$Locker:  $
  *
  */
 
 #ifndef lint
 static char rcsid_addmtg_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.23 1989-05-19 00:43:27 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.24 1989-06-02 23:34:12 srz Exp $";
 #endif lint
 
 #include <string.h>

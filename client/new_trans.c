@@ -1,9 +1,14 @@
 /*
- *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v 1.23 1989-05-06 01:55:28 srz Exp $
- *	$Locker:  $
  *
- *	Copyright (C) 1986 by the Student Information Processing Board
+ *    Copyright (C) 1989 by the Massachusetts Institute of Technology
+ *    Developed by the MIT Student Information Processing Board (SIPB).
+ *    For copying information, see the file mit-copyright.h in this release.
+ *
+ */
+/*
+ *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v 1.24 1989-06-02 23:37:55 srz Exp $
+ *	$Locker:  $
  *
  *	New-transaction routine for DISCUSS.  (Request 'talk'.)
  *
@@ -12,7 +17,7 @@
 
 #ifndef lint
 static char rcsid_discuss_c[] =
-     "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v 1.23 1989-05-06 01:55:28 srz Exp $";
+     "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v 1.24 1989-06-02 23:37:55 srz Exp $";
 #endif lint
 
 #include <stdio.h>

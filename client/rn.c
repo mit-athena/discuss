@@ -1,11 +1,19 @@
 /*
+ *
+ *	Copyright (C) 1989 by the Massachusetts Institute of Technology
+ *    	Developed by the MIT Student Information Processing Board (SIPB).
+ *    	For copying information, see the file mit-copyright.h in this release.
+ *
+ */
+/*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/rn.c,v $
  *	$Author: srz $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/rn.c,v 1.8 1989-05-19 16:58:18 srz Exp $
- *
- *	Copyright (C) 1987 by the Massachusetts Institute of Technology
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/rn.c,v 1.9 1989-06-02 23:38:39 srz Exp $
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.8  89/05/19  16:58:18  srz
+ * Declared static functions in advance.
+ * 
  * Revision 1.7  89/05/08  02:47:31  srz
  * jik's fix to stop printing twice.
  * 
@@ -33,7 +41,7 @@
 
 #ifndef lint
 static char rcsid_update_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/rn.c,v 1.8 1989-05-19 16:58:18 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/rn.c,v 1.9 1989-06-02 23:38:39 srz Exp $";
 #endif /* lint */
 
 #include <discuss/discuss.h>

@@ -1,13 +1,20 @@
 /*
  *
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/trn_select.c,v 1.13 1989-05-02 21:09:45 srz Exp $
+ *	Copyright (C) 1989 by the Massachusetts Institute of Technology
+ *    	Developed by the MIT Student Information Processing Board (SIPB).
+ *    	For copying information, see the file mit-copyright.h in this release.
+ *
+ */
+/*
+ *
+ * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/trn_select.c,v 1.14 1989-06-02 23:39:16 srz Exp $
  * $Locker:  $
  *
  */
 
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/trn_select.c,v 1.13 1989-05-02 21:09:45 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/trn_select.c,v 1.14 1989-06-02 23:39:16 srz Exp $";
 #endif lint
 
 #define	MIN(a,b)	((a)<(b)?(a):(b))

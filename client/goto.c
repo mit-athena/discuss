@@ -1,10 +1,14 @@
 /*
- *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/goto.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/goto.c,v 1.13 1989-03-29 00:32:50 srz Exp $
- *	$Locker:  $
  *
- *	Copyright (C) 1986, 1988 by the Student Information Processing
- *	Board of the Massachusetts Institute of Technology.
+ *    Copyright (C) 1989 by the Massachusetts Institute of Technology
+ *    Developed by the MIT Student Information Processing Board (SIPB).
+ *    For copying information, see the file mit-copyright.h in this release.
+ *
+ */
+/*
+ *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/goto.c,v $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/goto.c,v 1.14 1989-06-02 23:37:10 srz Exp $
+ *	$Locker:  $
  *
  *	Code for "goto" request in discuss.
  *
@@ -12,7 +16,7 @@
 
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/goto.c,v 1.13 1989-03-29 00:32:50 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/goto.c,v 1.14 1989-06-02 23:37:10 srz Exp $";
 #endif lint
 
 #include <stdio.h>

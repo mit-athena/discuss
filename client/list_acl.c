@@ -1,10 +1,18 @@
 /*
- *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list_acl.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list_acl.c,v 1.9 1989-01-05 01:20:31 raeburn Exp $
  *
- *	Copyright (C) 1986, 1988 by the Massachusetts Institute of Technology
+ *    Copyright (C) 1989 by the Massachusetts Institute of Technology
+ *    Developed by the MIT Student Information Processing Board (SIPB).
+ *    For copying information, see the file mit-copyright.h in this release.
+ *
+ */
+/*
+ *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list_acl.c,v $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list_acl.c,v 1.10 1989-06-02 23:37:37 srz Exp $
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.9  89/01/05  01:20:31  raeburn
+ * replaced included header files with <discuss/discuss.h>
+ * 
  * Revision 1.8  88/08/10  21:15:03  raeburn
  * Changed type names of acl code.
  * 
@@ -38,7 +46,7 @@
 
 #ifndef lint
 static char rcsid_list_acl_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list_acl.c,v 1.9 1989-01-05 01:20:31 raeburn Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list_acl.c,v 1.10 1989-06-02 23:37:37 srz Exp $";
 #endif lint
 
 #include <string.h>

@@ -1,10 +1,17 @@
 /*
+ *
+ *    Copyright (C) 1989 by the Massachusetts Institute of Technology
+ *    Developed by the MIT Student Information Processing Board (SIPB).
+ *    For copying information, see the file mit-copyright.h in this release.
+ *
+ */
+/*
  * Routines for dealing with ^C while running program.
  *
  * Stan picked the names, not me..
  */
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/interrupt.c,v 1.3 1989-05-19 16:59:19 srz Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/interrupt.c,v 1.4 1989-06-02 23:37:19 srz Exp $";
 #endif lint
 
 #include <signal.h>

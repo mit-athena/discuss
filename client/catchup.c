@@ -1,17 +1,22 @@
 /*
  *
+ *    Copyright (C) 1989 by the Massachusetts Institute of Technology
+ *    Developed by the MIT Student Information Processing Board (SIPB).
+ *    For copying information, see the file mit-copyright.h in this release.
+ *
+ */
+/*
+ *
  * catchup request for DISCUSS
  *
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/catchup.c,v 1.4 1989-03-29 00:32:30 srz Exp $
+ * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/catchup.c,v 1.5 1989-06-02 23:36:33 srz Exp $
  * $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/catchup.c,v $
  * $Locker:  $
- *
- * Copyright (C) 1988 by the MIT Student Information Processing Board
  *
  */
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/catchup.c,v 1.4 1989-03-29 00:32:30 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/catchup.c,v 1.5 1989-06-02 23:36:33 srz Exp $";
 #endif lint
 
 #include <stdio.h>

@@ -1,12 +1,19 @@
 /*
+ *
+ *    Copyright (C) 1989 by the Massachusetts Institute of Technology
+ *    Developed by the MIT Student Information Processing Board (SIPB).
+ *    For copying information, see the file mit-copyright.h in this release.
+ *
+ */
+/*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v 1.22 1989-03-29 00:32:36 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v 1.23 1989-06-02 23:37:45 srz Exp $
  *
  */
 
 #ifndef lint
 static char rcsid_lsm_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v 1.22 1989-03-29 00:32:36 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v 1.23 1989-06-02 23:37:45 srz Exp $";
 #endif lint
 
 #include <string.h>

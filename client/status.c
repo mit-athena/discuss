@@ -1,18 +1,22 @@
 /*
  *
+ *	Copyright (C) 1989 by the Massachusetts Institute of Technology
+ *    	Developed by the MIT Student Information Processing Board (SIPB).
+ *    	For copying information, see the file mit-copyright.h in this release.
+ *
+ */
+/*
+ *
  * Status request for DISCUSS
  *
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/status.c,v 1.11 1989-01-05 00:43:47 raeburn Exp $
+ * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/status.c,v 1.12 1989-06-02 23:38:54 srz Exp $
  * $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/status.c,v $
  * $Locker:  $
- *
- * Copyright (C) 1986, 1988 by the MIT Student Information Processing
- * Board.
  *
  */
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/status.c,v 1.11 1989-01-05 00:43:47 raeburn Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/status.c,v 1.12 1989-06-02 23:38:54 srz Exp $";
 #endif lint
 
 #include <stdio.h>
