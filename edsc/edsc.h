@@ -47,7 +47,7 @@ extern int	do_dt(), do_rt(), do_ls();
 /*
  * The caching is only enabled if EDSC_CACHE is defined....
  */
-/* #define EDSC_CACHE */
+#define EDSC_CACHE
 
 #ifdef EDSC_CACHE
 #define CACHE_DIR	"/tmp"
