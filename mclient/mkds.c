@@ -1,13 +1,16 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v 1.2 1986-11-24 20:07:21 rfrench Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v 1.3 1986-12-05 20:06:12 rfrench Exp $
  *	$Locker:  $
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.2  86/11/24  20:07:21  rfrench
+ * Initial (working) revision
+ * 
  */
 
 #ifndef lint
-static char *rcsid_mkds_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v 1.2 1986-11-24 20:07:21 rfrench Exp $";
+static char *rcsid_mkds_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v 1.3 1986-12-05 20:06:12 rfrench Exp $";
 #endif lint
 
 #include "../include/tfile.h"
@@ -61,18 +64,15 @@ char *argv[];
 	if (!strcmp(whoami,"rmds"))
 		remove++;
 
-	printf("Meeting directory <working dir>: ");
+	printf("Meeting location </usr/spool/discuss default>: ");
 	(void) gets(mtg_path);
 	if (!mtg_path[0])
-		if (!getwd(mtg_path)) {
-			(void) fprintf(stderr,"Can't get working directory\n");
-			goto kaboom;
-		}
+		strcpy(mtg_path,"/usr/spool/discuss");
 	if (!remove) {
 		printf("\nLong meeting name: ");
 		(void) gets(long_name);
 	}
-	printf("\nShort meeting name: ");
+	printf("\nYour meeting name: ");
 	(void) gets(short_name);
 	(void) strcat(mtg_path,"/");
 	(void) strcat(mtg_path,short_name);
@@ -100,7 +100,7 @@ char *argv[];
 	}
 
 	printf("\n");
-	public = getyn("Should this meeting be public <N>? ",'N');
+	public = getyn("Should this meeting be public <Y>? ",'Y');
 
 	create_mtg(mtg_path,long_name,public,&result);
 	if (result) {
@@ -263,14 +263,6 @@ int *result;
 	*result = 0;
 	return;
 }
-
-/*
-Subject: Meeting name
-Location: blah
-Participation:  public/one line description
-
-Transaction
-*/
 
 getyn(prompt,def)
 char *prompt,def;
