@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss_utils.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss_utils.c,v 1.7 1986-10-27 16:29:04 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss_utils.c,v 1.8 1986-10-27 16:48:15 wesommer Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board.
@@ -8,6 +8,9 @@
  *	Utility routines.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.7  86/10/27  16:29:04  wesommer
+ * Damnit, folks, use RCS.  
+ * 
  * Revision 1.6  86/10/19  09:58:52  spook
  * Changed to use dsc_ routines; eliminate refs to rpc.
  * 
@@ -25,7 +28,7 @@
  */
 
 #ifndef lint
-static char *rcsid_discuss_utils_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss_utils.c,v 1.7 1986-10-27 16:29:04 wesommer Exp $";
+static char *rcsid_discuss_utils_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss_utils.c,v 1.8 1986-10-27 16:48:15 wesommer Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -80,16 +83,16 @@ output_trans(txn_no, tf, code)
 	if (*code != 0) return;
 
 	if (tinfo.pref == 0 && tinfo.nref == 0)
-		(void) sprintf (line, "--[%04d]--\n\n", tinfo.current);
+		(void) sprintf (line, "--[%04d]--\n\f\n", tinfo.current);
 	else if (tinfo.pref == 0)
-		(void) sprintf (line, "--[%04d]-- (nref = [%04d])\n\n",
+		(void) sprintf (line, "--[%04d]-- (nref = [%04d])\n\f\n",
 				tinfo.current, tinfo.nref);
 	else if (tinfo.nref == 0)
-		(void) sprintf (line, "--[%04d]-- (pref = [%04d])\n\n",
+		(void) sprintf (line, "--[%04d]-- (pref = [%04d])\n\f\n",
 				tinfo.current, tinfo.pref);
 	else
 		(void) sprintf (line,
-				"--[%04d]-- (pref = [%04d], nref = [%04d])\n\n",
+				"--[%04d]-- (pref = [%04d], nref = [%04d])\n\f\n",
 				tinfo.current, tinfo.pref, tinfo.nref);
 	twrite (tf, line, strlen (line), code);
 }
