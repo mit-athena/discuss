@@ -287,7 +287,7 @@ expunge_range:
 	  } else if (old_mtg_info.highest > high) {		/* New transactions added */
 	       low = high + 1;
 	       high = old_mtg_info.highest;
-#ifdef POSIX
+#ifdef POSIX_FLOCK
                lock.l_type = F_UNLCK;
                lock.l_start = 0;
                lock.l_whence = 0;
