@@ -9,8 +9,11 @@
  * dsc_enter.c - enter a transaction from a file into discuss.
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsc_enter.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsc_enter.c,v 1.9 1997-12-17 00:12:41 ghudson Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsc_enter.c,v 1.10 1997-12-17 00:30:37 ghudson Exp $
  *	$Log: not supported by cvs2svn $
+ *	Revision 1.9  1997/12/17 00:12:41  ghudson
+ *	Use POSIX regexps.
+ *
  *	Revision 1.8  1996/09/19 22:30:48  ghudson
  *	BSD -> ANSI string and memory functions
  *
@@ -35,7 +38,7 @@
 
 #ifndef	lint
 static char rcsid[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsc_enter.c,v 1.9 1997-12-17 00:12:41 ghudson Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsc_enter.c,v 1.10 1997-12-17 00:30:37 ghudson Exp $";
 #endif
 
 #include <stdio.h>
@@ -260,7 +263,7 @@ static bool list_compare(s,list)
 	regex_t reg;
 
 	while (*list!=NULL) {
-		if (regcomp(&reg, *list++, REG_BASIC|REG_NOSUB) != 0)
+		if (regcomp(&reg, *list++, REG_NOSUB) != 0)
 			return(FALSE);
 		if (regexec(&reg, s, 0, NULL, 0) == 0) {
 			regfree(&reg);

@@ -12,6 +12,9 @@
  *        $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/dsmail.c,v $
  *
  *        $Log: not supported by cvs2svn $
+ *        Revision 1.5  1997/12/17 00:13:06  ghudson
+ *        Use POSIX regexps.
+ *
  *        Revision 1.4  1995/11/30 19:37:40  miki
  *        In Solaris2.4 sysexits.h migrated to /usr/include
  *
@@ -129,7 +132,7 @@
 
 #ifndef	lint
 static char rcsid[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/dsmail.c,v 1.5 1997-12-17 00:13:06 ghudson Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/dsmail.c,v 1.6 1997-12-17 00:31:38 ghudson Exp $";
 #endif
 
 char *malloc(), *realloc ();
@@ -562,7 +565,7 @@ int list_compare(s,list)
 	int status;
 
 	while (*list!=NULL) {
-		status = regcomp(&reg, *list, REG_BASIC|REG_NOSUB);
+		status = regcomp(&reg, *list, REG_NOSUB);
 		if (status != 0) {
 			regerror(status, &reg, buf, sizeof(buf));
 			fprintf(stderr,"554-%s - %s: %s\n",
