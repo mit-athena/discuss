@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.2 1986-11-16 06:05:37 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.3 1986-11-22 06:25:42 spook Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
@@ -11,13 +11,16 @@
  *		  in-memory superblock, and to open & close meetings.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.2  86/11/16  06:05:37  wesommer
+ * Changed open_mtg to stat(2) the acl file before assuming that it's 
+ * up to date, and revert the acl from there if the in-core version
+ * is stale.
+ * 
  */
 
-
 #ifndef lint
-static char *rcsid_coreutil_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.2 1986-11-16 06:05:37 wesommer Exp $";
+static char *rcsid_coreutil_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.3 1986-11-22 06:25:42 spook Exp $";
 #endif lint
-
 
 #include "../include/types.h"
 #include "../include/dsc_et.h"
@@ -29,6 +32,7 @@ static char *rcsid_coreutil_c = "$Header: /afs/dev.mit.edu/source/repository/ath
 #include <sys/types.h>
 #include <sys/file.h>
 #include <sys/stat.h>
+#include <strings.h>
 
 #define NULL 0
 
@@ -47,8 +51,9 @@ char *super_long_name;
 
 
 /* EXTERNAL */
-char *malloc();
-
+extern char *malloc();
+extern uid_t geteuid();
+extern off_t lseek();
 extern int errno;
 extern char rpc_caller [];
 
@@ -65,8 +70,8 @@ char *s;
      char *newstr;
 
      len = strlen (s) + 1;
-     newstr = malloc (len);
-     strcpy (newstr, s);
+     newstr = malloc ((unsigned)len);
+     (void) strcpy (newstr, s);
      return (newstr);
 }
 
@@ -82,7 +87,7 @@ char *mtg_name;
      int result;
      int mtg_name_len;
      trn_base tb;
-     int uid = geteuid();
+     int uid = (int)geteuid();
      struct stat sb;
 
      mtg_name_len = strlen (mtg_name);
@@ -90,14 +95,14 @@ char *mtg_name;
 	  return (BAD_PATH);
      }
 
-     strcpy (str, mtg_name);
-     strcat (str, "/acl");
+     (void) strcpy (str, mtg_name);
+     (void) strcat (str, "/acl");
 
      if (!strcmp (mtg_name, current_mtg)) {
 	  /*
 	   * is acl stale? 
 	   */
-	  stat(str, &sb);
+	  (void) stat(str, &sb);
 	  if (sb.st_mtime <= last_acl_mod)
 		  return (0);				/* that was easy */
 	  /*
@@ -119,7 +124,7 @@ char *mtg_name;
 	  }
 
 	  mtg_acl = acl_read (u_acl_f);
-	  close(u_acl_f);
+	  (void) close(u_acl_f);
 	  u_acl_f = 0;
 	  fstat(u_acl_f, &sb);
 	  last_acl_mod = sb.st_mtime;
@@ -129,8 +134,8 @@ char *mtg_name;
      if (current_mtg [0] != '\0') {		/* close previous meeting */
 	  if (nuclear)
 	       panic ("Nuclear flag error");	/* should never happen */
-	  close (u_trn_f);
-	  close (u_control_f);
+	  (void) close (u_trn_f);
+	  (void) close (u_control_f);
 	  current_mtg [0] = '\0';
 	  acl_destroy(mtg_acl);
      }
@@ -152,13 +157,13 @@ char *mtg_name;
      }
 
      mtg_acl = acl_read (u_acl_f);
-     fstat(u_acl_f, &sb);
+     (void) fstat(u_acl_f, &sb);
      last_acl_mod = sb.st_mtime;
-     close(u_acl_f);
+     (void) close(u_acl_f);
      u_acl_f = 0;
 
-     strcpy (str, mtg_name);
-     strcat (str, "/control");
+     (void) strcpy (str, mtg_name);
+     (void) strcat (str, "/control");
 
      if ((u_control_f = open(str, O_RDWR, 0700)) < 0) {
 	  if (errno == ENOENT)
@@ -175,8 +180,8 @@ char *mtg_name;
 	  goto punt;
      }
 
-     strcpy (str, mtg_name);
-     strcat (str, "/transactions");
+     (void) strcpy (str, mtg_name);
+     (void) strcat (str, "/transactions");
      
      if ((u_trn_f = open(str, O_RDWR, 0700)) < 0) {
 	  if (errno == ENOENT)
@@ -199,17 +204,17 @@ char *mtg_name;
 	  goto punt;
      }
 
-     strcpy (current_mtg, mtg_name);
+     (void) strcpy (current_mtg, mtg_name);
 
      return (0);
 
  punt:
      if (u_trn_f)
-	  close(u_trn_f);
+	     (void) close(u_trn_f);
      if (u_control_f)
-	  close(u_control_f);
+	     (void) close(u_control_f);
      if (u_acl_f)
-	  close(u_acl_f);
+	     (void) close(u_acl_f);
      acl_destroy(mtg_acl);
      mtg_acl = NULL;
      return (result);
@@ -221,8 +226,8 @@ int read_super()
      if (nuclear) {
 	  aread (a_control_f, (char *) &super, sizeof(super), 0);
      } else {
-	  lseek (u_control_f, 0, 0);
-	  read (u_control_f, (char *) &super, sizeof (super));
+	     lseek (u_control_f, (long)0, 0);
+	     read (u_control_f, (char *) &super, sizeof (super));
      }
 
      if (super.version != MTG_SUPER_1)
@@ -231,16 +236,16 @@ int read_super()
      if (super.unique != MTG_SUPER_UNIQUE)
 	  return (INCONSISTENT);
 
-     super_long_name = malloc (super.long_name_len);
-     super_chairman = malloc (super.chairman_len);
+     super_long_name = malloc ((unsigned)super.long_name_len);
+     super_chairman = malloc ((unsigned)super.chairman_len);
 
      if (nuclear) {
 	  aread (a_control_f, super_long_name, super.long_name_len, super.long_name_addr);
 	  aread (a_control_f, super_chairman, super.chairman_len, super.chairman_addr);
      } else {
-	  lseek (u_control_f, super.long_name_addr, 0);
+	  lseek (u_control_f, (long)super.long_name_addr, 0);
 	  read (u_control_f, super_long_name, super.long_name_len);
-	  lseek (u_control_f, super.chairman_addr, 0);
+	  lseek (u_control_f, (long)super.chairman_addr, 0);
 	  read (u_control_f, super_chairman, super.chairman_len);
      }
 
@@ -266,11 +271,11 @@ write_super ()
 	  awrite (a_control_f, super_long_name, super.long_name_len, super.long_name_addr);
 	  awrite (a_control_f, super_chairman, super.chairman_len, super.chairman_addr);
      } else {
-	  lseek (u_control_f, 0, 0);
+	  lseek (u_control_f, (long)0, 0);
 	  write (u_control_f, (char *)  &super, sizeof (super));
-	  lseek (u_control_f, super.long_name_addr, 0);
+	  lseek (u_control_f, (long)super.long_name_addr, 0);
 	  write (u_control_f, super_long_name, super.long_name_len);
-	  lseek (u_control_f, super.chairman_addr, 0);
+	  lseek (u_control_f, (long)super.chairman_addr, 0);
 	  write (u_control_f, super_chairman, super.chairman_len);
      }
 
@@ -347,7 +352,7 @@ chain_blk *cb;
      if (nuclear)
 	  aread (a_control_f, (char *) cb, sizeof (chain_blk), cbaddr);
      else {
-	  lseek (u_control_f, cbaddr, 0);
+	  lseek (u_control_f, (long)cbaddr, 0);
 	  read (u_control_f, (char *) cb, sizeof (chain_blk));
      }
 
@@ -372,7 +377,7 @@ chain_blk *cb;
      if (nuclear)
 	  awrite (a_control_f, (char *) cb, sizeof (chain_blk), cbaddr);
      else {
-	  lseek (u_control_f, cbaddr, 0);
+	  lseek (u_control_f, (long)cbaddr, 0);
 	  write (u_control_f, (char *) cb, sizeof (chain_blk));
      }
 
@@ -389,7 +394,7 @@ faddr trn_addr;
 trn_hdr *th;
 char **th_subject, **th_author;
 {
-     lseek (u_trn_f, trn_addr, 0);
+     lseek (u_trn_f, (long)trn_addr, 0);
      read (u_trn_f, (char *) th, sizeof (trn_hdr));
 
      if (th -> version != TRN_HDR_1)
@@ -399,14 +404,14 @@ char **th_subject, **th_author;
 	  return (INCONSISTENT);
 
      if (th_subject != 0) {
-	  *th_subject = malloc (th -> subject_len);
-	  lseek (u_trn_f, th -> subject_addr, 0);
+	  *th_subject = malloc ((unsigned)(th -> subject_len));
+	  lseek (u_trn_f, (long)(th -> subject_addr), 0);
 	  read (u_trn_f, *th_subject, th -> subject_len);
      }
 	  
      if (th_author != 0) {
-	  *th_author = malloc (th -> author_len);
-	  lseek (u_trn_f, th -> author_addr, 0);
+	  *th_author = malloc ((unsigned)(th -> author_len));
+	  lseek (u_trn_f, (long)(th -> author_addr), 0);
 	  read (u_trn_f, *th_author, th -> author_len);
      }
 
@@ -496,6 +501,7 @@ char mode;
 		  ((!strcmp (author, rpc_caller)) && acl_check(mtg_acl,rpc_caller,"o")));
      default:
 	  panic ("Invalid mode");
+	  /*NOTREACHED*/
      }
 }	  
 /*

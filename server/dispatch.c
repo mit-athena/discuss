@@ -43,7 +43,7 @@ int procno;
      char *c1,*c2,*c3;
      char *modes;
      int i1,i2;
-     char b1,b2;
+     bool b1;
      tfile t1,mem_tfile();
      int result;
      Acl *list;
