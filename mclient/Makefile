@@ -3,7 +3,7 @@ CFLAGS=	-g -I../include
 
 SRCS=	pmtg.c dspipe.c mkds.c dlsm.c crmtgs.c disrc2meetings.sh dsc_setup.sh
 
-PROGS=	pmtg dspipe mkds dlsm crmtgs
+PROGS=	pmtg dspipe mkds dlsm crmtgs rmds
 
 SCRIPTS= disrc2meetings dsc_setup
 
@@ -70,10 +70,31 @@ depend:
 	echo '/^# DO NOT DELETE THIS LINE/+1,$$d' >eddep
 	echo '$$r makedep' >>eddep
 	echo 'w' >>eddep
+	rm -f Makefile.bak
 	cp Makefile Makefile.bak
-	ex - Makefile < eddep
+	ed - Makefile < eddep
 	rm eddep makedep
 #
 # the last constant line in the makefile should be...
 # DO NOT DELETE THIS LINE
 
+pmtg.o: pmtg.c ./../include/tfile.h ./../include/interface.h
+pmtg.o: ./../include/types.h ./../include/dsc_et.h ./../include/rpc.h
+pmtg.o: /usr/include/stdio.h ./../include/usp.h ./../include/usp_et.h
+pmtg.o: ./../include/rpc_et.h /usr/include/sys/file.h /usr/include/stdio.h
+pmtg.o: /usr/include/strings.h
+dspipe.o: dspipe.c ./../include/tfile.h ./../include/interface.h
+dspipe.o: ./../include/types.h ./../include/dsc_et.h ./../include/rpc.h
+dspipe.o: /usr/include/stdio.h ./../include/usp.h ./../include/usp_et.h
+dspipe.o: ./../include/rpc_et.h /usr/include/sys/file.h /usr/include/stdio.h
+dspipe.o: /usr/include/strings.h
+mkds.o: mkds.c ../include/tfile.h ../include/dsc_et.h ../include/config.h
+mkds.o: ../include/interface.h ../include/types.h ../include/rpc.h
+mkds.o: /usr/include/stdio.h ../include/usp.h ../include/usp_et.h
+mkds.o: ../include/rpc_et.h ../include/globals.h ../include/dsname.h
+mkds.o: /usr/include/sys/time.h /usr/include/sys/file.h /usr/include/stdio.h
+mkds.o: /usr/include/ctype.h /usr/include/strings.h /usr/include/netdb.h
+mkds.o: /usr/include/pwd.h
+dlsm.o: dlsm.c
+crmtgs.o: crmtgs.c ../include/dsname.h ../include/interface.h
+crmtgs.o: ../include/types.h
