@@ -11,7 +11,7 @@
 /*
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.15 1987-08-22 22:36:28 rfrench Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.16 1987-10-23 21:42:40 wesommer Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
@@ -21,6 +21,9 @@
  *		callable routines.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.15  87/08/22  22:36:28  rfrench
+ * Moved calling location of mtg_znotify -- write_super frees things!
+ * 
  * Revision 1.14  87/08/22  18:12:51  rfrench
  * Added Zephyr notifications
  * 
@@ -36,7 +39,7 @@
  *
  */
 #ifndef lint
-static char *rcsid_core_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.15 1987-08-22 22:36:28 rfrench Exp $";
+static char *rcsid_core_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.16 1987-10-23 21:42:40 wesommer Exp $";
 #endif lint
 
 
@@ -53,6 +56,7 @@ static char *rcsid_core_c = "$Header: /afs/dev.mit.edu/source/repository/athena/
 #include <sys/file.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/param.h>
 #include <strings.h>
 
 #define min(a, b) (a < b ? a : b)
@@ -786,7 +790,7 @@ int *result;
 	    long_mtg_name, location, public);*/
 
      loclen = strlen (location);
-     if (location[0] != '/' || loclen == 0 || loclen > 168 || location [loclen-1] == '/') {
+     if (location[0] != '/' || loclen == 0 || loclen >= MAXPATHLEN || location [loclen-1] == '/') {
 	  *result = BAD_PATH;
 	  return;
      }
@@ -1123,7 +1127,7 @@ int *result;
      *result = 0;				/* optimist */
 
      mtg_name_len = strlen (mtg_name);
-     if (mtg_name[0] != '/' || mtg_name_len == 0 || mtg_name_len > 168 || mtg_name [mtg_name_len-1] == '/') {
+     if (mtg_name[0] != '/' || mtg_name_len == 0 || mtg_name_len >= MAXPATHLEN || mtg_name [mtg_name_len-1] == '/') {
 	  *result = BAD_PATH;
 	  return;
      }
