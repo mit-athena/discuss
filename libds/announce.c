@@ -1,13 +1,20 @@
 /*
+ *
+ *	Copyright (C) 1988, 1989 by the Massachusetts Institute of Technology
+ *    	Developed by the MIT Student Information Processing Board (SIPB).
+ *    	For copying information, see the file mit-copyright.h in this release.
+ *
+ */
+/*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/announce.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/announce.c,v 1.5 1988-10-16 13:51:04 raeburn Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/announce.c,v 1.6 1989-06-03 00:18:57 srz Exp $
  *	$Locker:  $
  *
  */
 
 #ifndef lint
 static char rcsid_announce_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/announce.c,v 1.5 1988-10-16 13:51:04 raeburn Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/announce.c,v 1.6 1989-06-03 00:18:57 srz Exp $";
 #endif lint
 
 #include <stdio.h>

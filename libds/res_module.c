@@ -1,9 +1,14 @@
 /*
  *
- *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/res_module.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/res_module.c,v 1.7 1989-05-19 18:12:21 srz Exp $
+ *	Copyright (C) 1988, 1989 by the Massachusetts Institute of Technology
+ *    	Developed by the MIT Student Information Processing Board (SIPB).
+ *    	For copying information, see the file mit-copyright.h in this release.
  *
- *	Copyright (C) 1986 by the Massachusetts Institute of Technology
+ */
+/*
+ *
+ *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/res_module.c,v $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/res_module.c,v 1.8 1989-06-03 00:21:31 srz Exp $
  *
  * resolve_module () --
  *	Can you say "Put all the configuration into one file?"  Can you
@@ -15,6 +20,9 @@
  *	the remote function is executed as a subprocess.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.7  89/05/19  18:12:21  srz
+ * krb name changes, etc.
+ * 
  * Revision 1.6  89/05/19  17:05:18  raeburn
  * *** empty log message ***
  * 
@@ -22,7 +30,7 @@
 
 #ifndef lint
 static char rcsid_res_module_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/res_module.c,v 1.7 1989-05-19 18:12:21 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/res_module.c,v 1.8 1989-06-03 00:21:31 srz Exp $";
 #endif lint
 
 #include "rpc_et.h"

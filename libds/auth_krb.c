@@ -1,9 +1,14 @@
 /*
  *
- *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/auth_krb.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/auth_krb.c,v 1.5 1988-07-04 07:09:38 raeburn Exp $
+ *	Copyright (C) 1988, 1989 by the Massachusetts Institute of Technology
+ *    	Developed by the MIT Student Information Processing Board (SIPB).
+ *    	For copying information, see the file mit-copyright.h in this release.
  *
- *	Copyright (C) 1986 by the Massachusetts Institute of Technology
+ */
+/*
+ *
+ *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/auth_krb.c,v $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/auth_krb.c,v 1.6 1989-06-03 00:20:29 srz Exp $
  *
  * auth_krb () -- Authentication procedure for kerberos.  This contains the
  *		  standard authentication for kerberos.
@@ -11,7 +16,7 @@
  */
 #ifndef lint
 static char *rcsid_auth_krb_c =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/auth_krb.c,v 1.5 1988-07-04 07:09:38 raeburn Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/auth_krb.c,v 1.6 1989-06-03 00:20:29 srz Exp $";
 #endif lint
 
 #include <strings.h>

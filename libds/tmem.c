@@ -1,13 +1,21 @@
 /*
+ *
+ *	Copyright (C) 1988, 1989 by the Massachusetts Institute of Technology
+ *    	Developed by the MIT Student Information Processing Board (SIPB).
+ *    	For copying information, see the file mit-copyright.h in this release.
+ *
+ */
+/*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tmem.c,v $
  *	$Author: srz $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tmem.c,v 1.2 1989-06-03 00:13:07 srz Exp $
- *
- *	Copyright (C) 1988 by the Massachusetts Institute of Technology
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tmem.c,v 1.3 1989-06-03 00:22:16 srz Exp $
  *
  *	tfile module for ``memory'' tfiles. 
  * 
  *	$Log: not supported by cvs2svn $
+ * Revision 1.2  89/06/03  00:13:07  srz
+ * Ken's changes.
+ * 
  * Revision 1.1  88/03/11  00:05:45  wesommer
  * Initial revision
  * 
@@ -15,7 +23,7 @@
 
 #ifndef lint
 static char rcsid_tmem_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tmem.c,v 1.2 1989-06-03 00:13:07 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tmem.c,v 1.3 1989-06-03 00:22:16 srz Exp $";
 #endif lint
 
 #include <errno.h>

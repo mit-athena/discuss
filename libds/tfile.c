@@ -1,13 +1,21 @@
 /*
  *
- *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tfile.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tfile.c,v 1.4 1989-06-03 00:12:58 srz Exp $
+ *	Copyright (C) 1988, 1989 by the Massachusetts Institute of Technology
+ *    	Developed by the MIT Student Information Processing Board (SIPB).
+ *    	For copying information, see the file mit-copyright.h in this release.
  *
- *	Copyright (C) 1986 by the Massachusetts Institute of Technology
+ */
+/*
+ *
+ *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tfile.c,v $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tfile.c,v 1.5 1989-06-03 00:22:07 srz Exp $
  *
  * tfile.c -- a new implementation of tfile's.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.4  89/06/03  00:12:58  srz
+ * Ken's changes.
+ * 
  * Revision 1.3  87/07/18  00:01:19  srz
  * Added control operation to tfile's.
  * 
@@ -18,7 +26,7 @@
  */
 #ifndef lint
 static char rcsid_tfile_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tfile.c,v 1.4 1989-06-03 00:12:58 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tfile.c,v 1.5 1989-06-03 00:22:07 srz Exp $";
 #endif lint
 
 #include <stdio.h>

@@ -1,13 +1,23 @@
 /*
  *
+ *	Copyright (C) 1988, 1989 by the Massachusetts Institute of Technology
+ *    	Developed by the MIT Student Information Processing Board (SIPB).
+ *    	For copying information, see the file mit-copyright.h in this release.
+ *
+ */
+/*
+ *
  *  rpcall.c -- Procedures to implement a simple (perhaps brain-asleep) RPC
  *	  	protocol over a TCP connection.
  *		This file handles the caller's side of the connection.
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/rpcall.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/rpcall.c,v 1.14 1989-06-03 00:12:42 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/rpcall.c,v 1.15 1989-06-03 00:21:41 srz Exp $
  *	$Locker:  $
  *	$Log: not supported by cvs2svn $
+ * Revision 1.14  89/06/03  00:12:42  srz
+ * Ken's changes.
+ * 
  * Revision 1.13  89/01/04  20:36:24  raeburn
  * Fixed return type of open_rpc and case statement syntax; fixed
  * include paths.
@@ -39,7 +49,7 @@
  */
 #ifndef lint
 static char rcsid_rpcall_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/rpcall.c,v 1.14 1989-06-03 00:12:42 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/rpcall.c,v 1.15 1989-06-03 00:21:41 srz Exp $";
 #endif lint
 
 /* INCLUDES */

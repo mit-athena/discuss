@@ -1,9 +1,14 @@
 /*
  *
- *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/conv_mgr.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/conv_mgr.c,v 1.10 1989-01-29 17:20:06 srz Exp $
+ *	Copyright (C) 1988, 1989 by the Massachusetts Institute of Technology
+ *    	Developed by the MIT Student Information Processing Board (SIPB).
+ *    	For copying information, see the file mit-copyright.h in this release.
  *
- *	Copyright (C) 1986 by the Massachusetts Institute of Technology
+ */
+/*
+ *
+ *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/conv_mgr.c,v $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/conv_mgr.c,v 1.11 1989-06-03 00:20:36 srz Exp $
  *
  * conv_mgr () -- File that contains procedure to handle conversations.  This
  *		  allows multiplexing of RPC stream, setting up the correct
@@ -17,7 +22,7 @@
 
 #ifndef lint
 static const char rcsid_conv_mgr_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/conv_mgr.c,v 1.10 1989-01-29 17:20:06 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/conv_mgr.c,v 1.11 1989-06-03 00:20:36 srz Exp $";
 #endif lint
 
 #include <errno.h>

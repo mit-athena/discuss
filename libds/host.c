@@ -1,9 +1,14 @@
 /*
  *
- *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/host.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/host.c,v 1.4 1987-06-27 01:24:33 spook Exp $
+ *	Copyright (C) 1988, 1989 by the Massachusetts Institute of Technology
+ *    	Developed by the MIT Student Information Processing Board (SIPB).
+ *    	For copying information, see the file mit-copyright.h in this release.
  *
- *	Copyright (C) 1986 by the Massachusetts Institute of Technology
+ */
+/*
+ *
+ *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/host.c,v $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/host.c,v 1.5 1989-06-03 00:21:10 srz Exp $
  *
  * host.c () -- Program to return the default hostname, internet style.  
  *		Placed here because UNIX is too brain-damaged to have this
@@ -12,7 +17,7 @@
  *
  */
 #ifndef lint
-static char *rcsid_host_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/host.c,v 1.4 1987-06-27 01:24:33 spook Exp $";
+static char *rcsid_host_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/host.c,v 1.5 1989-06-03 00:21:10 srz Exp $";
 #endif lint
 
 #include <strings.h>

@@ -1,13 +1,21 @@
 /*
  *
- *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tunix.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tunix.c,v 1.4 1989-01-04 20:47:00 raeburn Exp $
+ *	Copyright (C) 1988, 1989 by the Massachusetts Institute of Technology
+ *    	Developed by the MIT Student Information Processing Board (SIPB).
+ *    	For copying information, see the file mit-copyright.h in this release.
  *
- *	Copyright (C) 1986 by the Massachusetts Institute of Technology
+ */
+/*
+ *
+ *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tunix.c,v $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tunix.c,v 1.5 1989-06-03 00:22:33 srz Exp $
  *
  * tunix.c -- procedures to have tfiles work from unix files.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.4  89/01/04  20:47:00  raeburn
+ * Fixed include reference
+ * 
  * Revision 1.3  87/07/18  00:01:38  srz
  * Added control operation to tfile's.  First control operation:  FORCE_NL,
  * which forces a NL onto a tfile if it isn't already there.
@@ -19,7 +27,7 @@
  */
 #ifndef lint
 static char rcsid_tunix_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tunix.c,v 1.4 1989-01-04 20:47:00 raeburn Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tunix.c,v 1.5 1989-06-03 00:22:33 srz Exp $";
 #endif lint
 
 #define min(A, B) ((A) < (B) ? (A) : (B))

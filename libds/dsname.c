@@ -1,8 +1,13 @@
 /*
- *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v 1.20 1989-03-29 22:32:42 srz Exp $
  *
- *	Copyright (C) 1986 by the Massachusetts Institute of Technology
+ *	Copyright (C) 1988, 1989 by the Massachusetts Institute of Technology
+ *    	Developed by the MIT Student Information Processing Board (SIPB).
+ *    	For copying information, see the file mit-copyright.h in this release.
+ *
+ */
+/*
+ *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v 1.21 1989-06-03 00:20:54 srz Exp $
  *
  */
 
@@ -24,7 +29,7 @@
 
 #ifndef lint
 static const char rcsid_dsname_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v 1.20 1989-03-29 22:32:42 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsname.c,v 1.21 1989-06-03 00:20:54 srz Exp $";
 #endif lint
 
 extern char *malloc (), *local_realm (), *getenv ();

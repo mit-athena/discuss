@@ -1,23 +1,22 @@
-     /********************************************************************
-      *                                                                  *
-      *         Copyright (c) 1985 by                                    *
-      *            Lewis Makepeace and Stan Zanarotti                    *
-      *                                                                  *
-      *                                                                  *
-      *         All rights reserved.                                     *
-      *                                                                  *
-      ********************************************************************/
-
+/*
+ *
+ *	Copyright (C) 1988, 1989 by the Massachusetts Institute of Technology
+ *    	Developed by the MIT Student Information Processing Board (SIPB).
+ *    	For copying information, see the file mit-copyright.h in this release.
+ *
+ */
 /*
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/stubs.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/stubs.c,v 1.13 1989-03-27 00:33:07 srz Exp $
- *
- *	Copyright (C) 1986 by the Massachusetts Institute of Technology
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/stubs.c,v 1.14 1989-06-03 00:21:54 srz Exp $
  *
  * stubs.c -- These are stubs that handle the calling of routines.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.13  89/03/27  00:33:07  srz
+ * Null out fields, so that callers can FREE() fields of trn_info & mtg_info
+ * after calling.
+ * 
  * Revision 1.12  89/01/29  17:17:59  srz
  * Added flag routines, and version check.
  * 
@@ -46,7 +45,7 @@
  */
 #ifndef lint
 static char rcsid_stubs_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/stubs.c,v 1.13 1989-03-27 00:33:07 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/stubs.c,v 1.14 1989-06-03 00:21:54 srz Exp $";
 #endif lint
 
 /* Derived from CORE.PAS 06/21/86 by SRZ */

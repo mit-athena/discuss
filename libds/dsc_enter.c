@@ -1,14 +1,24 @@
 /*
+ *
+ *	Copyright (C) 1988, 1989 by the Massachusetts Institute of Technology
+ *    	Developed by the MIT Student Information Processing Board (SIPB).
+ *    	For copying information, see the file mit-copyright.h in this release.
+ *
+ */
+/*
  * dsc_enter.c - enter a transaction from a file into discuss.
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsc_enter.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsc_enter.c,v 1.3 1988-10-16 13:56:18 raeburn Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsc_enter.c,v 1.4 1989-06-03 00:20:45 srz Exp $
  *	$Log: not supported by cvs2svn $
+ * Revision 1.3  88/10/16  13:56:18  raeburn
+ * Changed include format.
+ * 
  */
 
 #ifndef	lint
 static char rcsid[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsc_enter.c,v 1.3 1988-10-16 13:56:18 raeburn Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsc_enter.c,v 1.4 1989-06-03 00:20:45 srz Exp $";
 #endif
 
 #include <stdio.h>
