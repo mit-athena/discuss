@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/include/globals.h,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/include/globals.h,v 1.14 1989-01-05 00:08:54 raeburn Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/include/globals.h,v 1.15 1989-02-25 16:55:44 raeburn Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
@@ -59,3 +59,12 @@ extern	char	*user_id;	/* user.instance@realm identifier for user */
 extern void	get_trn_map();
 extern selection_list *trn_select();
 
+/* Compiler fudging */
+#if defined(__HIGHC__) && defined(ibm032)
+pragma on(alloca);		/* make High-C seem reasonable */
+#endif
+
+#if defined(__GNUC__)
+#undef alloca
+#define alloca(x) __builtin_alloca(x)
+#endif
