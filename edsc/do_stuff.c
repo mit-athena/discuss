@@ -500,7 +500,7 @@ char *args;
      /* Hmm.  Deleted transaction.  Try the next five transactions, hoping
 	to get a non-deleted one */
      for (i = 1; i <= 5; i++) {
-	  dsc_get_trn_info(&nb,trn_num,&t_info,&code);
+	  dsc_get_trn_info(&nb,trn_num+i,&t_info,&code);
 	  if (code == 0) {
 	       printf("(%d)\n", t_info.current);
 	       goto done;
@@ -526,7 +526,7 @@ char *args;
 
      /* Ok.  We bite the bullet and loop until we can find something. */
      code = DELETED_TRN;
-     trn_num++;
+     trn_num += 6;
      while (code == DELETED_TRN) {
 	  dsc_get_trn_info (&nb, trn_num, &t_info, &code);
 	  if (code == 0) {
@@ -541,8 +541,8 @@ char *args;
      }
 
 done:
-     dsc_destroy_mtg_info(&m_info);
+     dsc_destroy_trn_info(&t_info);
 done2:     
      dsc_destroy_name_blk(&nb);
-     dsc_destroy_trn_info(&t_info);
+     dsc_destroy_mtg_info(&m_info);
 }
