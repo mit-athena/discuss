@@ -1,5 +1,5 @@
 ;;;	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v $
-;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.9 1988-12-05 08:11:22 eichin Exp $
+;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.10 1988-12-05 08:18:12 eichin Exp $
 ;;;
 ;;;  Emacs lisp code to remote control a "discuss" shell process to
 ;;;  provide an emacs-based interface to the discuss conferencing system.
@@ -8,6 +8,10 @@
 ;;;  Written by Stan Zanarotti and Bill Sommerfeld.
 ;;;
 ;;;  $Log: not supported by cvs2svn $
+; Revision 1.9  88/12/05  08:11:22  eichin
+; Fixed ^O [discuss-output-last-file wasn't getting set, probably
+; because discuss-send-cmd doesn't really return...] and tested it.
+; 
 ; Revision 1.8  88/11/08  07:28:26  raeburn
 ; typo fixes...
 ; 
@@ -532,7 +536,7 @@ a	Add meeting.  Not implemented yet."
 ; run this at each load
 (defun discuss-initialize nil
   (setq discuss-version
-	"$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.9 1988-12-05 08:11:22 eichin Exp $")
+	"$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.10 1988-12-05 08:18:12 eichin Exp $")
 
 ;;; Keymaps, here at the end, where the trash belongs..
 
@@ -607,3 +611,15 @@ a	Add meeting.  Not implemented yet."
       (insert "\n")			;other modifying here as well
       (append-to-file (point-min) (point-max) file-name))
     (kill-buffer tembuf)))
+;;;
+;;; this is just a quick hack, but I don't see an `better' way to do it...
+;;;
+(defun discuss-next-meeting ()
+  "Find the next changed meeting in the discuss *meetings* buffer, or wrap."
+  (interactive)
+  (if (not (re-search-forward "^ c " nil t))
+      (progn
+	(goto-char (point-min))
+	(if (not (re-search-forward "^ c " nil t))
+	    (message "No new meetings, try discuss-lsm instead.")
+	  ))))
