@@ -8,9 +8,12 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/rn.c,v $
  *	$Author: probe $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/rn.c,v 1.11 1993-03-07 06:21:45 probe Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/rn.c,v 1.12 1993-03-07 06:24:04 probe Exp $
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.11  93/03/07  06:21:45  probe
+ * ss_execute_line should not be called with read-only strings.
+ * 
  * Revision 1.10  91/07/22  01:28:26  probe
  * POSIX integration
  * 
@@ -47,7 +50,7 @@
 
 #ifndef lint
 static char rcsid_update_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/rn.c,v 1.11 1993-03-07 06:21:45 probe Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/rn.c,v 1.12 1993-03-07 06:24:04 probe Exp $";
 #endif /* lint */
 
 #include <discuss/discuss.h>
@@ -122,7 +125,7 @@ rn(argc, argv, ss_idx)
 	     }
 	}
 first_meeting:
-	strcpy(ss_buf, "nm")
+	strcpy(ss_buf, "nm");
 	ss_execute_line(ss_idx, ss_buf, &code);
 	if (code != 0) goto punt;
 
@@ -146,7 +149,7 @@ first_meeting:
 				if (dsc_public.current == 0)
 				    strcpy(ss_buf, "pr first");
 				else
-				    strcpy(ss_buf "next");
+				    strcpy(ss_buf, "next");
 				ss_execute_line(ss_idx, ss_buf, &code);
 				if (code != 0) goto punt;
 				break;
