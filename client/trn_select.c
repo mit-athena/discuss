@@ -7,14 +7,14 @@
  */
 /*
  *
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/trn_select.c,v 1.14 1989-06-02 23:39:16 srz Exp $
+ * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/trn_select.c,v 1.15 1990-02-24 18:51:10 srz Exp $
  * $Locker:  $
  *
  */
 
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/trn_select.c,v 1.14 1989-06-02 23:39:16 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/trn_select.c,v 1.15 1990-02-24 18:51:10 srz Exp $";
 #endif lint
 
 #define	MIN(a,b)	((a)<(b)?(a):(b))
@@ -85,7 +85,7 @@ sl_free(list)
 
 int filter_call_func (func, t, r, flags)
 int (*func)();
-trn_info2 *t;
+trn_info3 *t;
 int *r;
 int flags;
 {
@@ -108,31 +108,31 @@ int filter_flags;
      register selection_list *p;
      register int i;
      int result,trn_no;
-     trn_info2 t_info;
+     trn_info3 t_info;
      
      flag_interrupts();
      for (p = list; p; p = p->next) {
 	  if ((p->flags & flag_AREF)) {			/* Handle aref */
-	       dsc_get_trn_info2 (&dsc_public.nb, p->low, &t_info, &result);
+	       dsc_get_trn_info3 (&dsc_public.nb, p->low, &t_info, &result);
 	       t_info.current = p->low;
 	       if (result != 0) {
 		    filter_call_func(func, &t_info, &result, filter_flags);
-		    dsc_destroy_trn_info(&t_info);
+		    dsc_destroy_trn_info3(&t_info);
 		    if (result != 0) {
 			 return(result);
 		    }
 		    continue;
 	       }
 	       if (t_info.fref != t_info.current) {	/* Get fref */
-		    dsc_destroy_trn_info(&t_info);
+		    dsc_destroy_trn_info3(&t_info);
 		    trn_no = t_info.fref;
-		    dsc_get_trn_info2 (&dsc_public.nb, trn_no, &t_info, &result);
+		    dsc_get_trn_info3 (&dsc_public.nb, trn_no, &t_info, &result);
 		    t_info.current = trn_no;
 	       }
 
 	       do {
 		    filter_call_func(func, &t_info, &result, filter_flags);
-		    dsc_destroy_trn_info(&t_info);
+		    dsc_destroy_trn_info3(&t_info);
 		    if (result != 0)
 			 return(result);
 
@@ -141,7 +141,7 @@ int filter_flags;
 
 		    trn_no = t_info.nref;
 		    if (trn_no != 0) {
-			 dsc_get_trn_info2 (&dsc_public.nb, trn_no, &t_info, &result);
+			 dsc_get_trn_info3 (&dsc_public.nb, trn_no, &t_info, &result);
 			 t_info.current = trn_no;
 		    }
 	       } while (trn_no != 0);
@@ -153,12 +153,12 @@ int filter_flags;
 		    if (i == 0)
 			 continue;
 
-		    dsc_get_trn_info2 (&dsc_public.nb, i, &t_info, &result);
+		    dsc_get_trn_info3 (&dsc_public.nb, i, &t_info, &result);
 		    if ((result != DELETED_TRN) || (t_info.current != 0)) {
 		      t_info.current = i;
 		      filter_call_func(func, &t_info, &result, filter_flags);
 		    }
-		    dsc_destroy_trn_info(&t_info);
+		    dsc_destroy_trn_info3(&t_info);
 		    if (result != 0)
 			 return(result);
 
@@ -174,17 +174,17 @@ int filter_flags;
 		    if (interrupt)
 			 goto exit;
 
-		    dsc_get_trn_info2(&dsc_public.nb, trn_no, &t_info, &result);
+		    dsc_get_trn_info3(&dsc_public.nb, trn_no, &t_info, &result);
 		    t_info.current = trn_no;
 
 		    if (result == DELETED_TRN) {
 			 trn_no++;
-			 dsc_destroy_trn_info(&t_info);
+			 dsc_destroy_trn_info3(&t_info);
 			 continue;
 		    }
 
 		    filter_call_func(func, &t_info, &result, filter_flags);
-		    dsc_destroy_trn_info(&t_info);
+		    dsc_destroy_trn_info3(&t_info);
 		    if (result != 0)
 			 return(result);
 
