@@ -1,10 +1,13 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.6 1987-01-09 20:51:00 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.7 1987-01-12 04:15:47 wesommer Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.6  87/01/09  20:51:00  srz
+ * Added modules to rpc mechanism.
+ * 
  * Revision 1.5  86/11/22  03:34:52  wesommer
  * Corrected argument mismatch on get_access() call.
  * 
@@ -17,7 +20,7 @@
  */
 
 #ifndef lint
-static char *rcsid_interface_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.6 1987-01-09 20:51:00 srz Exp $";
+static char *rcsid_interface_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.7 1987-01-12 04:15:47 wesommer Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -96,7 +99,9 @@ select_meeting(mtg_uid, code_ptr)
 	set_module (mp->module, &is_fatal, code_ptr);
 	cmtg = mp;
 	if (*code_ptr && !is_fatal) {
-	     fprintf (stderr, "Warning: %s\n", error_message(*code_ptr));
+	     char buf[100];
+	     sprintf(buf, "while connecting to %s", mp->module);
+	     log_warning(*code_ptr, buf);
 	     *code_ptr = 0;
 	}
 }
