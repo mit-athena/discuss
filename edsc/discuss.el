@@ -1,5 +1,5 @@
 ;;;	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v $
-;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.8 1988-11-08 07:28:26 raeburn Exp $
+;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.9 1988-12-05 08:11:22 eichin Exp $
 ;;;
 ;;;  Emacs lisp code to remote control a "discuss" shell process to
 ;;;  provide an emacs-based interface to the discuss conferencing system.
@@ -8,6 +8,9 @@
 ;;;  Written by Stan Zanarotti and Bill Sommerfeld.
 ;;;
 ;;;  $Log: not supported by cvs2svn $
+; Revision 1.8  88/11/08  07:28:26  raeburn
+; typo fixes...
+; 
 ; Revision 1.7  88/11/08  06:50:38  raeburn
 ; Fixed nref code not to reference variable "prev"; changed
 ; output-transaction routine to default to <mtg-name>.trans.
@@ -283,10 +286,10 @@ a	Add meeting.  Not implemented yet."
 	(switch-to-buffer discuss-cur-mtg-buf)
 	(discuss-trn-mode)))
   (switch-to-buffer discuss-cur-mtg-buf)
-  (discuss-send-cmd (format "(gmi %s)\n" meeting)
-		    'discuss-end-of-goto 'discuss-read-form)
   (setq discuss-current-meeting meeting)
-  (setq discuss-output-last-file (concat discuss-current-meeting ".trans")))
+  (setq discuss-output-last-file (concat discuss-current-meeting ".trans"))
+  (discuss-send-cmd (format "(gmi %s)\n" meeting)
+		    'discuss-end-of-goto 'discuss-read-form))
 
 (defun discuss-end-of-goto ()
   (let ((last (nth 4 discuss-form)))
@@ -529,7 +532,7 @@ a	Add meeting.  Not implemented yet."
 ; run this at each load
 (defun discuss-initialize nil
   (setq discuss-version
-	"$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.8 1988-11-08 07:28:26 raeburn Exp $")
+	"$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.9 1988-12-05 08:11:22 eichin Exp $")
 
 ;;; Keymaps, here at the end, where the trash belongs..
 
