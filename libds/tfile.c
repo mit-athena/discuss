@@ -1,17 +1,20 @@
 /*
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tfile.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tfile.c,v 1.2 1987-04-11 00:06:21 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tfile.c,v 1.3 1987-07-18 00:01:19 srz Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
  * tfile.c -- a new implementation of tfile's.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.2  87/04/11  00:06:21  srz
+ * Added RCS junk
+ * 
  *
  */
 #ifndef lint
-static char *rcsid_tfile_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tfile.c,v 1.2 1987-04-11 00:06:21 srz Exp $";
+static char *rcsid_tfile_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tfile.c,v 1.3 1987-07-18 00:01:19 srz Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -110,6 +113,20 @@ int *result;
      }
 
      return ((*(tf -> proc)) (TFWRITE, &(tf -> infop), &(tf -> info), bufp, wanted, result));
+}
+
+int tcontrol(tf,op,cinfop,result)
+tfile tf;
+int op;
+char *cinfop;
+int *result;
+{
+     if (tf == NIL || tf -> proc == NIL) {
+	  *result = EINVAL;
+	  return (-1);
+     }
+
+     return ((*(tf -> proc)) (TFCONTROL, &(tf -> infop), &(tf -> info), cinfop, op, result));
 }
 
 int tdestroy (tf)
