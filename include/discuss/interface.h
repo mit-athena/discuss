@@ -62,8 +62,8 @@ typedef struct {
 	pathnames location;		/* location of actual meeting */
 	mtg_names long_name;		/* long name of meeting */
 	char *chairman;			/* #1 chairman of meeting */
-	trn_nums first,last;		/* first & last trns of mtg */
-	trn_nums lowest,highest;	/* first & last non-dl trns */
+	trn_nums first,last;		/* first & last non-dl trns of mtg */
+	trn_nums lowest,highest;	/* first & last maybe-dl trns */
 
 	date_times date_created;	/* date meeting created */
 	date_times date_modified;	/* last modification of meeting */
