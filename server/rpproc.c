@@ -9,11 +9,15 @@
 /*
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/rpproc.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/rpproc.c,v 1.5 1988-07-04 08:06:10 raeburn Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/rpproc.c,v 1.6 1988-10-08 01:41:53 raeburn Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.5  88/07/04  08:06:10  raeburn
+ * Fixed names used in Kerberos library, to be compatible with new
+ * library.
+ * 
  * Revision 1.4  87/04/24  21:01:05  srz
  * Have subprocess close the tty, so that random signals can't get sent.
  * 
@@ -59,7 +63,7 @@
 char rpc_caller[50];
 
 extern int numprocs;
-extern struct proc_table procs [1];
+extern struct proc_table procs [];
 extern char *malloc();
 extern int errno;
 short recvshort();
@@ -68,8 +72,10 @@ extern tfile net_tfile ();
 
 /* Static variables */
 
+#ifdef USPRPC
 /* connections & socket info */
 static USPStream *us = NULL;
+#endif
 
 /*
  *
@@ -77,176 +83,183 @@ static USPStream *us = NULL;
  *
  */
 init_rpc (service,code)
-char *service;
-int *code;
+    char *service;
+    int *code;
 {
 #ifdef INETD
-     int d;
+    int d;
 #endif
-     int snew;					/* socket we're reading from */
-
+    int snew;			/* socket we're reading from */
+    
 #ifdef SUBPROC
-     int uid;
-     struct passwd *pwent;
+    int uid;
+    struct passwd *pwent;
 #endif
-
+    
 #ifndef ASSOC
-     struct protoent *pe;
-     struct servent *se;
-     struct sockaddr_in sai;
-     int sock_len = sizeof (sai);
-     int s;
+    struct protoent *pe;
+    struct servent *se;
+    struct sockaddr_in sai;
+    int sock_len = sizeof (sai);
+    int s;
 #endif
-
+    
 #ifdef KERBEROS
-     int fromlen,i;
-     struct sockaddr_in from;
-     char hostname[50];
-     long hostaddr;
-     char filename[50];
-     char instance[INST_SZ];
-     AUTH_DAT kdata;
-     KTEXT_ST ticket;
-     struct hostent *hp;
-     USPCardinal bt;
+    int fromlen,i;
+    struct sockaddr_in from;
+    char hostname[50];
+    long hostaddr;
+    char filename[50];
+    char instance[INST_SZ];
+    AUTH_DAT kdata;
+    KTEXT_ST ticket;
+    struct hostent *hp;
+    USPCardinal bt;
 #endif	  
 
-     init_rpc_err_tbl();
-     
+    init_rpc_err_tbl();
+
 #ifdef INETD
-     d = open ("/dev/null", 2);
-     dup2(d, 1);
-     dup2(d, 2);
-     close(d);
-     if (geteuid() == 0)
-	  panic ("Can't run as root.");		/* just in case setuid bit off */
+    d = open ("/dev/null", 2);
+    dup2(d, 1);
+    dup2(d, 2);
+    close(d);
+    if (geteuid() == 0)
+	panic ("Can't run as root."); /* just in case setuid bit off */
 #endif
-
+    
 #ifdef ASSOC
-     /* safety check -- 0 better be a socket, not a pipe or file */
-     {
-	  if (isatty (0)) {
-	       *code = RPC_NOT_SUBPROC;
-	       return;
-	  }
-     }
+    /* safety check -- 0 better be a socket, not a pipe or file */
+    {
+	if (isatty (0)) {
+	    *code = RPC_NOT_SUBPROC;
+	    return;
+	}
+    }
 
 #ifdef SUBPROC
-     {
-	  int s;
-	  for (s = 1; s < 10; s++)
-	       (void) close (s);
-     }
-     (void) open("/dev/null", 2);
-     (void) dup2(1, 2);
-     {
-	  int tt = open("/dev/tty", O_RDWR);
-	  if (tt > 0) {
-	       ioctl (tt, TIOCNOTTY, (char *)0);
-	       close(tt);
-	  }
-     }
+    {
+	int s;
+	for (s = 1; s < 10; s++)
+	    (void) close (s);
+    }
+    {
+	int fd;
+	fd = open("/dev/null", 2);
+	if (fd != 1) {
+	    (void) dup2 (fd, 1);
+	    (void) close (fd);
+	}
+	(void) dup2(1, 2);
+    }
+    {
+	int tt = open("/dev/tty", O_RDWR);
+	if (tt != -1) {
+	    ioctl (tt, TIOCNOTTY, (char *)0);
+	    close(tt);
+	}
+    }
 #endif
-
-     snew = 0;
-     us = USP_associate (snew);
+    
+    snew = 0;
+    us = USP_associate (snew);
 #else    
-     /* to be added */
-     setprotoent(0);			    /* get protocol information */
-     pe = getprotobyname("tcp");
-     setservent(0);			    /* get service information */
-     
-     if((se = getservbyname("discuss", "tcp")) == NULL) {
-	  *code = RPC_SERV_UNKNOWN;
-	  return;
-     }
-     sai.sin_addr.s_addr = INADDR_ANY;
-     sai.sin_port = se->s_port;		    /* set up socket */
-     if((s = socket(AF_INET, SOCK_STREAM, pe->p_proto)) < 0) {
-	  *code = errno;
-	  return;
-     }
-     if(bind(s, &sai, sizeof(sai))) {	    /* bind service name */
-	  *code = errno;
-	  return;
-     }	
-     listen(s, SOMAXCONN);		/* listen for connection */
-     if((snew = accept(s, &sai, &sock_len)) < 0) { /* accept connection */
-	  *code = errno;
-	  return;
-     }
-
-     us = USP_associate (snew);
-     if (us == NULL) {
-	  *code = errno;
-	  return;
-     }
+    /* to be added */
+    setprotoent(0);			    /* get protocol information */
+    pe = getprotobyname("tcp");
+    setservent(0);			    /* get service information */
+    
+    if((se = getservbyname("discuss", "tcp")) == NULL) {
+	*code = RPC_SERV_UNKNOWN;
+	return;
+    }
+    sai.sin_addr.s_addr = INADDR_ANY;
+    sai.sin_port = se->s_port;		    /* set up socket */
+    if((s = socket(AF_INET, SOCK_STREAM, pe->p_proto)) < 0) {
+	*code = errno;
+	return;
+    }
+    if(bind(s, &sai, sizeof(sai))) {	    /* bind service name */
+	*code = errno;
+	return;
+    }	
+    listen(s, SOMAXCONN);		/* listen for connection */
+    if((snew = accept(s, &sai, &sock_len)) < 0) { /* accept connection */
+	*code = errno;
+	return;
+    }
+    
+    us = USP_associate (snew);
+    if (us == NULL) {
+	*code = errno;
+	return;
+    }
 #endif
-
-     strcpy (rpc_caller, "???");		/* safety drop */
-
+    
+    strcpy (rpc_caller, "???");		/* safety drop */
+    
 #ifdef SUBPROC
-     uid = getuid ();
-     pwent = getpwuid(uid);
-     if (pwent != 0) {
-	  strcpy (rpc_caller, pwent -> pw_name);
-     }
+    uid = getuid ();
+    pwent = getpwuid(uid);
+    if (pwent != 0) {
+	strcpy (rpc_caller, pwent -> pw_name);
+    }
 #endif
-     strcat (rpc_caller, "@");
-     strcat (rpc_caller, REALM);
-
+    strcat (rpc_caller, "@");
+    strcat (rpc_caller, REALM);
+    
 #ifdef KERBEROS
-     fromlen = sizeof (from);
-     if (getpeername (snew, &from, &fromlen) < 0) {
-	  *code = errno;
-	  return;
-     }
-     if (fromlen == 0) {		/* no len, UNIX domain = me */
-	  gethostname(hostname, sizeof(hostname));
-	  hp = gethostbyname(hostname);
-	  bcopy(hp -> h_addr, &hostaddr, 4);
-     } else {
-	  bcopy(&from.sin_addr, &hostaddr, 4);
-     }
-
-     if ((USP_rcv_blk(us, &bt) != SUCCESS) || bt != KRB_TICKET) {
-	  *code = RPC_PROTOCOL;
-	  return;
-     }
-
-     /* read authenticator off net */
-     ticket.length = recvshort();
-     if ((ticket.length<=0) || (ticket.length>MAX_KTXT_LEN)) {
-	  goto punt_kerberos;
-     }
-     for (i=0; i<ticket.length; i++) {
-	  ticket.dat[i] = recvshort();
-     }
-
-     /* make filename from service */
-     strcpy (filename, "/usr/spool/");
-     strcat (filename, service);
-     strcat (filename, "/srvtab");
-
-     strcpy(instance,"*");
-     i = krb_rd_req (&ticket, service, instance, hostaddr, &kdata,filename);
-     if (i == 0) {
-	  strcpy(rpc_caller, kdata.pname);
-	  if (kdata.pinst[0] != '\0') {
-	       strcat(rpc_caller, ".");
-	       strcat(rpc_caller, kdata.pinst);
-	  }
-	  strcat(rpc_caller, "@");
-	  strcat(rpc_caller, kdata.prealm);
-     }
-     else {
-	  goto punt_kerberos;
-     }
+    fromlen = sizeof (from);
+    if (getpeername (snew, &from, &fromlen) < 0) {
+	*code = errno;
+	return;
+    }
+    if (fromlen == 0) {		/* no len, UNIX domain = me */
+	gethostname(hostname, sizeof(hostname));
+	hp = gethostbyname(hostname);
+	bcopy(hp -> h_addr, &hostaddr, 4);
+    } else {
+	bcopy(&from.sin_addr, &hostaddr, 4);
+    }
+    
+    if ((USP_rcv_blk(us, &bt) != SUCCESS) || bt != KRB_TICKET) {
+	*code = RPC_PROTOCOL;
+	return;
+    }
+    
+    /* read authenticator off net */
+    ticket.length = recvshort();
+    if ((ticket.length<=0) || (ticket.length>MAX_KTXT_LEN)) {
+	goto punt_kerberos;
+    }
+    for (i=0; i<ticket.length; i++) {
+	ticket.dat[i] = recvshort();
+    }
+    
+    /* make filename from service */
+    strcpy (filename, "/usr/spool/");
+    strcat (filename, service);
+    strcat (filename, "/srvtab");
+    
+    strcpy(instance,"*");
+    i = krb_rd_req (&ticket, service, instance, hostaddr, &kdata,filename);
+    if (i == 0) {
+	strcpy(rpc_caller, kdata.pname);
+	if (kdata.pinst[0] != '\0') {
+	    strcat(rpc_caller, ".");
+	    strcat(rpc_caller, kdata.pinst);
+	}
+	strcat(rpc_caller, "@");
+	strcat(rpc_caller, kdata.prealm);
+    }
+    else {
+	goto punt_kerberos;
+    }
 punt_kerberos:
-     USP_flush_block(us);
+    USP_flush_block(us);
 #endif
-     *code = 0;
-     return;
+    *code = 0;
+    return;
 }
 
 /*
@@ -255,59 +268,59 @@ punt_kerberos:
  *
  */
 recvit (code)
-int *code;
+    int *code;
 {
-     USPCardinal bt;
-     int procno;
-
-     if (USP_rcv_blk(us, &bt) != SUCCESS) {
-	  if (errno = ECONNRESET) {		/* he went away, so do we */
-	       *code = errno;
-	  }
-	  *code = errno;
-	  return;
-     }
-
-     procno = bt - PROC_BASE;
-
-     if (procno == 0) {
-	  *code = RPC_PROTOCOL;
-	  return;
-     }
-     if (procno > numprocs) {
-	  USP_flush_block(us);
-	  senddunno();
-	  *code = 0;
-	  return;
-     }
-
-     rpc_err = 0;
-     dispatch (procno);
-     *code = rpc_err;
-     return;
+    USPCardinal bt;
+    int procno;
+    
+    if (USP_rcv_blk(us, &bt) != SUCCESS) {
+	if (errno = ECONNRESET) {		/* he went away, so do we */
+	    *code = errno;
+	}
+	*code = errno;
+	return;
+    }
+    
+    procno = bt - PROC_BASE;
+    
+    if (procno == 0) {
+	*code = RPC_PROTOCOL;
+	return;
+    }
+    if (procno > numprocs) {
+	USP_flush_block(us);
+	senddunno();
+	*code = 0;
+	return;
+    }
+    
+    rpc_err = 0;
+    dispatch (procno);
+    *code = rpc_err;
+    return;
 }
 
 int recvint ()
 {
-     USPLong_integer li;
-
-     if (USP_get_long_integer(us, &li) != SUCCESS) {
-	  rpc_err = errno;
-	  return(0);
-     }
-
-     return (li);
+    USPLong_integer li;
+    
+    if (USP_get_long_integer(us, &li) != SUCCESS) {
+	rpc_err = errno;
+	return(0);
+    }
+    
+    return (li);
 }
 short recvshort ()
 {
-     USPInteger li;
-
-     if (USP_get_integer(us, &li) != SUCCESS) {
-	  rpc_err = errno;
-	  return(0);
-     }
-
-     return (li);
+    USPInteger li;
+    
+    if (USP_get_integer(us, &li) != SUCCESS) {
+	rpc_err = errno;
+	return(0);
+    }
+    
+    return (li);
 }
 
 /*
@@ -317,14 +330,14 @@ short recvshort ()
  */
 char *recvstr ()
 {
-     USPString str;
-
-     if (USP_get_string(us, &str) != SUCCESS) {
-	  rpc_err = errno;
-	  return("");
-     }
-
-     return (str);
+    USPString str;
+    
+    if (USP_get_string(us, &str) != SUCCESS) {
+	rpc_err = errno;
+	return("");
+    }
+    
+    return (str);
 }
 
 /*
@@ -334,14 +347,14 @@ char *recvstr ()
  */
 bool recvbool()
 {
-     USPBoolean flag;
-
-     if (USP_get_boolean(us, &flag) != SUCCESS) {
-	  rpc_err = errno;
-	  return(0);
-     }
-
-     return ((bool)flag);
+    USPBoolean flag;
+    
+    if (USP_get_boolean(us, &flag) != SUCCESS) {
+	rpc_err = errno;
+	return(0);
+    }
+    
+    return ((bool)flag);
 }
 
 /*
@@ -351,17 +364,17 @@ bool recvbool()
  */
 tfile recvfile ()
 {
-     USPLong_integer tfs;
-     tfile tf;
-
-     if (USP_get_long_integer(us, &tfs) != SUCCESS) {
-	  rpc_err = errno;
-	  return(0);
-     }
-
-     tf = net_tfile (tfs,us);
-
-     return (tf);
+    USPLong_integer tfs;
+    tfile tf;
+    
+    if (USP_get_long_integer(us, &tfs) != SUCCESS) {
+	rpc_err = errno;
+	return(0);
+    }
+    
+    tf = net_tfile (tfs,us);
+    
+    return (tf);
 }
 
 /*
@@ -371,9 +384,9 @@ tfile recvfile ()
  */
 startreply()
 {
-     USP_begin_block(us,REPLY_TYPE);
-
-     return;
+    USP_begin_block(us,REPLY_TYPE);
+    
+    return;
 }
 
 /*
@@ -382,11 +395,11 @@ startreply()
  *
  */
 sendint(i)
-int i;
+    int i;
 {
-     if (USP_put_long_integer(us, i) != SUCCESS) {
-	  rpc_err = errno + rpc_err_base;
-     }
+    if (USP_put_long_integer(us, i) != SUCCESS) {
+	rpc_err = errno + rpc_err_base;
+    }
 }
 
 /*
@@ -395,12 +408,12 @@ int i;
  *
  */
 sendstr(str)
-char *str;
+    char *str;
 {
-     if (USP_put_string(us, str) != SUCCESS) {
-	  rpc_err = rpc_err_base + errno;
-	  return;
-     }
+    if (USP_put_string(us, str) != SUCCESS) {
+	rpc_err = rpc_err_base + errno;
+	return;
+    }
 }
 
 /*
@@ -409,12 +422,12 @@ char *str;
  *
  */
 sendbool(b)
-bool b;
+    bool b;
 {
-     if (USP_put_boolean(us, (USPBoolean)b) != SUCCESS) {
-	  rpc_err = rpc_err_base + errno;
-	  return;
-     }
+    if (USP_put_boolean(us, (USPBoolean)b) != SUCCESS) {
+	rpc_err = rpc_err_base + errno;
+	return;
+    }
 }
 
 /*
@@ -424,11 +437,11 @@ bool b;
  */
 sendreply()
 {
-     if (USP_end_block(us) != SUCCESS) {
-	  rpc_err = rpc_err_base + errno;
-	  return;
-     }
-     return;
+    if (USP_end_block(us) != SUCCESS) {
+	rpc_err = rpc_err_base + errno;
+	return;
+    }
+    return;
 }
 
 /*
@@ -438,10 +451,10 @@ sendreply()
  */
 senddunno()
 {
-     USP_begin_block(us,UNKNOWN_CALL);
-     if (USP_end_block(us) != SUCCESS) {
-	  rpc_err = rpc_err_base + errno;
-	  return;
-     }
-     return;
+    USP_begin_block(us,UNKNOWN_CALL);
+    if (USP_end_block(us) != SUCCESS) {
+	rpc_err = rpc_err_base + errno;
+	return;
+    }
+    return;
 }
