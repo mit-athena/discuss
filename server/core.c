@@ -11,7 +11,7 @@
 /*
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.13 1987-07-16 19:30:46 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.14 1987-08-22 18:12:51 rfrench Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
@@ -21,6 +21,9 @@
  *		callable routines.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.13  87/07/16  19:30:46  srz
+ * Changed deleted flag to general flags structure on the server.
+ * 
  * Revision 1.12  87/04/11  23:48:31  spook
  * Removed unused variable.
  * 
@@ -30,7 +33,7 @@
  *
  */
 #ifndef lint
-static char *rcsid_core_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.13 1987-07-16 19:30:46 srz Exp $";
+static char *rcsid_core_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.14 1987-08-22 18:12:51 rfrench Exp $";
 #endif lint
 
 
@@ -256,6 +259,8 @@ int *result;
      aclose(a_control_f);
      nuclear = 0;
 
+     mtg_znotify(mtg_name, subject, author);
+     
      *result = 0;
      *result_trn = cb.current;
      return;

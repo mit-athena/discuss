@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.7 1987-03-25 15:04:31 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.8 1987-08-22 18:12:30 rfrench Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
@@ -11,6 +11,9 @@
  *		  in-memory superblock, and to open & close meetings.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.7  87/03/25  15:04:31  srz
+ * toma change:  Expanded has_mtg_access to take more modes as arguments
+ * 
  * Revision 1.6  87/03/17  02:24:10  srz
  * Added expunging.  An ACL change will require meeting to be reopened, in
  * case an expunge is taking place.  Also added has_privs, which allows
@@ -34,7 +37,7 @@
  */
 
 #ifndef lint
-static char *rcsid_coreutil_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.7 1987-03-25 15:04:31 srz Exp $";
+static char *rcsid_coreutil_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.8 1987-08-22 18:12:30 rfrench Exp $";
 #endif lint
 
 #include "../include/types.h"
@@ -43,8 +46,10 @@ static char *rcsid_coreutil_c = "$Header: /afs/dev.mit.edu/source/repository/ath
 #include "mtg.h"
 #include "../include/tfile.h"
 #include "../include/acl.h"
+#include <zephyr/zephyr.h>
 #include <errno.h>
-#include <sys/types.h>
+/*#include <sys/types.h>*/
+#include <netdb.h>
 #include <sys/file.h>
 #include <sys/stat.h>
 #include <strings.h>
@@ -550,4 +555,73 @@ char *str;
      printf("panic: %s\n",str);
      perror("discuss");
      exit(1);
+}
+/*
+ *
+ * mtg_znotify -- send off a Zephyr notification as appropriate
+ *
+ */
+mtg_znotify(mtg_name, subject, author)
+	char *mtg_name, *subject, *author;
+{
+	register acl_entry *ae;
+	register int n;
+	ZNotice_t notice;
+	char *msglst[4],bfr[30],host[100],fullpath[256];
+	struct hostent *hent;
+	
+	/* Set up the notice structure */
+
+	ZInitialize();
+
+	if (gethostname(host,100) != 0)
+		return;
+	hent = (struct hostent *)gethostbyname(host);
+	if (hent == 0)
+		return;
+	sprintf(fullpath,"%s:%s",hent->h_name,mtg_name);
+		
+	notice.z_kind = UNSAFE;
+	notice.z_port = 0;
+	notice.z_class = "DISCUSS";
+	notice.z_class_inst = fullpath;
+	notice.z_opcode = "NEW_TRN";
+	notice.z_sender = 0;
+	notice.z_default_format = "New transaction [$1] entered in $2\nFrom: $3\nSubject: $4";
+
+	msglst[0] = bfr;
+	sprintf(msglst[0],"%04d",super.highest);
+	msglst[1] = super_long_name;
+	msglst[2] = author;
+	msglst[3] = subject;
+
+	/* Does "*" have read access? If so, just send out a global
+	 * notice.
+	 */
+
+	/* XXX
+	 * Check at some point for people who don't have access, etc.
+	 */
+	
+	for (ae = mtg_acl->acl_entries, n=mtg_acl->acl_length;
+	     n;
+	     ae++, n--) {
+		if ((strcmp("*", ae->principal) == 0) &&
+		    acl_is_subset("r", ae->modes))
+			break;
+	}
+	if (n) {
+		notice.z_recipient = "";
+		/* We really don't care if it gets through... */
+		ZSendList(&notice,msglst,4,ZNOAUTH);
+		return;
+	}
+	for (ae = mtg_acl->acl_entries, n=mtg_acl->acl_length;
+	     n;
+	     ae++, n--) {
+		if (acl_is_subset("r", ae->modes)) {
+			notice.z_recipient = ae->principal;
+			ZSendList(&notice,msglst,4,ZNOAUTH);
+		}
+	}
 }
