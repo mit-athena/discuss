@@ -17,9 +17,10 @@ typedef short slen;		/* length of a string */
 #define SUCCESS 1
 #define ERROR   -1
 
+#ifndef FALSE
 #define TRUE    1
 #define FALSE   0
-
+#endif
 #endif
 
 #define DISTYPES
