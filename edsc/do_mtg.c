@@ -52,7 +52,7 @@ char *args;
 #ifdef EDSC_CACHE
      if (curr = search_cache_meetings(&nb)) {
 	     /*
-	      * The meeting isn't cached yet, lets refresh the cache
+	      * The meeting is already cached, but we'll refresh the cache
 	      * information because we don't know if it's up to date.
 	      */
 	     dsc_get_mtg_info(&nb,&m_info,&code);
@@ -66,6 +66,8 @@ char *args;
 			     return;
 		     }
 	     }
+	     if (curr->m_info.last != m_info.last)
+		     cache_it(&nb, curr->m_info.last);
 	     dsc_destroy_mtg_info(&curr->m_info);
 	     curr->m_info = m_info;
 	     curr->meeting_code = code;

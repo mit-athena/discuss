@@ -200,7 +200,6 @@ char *args;
      trn_nums trn_num;
      name_blk nb;
      int	code;
-     struct	cache_info	*entry;
 
      /* First, we get the transaction number */
      if (get_word(&cp, &trn_string, " ", &delim) < 0) {
@@ -219,15 +218,22 @@ char *args;
 	  printf(";%s\n", error_message(code));
 	  return;
      }
-     if (entry = cache_search(&nb, trn_num)) {
+     cache_it(&nb, trn_num);
+     printf("()\n");
+}
+
+cache_it(nbp, trn_num)
+     name_blk *nbp;
+     trn_nums trn_num;
+{
+     struct	cache_info	*entry;
+
+     if (entry = cache_search(nbp, trn_num)) {
 	     if (entry->flags & CACHE_FLG_INFO)
 		     dsc_destroy_trn_info3(&entry->t_info);
-	     if (entry->flags & CACHE_FLG_TEXT)
-		     unlink(entry->filename);
 	     entry->flags &= ~(CACHE_FLG_INFO|CACHE_FLG_TEXT);
 	     entry->info_code = entry->text_code = 0;
      }
-     printf("()\n");
 }
 
 /*
@@ -240,7 +246,6 @@ char *args;
      trn_nums trn_num;
      name_blk nb;
      int	code;
-     struct	cache_info	*entry, *current;
 
      /* First, we get the transaction number */
      if (get_word(&cp, &trn_string, " ", &delim) < 0) {
@@ -259,65 +264,31 @@ char *args;
 	  printf(";%s\n", error_message(code));
 	  return;
      }
-     if (!(current = cache_search(&nb, trn_num))) {
+     cache_itn(&nb, trn_num);
+     printf("()\n");
+}
+
+cache_itn(nbp, trn_num)
+     name_blk *nbp;
+     trn_nums trn_num;
+{
+     struct	cache_info	*current;
+	     
+
+     if (!(current = cache_search(nbp, trn_num))) {
 	     while (!current || !(current->flags & CACHE_FLG_INFO))
-		     cache_transaction(&nb, trn_num, &current);
+		     cache_transaction(nbp, trn_num, &current);
      }
-     if (entry = cache_search(&nb, current->t_info.next)) {
-	     if (entry->flags & CACHE_FLG_INFO)
-		     dsc_destroy_trn_info3(&entry->t_info);
-	     if (entry->flags & CACHE_FLG_TEXT)
-		     unlink(entry->filename);
-	     entry->info_code = entry->text_code = 0;
-	     entry->flags &= ~(CACHE_FLG_INFO|CACHE_FLG_TEXT);
-     }
-     if (entry = cache_search(&nb, current->t_info.prev)) {
-	     if (entry->flags & CACHE_FLG_INFO)
-		     dsc_destroy_trn_info3(&entry->t_info);
-	     if (entry->flags & CACHE_FLG_TEXT)
-		     unlink(entry->filename);
-	     entry->info_code = entry->text_code = 0;
-	     entry->flags &= ~(CACHE_FLG_INFO|CACHE_FLG_TEXT);
-     }
-     if (entry = cache_search(&nb, current->t_info.nref)) {
-	     if (entry->flags & CACHE_FLG_INFO)
-		     dsc_destroy_trn_info3(&entry->t_info);
-	     if (entry->flags & CACHE_FLG_TEXT)
-		     unlink(entry->filename);
-	     entry->info_code = entry->text_code = 0;
-	     entry->flags &= ~(CACHE_FLG_INFO|CACHE_FLG_TEXT);
-     }
-     if (entry = cache_search(&nb, current->t_info.pref)) {
-	     if (entry->flags & CACHE_FLG_INFO)
-		     dsc_destroy_trn_info3(&entry->t_info);
-	     if (entry->flags & CACHE_FLG_TEXT)
-		     unlink(entry->filename);
-	     entry->info_code = entry->text_code = 0;
-	     entry->flags &= ~(CACHE_FLG_INFO|CACHE_FLG_TEXT);
-     }
-     if (entry = cache_search(&nb, current->t_info.fref)) {
-	     if (entry->flags & CACHE_FLG_INFO)
-		     dsc_destroy_trn_info3(&entry->t_info);
-	     if (entry->flags & CACHE_FLG_TEXT)
-		     unlink(entry->filename);
-	     entry->info_code = entry->text_code = 0;
-	     entry->flags &= ~(CACHE_FLG_INFO|CACHE_FLG_TEXT);
-     }
-     if (entry = cache_search(&nb, current->t_info.lref)) {
-	     if (entry->flags & CACHE_FLG_INFO)
-		     dsc_destroy_trn_info3(&entry->t_info);
-	     if (entry->flags & CACHE_FLG_TEXT)
-		     unlink(entry->filename);
-	     entry->info_code = entry->text_code = 0;
-	     entry->flags &= ~(CACHE_FLG_INFO|CACHE_FLG_TEXT);
-     }
+     cache_it(nbp, current->t_info.next);
+     cache_it(nbp, current->t_info.prev);
+     cache_it(nbp, current->t_info.nref);
+     cache_it(nbp, current->t_info.pref);
+     cache_it(nbp, current->t_info.fref);
+     cache_it(nbp, current->t_info.lref);
      if (current->flags & CACHE_FLG_INFO)
 	     dsc_destroy_trn_info3(&current->t_info);
-     if (current->flags & CACHE_FLG_TEXT)
-	     unlink(current->filename);
      current->info_code = current->text_code = 0;
      current->flags &= ~(CACHE_FLG_INFO|CACHE_FLG_TEXT);	     
-     printf("()\n");
 }
 	
 /*
@@ -378,7 +349,9 @@ int cache_transaction(nbp, trn_num, trn_entry)
 	trn_nums trn_num;
 	struct cache_info **trn_entry;
 {
-	struct	cache_info	*entry;
+	struct	cache_info	*entry, *link;
+	trn_nums		trn;
+	cache_dir		i;
 
 	entry = cache_search(nbp, trn_num);
 #ifdef CACHE_DEBUG
@@ -395,6 +368,15 @@ int cache_transaction(nbp, trn_num, trn_entry)
 		dsc_get_trn_info3(&entry->meeting->nb, entry->trn_num,
 				  &entry->t_info, &entry->info_code);
 		entry->flags |= CACHE_FLG_INFO;
+		if (!entry->info_code) {
+			for (i=CACHE_DIR_NEXT; i <= CACHE_DIR_PREF; i++) {
+				if ((trn = move_trn(entry, i)) &&
+				    (link = cache_search(nbp, trn)) &&
+				    (link->flags & CACHE_FLG_INFO) &&
+				    (move_trn(link, ((i-1)^1)+1) != trn))
+					cache_it(nbp, trn);
+			}
+		}
 		return (entry->flags & CACHE_FLG_TEXT);
 	}
 	if (!(entry->flags & CACHE_FLG_TEXT)) {
@@ -571,8 +553,9 @@ cache_shutdown()
 void free_cache_entry(entry)
 	struct cache_info	*entry;
 {
-	if (entry->flags & CACHE_FLG_TEXT)
+	if (entry->filename[0])
 		unlink(entry->filename);
+	entry->filename[0]='\0';
 	if (entry->flags & CACHE_FLG_INFO)
 		dsc_destroy_trn_info3(&entry->t_info);
 	entry->flags = 0;
@@ -691,7 +674,6 @@ struct cache_meeting *search_cache_meetings(nbp)
 	name_blk	*nbp;
 {
 	struct cache_meeting	*curr;
-	int			code;
 	
 	for (curr=cache_meetings; curr; curr = curr->next) {
 		if (!strcasecmp(nbp->hostname, curr->nb.hostname) &&

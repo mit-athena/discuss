@@ -14,6 +14,7 @@
 
 #include <stdio.h>
 #include <sys/file.h>
+#include <sys/stat.h>
 #include <signal.h>
 #include <sys/wait.h>
 #include <ctype.h>
@@ -26,6 +27,13 @@
 #include <strings.h>
 #endif
 #include "edsc.h"
+
+/*
+ * Define POSIX-style macros for systems who don't have them.
+ */
+#ifndef S_ISREG
+#define S_ISREG(m) ((m&S_IFMT) == S_IFREG)
+#endif
 
 do_gti(args)
 char *args;
@@ -189,6 +197,8 @@ char *args;
      int fd;
      char *plural;
      char line[255];
+#else
+     struct stat stat_buf;
 #endif
      int code;
 
@@ -232,7 +242,9 @@ char *args;
      cache_pc = 0;
      cache_working = 1;
      tinfo = cache_current->t_info;
-     (void) unlink(output_fn);
+     if ((!stat(output_fn, &stat_buf)) &&
+	 S_ISREG(stat_buf.st_mode))
+	     (void) unlink(output_fn);
      if (link(cache_current->filename, output_fn)) {
 	     int	fd, rfd, cc;
 	     char	buf[8192];
@@ -536,6 +548,9 @@ char *args;
      }
 
      close(fd);
+#ifdef EDSC_CACHE
+     cache_itn(&nb, new_trn_num);
+#endif
 punt:
      dsc_destroy_name_blk(&nb);
 }
@@ -747,6 +762,10 @@ do_sfl(args)
      }
 
      dsc_set_trn_flags(&nb, trn_num, flags, &code);
+
+#ifdef EDSC_CACHE
+     cache_it(&nb, trn_num);
+#endif
      
      dsc_destroy_name_blk(&nb);
      
@@ -787,6 +806,10 @@ do_rt(args)
 	  return;
      }
      dsc_retrieve_trn(&nb, trn_num, &code);
+#ifdef EDSC_CACHE
+     if (!code)
+	     cache_itn(&nb, trn_num);
+#endif
      dsc_destroy_name_blk(&nb);
      if (code != 0) {
 	  printf(";%s\n", error_message(code));
@@ -827,6 +850,10 @@ do_dt(args)
      }
      
      dsc_delete_trn(&nb, trn_num, &code);
+#ifdef EDSC_CACHE
+     if (!code)
+	     cache_itn(&nb, trn_num);
+#endif
      dsc_destroy_name_blk(&nb);
      if (code != 0) {
 	  printf(";%s\n", error_message(code));
