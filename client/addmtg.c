@@ -9,13 +9,13 @@
  *	command line, in which case they are used as meeting announcements.
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.16 1987-07-17 19:11:45 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.17 1988-02-07 00:37:38 srz Exp $
  *	$Locker:  $
  *
  */
 
 #ifndef lint
-static char *rcsid_addmtg_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.16 1987-07-17 19:11:45 srz Exp $";
+static char *rcsid_addmtg_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.17 1988-02-07 00:37:38 srz Exp $";
 #endif lint
 
 #include <strings.h>
@@ -51,7 +51,7 @@ add_mtg(argc, argv)
 	used = (int *)calloc(argc, sizeof(int));
 	user = "";
 	realm = user;
-
+	set = NULL;
 	dsc_expand_mtg_set(user_id, "*", &set, &num, &code);
 
 	i = 1;
@@ -66,16 +66,13 @@ add_mtg(argc, argv)
 		if (code) {
 			(void) ss_perror(sci_idx, code,
 					 "Can't get meeting info for current meeting");
-			return;
+			goto punt;
 		}
 		dsc_get_trn_info(&dsc_public.nb,
 				 dsc_public.current, &t_info, &code);
 		if (code)
 			t_info.current = 0;
-		else {
-			free(t_info.subject);
-			free(t_info.author);
-		}
+		else dsc_destroy_trn_info (&t_info);
 		t_info.subject = NULL;
 		t_info.author = NULL;
 		if (argc == 1) {
@@ -84,11 +81,10 @@ add_mtg(argc, argv)
 			if (code) {
 				ss_perror(sci_idx, code, "");
 				free((char *)trn_list);
-				return;
+				goto punt;
 			}
 			used[1] = 1;
-		}
-		else {
+		} else {
 			trn_list = (selection_list *)NULL;
 			for (;i<argc;i++) {
 				trn_temp = trn_select(&t_info, argv[i],
@@ -135,7 +131,7 @@ add_mtg(argc, argv)
 				"Unknown control argument %s\n",
 				argv[i]);
 			free((char *)used);
-			return;
+			goto punt;
 		}
 		else {
 			have_names = 1;
@@ -190,12 +186,12 @@ add_mtg(argc, argv)
 		       ss_perror(sci_idx, code, cerror);
 		 else
 		      printf ("Meeting %s (%s) added.\n", nb.aliases[0], nb.aliases[1]);
-		  free_nb(&nb);
+		  dsc_destroy_name_blk(&nb);
 	     }
 	}
 
 punt:
-	free((char *)set);
+	dsc_destroy_mtg_set (set, num);
 	free((char *)used);
 	return;
 }
@@ -227,7 +223,7 @@ int trn_no;
      } else
 	  printf ("Transaction [%04d] Meeting %s (%s) added.\n", trn_no, nb.aliases[0], nb.aliases[1]);
      
-     free_nb (&nb);
+     dsc_destroy_name_blk (&nb);
      return(0);
 }
 
@@ -337,7 +333,7 @@ int *code;
      return;
 
 punt:
-     free_nb (nbp);
+     dsc_destroy_name_blk (nbp);
      return;
 }
 
@@ -366,14 +362,15 @@ add_the_mtg(new_nbp,code)
 
 		  del_the_mtg (&temp_nb, code);
 		  if (*code != 0) {
-		       free_nb (&temp_nb);
+		       dsc_destroy_name_blk (&temp_nb);
 		       return;
 		  }
-		  free_nb(&temp_nb);
+		  dsc_destroy_name_blk(&temp_nb);
 	     }
 	}
 	     
 	dsc_update_mtg_set(user_id, new_nbp, 1, code);
+	dsc_destroy_name_blk(&new_nbp);
 	if (*code) {
 		return;
 	}
@@ -460,27 +457,6 @@ int *code;
 	  leave_mtg();
      nbp->status |= DSC_ST_DELETED;
      dsc_update_mtg_set(user_id, nbp, 1, code);
-}
-
-free_nb (nbp)
-name_blk *nbp;
-{
-     int j;
-
-     if (nbp->hostname != NULL)
-	  free(nbp->hostname);
-     if (nbp->pathname != NULL)
-	  free(nbp->pathname);
-     if (nbp->spare != NULL)
-	  free(nbp->spare);
-     if (nbp->user_id != NULL)
-	  free(nbp->user_id);
-     if (nbp->aliases != NULL) {
-	  for (j = 0; nbp->aliases[j] != NULL; j++)
-	       free(nbp->aliases[j]);
-	  free(nbp->aliases);
-     }
-     return;
 }
      
 /*
