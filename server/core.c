@@ -29,11 +29,14 @@
 #include <sys/file.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <strings.h>
 
 #define min(a, b) (a < b ? a : b)
 #define NULL 0
 extern char *malloc();
 extern char *new_string();
+extern long time();
+extern off_t lseek();
 
 extern mtg_super super;
 extern char *super_chairman;
@@ -64,7 +67,7 @@ trn_nums reply_trn;		/* trn replying to;  0 if original */
 trn_nums *result_trn;		/* trn number given to added trn */
 int *result;
 {
-     add_trn_priv (mtg_name, source_file, subject, reply_trn, 0, rpc_caller, time (0), result_trn, result);
+     add_trn_priv (mtg_name, source_file, subject, reply_trn, 0, rpc_caller, (date_times) time ((long *)0), result_trn, result);
 }
 
 
@@ -199,7 +202,7 @@ int *result;
      th.author_addr = th.subject_addr + th.subject_len;
      th.text_addr = th.author_addr + th.author_len;
 
-     lseek (u_trn_f, 0, 2);
+     lseek (u_trn_f, (long)0, 2);
      if (write (u_trn_f, (char *) &th, sizeof (th)) < 0) goto werror;
 
      if (write (u_trn_f, subject, th.subject_len) < 0) goto werror;
@@ -221,7 +224,7 @@ int *result;
      tclose(source_file,result);
      abort_file = NULL;
 
-     lseek(u_trn_f, cb.trn_addr, 0);
+     lseek(u_trn_f, (long)(cb.trn_addr), 0);
      if (write (u_trn_f, (char *) &th, sizeof (trn_hdr)) < 0) goto werror;	/* update num_lines */
 
      super.trn_fsize = fsize (u_trn_f);
@@ -374,7 +377,7 @@ int *result;
 	  core_abort (); return;
      }
 
-     *result = read_trn (cb.trn_addr, &th, 0, &th_author);
+     *result = read_trn (cb.trn_addr, &th, (char **)0, &th_author);
      if (*result) { core_abort(); return; }
 
      if (!has_trn_access(th_author,'d')) {
@@ -495,7 +498,7 @@ int *result;
      }
 
      /* for paranoia, read transaction */
-     *result = read_trn (cb.trn_addr, &th, 0, &th_author);
+     *result = read_trn (cb.trn_addr, &th, (char **)0, &th_author);
      if (*result) { core_abort(); return; }
 
      if (!has_trn_access(th_author,'d')) {
@@ -655,7 +658,7 @@ char *location,*long_mtg_name;
 bool public;
 int *result;
 {
-     create_mtg_priv (location, long_mtg_name, public, time (0), rpc_caller, result);
+     create_mtg_priv (location, long_mtg_name, public, (date_times) time ((long *)0), rpc_caller, result);
 }
 
 /* create_mtg_priv -- for people who know the chairman and date_created */
@@ -665,9 +668,6 @@ bool public;
 date_times date_created;
 int *result;
 {
-
-
-
      char str[256];
      trn_base tb;
      int loclen;
@@ -883,7 +883,7 @@ int *result;
      *result = read_chain (trn, &cb);
      if (*result) { core_abort(); return; }
 
-     *result = read_trn (cb.trn_addr, &th, 0, &th_author);
+     *result = read_trn (cb.trn_addr, &th, (char **)0, &th_author);
      if (*result) { core_abort(); return; }
 
      finish_read();
@@ -900,9 +900,9 @@ int *result;
 	  core_abort(); return;
      }
 
-     free(th_author);
+     (void) free(th_author);
 
-     lseek (u_trn_f, th.text_addr, 0);
+     lseek (u_trn_f, (long)(th.text_addr), 0);
      tfs = th.num_chars;
      while (tfs > 0) {
 	  tocopy = min (512, tfs);
@@ -1020,7 +1020,7 @@ int *result;
      }
 
      /* forget locking (and stuff) for what we're doing */
-     lseek (uf, 0, 0);
+     lseek (uf, (long)0, 0);
      read (uf, (char *) &mysuper, sizeof (mysuper));
      close(uf);
 
