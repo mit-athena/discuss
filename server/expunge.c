@@ -37,7 +37,7 @@ char *malloc();
 extern char rpc_caller[];
 extern int has_privs;
 extern int errno;
-extern int no_nuke;
+extern int no_nuke, use_zephyr;
 
 main (argc, argv)
 int argc;
@@ -53,7 +53,7 @@ char **argv;
      tfile tf;
      char control_name[256];
      int control_fd;
-     
+
      init_dsc_err_tbl();
 
      for (i = 1; i < argc; i++) {
@@ -79,7 +79,8 @@ char **argv;
      if (location == NULL)
 	  goto lusage;					/* required */
 
-     has_privs = TRUE;					/* Tell discuss we're special */
+     has_privs = TRUE;		/* Tell discuss we're special */
+     use_zephyr = 0;		/* Don't notify of every trn copied */
      strcpy (rpc_caller, "expunger");
 
      /* First, we get the mtg info to make sure it exists */
