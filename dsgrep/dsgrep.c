@@ -8,7 +8,7 @@
 
 #ifndef lint
 #ifndef SABER
-static char *RCSid = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/dsgrep/dsgrep.c,v 1.4 1993-06-22 09:30:01 miki Exp $";
+static char *RCSid = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/dsgrep/dsgrep.c,v 1.5 1993-07-22 20:23:15 vrt Exp $";
 #endif
 #endif
 
@@ -127,7 +127,6 @@ main(argc,argv)
       fprintf(stderr,"           [-d]  (search deleted transactions as well)\n");
       fprintf(stderr,"           [-i]  (convert text to lower case before searching)\n");
       fprintf(stderr,"           [-f alt_meeting_file]\n");
-      fprintf(stderr,"           [-l]  (search through OLC logs)\n");
       fprintf(stderr,"           [meetings]   (this must be last)\n");
       exit(1);
       break;
