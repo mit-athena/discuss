@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/output.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/output.c,v 1.10 1989-02-23 23:29:44 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/output.c,v 1.11 1989-03-27 02:19:38 srz Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986, 1988 by the Student Information Processing Board.
@@ -11,7 +11,7 @@
 
 #ifndef lint
 static char rcsid_discuss_utils_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/output.c,v 1.10 1989-02-23 23:29:44 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/output.c,v 1.11 1989-03-27 02:19:38 srz Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -28,41 +28,37 @@ extern char *temp_file;
 extern char *pgm;
 extern char *malloc(), *getenv(), *short_time();
 
-output_trans(txn_no, tf, code)
-	trn_nums txn_no;
+output_trans(tinfop, tf, code)
+	trn_info2 *tinfop;
 	tfile tf;
 	int *code;
 {
 	char *plural;
 	char newtime[26];
 	char line[255];
-	trn_info2 tinfo;
 	int flagged;
 
-	*code = 0;
-	dsc_get_trn_info2(&dsc_public.nb, txn_no,
-			 &tinfo, code);
 	if (*code != 0) return;
 
-	(void) strcpy (newtime, short_time (&tinfo.date_entered));
+	(void) strcpy (newtime, short_time (&tinfop->date_entered));
 	newtime [24] = '\0';			/* get rid of \n */
 
-	if (tinfo.num_lines != 1)
+	if (tinfop->num_lines != 1)
 		plural = "s";
 	else
 		plural = "";
      
 	(void) sprintf (line, "[%04d] %s  %s  %s (%d line%s)\n",
-			tinfo.current, tinfo.author,
+			tinfop->current, tinfop->author,
 			dsc_public.m_info.long_name,
-			newtime, tinfo.num_lines, plural);
+			newtime, tinfop->num_lines, plural);
 	twrite (tf, line, strlen (line), code);
-	if (tinfo.subject [0] != '\0') {
+	if (tinfop->subject [0] != '\0') {
 		twrite (tf, "Subject: ", 9, code);
-		twrite (tf, tinfo.subject, strlen (tinfo.subject), code);
+		twrite (tf, tinfop->subject, strlen (tinfop->subject), code);
 		twrite (tf, "\n", 1, code);
 	}
-	dsc_get_trn(&dsc_public.nb, txn_no, tf, code);
+	dsc_get_trn(&dsc_public.nb, tinfop->current, tf, code);
 	if (*code != 0) return;
 
 	/* Force a NL in case the transaction doesn't have one.
@@ -70,22 +66,22 @@ output_trans(txn_no, tf, code)
 	   do this */
 	tcontrol(tf, TFC_FORCE_NL, 0, code);
 
-	flagged = (tinfo.flags & TRN_FLAG1) != 0;
-	if (tinfo.pref == 0 && tinfo.nref == 0)
-		(void) sprintf (line, "--[%04d]--%s\n\f\n", tinfo.current,
+	flagged = (tinfop->flags & TRN_FLAG1) != 0;
+	if (tinfop->pref == 0 && tinfop->nref == 0)
+		(void) sprintf (line, "--[%04d]--%s\n\f\n", tinfop->current,
 				flagged ? " (flagged)" : "");
-	else if (tinfo.pref == 0)
+	else if (tinfop->pref == 0)
 		(void) sprintf (line, "--[%04d]-- (nref = [%04d]%s)\n\f\n",
-				tinfo.current, tinfo.nref,
+				tinfop->current, tinfop->nref,
 				flagged ? ", flagged" : "");
-	else if (tinfo.nref == 0)
+	else if (tinfop->nref == 0)
 		(void) sprintf (line, "--[%04d]-- (pref = [%04d]%s)\n\f\n",
-				tinfo.current, tinfo.pref,
+				tinfop->current, tinfop->pref,
 				flagged ? ", flagged" : "");
 	else
 	     (void) sprintf (line,
 			     "--[%04d]-- (pref = [%04d], nref = [%04d]%s)\n\f\n",
-			     tinfo.current, tinfo.pref, tinfo.nref,
+			     tinfop->current, tinfop->pref, tinfop->nref,
 			     flagged ? ", flagged" : "");
 	twrite (tf, line, strlen (line), code);
 }
