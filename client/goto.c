@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/goto.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/goto.c,v 1.9 1988-06-17 23:17:12 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/goto.c,v 1.10 1988-08-16 23:15:11 srz Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
@@ -11,7 +11,7 @@
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/goto.c,v 1.9 1988-06-17 23:17:12 srz Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/goto.c,v 1.10 1988-08-16 23:15:11 srz Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -82,6 +82,15 @@ switch_to_mtg_nb(nbp)
 	int code, have_a, have_w;
 	char msgbuf[80];
 	trn_info t_info;
+
+	/* Check to see if we're switching to same meeting. */
+	if (dsc_public.attending 
+	    && !strcmp(dsc_public.path, nbp->pathname)
+	    && !strcmp(dsc_public.host, nbp ->hostname)) {
+	    nbp -> date_attended = time((int *) 0);
+	    nbp -> last = dsc_public.highest_seen;
+        }
+
 	leave_mtg();
 
 	dsc_copy_name_blk(nbp, &dsc_public.nb);
