@@ -4,7 +4,7 @@
 ;;;    	For copying information, see the file mit-copyright.h in this release.
 ;;;
 ;;;	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v $
-;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.22 1991-02-01 17:45:59 tytso Exp $
+;;;	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.23 1991-02-19 16:13:50 bjaspan Exp $
 ;;;
 ;;;  Emacs lisp code to remote control a "discuss" shell process to
 ;;;  provide an emacs-based interface to the discuss conferencing system.
@@ -13,6 +13,13 @@
 ;;;  Written by Stan Zanarotti, Bill Sommerfeld and Theodore Ts'o.
 ;;;
 ;;;  $Log: not supported by cvs2svn $
+; Revision 1.22  91/02/01  17:45:59  tytso
+; Removed useless let in mainline discuss entrance point.
+; 
+; Changed message and removed bell when emacs-discuss tries to update
+; the changed flag for a meeting and fails (usually because the list of
+; meetings isn't in the buffer at the moment).
+; 
 ; Revision 1.21  91/01/04  19:30:46  bjaspan
 ; added doc for l and F to discuss-trn-mode.
 ; 
@@ -186,9 +193,10 @@ request completed successfully.")
       (delete-backward-char 1)
       (setq foo (buffer-string))
       (kill-buffer buf)
-      (if (memq (intern foo) '(vax rt decmips))
-	  foo
-	(error "Can't determine machine type.")))))
+      (if (eq foo "")
+	  (error "Can't determine machine type.")
+	foo)
+      )))
 
 (defvar discuss-pathname
   (concat "/afs/sipb.mit.edu/user/tytso/src/edsc/edsc." (edsc-machine-type))
@@ -1179,7 +1187,7 @@ discuss server while we spin-block."
 ; run this at each load
 (defun discuss-initialize nil
   (setq discuss-version
-	"$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.22 1991-02-01 17:45:59 tytso Exp $")
+	"$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/discuss.el,v 1.23 1991-02-19 16:13:50 bjaspan Exp $")
 
 ;;;
 ;;; Lots of autoload stuff....
