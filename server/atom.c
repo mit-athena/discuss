@@ -61,12 +61,15 @@ int d;
      afile af;
      struct stat buf;
 
-     if (fstat (d, &buf) < 0)
+     if (flock(d, LOCK_EX) < 0)
 	  return (NULL);
+
+     if (fstat (d, &buf) < 0)
+	  goto punt;
 
      af = (afile) malloc (sizeof (*af));
      if (af == NULL)
-	  return (NULL);			/* no memory, ack! */
+	  goto punt;				/* no memory, ack! */
 
      af -> desc = d;
      af -> dir_list = NULL;
@@ -74,6 +77,10 @@ int d;
      af -> file_size = buf.st_size;
 
      return (af);
+
+punt:
+     flock(d, LOCK_UN);
+     return (NULL);
 }
 
 /*
@@ -200,6 +207,7 @@ afile af;
      }
 
      fsync(af -> desc);				/* tell kernel to get a move on */
+     flock(af -> desc, LOCK_UN);		/* and to let others at it */
      af -> dir_list = NULL;
      maxdirty = max(maxdirty, af -> dirty_blks);
      af -> desc = -1;				/* to prevent reuse */
@@ -231,6 +239,7 @@ afile af;
      }
 
      ftruncate(af -> desc, (long)(af -> file_size));
+     flock(af -> desc, LOCK_UN);
 
      af -> dir_list = NULL;
      maxdirty = max(maxdirty, af -> dirty_blks);
