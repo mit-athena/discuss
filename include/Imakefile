@@ -1,12 +1,12 @@
 #
-# $Id: Imakefile,v 1.1 1991-07-09 11:40:49 lwvanels Exp $
+# $Id: Imakefile,v 1.2 1991-07-09 11:46:14 lwvanels Exp $
 #
 
 INFODIR=/usr/athena/lib/discuss/info
 
 #LINKS=	 ss/mit-sipb-copyright.h com_err.h
 LINKS=	usp/usp.h usp/usp_et.h rpc_et.h discuss/dsc_et.h usp.h usp_et.h \
-	discuss_err.h ss/ss.h ss/ss_err.h ss.h
+	discuss_err.h ss/ss.h ss/ss_err.h ss.h regexp.h
 FILES=	ansi.h atom.h globals.h internal.h mit-copyright.h \
 	rpc.h trn_spec.h \
 	discuss/acl.h discuss/discuss.h discuss/dsname.h discuss/interface.h \
@@ -73,6 +73,10 @@ discuss/dsc_et.h: ../ets/dsc_et.h
 discuss_err.h:	../ets/discuss_err.h
 	$(RM) discuss_err.h
 	ln -s ../ets/discuss_err.h .
+
+regexp.h: ../dsgrep/regexp/regexp.h
+	$(RM) regexp.h
+	ln -s ../dsgrep/regexp/regexp.h .
 
 clean::
 	$(RM) -r ss usp $(LINKS) *~ discuss/?*~ config.h
