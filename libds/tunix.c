@@ -1,17 +1,20 @@
 /*
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tunix.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tunix.c,v 1.2 1987-04-11 00:06:29 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tunix.c,v 1.3 1987-07-18 00:01:38 srz Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
  * tunix.c -- procedures to have tfiles work from unix files.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.2  87/04/11  00:06:29  srz
+ * Added RCS junk
+ * 
  *
  */
 #ifndef lint
-static char *rcsid_tunix_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tunix.c,v 1.2 1987-04-11 00:06:29 srz Exp $";
+static char *rcsid_tunix_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tunix.c,v 1.3 1987-07-18 00:01:38 srz Exp $";
 #endif lint
 
 #define min(A, B) ((A) < (B) ? (A) : (B))
@@ -25,8 +28,15 @@ static char *rcsid_tunix_c = "$Header: /afs/dev.mit.edu/source/repository/athena
 #include <sys/types.h>
 #include <sys/stat.h>
 
+#define NL '\n'
+
+char *malloc();
 
 extern int errno;
+
+struct tunix_state {
+     char last_char;
+};
 
 /*
  *
@@ -38,8 +48,10 @@ int op, *info, argn, *result;
 char **infop, *argp;
 {
      int numread,numwrite;
+     struct tunix_state *ts;
 
      *result = 0;		/* optimist */
+     ts = (struct tunix_state *) *infop;
 
      switch (op) {
      case TFOPEN:		/* argp is pointer to modes */
@@ -62,9 +74,21 @@ char **infop, *argp;
 	       *result = errno;
 	       return (-1);
 	  }
+	  /* save last character written to file, so we can force NL */
+	  ts -> last_char = argp [numwrite-1];
 	  return(numwrite);
 
      case TFDESTROY:
+	  free (*infop);
+	  return (0);
+
+     case TFCONTROL:
+	  if (argn == TFC_FORCE_NL) {			/* force a NL at this point */
+	       if (ts -> last_char != NL) {
+		    ts -> last_char = NL;
+		    write (*info, &(ts -> last_char), 1);
+	       }
+	  }
 	  return (0);
 
      default:
@@ -82,9 +106,13 @@ tfile unix_tfile (desc)
 int desc;
 {
      struct stat buf;
+     struct tunix_state *ts;
 
      if (fstat (desc, &buf) < 0)
 	  return (NIL);
 
-     return (tcreate (buf.st_size, 0, desc, tunix));
+     ts = (struct tunix_state *) malloc (sizeof (struct tunix_state));
+     ts -> last_char = 0;
+
+     return (tcreate (buf.st_size, (char *) ts, desc, tunix));
 }
