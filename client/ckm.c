@@ -1,11 +1,11 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v 1.10 1987-07-08 01:57:17 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v 1.11 1987-07-09 16:22:54 wesommer Exp $
  *
  */
      
 #ifndef lint
-static char *rcsid_ckm_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v 1.10 1987-07-08 01:57:17 wesommer Exp $";
+static char *rcsid_ckm_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v 1.11 1987-07-09 16:22:54 wesommer Exp $";
 #endif lint
 
 #include <strings.h>
@@ -124,9 +124,28 @@ next_meeting(argc, argv)
      name_blk *set;
      register name_blk *nbp;
      int n_matches, code, i;
+     int ls_flag = 0;
+     
+     ++argv;
+     --argc;
+     
+     while (argc) {
+	     if (**argv == '-') {
+		     if (!strcmp(*argv, "-list") ||
+			 !strcmp(*argv, "-ls")) ls_flag++;
+		     else {
+			     ss_perror(sci_idx, 0, "Unknown control argument.");
+		     usage:
+			     
+			     printf("Usage: nm [-list]\n");
+			     return;
+		     }
+	     } else goto usage;
+	     --argc;
+	     ++argv;
+     }
      
      dsc_expand_mtg_set(user_id, "*", &set, &n_matches, &code);
-
 
      if (code) {
 	  ss_perror(sci_idx, code, "Can't get meeting names.");
@@ -136,21 +155,28 @@ next_meeting(argc, argv)
 	  ss_perror(sci_idx, 0, "No meetings found.");
 	  return;
      }
+     print_header = 1;
+     
      for (i = 0; i < n_matches; i++) {
 	  nbp = &set[i];
 	  if (nbp->status & DSC_ST_CHANGED) {
-	       switch_to_mtg(nbp->aliases[0]);
-	       dsc_public.nb.status &= ~DSC_ST_CHANGED;
-	       dsc_update_mtg_set(user_id, &dsc_public.nb, 1, &code);
-	       if (code)
-		    ss_perror(sci_idx, code,
-			      "Error updating meetings file.");
-	       goto done;
+	       if (ls_flag) {
+		    do_line(nbp, 0, 1);
+	       } else {
+	            switch_to_mtg(nbp->aliases[0]);
+		    dsc_public.nb.status &= ~DSC_ST_CHANGED;
+		    dsc_update_mtg_set(user_id, &dsc_public.nb, 1, &code);
+		    if (code)
+			 ss_perror(sci_idx, code,
+				   "Error updating meetings file.");
+		    goto done;
+	       }
 	  }
      }
-     if (!checked_meetings) {
+     if (!checked_meetings && print_header) {
 	  ss_perror(sci_idx, 0, "Use check_meetings first.");
-     } else ss_perror(sci_idx, 0, "No more changed meetings.");
+     } else if (print_header)
+	  ss_perror(sci_idx, 0, "No more changed meetings.");
  done:
      free(set);
 }
