@@ -7,7 +7,7 @@
  */
 /*
  *
- *	$Id: auth_krb.c,v 1.11 1999-02-08 14:47:08 danw Exp $
+ *	$Id: auth_krb.c,v 1.12 2004-03-06 18:02:22 zacheiss Exp $
  *
  * auth_krb () -- Authentication procedure for kerberos.  This contains the
  *		  standard authentication for kerberos.
@@ -15,15 +15,13 @@
  */
 #ifndef lint
 static char *rcsid_auth_krb_c =
-    "$Id: auth_krb.c,v 1.11 1999-02-08 14:47:08 danw Exp $";
+    "$Id: auth_krb.c,v 1.12 2004-03-06 18:02:22 zacheiss Exp $";
 #endif /* lint */
 
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
 #include "krb.h"
-
-extern int krb_err_base;
 
 char *local_host_name ();
 
