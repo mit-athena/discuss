@@ -1,10 +1,17 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list_acl.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list_acl.c,v 1.5 1987-02-21 20:11:08 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list_acl.c,v 1.6 1987-03-24 14:02:47 spook Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.5  87/02/21  20:11:08  wesommer
+ * Major changes:
+ * 	Fix bug introduced by KR (la USER, not la MEETING; the current
+ * meeting is always implied).
+ *      Changed to default realm to local_realm if not present.
+ *      da can now take multiple principal names.
+ * 
  * Revision 1.4  86/12/07  16:04:45  rfrench
  * Globalized sci_idx
  * 
@@ -21,7 +28,7 @@
  */
 
 #ifndef lint
-static char *rcsid_list_acl_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list_acl.c,v 1.5 1987-02-21 20:11:08 wesommer Exp $";
+static char *rcsid_list_acl_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list_acl.c,v 1.6 1987-03-24 14:02:47 spook Exp $";
 #endif lint
 
 #include <strings.h>
@@ -31,7 +38,7 @@ static char *rcsid_list_acl_c = "$Header: /afs/dev.mit.edu/source/repository/ath
 #include "acl.h"
 #include "globals.h"
 
-extern char *malloc();
+extern char *malloc(), *error_message();
 
 list_acl(argc, argv)
 	int argc;
@@ -51,7 +58,7 @@ list_acl(argc, argv)
 
 	if (argc == 1) {
 		/* long form; dump the access control list */
-		dsc_get_acl(dsc_public.mtg_uid, &code, &list);
+		dsc_get_acl(&dsc_public.nb, &code, &list);
 		if (code) {
 			fprintf(stderr, "Can't read ACL: %s\n", 
 				error_message(code));
@@ -62,7 +69,7 @@ list_acl(argc, argv)
 	}
 	
 	while(++argv,--argc) {
-		dsc_get_access(dsc_public.mtg_uid, *argv, &modes, &code);
+		dsc_get_access(&dsc_public.nb, *argv, &modes, &code);
 		if (code) {
 			fprintf(stderr, "Can't read ACL for %s: %s\n",
 				*argv, error_message(code));
@@ -111,7 +118,7 @@ set_acl(argc, argv)
 		principal = buf;
 	} else principal=argv[2];
 
-	dsc_set_access(dsc_public.mtg_uid, principal, modes, &code);
+	dsc_set_access(&dsc_public.nb, principal, modes, &code);
 	if(code) fprintf(stderr, "Can't set access for %s: %s\n",
 			 principal, error_message(code));
 }
@@ -139,7 +146,7 @@ del_acl(argc, argv)
 			strcat(buf, local_realm());
 			principal = buf;
 		} else principal = *argv;
-		dsc_delete_access(dsc_public.mtg_uid, principal, &code);
+		dsc_delete_access(&dsc_public.nb, principal, &code);
 		if(code) fprintf(stderr, "Can't delete access of %s: %s\n",
 				 principal, error_message(code));
 	}
