@@ -13,7 +13,7 @@
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/edsc.c,v 1.10 1996-09-19 22:29:32 ghudson Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/edsc/edsc.c,v 1.11 1998-11-05 14:40:23 danw Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -23,7 +23,6 @@ static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athe
 #include <signal.h>
 #include <string.h>
 #include <sys/wait.h>
-#include <sys/signal.h>
 #include <pwd.h>
 #include <ctype.h>
 #include <errno.h>
