@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.16 1988-02-15 01:02:15 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.17 1988-03-21 20:00:38 srz Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
@@ -8,7 +8,7 @@
 
 #ifndef lint
 static char rcsid_interface_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.16 1988-02-15 01:02:15 wesommer Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.17 1988-03-21 20:00:38 srz Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -119,7 +119,7 @@ select_meeting(nbp, code_ptr)
 		/*XXX should move mp to head of list.. but not yet */
 	}
 	set_module (mp->module, &fatal, code_ptr);
-	if (*code_ptr & !fatal) {
+	if (*code_ptr && !fatal) {
 	    char buf[100];
 	    sprintf(buf, "while connecting to %s", mp->module);
 	    log_warning(*code_ptr, buf);
