@@ -16,14 +16,14 @@
  *	command line, in which case they are used as meeting announcements.
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.24 1989-06-02 23:34:12 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.25 1990-02-16 22:24:49 tytso Exp $
  *	$Locker:  $
  *
  */
 
 #ifndef lint
 static char rcsid_addmtg_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.24 1989-06-02 23:34:12 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.25 1990-02-16 22:24:49 tytso Exp $";
 #endif lint
 
 #include <string.h>
@@ -350,6 +350,7 @@ int *code;
      nbp -> aliases[1] = malloc(strlen(short_name));
      strcpy(nbp -> aliases[1],short_name+1);
      nbp -> aliases[2] = (char *)NULL;
+     *(nbp->spare = malloc(1)) = '\0';
      free(m_info.location);
      free(m_info.chairman);
      free(m_info.long_name);
