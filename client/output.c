@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/output.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/output.c,v 1.7 1988-12-05 14:10:14 raeburn Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/output.c,v 1.8 1989-01-05 00:21:13 raeburn Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986, 1988 by the Student Information Processing Board.
@@ -11,7 +11,7 @@
 
 #ifndef lint
 static char rcsid_discuss_utils_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/output.c,v 1.7 1988-12-05 14:10:14 raeburn Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/output.c,v 1.8 1989-01-05 00:21:13 raeburn Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -19,10 +19,8 @@ static char rcsid_discuss_utils_c[] =
 #include <string.h>
 #include <signal.h>
 #include "ss.h"
-#include "tfile.h"
-#include "interface.h"
+#include <discuss/discuss.h>
 #include "config.h"
-#include "discuss_err.h"
 #include "globals.h"
 
 extern ss_request_table discuss_cmds;

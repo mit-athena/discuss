@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/edit.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/edit.c,v 1.7 1988-04-03 21:55:11 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/edit.c,v 1.8 1989-01-05 00:17:56 raeburn Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board.
@@ -8,6 +8,10 @@
  *	Utility routines.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.7  88/04/03  21:55:11  srz
+ * Added check for interrupt in edit loop, so that won't have to
+ * end transaction to have ^C work.
+ * 
  * Revision 1.6  88/02/07  23:09:48  balamac
  * Added Fend options to the type-in prompter
  * 
@@ -55,18 +59,16 @@
  */
 
 #ifndef lint
-static char *rcsid_discuss_utils_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/edit.c,v 1.7 1988-04-03 21:55:11 srz Exp $";
+static char rcsid_discuss_utils_c[] =
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/edit.c,v 1.8 1989-01-05 00:17:56 raeburn Exp $";
 #endif lint
 
 #include <stdio.h>
 #include <sys/file.h>
-#include <strings.h>
+#include <string.h>
 #include <signal.h>
 #include "ss.h"
-#include "tfile.h"
-#include "interface.h"
-#include "config.h"
-#include "discuss_err.h"
+#include <discuss/discuss.h>
 #include "globals.h"
 #include <sys/wait.h>
 #include <sys/types.h>
@@ -100,11 +102,10 @@ edit(fn, edit_path)
 	char *fn;
 	char *edit_path;
 {
-	char *editor_path_d, *editor_path_e, *editor_path_2 = NULL;
+	char *editor_path_e, *editor_path_2 = NULL;
 	char *editor_path_v;
 	int pid;
 	int (*handler)();
-	int code;
 	union wait wbuf;
 	struct stat buf;
 	char buffer[BUFSIZ];
@@ -115,8 +116,10 @@ edit(fn, edit_path)
 	editor_path_v = getenv("VISUAL");
 	if (!editor_path_v) editor_path_v = "/usr/ucb/vi";
 
-	if (use_editor && editor_path && !edit_path) editor_path_2 = editor_path; 
-	else if (edit_path && (*edit_path != '\0')) editor_path_2 = edit_path;
+	if (use_editor && editor_path && !edit_path)
+	    editor_path_2 = editor_path; 
+	else if (edit_path && (*edit_path != '\0'))
+	    editor_path_2 = edit_path;
 	else {
 		the_file = fopen(fn, "w");
 		if (!the_file) { 
