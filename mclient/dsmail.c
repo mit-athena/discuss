@@ -12,6 +12,12 @@
  *        $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/dsmail.c,v $
  *
  *        $Log: not supported by cvs2svn $
+ * Revision 1.2  1994/08/14  22:21:28  cfields
+ * include /usr/ucbinclude/sysexits.h if SYSV
+ * index to strchr
+ * extern int regerrno --- why??? It's not used!
+ * 7.7 checkin; changes by vrt
+ *
  * Revision 1.1  94/04/08  12:37:12  vrt
  * Initial revision
  * 
@@ -97,9 +103,8 @@
 #include <ctype.h>
 #include <sys/types.h>
 #include <sys/file.h>
-#if defined(SVR4) || defined (SYSV)
+#ifdef SOLARIS
 #include "/usr/ucbinclude/sysexits.h"
-#define EX_CONFIG EX_SOFTWARE
 #else
 #include <sysexits.h>
 #endif
@@ -119,7 +124,7 @@
 
 #ifndef	lint
 static char rcsid[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/dsmail.c,v 1.2 1994-08-14 22:21:28 cfields Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/dsmail.c,v 1.3 1995-07-31 21:43:53 cfields Exp $";
 #endif
 
 char *malloc(), *realloc ();
