@@ -6,7 +6,7 @@
 ;;; Written by Stan Zanarotti, Bill Sommerfeld and Theodore Ts'o.
 ;;; For copying information, see the file mit-copyright.h in this release.
 ;;;
-;;; $Id: discuss.el,v 1.39 1999-02-09 20:00:07 danw Exp $
+;;; $Id: discuss.el,v 1.40 1999-04-28 01:51:14 danw Exp $
 ;;;
 
 ;;
@@ -557,19 +557,21 @@ Instead, these commands are available:
 		(backward-char 1))
 	    (narrow-to-region start (point))
 	    (goto-char (point-min))
-	    (if discuss-visible-headers
-		(while (< (point) (point-max))
-		  (cond ((looking-at discuss-visible-headers)
-			 (re-search-forward "\n[^ \t]"))
-			(t
-			 (delete-region (point)
-					(progn (re-search-forward "\n[^ \t]")
-					       (- (point) 1))))))
-	      (while (re-search-forward discuss-invisible-headers nil t)
-		(beginning-of-line)
-		(delete-region (point) (progn (re-search-forward "\n[^ \t]")
-					      (- (point) 1)))
-		(beginning-of-line))))))))
+	    (condition-case nil
+		(if discuss-visible-headers
+		    (while (< (point) (point-max))
+		      (cond ((looking-at discuss-visible-headers)
+			     (re-search-forward "\n[^ \t]"))
+			    (t
+			     (delete-region (point)
+					    (progn (re-search-forward "\n[^ \t]")
+						   (- (point) 1))))))
+		  (while (re-search-forward discuss-invisible-headers nil t)
+		    (beginning-of-line)
+		    (delete-region (point) (progn (re-search-forward "\n[^ \t]")
+						  (- (point) 1)))
+		    (beginning-of-line)))
+	      (error nil)))))))
 
 (defun discuss-update ()
   "Update Discuss display to show new transactions."
@@ -1040,7 +1042,7 @@ discuss server while we spin-block."
 ; run this at each load
 (defun discuss-initialize nil
   (setq discuss-version
-	"$Id: discuss.el,v 1.39 1999-02-09 20:00:07 danw Exp $")
+	"$Id: discuss.el,v 1.40 1999-04-28 01:51:14 danw Exp $")
 
 ;;;
 ;;; Lots of autoload stuff....
