@@ -1,5 +1,5 @@
 ...
-... $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/dsgrep/dsgrep.1,v 1.1 1991-05-22 11:24:56 lwvanels Exp $
+... $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/dsgrep/dsgrep.1,v 1.2 1991-07-11 18:11:56 lwvanels Exp $
 ...
 .TH DSGREP
 .DA 18 Jun 1990
@@ -32,17 +32,11 @@ transactions.
 .TP
 .B \-f \fImeetings_file\fR
 This specifies an alternative meetings file to use as a source of meetings.
-If neither this option nor the the -l option is specified, it will use the
-file ${HOME}/.meetings., 
+If this option is not specified, it will use the file ${HOME}/.meetings., 
 .TP
 .B \-t \fItrans_num\fR
 Print out a specific transaction, by number.  When this option is used, the
 -n option is ignored.
-.TP
-.B \-l
-Causes dsgrep to use a standard meetings file instead of the default.  This
-allows you search a set of discuss meetings which are not necessarily in
-your own meetings file.
 .TP
 .B \-a
 Causes
@@ -134,10 +128,6 @@ will match `ab' just after `x', due to the begins-earliest rule.
 to be made, hence subsequent choices must respect it even if this leads them
 to less-preferred alternatives.)
 
-.SH FILES
-.TP 2i
-/usr/lib/dsgrep/default_meetings
-Default meetings file
 .SH SEE ALSO
 .PP
 egrep(1), discuss(1)
