@@ -9,8 +9,11 @@
  * dsc_enter.c - enter a transaction from a file into discuss.
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsc_enter.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsc_enter.c,v 1.8 1996-09-19 22:30:48 ghudson Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsc_enter.c,v 1.9 1997-12-17 00:12:41 ghudson Exp $
  *	$Log: not supported by cvs2svn $
+ *	Revision 1.8  1996/09/19 22:30:48  ghudson
+ *	BSD -> ANSI string and memory functions
+ *
  *	Revision 1.7  1994/08/15 17:36:45  cfields
  *	Removed Solaris specific regexp code.
  *	7.7 checkin; changes by miki
@@ -32,17 +35,17 @@
 
 #ifndef	lint
 static char rcsid[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsc_enter.c,v 1.8 1996-09-19 22:30:48 ghudson Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsc_enter.c,v 1.9 1997-12-17 00:12:41 ghudson Exp $";
 #endif
 
 #include <stdio.h>
 #include <string.h>
 #include <fcntl.h>
-#ifdef SOLARIS
-#include <regexpr.h>
-#endif
+#include <unistd.h>
+#include <errno.h>
 #include <ctype.h>
-#include <sys/file.h>
+#include <sys/types.h>
+#include <regex.h>
 
 #include <discuss/tfile.h>
 #include <discuss/types.h>
@@ -52,12 +55,6 @@ static char rcsid[] =
  */
 
 extern tfile unix_tfile();
-extern int errno;
-extern char *malloc();
-extern char *mktemp();
-extern long lseek();
-extern char *re_comp();
-extern int re_exec();
 
 #define DEFAULT_SUBJECT "No subject found in mail header"
 
@@ -260,15 +257,16 @@ out:
 static bool list_compare(s,list)
 	char *s,**list;
 {
-	char *retval;
+	regex_t reg;
 
 	while (*list!=NULL) {
-		retval=re_comp(*list++);
-		if (retval) return FALSE; /* XXX */
-
-		if (re_exec(s))
+		if (regcomp(&reg, *list++, REG_BASIC|REG_NOSUB) != 0)
+			return(FALSE);
+		if (regexec(&reg, s, 0, NULL, 0) == 0) {
+			regfree(&reg);
 			return(TRUE);
-
+		}
+		regfree(&reg);
 	}
 	return(FALSE);
 }

@@ -12,6 +12,9 @@
  *        $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/dsmail.c,v $
  *
  *        $Log: not supported by cvs2svn $
+ *        Revision 1.4  1995/11/30 19:37:40  miki
+ *        In Solaris2.4 sysexits.h migrated to /usr/include
+ *
  * Revision 1.3  1995/07/31  21:43:53  cfields
  * Get sysexits.h from ucbinclude if SOLARIS, not SYSV.
  * Don't need the EX_CONFIG def in that ifdef; it happens later if necessary.
@@ -108,6 +111,7 @@
 #include <sys/types.h>
 #include <sys/file.h>
 #include <sysexits.h>
+#include <regex.h>
 
 
 #include <discuss/discuss.h>
@@ -125,7 +129,7 @@
 
 #ifndef	lint
 static char rcsid[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/dsmail.c,v 1.4 1995-11-30 19:37:40 miki Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/dsmail.c,v 1.5 1997-12-17 00:13:06 ghudson Exp $";
 #endif
 
 char *malloc(), *realloc ();
@@ -137,18 +141,17 @@ int getopt();
 
 extern char *optarg;                /* External variables for getopt */
 extern int optind;
-extern int regerrno;
 
 char *deflist[] = {
 	"^to$","^from$","^cc$",".*-to$",".*-from$","^date$", NULL
 };
 		
 char *subjlist[] = {
-	"subject",NULL
+	"^subject$",NULL
 };
 
 char *inreplyto[] = {
-	"in-reply-to",NULL
+	"^in-reply-to$",NULL
 };
 
 char *fromlist[] = {
@@ -551,22 +554,26 @@ void PRS(argc,argv)
 	exit (EX_USAGE);
 }
 
-char *re_comp();
-
 int list_compare(s,list)
 	char *s,**list;
 {
-	char *err;
+	char buf[BUFSIZ];
+	regex_t reg;
+	int status;
 
 	while (*list!=NULL) {
-		err=re_comp(*list++);
-		if (err) {
-			fprintf(stderr,"554-%s - %s\n",
-				progname, err, list[-1]);
-			exit(EX_CONFIG);
-			}
-		if (re_exec(s))
-			return(1);
+		status = regcomp(&reg, *list, REG_BASIC|REG_NOSUB);
+		if (status != 0) {
+			regerror(status, &reg, buf, sizeof(buf));
+			fprintf(stderr,"554-%s - %s: %s\n",
+				progname, *list, buf);
+		}
+		if (regexec(&reg, s, 0, NULL, 0) == 0) {
+			regfree(&reg);
+			return 1;
+		}
+		regfree(&reg);
+		list++;
 	}
 	return(0);
 }
