@@ -1,20 +1,24 @@
 /*
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tnet.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tnet.c,v 1.3 1987-07-17 03:11:26 spook Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tnet.c,v 1.4 1989-01-04 20:49:11 raeburn Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
  * tnet.c -- procedures to have tfiles go over the net.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.3  87/07/17  03:11:26  spook
+ * *** empty log message ***
+ * 
  * Revision 1.2  87/04/11  00:06:25  srz
  * Added RCS junk
  * 
  *
  */
 #ifndef lint
-static char *rcsid_tnet_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tnet.c,v 1.3 1987-07-17 03:11:26 spook Exp $";
+static char rcsid_tnet_c[] =
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/tnet.c,v 1.4 1989-01-04 20:49:11 raeburn Exp $";
 #endif lint
 
 #define min(A, B) ((A) < (B) ? (A) : (B))
@@ -24,8 +28,8 @@ static char *rcsid_tnet_c = "$Header: /afs/dev.mit.edu/source/repository/athena/
 #define TFILE_BLK 500
 
 #include <stdio.h>
-#include "../include/usp.h"
-#include "../include/tfile.h"
+#include "usp.h"
+#include <discuss/tfile.h>
 #include <errno.h>
 
 
