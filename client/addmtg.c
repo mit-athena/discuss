@@ -9,14 +9,14 @@
  *	command line, in which case they are used as meeting announcements.
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.22 1989-03-29 00:58:29 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.23 1989-05-19 00:43:27 srz Exp $
  *	$Locker:  $
  *
  */
 
 #ifndef lint
 static char rcsid_addmtg_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.22 1989-03-29 00:58:29 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.23 1989-05-19 00:43:27 srz Exp $";
 #endif lint
 
 #include <string.h>
@@ -32,6 +32,7 @@ extern tfile unix_tfile();
 int add_mtg_it();
 
 static int mtgs_added;
+static del_the_mtg();
 
 name_blk *set;
 int num;
