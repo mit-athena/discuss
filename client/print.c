@@ -2,29 +2,27 @@
  *	Print-related requests for DISCUSS.
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.16 1988-01-03 21:59:10 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.17 1989-01-05 00:58:33 raeburn Exp $
  *	$Locker:  $
  *
- *	Copyright (C) 1986 by the Student Information Processing Board
+ *	Copyright (C) 1986, 1988 by the Student Information Processing Board
  */
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.16 1988-01-03 21:59:10 srz Exp $";
-#endif lint
+static char rcsid_discuss_c[] =
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.17 1989-01-05 00:58:33 raeburn Exp $";
+#endif /* lint */
 
 #include <stdio.h>
 #include <errno.h>
 #include <sys/file.h>
 #include <signal.h>
-#include <strings.h>
+#include <string.h>
 #include <sys/wait.h>
+#include <discuss/discuss.h>
 #include "ss.h"
-#include "tfile.h"
-#include "interface.h"
 #include "config.h"
-#include "dsc_et.h"
-#include "discuss_err.h"
 #include "globals.h"
 
 #ifdef	lint
