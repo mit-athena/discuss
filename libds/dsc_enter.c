@@ -2,11 +2,13 @@
  * dsc_enter.c - enter a transaction from a file into discuss.
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsc_enter.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsc_enter.c,v 1.2 1988-01-26 02:13:06 raeburn Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsc_enter.c,v 1.3 1988-10-16 13:56:18 raeburn Exp $
+ *	$Log: not supported by cvs2svn $
  */
 
 #ifndef	lint
-static char rcsid[] = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsc_enter.c,v 1.2 1988-01-26 02:13:06 raeburn Exp $";
+static char rcsid[] =
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/dsc_enter.c,v 1.3 1988-10-16 13:56:18 raeburn Exp $";
 #endif
 
 #include <stdio.h>
@@ -14,8 +16,8 @@ static char rcsid[] = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/di
 #include <ctype.h>
 #include <sys/file.h>
 
-#include "tfile.h"
-#include "types.h"		/* there's got to be a better name */
+#include <discuss/tfile.h>
+#include <discuss/types.h>
 
 /*
  * Externals.
