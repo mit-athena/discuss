@@ -1,17 +1,20 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.4 1986-11-16 06:09:04 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.5 1986-11-22 03:34:52 wesommer Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.4  86/11/16  06:09:04  wesommer
+ * Added dsc_get_acl, dsc_get_access, dsc_set_access, and dsc_delete_access.
+ * 
  * Revision 1.3  86/11/11  17:00:20  wesommer
  * Replaced version of select_meeting which keeps connections open..
  * 
  */
 
 #ifndef lint
-static char *rcsid_interface_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.4 1986-11-16 06:09:04 wesommer Exp $";
+static char *rcsid_interface_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.5 1986-11-22 03:34:52 wesommer Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -236,7 +239,7 @@ dsc_get_access (mtg_uid, princ, modes, result)
 {
 	select_meeting(mtg_uid, result);
 	if (*result) return;
-	get_access(mtg_name, princ, result);
+	get_access(mtg_name, princ, modes, result);
 }
 
 dsc_set_access (mtg_uid, princ, modes, result)
