@@ -16,14 +16,14 @@
  *	command line, in which case they are used as meeting announcements.
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.25 1990-02-16 22:24:49 tytso Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.26 1990-02-24 18:49:43 srz Exp $
  *	$Locker:  $
  *
  */
 
 #ifndef lint
 static char rcsid_addmtg_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.25 1990-02-16 22:24:49 tytso Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.26 1990-02-24 18:49:43 srz Exp $";
 #endif lint
 
 #include <string.h>
@@ -213,7 +213,7 @@ punt:
 
 static
 add_mtg_it(t_infop, codep)
-trn_info2 *t_infop;
+trn_info3 *t_infop;
 int *codep;
 {
      char cerror[80];
