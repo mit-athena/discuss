@@ -12,6 +12,10 @@
  *        $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/dsmail.c,v $
  *
  *        $Log: not supported by cvs2svn $
+ *        Revision 1.6  1997/12/17 00:31:38  ghudson
+ *        Oops, REG_BASIC isn't universal.  (It's 0 where it is defined, so just
+ *        punt it.)
+ *
  *        Revision 1.5  1997/12/17 00:13:06  ghudson
  *        Use POSIX regexps.
  *
@@ -132,7 +136,7 @@
 
 #ifndef	lint
 static char rcsid[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/dsmail.c,v 1.6 1997-12-17 00:31:38 ghudson Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/dsmail.c,v 1.7 1998-04-07 22:00:03 danw Exp $";
 #endif
 
 char *malloc(), *realloc ();
@@ -146,7 +150,8 @@ extern char *optarg;                /* External variables for getopt */
 extern int optind;
 
 char *deflist[] = {
-	"^to$","^from$","^cc$",".*-to$",".*-from$","^date$", NULL
+	"^to$","^from$","^cc$",".*-to$",".*-from$","^date$",
+	"^message-id$", "^mime-version$", "^content-.*$", NULL
 };
 		
 char *subjlist[] = {
