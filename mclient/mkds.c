@@ -1,9 +1,12 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v 1.7 1987-04-08 21:40:57 rfrench Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v 1.8 1987-04-09 00:12:43 rfrench Exp $
  *	$Locker:  $
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.7  87/04/08  21:40:57  rfrench
+ * Changed interface to deal with new dsc_announce_mtg function.
+ * 
  * Revision 1.5  87/03/22  04:51:58  spook
  * Rewritten for new interfaces.
  * 
@@ -19,7 +22,7 @@
  */
 
 #ifndef lint
-static char *rcsid_mkds_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v 1.7 1987-04-08 21:40:57 rfrench Exp $";
+static char *rcsid_mkds_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/mkds.c,v 1.8 1987-04-09 00:12:43 rfrench Exp $";
 #endif lint
 
 #include "tfile.h"
@@ -49,7 +52,7 @@ int argc;
 char *argv[];
 {
 	extern tfile unix_tfile();
-	name_blk nb;
+	name_blk nbsrc,nbdest;
 	char long_name[100],short_name[100],module[50],mtg_path[100];
 	char temp_file[64],tempbfr[256];
 	char ann_mtg[100],subject[100];
@@ -61,7 +64,7 @@ char *argv[];
 
 	init_dsc_err_tbl();
 
-	nb.user_id = malloc(132);
+	nbsrc.user_id = malloc(132);
 
 	(void) sprintf(temp_file,"/tmp/mtg%d.%d",getuid(),getpid());
 
@@ -90,8 +93,8 @@ char *argv[];
 		struct hostent *hp;
 		hp = gethostbyname(hostname);
 		h = (hp ? hp->h_name : hostname);
-		nb.hostname = malloc(strlen(h)+1);
-		strcpy(nb.hostname, h);
+		nbsrc.hostname = malloc(strlen(h)+1);
+		strcpy(nbsrc.hostname, h);
 	}
 
 	printf("Meeting location [default %s]: ", default_dir);
@@ -106,11 +109,11 @@ char *argv[];
 	(void) gets(short_name);
 	(void) strcat(mtg_path,"/");
 	(void) strcat(mtg_path,short_name);
-	nb.pathname = malloc(strlen(mtg_path)+1);
-	strcpy(nb.pathname, mtg_path);
+	nbsrc.pathname = malloc(strlen(mtg_path)+1);
+	strcpy(nbsrc.pathname, mtg_path);
 
 	(void) strcpy (module, getpwuid(getuid())->pw_name);
-	(void) strcpy (nb.user_id, module);
+	(void) strcpy (nbsrc.user_id, module);
 	{			/* XXX - tmp kludge to get this running */
 		char buf[BUFSIZ];
 
@@ -155,17 +158,17 @@ char *argv[];
 
 	delmtg = 1;
 
-	nb.date_attended = time(0);
-	nb.last = 0;
-	nb.status = 0;
-	nb.aliases = (char **) calloc(3, sizeof(char *));
-	nb.aliases[0] = malloc(strlen(long_name)+1);
-	strcpy(nb.aliases[0], long_name);
-	nb.aliases[1] = malloc(strlen(short_name)+1);
-	strcpy(nb.aliases[1], short_name);
-	nb.aliases[2] = (char *)NULL;
+	nbsrc.date_attended = time(0);
+	nbsrc.last = 0;
+	nbsrc.status = 0;
+	nbsrc.aliases = (char **) calloc(3, sizeof(char *));
+	nbsrc.aliases[0] = malloc(strlen(long_name)+1);
+	strcpy(nbsrc.aliases[0], long_name);
+	nbsrc.aliases[1] = malloc(strlen(short_name)+1);
+	strcpy(nbsrc.aliases[1], short_name);
+	nbsrc.aliases[2] = (char *)NULL;
 
-	dsc_update_mtg_set(module,&nb,1,&result);
+	dsc_update_mtg_set(module,&nbsrc,1,&result);
 	if (result) {
 		fprintf(stderr, "mkds: Can't set meeting name: %s",
 			error_message(result));
@@ -191,7 +194,7 @@ char *argv[];
 	}
 	tf = unix_tfile(fd);
 
-	dsc_add_trn(&nb, tf, "Reason for this meeting", 0, &txn_no, &result);
+	dsc_add_trn(&nbsrc, tf, "Reason for this meeting", 0, &txn_no, &result);
 	if (result) {
 		fprintf(stderr, "mkds: Error adding transaction: %s",
 			error_message(result));
@@ -211,7 +214,7 @@ char *argv[];
 	for (;;) {
 		printf("\nAnnounce in what meeting? ");
 		(void) gets(ann_mtg);
-		dsc_get_mtg(nb.user_id,ann_mtg,&nb,&result); /* XXX */
+		dsc_get_mtg(nbsrc.user_id,ann_mtg,&nbdest,&result); /* XXX */
 		if (!result)
 			break;
 		printf("Meeting not found in search path.\n");
@@ -225,7 +228,7 @@ char *argv[];
 
 	tf = unix_tfile(fd);
 
-	dsc_announce_mtg(&nb, long_name, public, tf, &txn_no, &result);
+	dsc_announce_mtg(&nbsrc, &nbdest, public, tf, &txn_no, &result);
 
 	if (result) {
 		(void) fprintf(stderr,"Error adding transation: %s\n",
@@ -234,7 +237,7 @@ char *argv[];
 	}
 
 	(void) printf("Transaction [%04d] entered in the %s meeting.\n",
-		      txn_no, nb.aliases[0]);
+		      txn_no, nbdest.aliases[0]);
 
 	(void) close(fd);
 
