@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.26 1986-12-14 12:04:11 spook Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.27 1987-03-22 04:32:27 spook Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
@@ -9,6 +9,10 @@
  *	ss library for the command interpreter.
  *
  *      $Log: not supported by cvs2svn $
+ * Revision 1.26  86/12/14  12:04:11  spook
+ * Fix implementation of -editor, -no_editor that was breaking things
+ * elsewhere...
+ * 
  * Revision 1.25  86/12/08  00:43:30  wesommer
  * Implemented -editor, -no_editor control args for program, 
  * similar args and -mtg arg for repl.
@@ -92,7 +96,7 @@
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.26 1986-12-14 12:04:11 spook Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.27 1987-03-22 04:32:27 spook Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -100,6 +104,7 @@ static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athe
 #include <signal.h>
 #include <strings.h>
 #include <sys/wait.h>
+#include <pwd.h>
 #include "ss.h"
 #include "tfile.h"
 #include "interface.h"
@@ -128,11 +133,13 @@ char	*pgm = (char *)NULL;
 char	buf[BUFSIZ];
 char	*buffer = &buf[0];
 int	sci_idx;
+char	*user_id = (char *)NULL;
 
 /* EXTERNAL ROUTINES */
 
 char	*malloc(), *getenv(), *gets(), *ctime();
 tfile	unix_tfile();
+char	*local_realm();
 
 #define DEFAULT_EDITOR "/bin/ed"
 
@@ -144,11 +151,12 @@ main(argc, argv)
 	char *initial_meeting = (char *)NULL;
 	char *subsystem_name = "discuss";
 	char *initial_request = (char *)NULL;
-	bool quit = FALSE;		/* quit after processing request */
+	bool quit = FALSE;	/* quit after processing request */
 	bool flame = FALSE;	/* Have we flamed them for multiple  */
 
 	editor_path = getenv ("EDITOR");
-	if (!editor_path) editor_path = DEFAULT_EDITOR;
+	if (!editor_path)
+		editor_path = DEFAULT_EDITOR;
 
 	while (++argv, --argc) {
 		if (!strcmp(*argv, "-subsystem_name") || !strcmp(*argv, "-ssn")) {
@@ -161,7 +169,8 @@ main(argc, argv)
 		}
 		else if (!strcmp(*argv, "-request") || !strcmp(*argv, "-rq")) {
 			if (argc == 1) {
-				fprintf(stderr, "No string supplied with -request.\n");
+				fprintf(stderr,
+					"No string supplied with -request.\n");
 				exit(1);
 			}
 			argc--; argv++;
@@ -188,7 +197,8 @@ main(argc, argv)
 		else if (**argv == '-') {
 			fprintf(stderr, "Unknown control argument %s\n",
 				*argv);
-			fprintf(stderr, "Usage: %s [ -ssn name ] [ -request name ] [ -quit ] [ -editor editor_path ]\n [ -no_editor ]\n");
+			fprintf(stderr, "Usage: %s [ -ssn name ] [ -request name ] [ -quit ] [ -editor editor_path ]\n [ -no_editor ]\n",
+				*argv);
 			exit(1);
 		}
 		else {
@@ -201,6 +211,17 @@ main(argc, argv)
 				}
 			} else initial_meeting = *argv;
 		}
+	}
+
+	if (!user_id) {
+		register char *user = getpwuid(getuid())->pw_name;
+		register char *realm = local_realm();
+		register char *uid = malloc((unsigned)
+					    (strlen(user)+strlen(realm)+2));
+		strcpy(uid, user);
+		strcat(uid, "@");
+		strcat(uid, realm);
+		user_id = uid;
 	}
 
 	sci_idx = ss_create_invocation(subsystem_name, CURRENT_VERSION,
@@ -236,238 +257,4 @@ main(argc, argv)
 		(void) ss_listen (sci_idx, &code);
 	(void) unlink(temp_file);
 	leave_mtg();				/* clean up after ourselves */
-}
-
-
-
-repl(argc, argv)
-	int argc;
-	char **argv;
-{
-	int fd;
-	trn_nums txn_no, orig_trn;
-	tfile tf;
-	selection_list *trn_list;
-	trn_info t_info;
-	int code;
-	char *editor = NULL;
-	char *whoami = argv[0];
-	char *trans = NULL;
-	char *mtg = NULL;
-
-	while (++argv, --argc) {
-		if (!strcmp (*argv, "-meeting") || !strcmp (*argv, "-mtg")) {
-			if (argc==1) {
-				(void) fprintf(stderr, 
-					       "No argument to %s.\n", *argv);
-				return;
-			} else {
-				--argc;
-				mtg = *(++argv);
-			}
-		} else if (!strcmp (*argv, "-editor") || !strcmp(*argv, "-ed")) {
-			if (argc==1) {
-				(void) fprintf(stderr, 
-					       "No argument to %s.\n", *argv);
-				return;
-			} else {
-				--argc;
-				editor = *(++argv);
-			}
-		} else if (!strcmp(*argv, "-no_editor")) {
-			editor = "";
-		} else {
-			if (!trans) trans = *argv; 
-			else {
-				ss_perror(sci_idx, 0, "Cannot reply to multiple transactions");
-				return; 
-			}
-		}
-	}
-	if (mtg && !trans) { 
-		fprintf(stderr, "Must have transaction specifier if using -mtg.\n");
-		return;
-	}
-	if(mtg) {
-		(void) sprintf(buffer, "goto %s", mtg);
-		ss_execute_line(sci_idx, buffer, &code);
-		if (code != 0) {
-			ss_perror(sci_idx, code, buffer);
-			return;
-		}
-	}
-
-	if (!dsc_public.attending) {
-		ss_perror(sci_idx, 0, "No current meeting.\n");
-		return;
-	}
-
-
-	dsc_get_trn_info(dsc_public.mtg_uid, dsc_public.current, &t_info, &code);
-	if (code != 0)
-		t_info.current = 0;
-	else {
-	     free(t_info.subject);			/* don't need these */
-	     t_info.subject = NULL;
-	     free(t_info.author);
-	     t_info.author = NULL;
-	}
-
-	trn_list = trn_select(&t_info, trans ? trans : "current" ,
-			      (selection_list *)NULL, &code);
-	if (code) {
-	     ss_perror(sci_idx, code, "");
-	     free((char *) trn_list);
-	     return;
-	}
-
-	if (trn_list -> low != trn_list -> high) {
-	     ss_perror(sci_idx, 0, "Cannot reply to range");
-	     free((char *)trn_list);
-	     return;
-	}
-
-	orig_trn = trn_list -> low;
-	free((char *)trn_list);
-
-	dsc_get_trn_info(dsc_public.mtg_uid, orig_trn, &t_info, &code);
-	if (code != 0) {
-	     ss_perror(sci_idx, code, "");
-	     return;
-	}
-
-	if(!acl_is_subset("a", dsc_public.m_info.access_modes))
-		(void) fprintf(stderr, "Warning: You do not have permission to create replies.\n");
-
-	if (strncmp(t_info.subject, "Re: ", 4)) {
-		char *new_subject = malloc((unsigned)strlen(t_info.subject)+5);
-		(void) strcpy(new_subject, "Re: ");
-		(void) strcat(new_subject, t_info.subject);
-		(void) free(t_info.subject);
-		t_info.subject = new_subject;
-	}
-
-	(void) unlink(temp_file);
-	if (edit(temp_file, editor) != 0) {
-		(void) fprintf(stderr,
-			       "Error during edit; transaction not entered\n");
-		unlink(temp_file);
-		goto abort;
-	}
-	fd = open(temp_file, O_RDONLY, 0);
-	if (fd < 0) {
-		(void) fprintf(stderr, "No file; not entered.\n");
-		goto abort;
-	}
-	tf = unix_tfile(fd);
-	
-	dsc_add_trn(dsc_public.mtg_uid, tf, t_info.subject,
-		orig_trn, &txn_no, &code);
-	if (code != 0) {
-		fprintf(stderr, "Error adding transaction: %s\n",
-			error_message(code));
-		goto abort;
-	}
-	(void) printf("Transaction [%04d] entered in the %s meeting.\n",
-		      txn_no, dsc_public.mtg_name);
-
-	dsc_public.current = orig_trn;
-
-	/* and now a pragmatic definition of 'seen':  If you are up-to-date
-	   in a meeting, then you see transactions you enter. */
-	if (dsc_public.highest_seen == txn_no -1) {
-	     dsc_public.highest_seen = txn_no;
-	}
-
-abort:
-	free(t_info.subject);
-	free(t_info.author);
-}
-
-goto_mtg(argc, argv)
-	int argc;
-	char **argv;
-{
-	int code;
-
-	DONT_USE(sci_idx);
-	if (argc != 2) {
-		(void) fprintf(stderr, "Usage:  %s mtg_name\n", argv[0]);
-		return;
-	}
-
-	leave_mtg();
-
-	dsc_public.mtg_name = (char *)malloc(strlen(argv[1])+1);
-	strcpy(dsc_public.mtg_name, argv[1]);
-
-	get_mtg_unique_id ("", "", dsc_public.mtg_name, &dsc_public.nb, &code);
-	if (code != 0) {
-		(void) fprintf (stderr,
-				"%s: Meeting not found in search path.\n",
-				argv[1]);
-		return;
-	}
-
-	dsc_public.mtg_uid = dsc_public.nb.unique_id;	/* warning - sharing */
-	dsc_get_mtg_info(dsc_public.mtg_uid, &dsc_public.m_info, &code);
-	if (code != 0) {
-		(void) fprintf(stderr,
-			       "Error getting meeting info for %s: %s\n", 
-			       dsc_public.mtg_name, error_message(code));
-		dsc_public.mtg_uid = (char *)NULL;
-		return;
-	}
-	dsc_public.attending = TRUE;
-        dsc_public.highest_seen = dsc_public.current = dsc_public.nb.last;
-	printf ("%s meeting;  %d new, %d last",
-		dsc_public.m_info.long_name,
-		max (dsc_public.m_info.last - dsc_public.highest_seen, 0),
-		dsc_public.m_info.last);
-	if (acl_is_subset("c", dsc_public.m_info.access_modes)) 
-		printf(" (You are a chairman)");
-	if (!acl_is_subset("w", dsc_public.m_info.access_modes)) {
-		if (!acl_is_subset("a", dsc_public.m_info.access_modes)) 
-			printf(" (Read only)");
-		else printf(" (Reply only)");
-	} else if (!acl_is_subset("a", dsc_public.m_info.access_modes))
-		printf(" (No replies)");
-	printf(".\n\n");
-}
-
-/*
- *
- * leave_mtg () -- Internal routine to leave the current meeting, updating
- *		   all the stuff we need.  Not a light-weight operation.
- *
- */
-
-leave_mtg()
-{
-     int code;
-
-     if (!dsc_public.attending)
-	  return;				/* bye, jack */
-     if (dsc_public.mtg_uid == (char *)NULL) {
-	  fprintf (stderr, "leave: Inconsistent meeting state\n");
-	  return;
-     }
-
-     dsc_public.nb.date_attended = time((long *)0);
-     dsc_public.nb.last = dsc_public.highest_seen;
-     update_mtg_set ("", "", &dsc_public.nb, 1, &code);
-
-     /* done with everything.  start nuking stuff */
-     dsc_public.current = 0;
-     dsc_public.highest_seen = 0;
-     dsc_public.attending = FALSE;
-     dsc_public.mtg_uid = (char *)NULL;
-
-     /* Don't forget the women and children... */
-     FREE(dsc_public.mtg_name);
-     dsc_public.mtg_name = (char *)NULL;
-     FREE(dsc_public.m_info.chairman);
-     dsc_public.m_info.chairman = (char *)NULL;
-     FREE(dsc_public.m_info.location);
-     dsc_public.m_info.location = (char *)NULL;
 }
