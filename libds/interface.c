@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.23 1989-03-31 01:44:09 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.24 1989-05-19 20:01:28 srz Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
@@ -8,7 +8,7 @@
 
 #ifndef lint
 static char rcsid_interface_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.23 1989-03-31 01:44:09 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/interface.c,v 1.24 1989-05-19 20:01:28 srz Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -37,6 +37,9 @@ typedef struct _meeting {
 
 extern char *malloc();
 extern int errno;
+extern int com_err();
+
+static int (*warning_hook)() = 0;
 
 static meeting *meeting_list = (meeting *)NULL;
 meeting *cmtg = (meeting *) NULL;
@@ -124,7 +127,7 @@ select_meeting(nbp, code_ptr)
 	if (*code_ptr && !fatal) {
 	    char buf[100];
 	    sprintf(buf, "while connecting to %s", mp->module);
-	    com_err ("discuss", *code_ptr, buf);
+	    log_warning (*code_ptr, buf);
 	    *code_ptr = 0;
 	}
 	cmtg = mp;
@@ -345,4 +348,22 @@ void dsc_destroy_trn_info (info)
 		free (info->subject);
 		info->subject = NULL;
 	}
+}
+
+log_warning(code, buf)
+int code;
+char *buf;
+{
+     if (warning_hook == 0) {
+	  char buf2[200];
+	  sprintf(buf2, "Warning: %s %s\n", error_message(code), buf);
+	  printf(buf2);
+     } else
+	  (*warning_hook)(code, buf);
+}
+
+set_warning_hook(hook)
+int (*hook)();
+{
+     warning_hook = hook;
 }
