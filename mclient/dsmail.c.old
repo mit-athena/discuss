@@ -12,6 +12,22 @@
  *        $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/dsmail.c.old,v $
  *
  *        $Log: not supported by cvs2svn $
+ * Revision 1.15  91/07/05  20:48:09  bjaspan
+ * ported to svr4
+ * 
+ * Revision 1.14  91/07/05  19:16:33  bjaspan
+ * actually, I meant ucbinclude
+ * 
+ * Revision 1.13  91/07/05  19:12:47  bjaspan
+ * use /usr/ucb/sysexits.h on svr4
+ * 
+ * Revision 1.12  91/05/29  16:54:27  raeburn
+ * Discarded some unused code; use exit codes that sendmail will recognize, and
+ * use SMTP codes in error messages printed.  Renamed PipeToMeeting to
+ * SendToMeeting.  Some other minor changes dealing with initialization of
+ * variables.  Deleted useless `p' option, added h to indicate that hostname
+ * should be extracted from meeting name (not currently used, though).
+ * 
  * Revision 1.11  90/02/24  18:46:12  srz
  * Added deriving signature from From: field.
  * 
@@ -47,8 +63,14 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+#include <sys/types.h>
 #include <sys/file.h>
+#ifdef SVR4
+#include "/usr/ucbinclude/sysexits.h"
+#define EX_CONFIG EX_SOFTWARE
+#else
 #include <sysexits.h>
+#endif
 
 #include <discuss/discuss.h>
 #include <rpc.h>
@@ -60,7 +82,7 @@
 
 #ifndef	lint
 static char rcsid[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/dsmail.c.old,v 1.12 1991-05-29 16:54:27 raeburn Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/dsmail.c.old,v 1.13 1991-07-08 20:16:26 epeisach Exp $";
 #endif
 
 char *malloc(), *realloc ();
