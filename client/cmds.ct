@@ -31,6 +31,9 @@
 	request		status, "Show status information.",
 			status, stat, st;
 
+	request		list_meetings, "List meetings.",
+			list_meetings, lsm;
+
 	request		ss_abort_subsystem, "Quit.",
 			quit, exit, q;
 
