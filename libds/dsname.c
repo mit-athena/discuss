@@ -6,7 +6,7 @@
  *
  */
 /*
- *	$Id: dsname.c,v 1.27 1999-02-02 20:40:26 kcr Exp $
+ *	$Id: dsname.c,v 1.28 1999-04-11 19:15:39 danw Exp $
  *
  */
 
@@ -31,7 +31,7 @@
 
 #ifndef lint
 static const char rcsid_dsname_c[] =
-    "$Id: dsname.c,v 1.27 1999-02-02 20:40:26 kcr Exp $";
+    "$Id: dsname.c,v 1.28 1999-04-11 19:15:39 danw Exp $";
 #endif
 
 extern char *malloc (), *local_realm (), *getenv ();
@@ -52,7 +52,6 @@ static server_name_blk current = {
 
 static char disrcbuf[MAXPATHLEN]; /* user's MEETINGS file */
 static char *disrcfile = NULL;	/* pointer to above */
-static char *me = NULL;		/* user's own user_id field */
 
 static char mtgs[] = "/.meetings";
 
@@ -98,11 +97,6 @@ int find_rc_filename()
     pw = getpwuid(getuid());
     if (!pw)
 	return NO_SUCH_USER;
-    me = malloc(strlen(pw->pw_name)+2+
-		strlen(local_realm()));
-    strcpy(me, pw->pw_name);
-    strcat(me, "@");
-    strcat(me, local_realm());
 
     cp = getenv("MEETINGS");
     if (cp)
@@ -123,39 +117,6 @@ int find_rc_filename()
 	return 0;
     }
     return errno;
-}
-
-static int set_rc_filename(auser_id, buf, len)
-    const char *auser_id;
-    char *buf;
-    int len;
-{
-    struct passwd *pw = NULL;
-    register char *cp = NULL;
-
-    if ((auser_id == NULL) ||
-	(auser_id[0] == '\0') ||
-	(me && !strcmp(auser_id, me))) {
-	if (!disrcfile) {
-	    register int code;
-	    if (code = find_rc_filename())
-		return code;
-	}
-	strncpy(buf, disrcbuf, MAXPATHLEN-1);
-	return 0;
-    }
-    cp = strchr(auser_id, '@');
-    if (cp)
-	*cp = '\0';
-    pw = getpwnam(auser_id);
-    if (cp)
-	*cp = '@';
-    if (!pw) {
-	return NO_SUCH_USER;
-    }
-    strncpy(buf, pw->pw_dir, len);
-    strncat(buf, mtgs, len - strlen(buf));
-    return (access(buf, R_OK)? NO_MTGS_FILE : 0);
 }
 
 static void clear_current () {
@@ -291,10 +252,12 @@ static int setdbent(user_id)
 
     if (!user_id)
 	user_id = "";
-    if (!db_file)
-	db_file = malloc(MAXPATHLEN);
-    if (code = set_rc_filename(user_id, db_file, MAXPATHLEN))
-	return code;
+    if (!disrcfile) {
+    	code = find_rc_filename();
+	if (code)
+	    return code;
+    }
+    db_file = ds(disrcfile);
 
     db = fopen(db_file, "r");
     if (!db)
