@@ -16,9 +16,12 @@
 /*
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/rpproc.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/rpproc.c,v 1.9 1989-06-03 00:43:37 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/rpproc.c,v 1.10 1990-06-21 01:16:24 srz Exp $
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.9  89/06/03  00:43:37  srz
+ * Added standard copyright notice.
+ * 
  * Revision 1.8  89/01/29  17:16:57  srz
  * Add new kerberos ticket support.
  * 
@@ -167,11 +170,7 @@ init_rpc (service,code)
 	(void) dup2(1, 2);
     }
     {
-	int tt = open("/dev/tty", O_RDWR);
-	if (tt != -1) {
-	    ioctl (tt, TIOCNOTTY, (char *)0);
-	    close(tt);
-	}
+	setpgrp(0, getpid());		/* So we don't get tty signals */
     }
 #endif
     
