@@ -14,6 +14,8 @@ MACHSRCS=mktemp.c
 #endif
 
 
+all:: edsc
+
 edsc:: newvers.sh
 	-$(RM) edsc
 	sh newvers.sh
@@ -27,3 +29,9 @@ install_file(discuss-enter.el,$(ATHLIBDIR)/elisp)
 install_file(discuss-ls.el,$(ATHLIBDIR)/elisp)
 install_file(discuss-misc.el,$(ATHLIBDIR)/elisp)
 install_file(discuss.el,$(ATHLIBDIR)/elisp)
+
+install_file(discuss-acl.elc,$(ATHLIBDIR)/elisp)
+install_file(discuss-enter.elc,$(ATHLIBDIR)/elisp)
+install_file(discuss-ls.elc,$(ATHLIBDIR)/elisp)
+install_file(discuss-misc.elc,$(ATHLIBDIR)/elisp)
+install_file(discuss.elc,$(ATHLIBDIR)/elisp)
