@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/output.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/output.c,v 1.4 1987-07-17 00:37:22 spook Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/output.c,v 1.5 1987-07-18 00:00:23 srz Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board.
@@ -10,7 +10,7 @@
  */
 
 #ifndef lint
-static char *rcsid_discuss_utils_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/output.c,v 1.4 1987-07-17 00:37:22 spook Exp $";
+static char *rcsid_discuss_utils_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/output.c,v 1.5 1987-07-18 00:00:23 srz Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -64,6 +64,11 @@ output_trans(txn_no, tf, code)
 	}
 	dsc_get_trn(&dsc_public.nb, txn_no, tf, code);
 	if (*code != 0) return;
+
+	/* Force a NL in case the transaction doesn't have one.
+	   Tfile's now have Control operations that allow us to
+	   do this */
+	tcontrol(tf, TFC_FORCE_NL, 0, code);
 
 	if (tinfo.pref == 0 && tinfo.nref == 0)
 		(void) sprintf (line, "--[%04d]--\n\f\n", tinfo.current);
