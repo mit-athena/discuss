@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.41 1988-04-21 16:05:35 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.42 1988-06-12 23:27:23 srz Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
@@ -12,7 +12,7 @@
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.41 1988-04-21 16:05:35 srz Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.42 1988-06-12 23:27:23 srz Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -208,7 +208,8 @@ char *prompt,def;
 
 	for (;;) {
 		(void) printf("%s ",prompt);
-		(void) gets(yn_inp);
+		if (gets(yn_inp) == NULL)
+			return(FALSE);		/* ^D = No */
 		if (yn_inp[0] == '\0')
 			yn_inp[0] = def;
 		if (toupper(yn_inp[0]) == 'Y' || toupper(yn_inp[0]) == 'N')
