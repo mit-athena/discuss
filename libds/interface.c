@@ -47,6 +47,9 @@ select_meeting(mtg_uid, code_ptr)
 	else if (!strcmp(cmtg->unique_id, mtg_uid))
 		return;
 	/* we need to set the meeting */
+#ifdef	DEBUG
+	printf("interface.debug: Changing to meeting %s\n", mtg_uid);
+#endif
 	current_host = cmtg->hostname;
 	FREE(cmtg->unique_id);
 	FREE(cmtg->name);
@@ -69,11 +72,14 @@ select_meeting(mtg_uid, code_ptr)
 		return;
 	}
 	/* we need to set the host */
+#ifdef	DEBUG
+	printf("interface.debug: Changing host to %s\n", host);
+#endif
 	FREE(current_host);
 	if (cmtg->rc)
 		close_rpc(cmtg->rc);
 	cmtg->rc = open_rpc(host, "discuss", code_ptr);
-	if (cmtg -> rc = NULL) {
+	if (cmtg -> rc == NULL) {
 		FREE(host);
 		FREE(path);
 		FREE(cmtg);
