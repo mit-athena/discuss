@@ -22,12 +22,14 @@
 #include <sys/time.h>
 #include <netdb.h>
 #ifdef SOLARIS
-#include <string.h>
 #include <fcntl.h>
-#else
-#include <strings.h>
 #endif
+#include <strings.h>
 #include "edsc.h"
+#ifdef SOLARIS
+#define random lrand48
+#define srandom srand48
+#endif
 
 /*
  * Define POSIX-style macros for systems who don't have them.
