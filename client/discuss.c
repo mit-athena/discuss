@@ -1,9 +1,14 @@
 /*
- *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.48 1989-05-06 01:54:42 srz Exp $
- *	$Locker:  $
  *
- *	Copyright (C) 1986 by the Student Information Processing Board
+ *    Copyright (C) 1989 by the Massachusetts Institute of Technology
+ *    Developed by the MIT Student Information Processing Board (SIPB).
+ *    For copying information, see the file mit-copyright.h in this release.
+ *
+ */
+/*
+ *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.49 1989-06-02 23:32:24 srz Exp $
+ *	$Locker:  $
  *
  *	A simple shell-type user interface to discuss; uses Ken Raeburn's
  *	ss library for the command interpreter.
@@ -13,7 +18,7 @@
 
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.48 1989-05-06 01:54:42 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.49 1989-06-02 23:32:24 srz Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -39,7 +44,7 @@ static char rcsid_discuss_c[] =
 
 extern ss_request_table discuss_cmds;
 
-char	dsc_version[] = "1.5EXL";
+char	dsc_version[] = "1.5";
 int	sci_idx;
 
 extern char *temp_file, *pgm, *user_id;
