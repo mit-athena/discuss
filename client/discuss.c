@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.20 1986-11-20 10:32:10 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.21 1986-12-07 00:29:25 rfrench Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
@@ -9,6 +9,9 @@
  *	ss library for the command interpreter.
  *
  *      $Log: not supported by cvs2svn $
+ * Revision 1.20  86/11/20  10:32:10  srz
+ * Reply sets current right
+ * 
  * Revision 1.19  86/11/17  00:58:05  spook
  * Added some control arg processing.  (-ssn, -rq, -quit)
  * 
@@ -74,7 +77,7 @@
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.20 1986-11-20 10:32:10 srz Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.21 1986-12-07 00:29:25 rfrench Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -82,11 +85,11 @@ static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athe
 #include <signal.h>
 #include <strings.h>
 #include <sys/wait.h>
-#include "../include/ss.h"
-#include "../include/tfile.h"
-#include "../include/interface.h"
-#include "../include/config.h"
-#include "../include/rpc.h"
+#include "ss.h"
+#include "tfile.h"
+#include "interface.h"
+#include "config.h"
+#include "rpc.h"
 #include "globals.h"
 
 #ifdef	lint
