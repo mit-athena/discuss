@@ -3,12 +3,15 @@
  *	Print-related requests for DISCUSS.
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.8 1986-11-11 16:33:21 spook Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.9 1986-11-20 10:27:54 srz Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
  *
  *      $Log: not supported by cvs2svn $
+ * Revision 1.8  86/11/11  16:33:21  spook
+ * Fixed to work with changes in et stuff
+ * 
  * Revision 1.7  86/10/29  10:28:59  srz
  * Fixed current handling, etc.
  * 
@@ -36,7 +39,7 @@
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.8 1986-11-11 16:33:21 spook Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.9 1986-11-20 10:27:54 srz Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -77,6 +80,7 @@ display_trans(trn_no)
 	     dsc_public.current = trn_no;
 	     performed = TRUE;
 	} else if (code == EPIPE) {
+	     dsc_public.current = trn_no;
 	     performed = TRUE;
 	     return(code);		/* silently quit */
 	}
