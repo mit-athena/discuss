@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.45 1988-12-03 01:42:13 raeburn Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.46 1989-01-05 00:11:59 raeburn Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
@@ -13,7 +13,7 @@
 
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.45 1988-12-03 01:42:13 raeburn Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.46 1989-01-05 00:11:59 raeburn Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -24,12 +24,9 @@ static char rcsid_discuss_c[] =
 #include <sys/signal.h>
 #include <pwd.h>
 #include "ss.h"
-#include "tfile.h"
-#include "interface.h"
+#include <discuss/discuss.h>
 #include "config.h"
-#include "rpc.h"
 #include "globals.h"
-#include "acl.h"
 
 #ifdef	lint
 #define	DONT_USE(var)	var=var;
