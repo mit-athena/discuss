@@ -4,7 +4,7 @@
  *
  */
 
-#include "../include/types.h"
+#include <discuss/types.h>
 
 /*
  *
