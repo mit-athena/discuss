@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.12 1988-09-23 17:07:33 raeburn Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.13 1988-10-08 01:28:26 srz Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
@@ -11,6 +11,9 @@
  *		  in-memory superblock, and to open & close meetings.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.12  88/09/23  17:07:33  raeburn
+ * Changed type names in accordance with acl.h.  Included include/internal.h.
+ * 
  * Revision 1.11  88/03/06  19:53:28  srz
  * Reversed order of checking magic number and version, so that
  * INCONSISTENT is returned instead of NEW_VERSION when that
@@ -55,7 +58,7 @@
 const
 #endif
 static char rcsid_coreutil_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.12 1988-09-23 17:07:33 raeburn Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.13 1988-10-08 01:28:26 srz Exp $";
 #endif /* lint */
 
 #include "../include/types.h"
@@ -89,7 +92,8 @@ int 	last_acl_mod;				/* last mod to ACL */
 mtg_super super;
 char *super_chairman;
 char *super_long_name;
-int has_privs = 0;
+int has_privs = 0;				/* Has privileges (linked) */
+int no_nuke = 0;				/* Don't be atomic (linked) */
 
 
 /* EXTERNAL */
@@ -325,9 +329,11 @@ forget_super()
  */
 start_read()
 {
-     if (flock (u_control_f, LOCK_SH) < 0)
-	  panic ("Cannot share lock");
-     read_lock = TRUE;
+     if (!no_nuke) {
+	  if (flock (u_control_f, LOCK_SH) < 0)
+	       panic ("Cannot share lock");
+	  read_lock = TRUE;
+     }
 }
 
 /*
@@ -338,8 +344,10 @@ start_read()
  */
 finish_read()
 {
-     flock(u_control_f,LOCK_UN);
-     read_lock = 0;
+     if (!no_nuke) {
+	  flock(u_control_f,LOCK_UN);
+	  read_lock = 0;
+     }
 }
 
 /*
@@ -593,7 +601,7 @@ mtg_znotify(mtg_name, subject, author)
 	struct hostent *hent;
 	
 	/* Set up the notice structure */
-
+	bzero(&notice, sizeof(notice));
 	ZInitialize();
 
 	if (gethostname(host,100) != 0)
