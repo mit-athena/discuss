@@ -1,8 +1,10 @@
 /*
+ *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/include/globals.h,v $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/include/globals.h,v 1.6 1986-12-08 00:45:41 wesommer Exp $
  *
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/include/globals.h,v 1.5 1986-12-07 03:00:04 rfrench Exp $
- * $Locker:  $
+ *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
+ *	Declarations of global variables for discuss.
  */
 
 #include "dsname.h"
@@ -36,6 +38,10 @@ extern char	*temp_file;	/* generic temporary file... */
 extern int	sci_idx;
 
 extern int	errno;		/* lusing UNIX method to pass error values */
+
+extern bool 	use_editor;	/* Should we snarf input from stdin, or 
+				 * use an editor instead? */
+extern char	*editor_path;	/* Pathname of editor to use */
 
 #define	CURRENT_VERSION	"1.0"
 
