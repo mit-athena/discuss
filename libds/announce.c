@@ -1,17 +1,18 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/announce.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/announce.c,v 1.3 1987-06-27 01:33:18 spook Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/announce.c,v 1.4 1987-07-17 02:22:00 srz Exp $
  *	$Locker:  $
  *
  */
 
 #ifndef lint
-static char *rcsid_announce_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/announce.c,v 1.3 1987-06-27 01:33:18 spook Exp $";
+static char *rcsid_announce_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/announce.c,v 1.4 1987-07-17 02:22:00 srz Exp $";
 #endif lint
 
 #include <stdio.h>
 #include <sys/file.h>
 #include "tfile.h"
+#include "interface.h"
 #include "dsname.h"
 #include "dsc_et.h"
 
@@ -28,11 +29,19 @@ int *code_ptr;
 {
 	char temp_file[64];
 	char buffer[512],subject[100];
-	int fd,tfs,tocopy;
+	int fd,tfs,tocopy,mycode;
 	FILE *fp;
 	tfile tf2;
+	mtg_info my_minfo;
 
 	*code_ptr = 0;
+        fp = NULL;
+	tf2 = NULL;
+
+	dsc_get_mtg_info(nbpsrc,
+			 &my_minfo, code_ptr);
+	if (*code_ptr != 0)
+	     return;
 
 	(void) sprintf(temp_file,"/tmp/mtgz%d.%d",getuid(),getpid());
 	(void) unlink(temp_file);
@@ -40,19 +49,20 @@ int *code_ptr;
 	fp = fopen(temp_file,"w");
 	if (!fp) {
 		*code_ptr = CANT_WRITE_TEMP;
-		return;
+		goto punt;
 	}
-	fprintf(fp,"  Meeting Name:  %s\n", nbpsrc->aliases[0]);
+	fprintf(fp,"  Meeting Name:  %s\n", my_minfo.long_name);
 	fprintf(fp,"  Host:          %s\n", nbpsrc->hostname);
 	fprintf(fp,"  Pathname:      %s\n", nbpsrc->pathname);
 	fprintf(fp,"  Participation: %s\n", public?"Public":"Private");
 	fprintf(fp,"\n");
 	fclose(fp);
+	fp = NULL;
 
 	fd = open(temp_file,O_APPEND|O_RDWR,0);
 	if (fd < 0) {
 		*code_ptr = CANT_WRITE_TEMP;
-		return;
+		goto punt;
 	}
 	tf2 = unix_tfile(fd);
 	tfs = tfsize(tf);
@@ -60,23 +70,35 @@ int *code_ptr;
 		tocopy = min (512, tfs);
 		tocopy = tread (tf, buffer, tocopy, code_ptr);
 		if (*code_ptr)
-			return;
+			goto punt;
 		twrite (tf2, buffer, tocopy, code_ptr);
 		if (*code_ptr)
-			return;
+			goto punt;
 		tfs -= tocopy;
 	}
-	(void) fclose(fp);
 	(void) tclose(tf2, code_ptr);
+	tf2 = NULL;
 	*code_ptr = 0;
 
 	fd = open(temp_file,O_RDONLY,0);
 	if (fd < 0) {
 		*code_ptr = CANT_WRITE_TEMP;
-		return;
+		goto punt;
 	}
 	tf2 = unix_tfile(fd);
 
-	(void) sprintf(subject,"%s meeting",nbpsrc->aliases[0]);
+	(void) sprintf(subject,"%s meeting",my_minfo.long_name);
 	dsc_add_trn(nbpdest, tf2, subject, 0, txn_no, code_ptr);
+
+punt:
+	if (tf2 != NULL)
+	     tclose(tf2, &mycode);
+	if (fp != NULL)
+	     fclose(fp);
+	if (my_minfo.chairman != NULL)
+	     free(my_minfo.chairman);
+	if (my_minfo.location != NULL)
+	     free(my_minfo.location);
+	if (my_minfo.long_name != NULL)
+	     free(my_minfo.long_name);
 }
