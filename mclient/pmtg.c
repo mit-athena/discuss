@@ -21,7 +21,7 @@ mtg_info minfo;
 
 #ifndef	lint
 static char rcsid_pmtg_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/pmtg.c,v 1.3 1989-06-03 00:31:53 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/pmtg.c,v 1.4 1994-03-25 16:57:12 miki Exp $";
 #endif
 
 int main (argc,argv)
@@ -155,7 +155,7 @@ char *usr_string,*machine,*mtg_name;
      char *colon;
      int machine_len;
 
-     colon = index (usr_string, ':');
+     colon = strchr (usr_string, ':');
 
      if (colon == 0) {
 	  strcpy (mtg_name, usr_string);
@@ -164,7 +164,11 @@ char *usr_string,*machine,*mtg_name;
      }
 
      machine_len = colon - usr_string;
+#ifdef POSIX
+     memmove (machine, usr_string, machine_len);
+#else
      bcopy (usr_string, machine, machine_len);
+#endif
      machine [machine_len] = '\0';
      strcpy (mtg_name, colon+1);
      return;
