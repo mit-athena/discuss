@@ -1,6 +1,6 @@
 /*
  *
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/trn_select.c,v 1.3 1986-09-22 06:20:42 spook Exp $
+ * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/trn_select.c,v 1.4 1986-10-14 23:00:04 spook Exp $
  * $Locker:  $
  *
  */
@@ -89,6 +89,8 @@ sl_map(func, list)
 
 	for (p = list; p; p = p->next) {
 		for (i = p->low; i <= p->high; i++) {
+			if (i == 0)
+				continue;
 			if ((result = func(i))) {
 				return(result);
 			}
