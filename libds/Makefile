@@ -1,5 +1,6 @@
 CFLAGS=	-g -O -I../include
 LFLAGS=	-uhv -I../include -DKERBEROS -DCONNECT -DSUBPROC
+PROFFLAG= -pg
 
 SRCS=	tfile.c tunix.c tnet.c stubs.c dsname.c interface.c rpcall.c \
 	conv_mgr.c host.c announce.c \
@@ -67,7 +68,7 @@ dist:	$(SRCS) Makefile
 
 .c.o:
 	-rm -f $*.o profiled/$*.o
-	${CC} -c -pg ${CFLAGS} $*.c
+	${CC} -c ${PROFFLAG} ${CFLAGS} $*.c
 	mv -f $*.o profiled/$*.o
 	${CC} -c ${CFLAGS} $*.c
 
