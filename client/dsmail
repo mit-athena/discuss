@@ -1,0 +1,10 @@
+#!/bin/sh
+path=/bin:/site/sipb/bin
+cat >/tmp/dsmail$$
+subject=`sed '/^$/q' </tmp/dsmail$$ | grep '^Subject: ' | sed 's/^Subject: //'`
+awk 'BEGIN { foo=0 }
+/^$/ { foo = 1 }
+{ if(foo) print }' </tmp/dsmail$$ | dspipe $* -t "$subject"
+rm /tmp/dsmail$$
+
+
