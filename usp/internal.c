@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include "gen.h"
 #include "usp.h"
+#include <netinet/in.h>
 
 /* internal routines */
 
