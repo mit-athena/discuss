@@ -12,6 +12,9 @@
  *        $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/dsmail.c.old,v $
  *
  *        $Log: not supported by cvs2svn $
+ * Revision 1.11  90/02/24  18:46:12  srz
+ * Added deriving signature from From: field.
+ * 
  * Revision 1.10  89/06/03  00:30:54  srz
  * Added standard copyright notice.
  * 
@@ -45,6 +48,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <sys/file.h>
+#include <sysexits.h>
 
 #include <discuss/discuss.h>
 #include <rpc.h>
@@ -56,10 +60,10 @@
 
 #ifndef	lint
 static char rcsid[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/dsmail.c.old,v 1.11 1990-02-24 18:46:12 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/mclient/dsmail.c.old,v 1.12 1991-05-29 16:54:27 raeburn Exp $";
 #endif
 
-char *malloc();
+char *malloc(), *realloc ();
 char *mktemp();
 FILE *popen();
 FILE *fopen();
@@ -88,25 +92,22 @@ char *fromlist[] = {
 char *progname;
 char *save[LISTLEN],*reject[LISTLEN];
 char *usr_mtg = "";
-int 	dodefs=0,
-	allfields=0,
-	debug;
+int dodefs, allfields, debug, have_host;
 char *optarg;
 int optind;
-char *dspipeloc;
 extern tfile unix_tfile();
 int reply_to;
 
 void PRS();
 void MakeLowerCase();
-void PipeToMeeting();
+void SendToMeeting();
 
 main(argc,argv)
 	int argc;
 	char *argv[];
 {
 	FILE *f;
-	char line[BUFFLEN+1],*keyword,*key;
+	char line[BUFFLEN+1],*keyword=0,*key;
 	char *subject=NULL;
 	int i,ok_prev=0,iscont = 0, have_signature = 0;
 	char filename[60], signature[35];
@@ -127,16 +128,15 @@ main(argc,argv)
 	reply_to = 0;
 	
 	if (fgets(line,BUFFLEN,stdin)==NULL)
-		exit(0);
-	if (isspace(line[0]))
-		iscont = 1;
+		exit(EX_NOINPUT);
 	while (*line != '\n') {
 		if (!iscont) {
+			char *cp;
 			for (i=0;line[i] && line[i]!=':';i++) ;
-			keyword=malloc(i+1);
+			keyword = realloc (keyword, 2*(i+1));
+			key = keyword + i + 1;
 			(void) strncpy(keyword,line,i);
 			keyword[i]='\0';
-			key=malloc(i+1);
 			MakeLowerCase(strcpy(key,keyword));
 			if (list_compare(key,subjlist)) {
 				for (i++;line[i]==' ';i++) ;
@@ -147,20 +147,20 @@ main(argc,argv)
 					(void) strcpy(subject,line+i);
 				}	
 			} else if (list_compare(key, inreplyto)) {
-				char *cp;
-				if ((cp = index(line,'[')) && index(cp, ']')) {
-					cp++;
-					if (isdigit(*cp))
-						reply_to = atoi(cp);
-				}
-			} else if (list_compare(key,fromlist)) {
-				char *cp;
-
+				if ((cp = index(line,'[')) != 0
+				    && index(++cp, ']')
+				    && isdigit (*cp))
+				    reply_to = atoi(cp);
+			}
+			else if (list_compare(key,fromlist)) {
 				cp = index(line, ':');
 				if (cp != NULL) {
 					cp++;
 					extract_full_name(cp, signature, sizeof(signature));
 					have_signature = TRUE;
+					if (debug)
+					    printf ("got sig: %s\n",
+						    signature);
 				}
 			}
 		}
@@ -182,40 +182,49 @@ main(argc,argv)
 		fprintf(f,"%s",line);
 	}
 	if (fflush(f) == EOF) {
-		fprintf(stderr, "dsmail: Unable to write to temporary file\n");
-		exit(1);
+		fprintf (stderr, "250-Can't write to ");
+		fflush (stderr);
+		perror (debug ? "standard output" : filename);
+		exit (EX_TEMPFAIL);
 	}
 	
-	PipeToMeeting(f,(subject==NULL) ? DEFAULT_SUBJECT : subject,
+	SendToMeeting(f,(subject==NULL) ? DEFAULT_SUBJECT : subject,
 		      (have_signature) ? signature : NULL, 
 		      reply_to);
  bye:
 	if (!debug)
 		(void) unlink(filename); 
-	exit(0);
+	exit (EX_OK);
 	
 }
 
-void PipeToMeeting(f,subject, signature, reply_to)	/* Pipes? I don't see any pipes here.. */
+void SendToMeeting(f,subject, signature, reply_to)
 	char *subject;
 	char *signature;     
 	FILE *f;
 	int reply_to;
 {
 	int len;
-	char module[100];
-	int fatal_err,result;
+	static char module[100] = "discuss@";
+	int fatal_err, result, smtp_code, exit_code;
 	tfile transaction;
 	int trn_no;
 	
-	strcpy(module, "discuss@");
 	gethostname(&module[8], sizeof(module)-8);
 	init_rpc();
 	set_module(module, &fatal_err, &result);
+	switch (result) {
+	case 0:
+	    break;
+	default:
+	    smtp_code = 554;
+	    exit_code = EX_CONFIG;
+	    break;
+	}
 	if (result) {
-		fprintf(stderr, "Can't connect to discuss server: %s\n",
-			error_message(result));
-		exit(1);
+		fprintf(stderr, "%03d-Can't connect to discuss server: %s\n",
+			smtp_code, error_message(result));
+		exit (exit_code);
 	}
 
 	rewind(f); lseek(fileno(f), 0, L_SET);
@@ -237,10 +246,20 @@ void PipeToMeeting(f,subject, signature, reply_to)	/* Pipes? I don't see any pip
 		     	add_trn2(usr_mtg, transaction, subject, signature, reply_to, &trn_no, &result);
 	}
 
+	switch (result) {
+	case 0:
+	    break;
+	default:
+	    smtp_code = 550;
+	    exit_code = EX_CANTCREAT;
+	}
 	if (result) {
-		fprintf(stderr, "Can't enter transaction into %s: %s\n",
-			usr_mtg, error_message(result));
-		exit(1);
+	    fprintf (stderr, "%03d-Can't enter transaction", smtp_code);
+	    if (reply_to)
+		fprintf (stderr, " as reply to %d", reply_to);
+	    fprintf (stderr, "\n%03d- into meeting %s: %s\n",
+		     smtp_code, usr_mtg, error_message (result));
+	    exit(exit_code);
 	}
 	(void) fclose(f);
 }
@@ -276,10 +295,9 @@ void PRS(argc,argv)
 	int c,rp,sp;
 	
 	progname=argv[0];
-	dspipeloc = DSPIPE;
 	sp=rp=0;
 	optind=1;		/* Initialize for getopt */
-	while ((c = getopt(argc,argv,"AZDda:r:p:")) != EOF)
+	while ((c = getopt(argc,argv,"AZDda:r:h")) != EOF)
 		switch(c) {
 		case 'd':
 			dodefs=!dodefs;
@@ -294,31 +312,37 @@ void PRS(argc,argv)
 			MakeLowerCase(optarg);
 			save[sp++]=optarg;
 			if (sp>=LISTLEN) {
-				fprintf(stderr,"Too many accept fields\n");
-				exit(1);
+				fprintf(stderr,"500-Too many accept fields\n");
+				exit (EX_USAGE);
 			}
+			break;
+		case 'h':
+			have_host = 1;
 			break;
 		case 'r':
 			MakeLowerCase(optarg);
 			reject[rp++]=optarg;
 			if (sp>=LISTLEN) {
-				fprintf(stderr,"Too many reject fields\n");
-				exit(1);
+				fprintf(stderr,"500-Too many reject fields\n");
+				exit (EX_USAGE);
 			}
-		case 'p':
-			dspipeloc = optarg;
-			break;
 		}    
 	if (optind>=argc) 
 		goto lusage;
 	usr_mtg=argv[optind];
+	if (have_host) {
+		usr_mtg = index (usr_mtg, ':');
+		if (!usr_mtg)
+			goto lusage;
+		usr_mtg++;
+	}
 	save[sp]=NULL;		/* Insert terminators */
 	reject[rp]=NULL;
 	return;
  lusage:
-	printf("Usage: %s [-dADZ] [-a field] [-r field] meeting-path-name\n",
+	printf("500-Usage: %s [-dADZ] [-a field] [-r field] meeting-path-name\n",
 	       progname);
-	exit(1);
+	exit (EX_USAGE);
 }
 
 char *re_comp();
@@ -331,8 +355,9 @@ int list_compare(s,list)
 	while (*list!=NULL) {
 		err=re_comp(*list++);
 		if (err) {
-			fprintf(stderr,"%s: %s - %s\n",progname,err,*(--list));
-			exit(1);
+			fprintf(stderr,"554-%s - %s\n",
+				progname, err, list[-1]);
+			exit(EX_CONFIG);
 			}
 		if (re_exec(s))
 			return(1);
