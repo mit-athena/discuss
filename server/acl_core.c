@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v 1.6 1987-04-06 02:18:19 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v 1.7 1987-10-24 07:01:03 wesommer Exp $
  *
  *	Copyright (C) 1986 by the Massachusetts Institute of Technology
  *
@@ -8,6 +8,9 @@
  *	Originally written for the discuss system by Bill Sommerfeld
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.6  87/04/06  02:18:19  wesommer
+ * Make sure that chair doesn't terminate himself.
+ * 
  * Revision 1.5  87/03/25  15:03:51  srz
  * toma change:  Can look at own access control list entry without 's' to
  * the meeting.
@@ -37,13 +40,14 @@
 #include <strings.h>
 
 #ifndef lint
-static char *rcsid_acl_core_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v 1.6 1987-04-06 02:18:19 wesommer Exp $";
+static char *rcsid_acl_core_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v 1.7 1987-10-24 07:01:03 wesommer Exp $";
 #endif lint
 
 extern Acl *mtg_acl;
 extern char rpc_caller [];
 extern int errno;
 extern int has_privs;
+extern char *new_string();
 
 /*
  * Routines provided:
@@ -76,31 +80,58 @@ extern int has_privs;
  *	Since the acl in place is always consistant (and file opens 
  *	are atomic), there is no need to read-lock when getting the ACL.
  */
+	
+static Acl *read_acl(mtg_name, code_ptr, check)
+	char *mtg_name;
+	int *code_ptr;
+	int check;
+{
+	int fd = -1;
+	Acl *list = NULL;
+	int result = 0;
+	int mtg_name_len = strlen(mtg_name);
+	char acl_name[MAXPATHLEN];
+	
+	if (mtg_name[0] != '/' || mtg_name_len == 0 || 
+	    mtg_name_len > MAXPATHLEN || mtg_name [mtg_name_len-1] == '/') {
+		result = BAD_PATH;
+		goto punt;
+	}
+	strcpy(acl_name, mtg_name);
+	strcat(acl_name, "/acl");
+	
+	if((fd = open(acl_name, O_RDONLY, 0700)) < 0) {
+		result = errno;
+		goto punt;
+	}
+
+	errno = 0;
+	if ((list = acl_read(fd)) == (Acl *) NULL) {
+		result = errno?errno:NO_ACCESS;
+		goto punt;
+	}
+	
+	if (check && !acl_check(list, rpc_caller, "s")) {
+		result = NO_ACCESS;
+		goto punt;
+	}
+	close(fd);
+	*code_ptr = result;
+	return (list);
+punt:
+	*code_ptr = result;
+	if (list) acl_destroy(list);
+	close(fd);
+	
+        return NULL;
+}
 
 get_acl(mtg_name, code, list)
 	char *mtg_name;
 	int *code;		/* RETURN */
 	Acl **list;		/* RETURN */
 {
-
-	/* 
-	 * bug with current code:  open_mtg should check that acl has not 
-	 * been changed since it was sucked into memory; a simple stat() 
-	 * call should suffice.  
-	 */
-
-	*list = NULL;		/* bogon ACL */
-	if((*code = open_mtg(mtg_name)) != 0) {
-		return;
-	}
-
-	if(!has_mtg_access('s')) {
-		*code = NO_ACCESS;
-		return;
-	}
-
-	*code = 0;
-	*list = acl_copy(mtg_acl);
+	*list = read_acl(mtg_name, code, 1);
 	return;
 }
 
@@ -110,19 +141,15 @@ get_access(mtg_name, princ_name, modes, code)
 	char **modes;		/* RETURN */
 	int *code;		/* RETURN */
 {
+	Acl *list;
 	*modes = NULL;
-		
-	if ((*code = open_mtg(mtg_name)) != 0) {
-		return;
-	}
-
-	if(!has_mtg_access('s') && strcmp (princ_name, rpc_caller)) {	/* can always check own access */
-		*code = NO_ACCESS;
-		return;
-	}
-
+	
 	*code = 0;
-	*modes = acl_get_access(mtg_acl, princ_name);
+	list = read_acl(mtg_name, code, strcmp(princ_name, rpc_caller) != 0);
+	if (*code) return;
+	
+	*modes = new_string(acl_get_access(list, princ_name));
+	acl_destroy(list);
 	return;
 }
 
@@ -233,7 +260,7 @@ locked_open_mtg(mtg_name, lockfd, acl_name, acl)
 	u_acl_f = -1;
 	/* XXX historical magic number should be MAXPATHLEN */
 	if (mtg_name[0] != '/' || mtg_name_len == 0 || 
-	    mtg_name_len > 168 || mtg_name [mtg_name_len-1] == '/') {
+	    mtg_name_len > MAXPATHLEN || mtg_name [mtg_name_len-1] == '/') {
 		result = BAD_PATH;
 		goto punt;
 	}
