@@ -21,11 +21,12 @@ struct proc_table procs[] = {
      2, {STRTYPE, INTTYPE, 0, 0, 0, 0, 0, 0},				/* delete_trn */
      2, {STRTYPE, INTTYPE, 0, 0, 0, 0, 0, 0},				/* retrieve_trn */
      3, {STRTYPE, STRTYPE, BOOLTYPE, 0, 0, 0, 0, 0},			/* create_mtg */
-     1, {STRTYPE, 0, 0, 0, 0, 0, 0, 0},					/* get_mtg_info */
+     1, {STRTYPE, 0, 0, 0, 0, 0, 0, 0},					/* old_get_mtg_info */
      0, { 0, 0, 0, 0, 0, 0, 0, 0},					/* start_mtg_info */
      0, { 0, 0, 0, 0, 0, 0, 0, 0},					/* next_mtg_info */
      3, {STRTYPE, INTTYPE, TFILETYPE, 0, 0, 0, 0, 0},				/* get_trn */
-     1, {STRTYPE, 0, 0, 0, 0, 0, 0, 0}					/* remove_mtg */
+     1, {STRTYPE, 0, 0, 0, 0, 0, 0, 0},					/* remove_mtg */
+     1, {STRTYPE, 0, 0, 0, 0, 0, 0, 0}					/* get_mtg_info */
 };
 
 int	numprocs = sizeof (procs) / sizeof (procs [0]);
@@ -118,6 +119,23 @@ int procno;
 	  free(minfo.location);
 	  free(minfo.long_name);
 	  free(minfo.chairman);
+	  free(minfo.access_modes);
+
+	  break;
+
+     /* old_get_mtg_info (mtg_name, info, result) */
+     case OLD_GET_MTG_INFO:
+	  c1 = recvstr();			/* mtg_name */
+	  get_mtg_info (c1, &minfo, &result);
+	  startreply();
+	  old_send_mtg_info(&minfo);
+	  sendint(result);
+	  sendreply();
+
+	  free(minfo.location);
+	  free(minfo.long_name);
+	  free(minfo.chairman);
+	  free(minfo.access_modes);
 
 	  break;
 
@@ -190,6 +208,27 @@ trn_info *tinfo;
  * send_mtg_info -- Send a mtg info struct.
  *
  */
+old_send_mtg_info(minfo)
+mtg_info *minfo;
+{
+     sendint (minfo -> version);
+     sendstr (minfo -> location);
+     sendstr (minfo -> long_name);
+     sendstr (minfo -> chairman);
+     sendint (minfo -> first);
+     sendint (minfo -> last);
+     sendint (minfo -> lowest);
+     sendint (minfo -> highest);
+     sendint (minfo -> date_created);
+     sendint (minfo -> date_modified);
+     sendbool (minfo -> public_flag);
+}
+    
+/*
+ *
+ * send_mtg_info -- Send a mtg info struct.
+ *
+ */
 send_mtg_info(minfo)
 mtg_info *minfo;
 {
@@ -204,4 +243,5 @@ mtg_info *minfo;
      sendint (minfo -> date_created);
      sendint (minfo -> date_modified);
      sendbool (minfo -> public_flag);
+     sendstr (minfo -> access_modes);
 }
