@@ -1,11 +1,11 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v 1.14 1988-01-15 23:20:39 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v 1.15 1988-01-24 11:33:04 wesommer Exp $
  *
  */
      
 #ifndef lint
-static char *rcsid_ckm_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v 1.14 1988-01-15 23:20:39 srz Exp $";
+static char *rcsid_ckm_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v 1.15 1988-01-24 11:33:04 wesommer Exp $";
 #endif lint
 
 #include <strings.h>
@@ -24,7 +24,7 @@ static
 do_mtg(mtg_name)
      char *mtg_name;
 {
-     name_blk *set;
+     name_blk *set = NULL;
      register name_blk *nbp;
      int n_matches, i, code;
      bool updated;
@@ -68,9 +68,9 @@ do_mtg(mtg_name)
 		    print_header = 0;
 	  }
      }
-     if (interrupt)
-	  return(0);
-     dsc_update_mtg_set(user_id, set, n_matches, &code);
+     if (!interrupt)
+	     dsc_update_mtg_set(user_id, set, n_matches, &code);
+     dsc_destroy_mtg_set(set, n_matches);
      return(0);
 }
 
@@ -171,7 +171,7 @@ next_meeting(argc, argv)
 	       if (ls_flag) {
 		    do_line(nbp, 0, 1);
 	       } else {
-	            switch_to_mtg(nbp->aliases[0]);
+	            switch_to_mtg_nb(nbp);
 		    dsc_public.nb.status &= ~DSC_ST_CHANGED;
 		    dsc_update_mtg_set(user_id, &dsc_public.nb, 1, &code);
 		    if (code)
@@ -186,6 +186,6 @@ next_meeting(argc, argv)
 		    "No meetings listed as changed; use check_meetings.");
      } else if (print_header)
 	  ss_perror(sci_idx, 0, "No more changed meetings.");
- done:
-     free(set);
+done:
+     dsc_destroy_mtg_set(set, n_matches);
 }

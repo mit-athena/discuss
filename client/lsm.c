@@ -1,11 +1,11 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v 1.15 1987-07-17 00:14:59 spook Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v 1.16 1988-01-24 11:32:40 wesommer Exp $
  *
  */
 
 #ifndef lint
-static char *rcsid_lsm_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v 1.15 1987-07-17 00:14:59 spook Exp $";
+static char *rcsid_lsm_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/lsm.c,v 1.16 1988-01-24 11:32:40 wesommer Exp $";
 #endif lint
 
 
@@ -115,6 +115,7 @@ do_mtg(mtg_name)
 		}
 		do_line(nbp, code, updated);
 	}
+	dsc_destroy_mtg_set(set, n_matches);
 	return(0);
 }
 

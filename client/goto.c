@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/goto.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/goto.c,v 1.5 1988-01-03 22:03:04 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/goto.c,v 1.6 1988-01-24 11:33:18 wesommer Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
@@ -11,7 +11,7 @@
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/goto.c,v 1.5 1988-01-03 22:03:04 srz Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/goto.c,v 1.6 1988-01-24 11:33:18 wesommer Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -61,20 +61,31 @@ goto_mtg(argc, argv)
 switch_to_mtg(name)
 	char *name;
 {
-	int code, have_a, have_w;
-	char msgbuf[80];
-	trn_info t_info;
-
+	int code;
+	name_blk nb;
+	
 	leave_mtg();
 	dsc_public.mtg_name = (char *)malloc((unsigned)strlen(name)+1);
 	(void) strcpy(dsc_public.mtg_name, name);
 
-	dsc_get_mtg (user_id, dsc_public.mtg_name, &dsc_public.nb, &code);
+	dsc_get_mtg (user_id, dsc_public.mtg_name, &nb, &code);
 	if (code != 0) {
 	     ss_perror(sci_idx, DISC_MTG_NOT_FOUND, name);
 	     return;
 	}
+	switch_to_mtg_nb (&nb);
+	dsc_destroy_name_blk (&nb);
+}
 
+switch_to_mtg_nb(nbp)
+	name_blk *nbp;
+{
+	int code, have_a, have_w;
+	char msgbuf[80];
+	trn_info t_info;
+	leave_mtg();
+
+	dsc_copy_name_blk(nbp, &dsc_public.nb);
 	dsc_public.host = dsc_public.nb.hostname; /* warning - sharing */
 	dsc_public.path = dsc_public.nb.pathname;
 	dsc_get_mtg_info(&dsc_public.nb,
@@ -167,6 +178,8 @@ leave_mtg()
      dsc_public.nb.last = dsc_public.highest_seen;
      dsc_update_mtg_set (user_id, &dsc_public.nb, 1, &code);
 
+     dsc_destroy_name_blk(&dsc_public.nb);
+     
      /* done with everything.  start nuking stuff */
      dsc_public.current = 0;
      dsc_public.highest_seen = 0;
