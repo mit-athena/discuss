@@ -9,7 +9,7 @@
  *	Print-related requests for DISCUSS.
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.22 1994-03-25 16:31:38 miki Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.23 1996-04-05 22:24:47 ghudson Exp $
  *	$Locker:  $
  *
  */
@@ -17,7 +17,7 @@
 
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.22 1994-03-25 16:31:38 miki Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/print.c,v 1.23 1996-04-05 22:24:47 ghudson Exp $";
 #endif /* lint */
 
 #include <stdio.h>
@@ -102,7 +102,7 @@ prt_trans(argc, argv)
 	}
 
 	if (!dsc_public.attending) {
-	     ss_perror(sci_idx, DISC_NO_MTG, (char *)NULL);
+	     ss_perror(sci_idx, DISC_NO_MTG, "");
 	     return;
 	}
 	dsc_destroy_mtg_info(&dsc_public.m_info);
