@@ -12,9 +12,12 @@
  *		This file handles the caller's side of the connection.
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/rpcall.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/rpcall.c,v 1.16 1992-11-08 22:58:54 probe Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/rpcall.c,v 1.17 1994-03-25 16:45:22 miki Exp $
  *	$Locker:  $
  *	$Log: not supported by cvs2svn $
+ * Revision 1.16  92/11/08  22:58:54  probe
+ * Avoid incompatible redeclarations (AIX 3.2)
+ * 
  * Revision 1.15  89/06/03  00:21:41  srz
  * Added standard copyright notice.
  * 
@@ -52,7 +55,7 @@
  */
 #ifndef lint
 static char rcsid_rpcall_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/rpcall.c,v 1.16 1992-11-08 22:58:54 probe Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/libds/rpcall.c,v 1.17 1994-03-25 16:45:22 miki Exp $";
 #endif lint
 
 /* INCLUDES */
@@ -286,7 +289,7 @@ rpc_conversation open_rpc (host, port_num, service_id, code)
 	    for (i = 3; i < 20; i++)
 		(void) close (i);
 
-	    server_name = rindex (service_id, '/');
+	    server_name = strrchr (service_id, '/');
 	    if (server_name == NULL)
 		server_name = service_id;
 	    else
@@ -335,8 +338,12 @@ rpc_conversation open_rpc (host, port_num, service_id, code)
        is that we eliminate an extra host lookup, and we don't have
        to rely on USP's primitive error mechanism.  Yeah! */
 
-    bzero((char *) &address, sizeof(address));
+    memset((char *) &address, 0, sizeof(address));
+#ifdef POSIX
+    memmove((char *) &address.sin_addr, hp->h_addr, hp->h_length);
+#else
     bcopy(hp->h_addr, (char *) &address.sin_addr, hp->h_length);
+#endif
     address.sin_family = hp->h_addrtype;
     address.sin_port = port_num;
     if((s = socket(hp->h_addrtype, SOCK_STREAM, 0)) < 0)
