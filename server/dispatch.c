@@ -1,15 +1,22 @@
 /*
- * Copyright (C) 1989 by the Student Information Processing Board of
- * the Massachusetts Institute of Technology.  See
- * mit-sipb-copyright.h for copyright and other info.
+ *
+ *	Copyright (C) 1988, 1989 by the Massachusetts Institute of Technology
+ *    	Developed by the MIT Student Information Processing Board (SIPB).
+ *    	For copying information, see the file mit-copyright.h in this release.
+ *
+ */
+/*
  *
  * dispatch.c  -- Procedure to do the dispatching on an RPC call.
  *		  This contains the procedure table.
  *
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/dispatch.c,v 1.9 1989-01-29 17:16:38 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/dispatch.c,v 1.10 1989-06-03 00:42:47 srz Exp $
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/dispatch.c,v $
  *	$Locker:  $
  *	$Log: not supported by cvs2svn $
+ * Revision 1.9  89/01/29  17:16:38  srz
+ * Added flag routines.
+ * 
  * Revision 1.8  89/01/04  22:18:43  raeburn
  * Added RCS stuff and copyright, fixed include paths.
  * 
@@ -23,7 +30,7 @@
 
 #ifndef lint
 static const char rcsid_dispatch_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/dispatch.c,v 1.9 1989-01-29 17:16:38 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/dispatch.c,v 1.10 1989-06-03 00:42:47 srz Exp $";
 #endif
 
 extern bool recvbool();

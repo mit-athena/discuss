@@ -1,5 +1,12 @@
 /*
  *
+ *	Copyright (C) 1988, 1989 by the Massachusetts Institute of Technology
+ *    	Developed by the MIT Student Information Processing Board (SIPB).
+ *    	For copying information, see the file mit-copyright.h in this release.
+ *
+ */
+/*
+ *
  * atom.c --    File to support the idea of 'atomic' files in C.  These are
  *	        files that support the ideas of coordination and failure
  *		atomicity.  Coordination is handled by using flock on the

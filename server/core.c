@@ -1,26 +1,23 @@
-     /********************************************************************
-      *                                                                  *
-      *         Copyright (c) 1985 by                                    *
-      *            Lewis Makepeace and Stan Zanarotti                    *
-      *                                                                  *
-      *                                                                  *
-      *         All rights reserved.                                     *
-      *                                                                  *
-      ********************************************************************/
-
+/*
+ *
+ *	Copyright (C) 1988, 1989 by the Massachusetts Institute of Technology
+ *    	Developed by the MIT Student Information Processing Board (SIPB).
+ *    	For copying information, see the file mit-copyright.h in this release.
+ *
+ */
 /*
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.25 1989-01-29 17:17:12 srz Exp $
- *
- *	Copyright (C) 1986 by the Massachusetts Institute of Technology
- *
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.26 1989-06-03 00:42:11 srz Exp $
  *
  *
  * core.c --    Routines that are the meat of discuss.  These provide user
  *		callable routines.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.25  89/01/29  17:17:12  srz
+ * Added flag routines.
+ * 
  * Revision 1.24  89/01/04  23:32:51  raeburn
  * fixed include paths
  * 
@@ -69,7 +66,7 @@
  */
 #ifndef lint
 static char rcsid_core_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.25 1989-01-29 17:17:12 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.26 1989-06-03 00:42:11 srz Exp $";
 #endif lint
 
 

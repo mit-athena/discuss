@@ -1,13 +1,22 @@
 /*
- *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl.c,v 1.11 1989-01-04 22:20:45 raeburn Exp $
  *
- *	Copyright (C) 1986 by the Student Information Processing Board
+ *	Copyright (C) 1988, 1989 by the Massachusetts Institute of Technology
+ *    	Developed by the MIT Student Information Processing Board (SIPB).
+ *    	For copying information, see the file mit-copyright.h in this release.
+ *
+ */
+/*
+ *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl.c,v $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl.c,v 1.12 1989-06-03 00:41:20 srz Exp $
  *
  * 	Routines for the manipulation of access control lists in core,
  *	along with routines to move them to and from files.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.11  89/01/04  22:20:45  raeburn
+ * Fixed include path: internal.h doesn't need to be in the discuss
+ * subdirectory.
+ * 
  * Revision 1.10  88/09/23  17:03:09  raeburn
  * Changed type names in accordance with acl.h; used "const" where
  * appropriate.  Also changed include files to use <discuss/discuss.h>
@@ -51,7 +60,7 @@
 
 #ifndef lint
 static const char rcsid_acl_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl.c,v 1.11 1989-01-04 22:20:45 raeburn Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl.c,v 1.12 1989-06-03 00:41:20 srz Exp $";
 #endif lint
 
 #include <stdio.h>

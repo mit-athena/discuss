@@ -1,13 +1,21 @@
 /*
- *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v 1.10 1989-01-04 22:27:42 raeburn Exp $
  *
- *	Copyright (C) 1986 by the Massachusetts Institute of Technology
+ *	Copyright (C) 1988, 1989 by the Massachusetts Institute of Technology
+ *    	Developed by the MIT Student Information Processing Board (SIPB).
+ *    	For copying information, see the file mit-copyright.h in this release.
+ *
+ */
+/*
+ *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v 1.11 1989-06-03 00:41:41 srz Exp $
  *
  *	Routines for use in a server to edit access control lists remotely.
  *	Originally written for the discuss system by Bill Sommerfeld
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.10  89/01/04  22:27:42  raeburn
+ * Fixed includes
+ * 
  * Revision 1.9  88/10/08  01:36:18  raeburn
  * Minor changes: include files, type names.
  * 
@@ -53,7 +61,7 @@
 
 #ifndef lint
 static const char rcsid_acl_core_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v 1.10 1989-01-04 22:27:42 raeburn Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v 1.11 1989-06-03 00:41:41 srz Exp $";
 #endif lint
 
 extern dsc_acl *mtg_acl;

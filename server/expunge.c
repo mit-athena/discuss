@@ -1,5 +1,12 @@
 /*
  *
+ *	Copyright (C) 1988, 1989 by the Massachusetts Institute of Technology
+ *    	Developed by the MIT Student Information Processing Board (SIPB).
+ *    	For copying information, see the file mit-copyright.h in this release.
+ *
+ */
+/*
+ *
  * expunge -- program to expunge a meeting; i.e. really delete those
  *	      deleted transaction.  This program is linked to a server
  *	      so it can use the privileged procedure of create_mtg, and

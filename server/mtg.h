@@ -1,5 +1,12 @@
 /*
  *
+ *	Copyright (C) 1988, 1989 by the Massachusetts Institute of Technology
+ *    	Developed by the MIT Student Information Processing Board (SIPB).
+ *    	For copying information, see the file mit-copyright.h in this release.
+ *
+ */
+/*
+ *
  * mtg.h  -- Include file for things that define the structure of a meeting.
  *
  */

@@ -1,5 +1,12 @@
 /*
  *
+ *	Copyright (C) 1988, 1989 by the Massachusetts Institute of Technology
+ *    	Developed by the MIT Student Information Processing Board (SIPB).
+ *    	For copying information, see the file mit-copyright.h in this release.
+ *
+ */
+/*
+ *
  * recover -- program to recover a meeting from the transaction file.
  *	      this program is linked to a server so it can use the
  *	      privileged procedures of create_mtg, and the like.

@@ -1,9 +1,13 @@
 /*
+ *
+ *	Copyright (C) 1988, 1989 by the Massachusetts Institute of Technology
+ *    	Developed by the MIT Student Information Processing Board (SIPB).
+ *    	For copying information, see the file mit-copyright.h in this release.
+ *
+ */
+/*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.16 1989-06-03 00:36:43 srz Exp $
- *
- *	Copyright (C) 1986 by the Massachusetts Institute of Technology
- *
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.17 1989-06-03 00:42:34 srz Exp $
  *
  *
  * coreutil.c  -- These contain lower-layer, utility type routines to
@@ -11,6 +15,9 @@
  *		  in-memory superblock, and to open & close meetings.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.16  89/06/03  00:36:43  srz
+ * Include file fixups, more efficient Zephyr service.
+ * 
  * Revision 1.15  88/10/13  01:26:29  discuss
  * Fixed Zephyr stuff.  Can you say, "Insufficient documentation?"  -srz
  * 
@@ -67,7 +74,7 @@
 const
 #endif
 static char rcsid_coreutil_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.16 1989-06-03 00:36:43 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.17 1989-06-03 00:42:34 srz Exp $";
 #endif /* lint */
 
 #include <discuss/types.h>
