@@ -1,11 +1,11 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v 1.13 1987-08-08 02:44:15 spook Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v 1.14 1988-01-15 23:20:39 srz Exp $
  *
  */
      
 #ifndef lint
-static char *rcsid_ckm_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v 1.13 1987-08-08 02:44:15 spook Exp $";
+static char *rcsid_ckm_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/ckm.c,v 1.14 1988-01-15 23:20:39 srz Exp $";
 #endif lint
 
 #include <strings.h>
@@ -45,6 +45,8 @@ do_mtg(mtg_name)
 	  if (dsc_public.attending 
 	  && !strcmp(dsc_public.host, nbp ->hostname)
   	  && !strcmp(dsc_public.path, nbp->pathname)) {
+	       dsc_get_mtg_info(&dsc_public.nb,
+				&dsc_public.m_info, &code);
 	       updated = (dsc_public.highest_seen < dsc_public.m_info.last);
 	  } else {
 	       dsc_updated_mtg(nbp, &updated, &code);
