@@ -2,7 +2,7 @@
  *
  * List request for DISCUSS
  *
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.25 1989-05-02 21:09:05 srz Exp $
+ * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.26 1989-05-19 23:23:42 srz Exp $
  * $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v $
  * $Locker:  $
  *
@@ -11,7 +11,7 @@
  */
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.25 1989-05-02 21:09:05 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.26 1989-05-19 23:23:42 srz Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -79,7 +79,7 @@ int *codep;
 
 	(void) sprintf (buffer + strlen (buffer), "%s %s %-15s ",
 			nlines, newtime, t_infop->author);
-	max_len = 80 - strlen (buffer);
+	max_len = 79 - strlen (buffer);
 
 	if (!long_subjects && strlen (t_infop->subject) > max_len)
 	    (void) strcpy (&t_infop->subject [max_len - 3], "...");
