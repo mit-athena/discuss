@@ -1,7 +1,7 @@
 #define	MIN(a,b)	((a)<(b)?(a):(b))
 #include <stdio.h>
 #include "../include/interface.h"
-#include "discuss_err.h"
+#include "../include/discuss_err.h"
 #include "globals.h"
 
 int *chosen_trn_map = (int *)NULL;

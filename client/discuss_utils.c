@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss_utils.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss_utils.c,v 1.4 1986-08-22 00:20:38 spook Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss_utils.c,v 1.5 1986-09-13 20:31:56 srz Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board.
@@ -8,6 +8,9 @@
  *	Utility routines.
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.4  86/08/22  00:20:38  spook
+ * new error-table stuff; separated routines
+ * 
  * Revision 1.3  86/08/01  02:41:59  spook
  * Moved edit() from discuss.c; made edit() ignore SIGINT while waiting
  * for editor process to exit.
@@ -16,7 +19,7 @@
  */
 
 #ifndef lint
-static char *rcsid_discuss_utils_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss_utils.c,v 1.4 1986-08-22 00:20:38 spook Exp $";
+static char *rcsid_discuss_utils_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss_utils.c,v 1.5 1986-09-13 20:31:56 srz Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -27,7 +30,7 @@ static char *rcsid_discuss_utils_c = "$Header: /afs/dev.mit.edu/source/repositor
 #include "../include/tfile.h"
 #include "../include/interface.h"
 #include "../include/config.h"
-#include "discuss_err.h"
+#include "../include/discuss_err.h"
 
 extern ss_request_table discuss_cmds;
 extern int current_trans;
