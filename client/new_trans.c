@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v 1.4 1986-10-29 10:28:40 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v 1.5 1986-11-11 01:53:04 wesommer Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
@@ -8,6 +8,9 @@
  *	New-transaction routine for DISCUSS.  (Request 'talk'.)
  *
  *      $Log: not supported by cvs2svn $
+ * Revision 1.4  86/10/29  10:28:40  srz
+ * Miscellaneous cleanup.
+ * 
  * Revision 1.3  86/10/19  10:00:13  spook
  * Changed to use dsc_ routines; eliminate refs to rpc.
  * 
@@ -22,7 +25,7 @@
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v 1.4 1986-10-29 10:28:40 srz Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/new_trans.c,v 1.5 1986-11-11 01:53:04 wesommer Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -43,6 +46,7 @@ static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athe
 #endif	lint
 
 extern tfile	unix_tfile();
+extern char *gets();
 
 new_trans(sci_idx, argc, argv)
 	int sci_idx;
@@ -63,6 +67,13 @@ new_trans(sci_idx, argc, argv)
 		(void) fprintf(stderr, "Usage:  %s\n", argv[0]);
 		return;
 	}
+	/*
+	 * Sanity check on access control; this could be changed on the fly
+	 * (which is why it is only a warning)
+	 */
+	if(!acl_is_subset("w", dsc_public.m_info.access_modes))
+		(void) fprintf(stderr, "Warning: meeting is read-only (enter will fail).\n");
+
 	(void) printf("Subject: ");
 	if (gets(subject) == (char *)NULL) {
 		(void) fprintf(stderr, "Error reading subject.\n");
