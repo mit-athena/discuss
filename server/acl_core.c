@@ -7,12 +7,15 @@
  */
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v 1.11 1989-06-03 00:41:41 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v 1.12 1993-04-29 17:05:47 miki Exp $
  *
  *	Routines for use in a server to edit access control lists remotely.
  *	Originally written for the discuss system by Bill Sommerfeld
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.11  89/06/03  00:41:41  srz
+ * Added standard copyright notice.
+ * 
  * Revision 1.10  89/01/04  22:27:42  raeburn
  * Fixed includes
  * 
@@ -58,10 +61,19 @@
 #include <sys/param.h>
 #include <string.h>
 #include "ansi.h"
-
+#ifdef SOLARIS
+#include <fcntl.h>
+/*
+ * flock operations.
+ */
+#define LOCK_SH               1       /* shared lock */
+#define LOCK_EX               2       /* exclusive lock */
+#define LOCK_NB               4       /* don't block when locking */
+#define LOCK_UN               8       /* unlock */
+#endif
 #ifndef lint
 static const char rcsid_acl_core_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v 1.11 1989-06-03 00:41:41 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/acl_core.c,v 1.12 1993-04-29 17:05:47 miki Exp $";
 #endif lint
 
 extern dsc_acl *mtg_acl;
