@@ -1,9 +1,12 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.11 1987-04-12 07:54:54 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.12 1987-04-19 22:15:21 srz Exp $
  *	$Locker:  $
  *
  *	$Log: not supported by cvs2svn $
+ * Revision 1.11  87/04/12  07:54:54  wesommer
+ * Fixed bug: crashed when deleting meeting that wasn't known.
+ * 
  * Revision 1.10  87/04/09  00:11:39  rfrench
  * Fixed to handle new format meeting announcements.
  * 
@@ -38,7 +41,7 @@
  */
 
 #ifndef lint
-static char *rcsid_addmtg_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.11 1987-04-12 07:54:54 wesommer Exp $";
+static char *rcsid_addmtg_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/addmtg.c,v 1.12 1987-04-19 22:15:21 srz Exp $";
 #endif lint
 
 #include <strings.h>
@@ -303,7 +306,7 @@ add_the_mtg(host,nb,tran,code)
 	nb->last = 0;
 	/* see if we're already attending... */
 	for (j = 0,nbp = set; j < num; j++,nbp++) {
-		if (!strcmp (nbp ->hostname, nb->hostname) && !strcmp(nbp->pathname, nb->pathname)) {
+		if (!namcmp (nbp ->hostname, nb->hostname) && !strcmp(nbp->pathname, nb->pathname)) {
 			nb->date_attended = nbp -> date_attended;
 			nb->last = nbp -> last;
 			if (!strcmp (nbp->aliases[0], nb->aliases[0])) {
