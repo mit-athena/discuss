@@ -1,6 +1,6 @@
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.18 1986-11-16 06:16:09 wesommer Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.19 1986-11-17 00:58:05 spook Exp $
  *	$Locker:  $
  *
  *	Copyright (C) 1986 by the Student Information Processing Board
@@ -9,6 +9,9 @@
  *	ss library for the command interpreter.
  *
  *      $Log: not supported by cvs2svn $
+ * Revision 1.18  86/11/16  06:16:09  wesommer
+ * Added call to init_acl_err_tbl.
+ * 
  * Revision 1.17  86/11/11  01:49:11  wesommer
  * Added access control warning on reply.
  * Added access control flags on entry to meetings: chairmen are told
@@ -68,7 +71,7 @@
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.18 1986-11-16 06:16:09 wesommer Exp $";
+static char *rcsid_discuss_c = "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/discuss.c,v 1.19 1986-11-17 00:58:05 spook Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -115,8 +118,42 @@ main(argc, argv)
 {
 	int sci_idx;
 	int code;
+	char *initial_meeting = (char *)NULL;
+	char *subsystem_name = "discuss";
+	char *initial_request = (char *)NULL;
+	int quit = 0;		/* quit after processing request */
 
-	sci_idx = ss_create_invocation("discuss", CURRENT_VERSION,
+	while (++argv, --argc) {
+		if (!strcmp(*argv, "-subsystem_name") || !strcmp(*argv, "-ssn")) {
+			if (argc == 1) {
+				fprintf(stderr, "No argument supplied with -subsystem_name\n");
+				exit(1);
+			}
+			argc--; argv++;
+			subsystem_name = *argv;
+		}
+		else if (!strcmp(*argv, "-request") || !strcmp(*argv, "-rq")) {
+			if (argc == 1) {
+				fprintf(stderr, "No string supplied with -request.\n");
+				exit(1);
+			}
+			argc--; argv++;
+			initial_request = *argv;
+		}
+		else if (!strcmp(*argv, "-quit"))
+			quit = 1;
+		else if (!strcmp(*argv, "-no_quit"))
+			quit = 0;
+		else if (**argv == '-') {
+			fprintf(stderr, "Unknown control argument %s\n",
+				*argv);
+			exit(1);
+		}
+		else
+			initial_meeting = *argv;
+	}
+
+	sci_idx = ss_create_invocation(subsystem_name, CURRENT_VERSION,
 				       (char *)NULL, &discuss_cmds, &code);
 	if (code) {
 		ss_perror(sci_idx, code, "creating invocation");
@@ -130,19 +167,24 @@ main(argc, argv)
 
 	init_disc_err_tbl();
 	init_dsc_err_tbl();
-	init_acl_err_tbl();
 
 	temp_file = malloc(64);
 	pgm = malloc(64);
 	(void) sprintf(temp_file, "/tmp/mtg%d.%d", getuid(), getpid());
 
-	if (argc != 1) {
-		(void) sprintf(buffer, "goto %s", argv[1]);
+	if (initial_meeting != (char *)NULL) {
+		(void) sprintf(buffer, "goto %s", initial_meeting);
 		ss_execute_line(sci_idx, buffer, &code);
 		if (code != 0)
-			ss_perror(sci_idx, code, argv[1]);
+			ss_perror(sci_idx, code, initial_meeting);
 	}
-	ss_listen (sci_idx, &code);
+	if (initial_request != (char *)NULL) {
+		ss_execute_line(sci_idx, initial_request, &code);
+		if (code != 0)
+			ss_perror(sci_idx, code, initial_request);
+	}
+	if (!quit || code)
+		ss_listen (sci_idx, &code);
 	(void) unlink(temp_file);
 	leave_mtg();				/* clean up after ourselves */
 }
