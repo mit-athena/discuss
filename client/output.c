@@ -7,7 +7,7 @@
  */
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/output.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/output.c,v 1.12 1989-06-02 23:38:04 srz Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/output.c,v 1.13 1990-02-24 18:51:30 srz Exp $
  *	$Locker:  $
  *
  *	Utility routines.
@@ -16,7 +16,7 @@
 
 #ifndef lint
 static char rcsid_discuss_utils_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/output.c,v 1.12 1989-06-02 23:38:04 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/output.c,v 1.13 1990-02-24 18:51:30 srz Exp $";
 #endif lint
 
 #include <stdio.h>
@@ -34,7 +34,7 @@ extern char *pgm;
 extern char *malloc(), *getenv(), *short_time();
 
 output_trans(tinfop, tf, code)
-	trn_info2 *tinfop;
+	trn_info3 *tinfop;
 	tfile tf;
 	int *code;
 {
@@ -53,10 +53,18 @@ output_trans(tinfop, tf, code)
 	else
 		plural = "";
      
-	(void) sprintf (line, "[%04d] %s  %s  %s (%d line%s)\n",
-			tinfop->current, tinfop->author,
-			dsc_public.m_info.long_name,
-			newtime, tinfop->num_lines, plural);
+	if (tinfop -> signature != NULL && *(tinfop -> signature) != '\0' &&
+	     strcmp(tinfop -> signature, tinfop->author)) {
+	     (void) sprintf (line, "[%04d] %s (%s)  %s  %s (%d line%s)\n",
+			     tinfop->current, tinfop->author,
+			      tinfop->signature, dsc_public.m_info.long_name,
+			     newtime, tinfop->num_lines, plural);
+	} else {
+	     (void) sprintf (line, "[%04d] %s  %s  %s (%d line%s)\n",
+			     tinfop->current, tinfop->author,
+			     dsc_public.m_info.long_name,
+			     newtime, tinfop->num_lines, plural);
+	}
 	twrite (tf, line, strlen (line), code);
 	if (tinfop->subject [0] != '\0') {
 		twrite (tf, "Subject: ", 9, code);
