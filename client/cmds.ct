@@ -59,6 +59,9 @@
 	request		del_mtg, "Delete meeting from list of those to be searched.",
 			delete_meeting, del_mtg, del_meeting, delete_mtg, dm;
 
+	request		announce_mtg, "Announce a meeting's existance",
+			announce_meeting, ann_mtg, announce_mtg, ann_meeting, anm;
+
 	request		list_acl, "List access control list.",
 			list_acl, la;
 
