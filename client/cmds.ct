@@ -83,6 +83,9 @@
 	request		rn, "Print new transactions in changed meetings.",
 			read_new, rn;
 
+	request		set_cmd, "Set options.",
+			set;
+
 	request		ss_list_requests, "List available commands.",
 			list_requests, lr, "?";
 
