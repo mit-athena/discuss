@@ -6,7 +6,7 @@
  *
  */
 /*
- *	$Id: crmtgs.c,v 1.5 1999-01-22 23:10:08 ghudson Exp $
+ *	$Id: crmtgs.c,v 1.6 1999-04-11 19:16:35 danw Exp $
  *
  *	Fill out a .meetings file with the primary name of all the
  *	meetings in it.  This requires that the meeting be accessible
@@ -17,7 +17,7 @@
 
 #ifndef lint
 static char rcsid_crmtgs_c[] =
-    "$Id: crmtgs.c,v 1.5 1999-01-22 23:10:08 ghudson Exp $";
+    "$Id: crmtgs.c,v 1.6 1999-04-11 19:16:35 danw Exp $";
 #endif /* lint */
 
 #include <discuss/discuss.h>
@@ -38,7 +38,7 @@ main(argc, argv)
 	
 	init_dsc_err_tbl();
 
-	dsc_expand_mtg_set(getenv("USER"), "*", &set, &n_matches, &code);
+	dsc_expand_mtg_set(NULL, "*", &set, &n_matches, &code);
 
 	if (code)
 		punt_code("Can't expand meeting set", code);
@@ -76,7 +76,7 @@ main(argc, argv)
 		} else printf("Long name %s already present\n", 
 			      info.long_name);
 	}
-	dsc_update_mtg_set(getenv("USER"), set, n_matches, &code);
+	dsc_update_mtg_set(NULL, set, n_matches, &code);
 	if (code)
 		punt_code("update_mtg_set failed", code);
 }
