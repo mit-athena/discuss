@@ -7,7 +7,7 @@
  */
 /*
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.27 1997-01-28 11:08:51 ghudson Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.28 1998-05-05 19:18:38 ghudson Exp $
  *
  *
  * coreutil.c  -- These contain lower-layer, utility type routines to
@@ -15,6 +15,11 @@
  *		  in-memory superblock, and to open & close meetings.
  *
  *	$Log: not supported by cvs2svn $
+ *	Revision 1.27  1997/01/28 11:08:51  ghudson
+ *	From kretch and srz: use F_SETLKW instead of F_SETLK when setting locks,
+ *	so we wait instead of bombing out.  In start_read(), use a non-exclusive
+ *	lock.
+ *
  *	Revision 1.26  1994/06/04 15:14:46  cfields
  *	But declare it if ZEPHYR isn't defined.
  *	This is not the best fix necessarily, but it's known safe to me.
@@ -108,7 +113,7 @@
 const
 #endif
 static char rcsid_coreutil_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.27 1997-01-28 11:08:51 ghudson Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/coreutil.c,v 1.28 1998-05-05 19:18:38 ghudson Exp $";
 #endif /* lint */
 
 #include <discuss/types.h>
@@ -144,6 +149,7 @@ bool nuclear = FALSE;		/* Using atomic reads/writes */
 afile a_control_f = NULL;	/* radioactive file descriptor */
 tfile abort_file = NULL;	/* close this on abort */
 bool  read_lock = FALSE;	/* have lock on u_control_f */
+bool  mtg_swapped = FALSE;	/* current meeting is swapped */
 dsc_acl   *mtg_acl = NULL;	/* current mtg acl */
 int 	last_acl_mod;		/* last mod to ACL */
 mtg_super super;
@@ -292,6 +298,13 @@ char *mtg_name;
      }
 
      read (u_trn_f, (char *) &tb, sizeof (trn_base));
+     if (tb.unique == TRN_BASE_UNIQUE_SWAP) {
+	  swap_trn_base(&tb);
+	  mtg_swapped = TRUE;
+     } else {
+	  mtg_swapped = FALSE;
+     }
+
      if (tb.unique != TRN_BASE_UNIQUE) {
 	  result = INCONSISTENT;
 	  goto punt;
@@ -323,8 +336,14 @@ int read_super()
 	     read (u_control_f, (char *) &super, sizeof (super));
      }
 
-     if (super.unique != MTG_SUPER_UNIQUE)
-	  return (INCONSISTENT);
+     if (!mtg_swapped) {
+	  if (super.unique != MTG_SUPER_UNIQUE)
+	       return (INCONSISTENT);
+     } else {
+	  if (super.unique != MTG_SUPER_UNIQUE_SWAP)
+	       return (INCONSISTENT);
+	  swap_super(&super);
+     }
 
      if (super.version != MTG_SUPER_1)
 	  return (NEW_VERSION);
@@ -348,6 +367,8 @@ int read_super()
 write_super ()
 {
      int sc_len, sl_len;
+     int slong_name_len, slong_name_addr;
+     int schairman_len, schairman_addr;
 
      sc_len = strlen (super_chairman)+1;
      sl_len = strlen (super_long_name)+1;
@@ -359,17 +380,26 @@ write_super ()
 	  super.chairman_len = sc_len;
      }
 
+     /* Copy into locals to avoid swapping */
+     slong_name_len = super.long_name_len;
+     slong_name_addr = super.long_name_addr;
+     schairman_len = super.chairman_len;
+     schairman_addr = super.chairman_addr;
+
+     if (mtg_swapped)
+	  swap_super(&super);
+
      if (nuclear) {
 	  awrite (a_control_f, (char *) &super, sizeof (super), 0);
-	  awrite (a_control_f, super_long_name, super.long_name_len, super.long_name_addr);
-	  awrite (a_control_f, super_chairman, super.chairman_len, super.chairman_addr);
+	  awrite (a_control_f, super_long_name, slong_name_len, slong_name_addr);
+	  awrite (a_control_f, super_chairman, schairman_len, schairman_addr);
      } else {
 	  lseek (u_control_f, (long)0, 0);
 	  write (u_control_f, (char *)  &super, sizeof (super));
-	  lseek (u_control_f, (long)super.long_name_addr, 0);
-	  write (u_control_f, super_long_name, super.long_name_len);
-	  lseek (u_control_f, (long)super.chairman_addr, 0);
-	  write (u_control_f, super_chairman, super.chairman_len);
+	  lseek (u_control_f, (long)slong_name_addr, 0);
+	  write (u_control_f, super_long_name, slong_name_len);
+	  lseek (u_control_f, (long)schairman_addr, 0);
+	  write (u_control_f, super_chairman, schairman_len);
      }
 
      free (super_chairman);
@@ -483,6 +513,9 @@ chain_blk *cb;
 	  read (u_control_f, (char *) cb, sizeof (chain_blk));
      }
 
+     if (mtg_swapped)
+	  swap_chain(cb);
+
      if (cb -> unique != CHAIN_BLK_UNIQUE || cb -> current != trn)
 	  return (INCONSISTENT);
 
@@ -501,16 +534,27 @@ chain_blk *cb;
      if (cbaddr == 0)
 	  return (NO_SUCH_TRN);
 
+     if (mtg_swapped)
+	  swap_chain(cb);
+
      if (nuclear) {
-	  if (awrite (a_control_f, (char *) cb, sizeof (chain_blk), cbaddr) != sizeof (chain_blk))
+	  if (awrite (a_control_f, (char *) cb, sizeof (chain_blk), cbaddr) != sizeof (chain_blk)) {
+	       if (mtg_swapped)
+		    swap_chain(cb);
 	       return (NO_WRITE);
+	  }
      }
      else {
 	  lseek (u_control_f, (long)cbaddr, 0);
-	  if (write (u_control_f, (char *) cb, sizeof (chain_blk)) != sizeof (chain_blk))
+	  if (write (u_control_f, (char *) cb, sizeof (chain_blk)) != sizeof (chain_blk)) {
+	       if (mtg_swapped)
+		    swap_chain(cb);
 	       return (NO_WRITE);
+	  }
      }
 
+     if (mtg_swapped)
+	  swap_chain(cb);
      return (0);
 }
 
@@ -528,6 +572,9 @@ char **th_subject, **th_author, **th_signature;
 
      lseek (u_trn_f, (long)trn_addr, 0);
      read (u_trn_f, (char *) th, sizeof (trn_hdr));
+
+     if (mtg_swapped)
+	  swap_trn(th);
 
      if (th -> unique != TRN_HDR_UNIQUE)
 	  return (INCONSISTENT);
@@ -799,3 +846,95 @@ void mtg_znotify(mtg_name, subject, author, signature)
 	}
 }
 #endif /* ZEPHYR */
+
+static unsigned long swap_32(val)
+unsigned long val;
+{
+     unsigned char b1 = (val >> 24) & 0xff;
+     unsigned char b2 = (val >> 16) & 0xff;
+     unsigned char b3 = (val >> 8) & 0xff;
+     unsigned char b4 = val & 0xff;
+
+     return ((b4 << 24) | (b3 << 16) | (b2 << 8) | b1);
+}
+
+static unsigned int swap_16(val)
+unsigned int val;
+{
+     unsigned char b1 = (val >> 8) & 0xff;
+     unsigned char b2 = val & 0xff;
+
+     return ((b2 << 8) | b1);
+}
+
+swap_super(superp)
+mtg_super *superp;
+{
+     superp->version = swap_32(superp->version);
+     superp->unique = swap_32(superp->unique);
+     superp->first = swap_32(superp->first);
+     superp->last = swap_32(superp->last);
+     superp->lowest = swap_32(superp->lowest);
+     superp->highest = swap_32(superp->highest);
+     superp->highest_chain = swap_32(superp->highest_chain);
+     superp->date_created = swap_32(superp->date_created);
+     superp->date_modified = swap_32(superp->date_modified);
+     superp->long_name_addr = swap_32(superp->long_name_addr);
+     superp->chairman_addr = swap_32(superp->chairman_addr);
+     superp->long_name_len = swap_16(superp->long_name_len);
+     superp->chairman_len = swap_16(superp->chairman_len);
+     superp->flags = swap_16(superp->flags);
+     superp->chain_start = swap_32(superp->chain_start);
+     superp->high_water = swap_32(superp->high_water);
+     superp->trn_fsize = swap_32(superp->trn_fsize);
+     superp->highest_trn_addr = swap_32(superp->highest_trn_addr);
+}
+
+swap_chain(cbp)
+chain_blk *cbp;
+{
+     cbp->version = swap_32(cbp->version);
+     cbp->unique = swap_32(cbp->unique);
+     cbp->current = swap_32(cbp->current);
+     cbp->prev = swap_32(cbp->prev);
+     cbp->next = swap_32(cbp->next);
+     cbp->pref = swap_32(cbp->pref);
+     cbp->nref = swap_32(cbp->nref);
+     cbp->trn_chain = swap_32(cbp->trn_chain);
+     cbp->trn_addr = swap_32(cbp->trn_addr);
+     cbp->flags = swap_16(cbp->flags);
+     cbp->filler = swap_16(cbp->filler);
+     cbp->chain_fref = swap_32(cbp->chain_fref);
+     cbp->chain_lref = swap_32(cbp->chain_lref);
+}
+
+swap_trn_base(tbp)
+trn_base *tbp;
+{
+     tbp->version = swap_32(tbp->version);
+     tbp->unique = swap_32(tbp->unique);
+     tbp->date_created = swap_32(tbp->date_created);
+     tbp->long_name_addr = swap_32(tbp->long_name_addr);
+     tbp->chairman_addr = swap_32(tbp->chairman_addr);
+     tbp->long_name_len = swap_16(tbp->long_name_len);
+     tbp->chairman_len = swap_16(tbp->chairman_len);
+     tbp->public_flag = swap_16(tbp->public_flag);
+}
+
+swap_trn(thp)
+trn_hdr *thp;
+{
+     thp->version = swap_32(thp->version);
+     thp->unique = swap_32(thp->unique);
+     thp->current = swap_32(thp->current);
+     thp->orig_pref = swap_32(thp->orig_pref);
+     thp->date_entered = swap_32(thp->date_entered);
+     thp->num_lines = swap_32(thp->num_lines);
+     thp->num_chars = swap_32(thp->num_chars);
+     thp->prev_trn = swap_32(thp->prev_trn);
+     thp->subject_addr = swap_32(thp->subject_addr);
+     thp->author_addr = swap_32(thp->author_addr);
+     thp->text_addr = swap_32(thp->text_addr);
+     thp->subject_len = swap_16(thp->subject_len);
+     thp->author_len = swap_16(thp->author_len);
+}

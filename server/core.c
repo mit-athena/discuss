@@ -8,13 +8,16 @@
 /*
  *
  *	$Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v $
- *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.35 1996-09-19 22:32:23 ghudson Exp $
+ *	$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.36 1998-05-05 19:18:34 ghudson Exp $
  *
  *
  * core.c --    Routines that are the meat of discuss.  These provide user
  *		callable routines.
  *
  *	$Log: not supported by cvs2svn $
+ *	Revision 1.35  1996/09/19 22:32:23  ghudson
+ *	BSD -> ANSI string and memory functions
+ *
  *	Revision 1.34  1994/03/25 17:21:46  miki
  *	chnaged index to strchr
  *
@@ -109,7 +112,7 @@
  */
 #ifndef lint
 static char rcsid_core_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.35 1996-09-19 22:32:23 ghudson Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/server/core.c,v 1.36 1998-05-05 19:18:34 ghudson Exp $";
 #endif lint
 
 
@@ -151,6 +154,7 @@ extern char *super_long_name;
 extern char current_mtg [];
 extern int u_trn_f,u_control_f,u_acl_f;
 extern bool nuclear;
+extern bool mtg_swapped;
 extern afile a_control_f;
 extern char rpc_caller [];
 extern int errno;
@@ -222,7 +226,6 @@ int *result;
      int tfs,tocopy,i,len;
      char buffer[512],*bptr,*cp;
      trn_hdr th;
-     
 
 /*   printf ("add_trn:  mtg %s, subject %s, reply %d\n",
 	     mtg_name, subject, reply_trn); */
@@ -370,8 +373,14 @@ int *result;
      th.author_addr = th.subject_addr + th.subject_len;
      th.text_addr = th.author_addr + th.author_len;
 
+     if (mtg_swapped)
+	  swap_trn(&th);
+
      lseek (u_trn_f, (long)0, 2);
      if (write (u_trn_f, (char *) &th, sizeof (th)) != sizeof (th)) goto werror;
+
+     if (mtg_swapped)					/* Swap it back */
+	  swap_trn(&th);
 
      if (write (u_trn_f, subject, th.subject_len) != th.subject_len) goto werror;
      if (signature == NULL) {
@@ -398,6 +407,9 @@ int *result;
 
      tclose(source_file,result);
      abort_file = NULL;
+
+     if (mtg_swapped)
+	  swap_trn(&th);
 
      lseek(u_trn_f, (long)(cb.trn_addr), 0);
      if (write (u_trn_f, (char *) &th, sizeof (trn_hdr)) != sizeof (trn_hdr)) goto werror;	/* update num_lines */
@@ -1293,6 +1305,8 @@ int *result;
 	  return;
      }
 
+     mtg_swapped = FALSE;
+
      /* Initialize super-block */
      super.version = MTG_SUPER_1;
      super.unique = MTG_SUPER_UNIQUE;
@@ -1656,6 +1670,9 @@ int *result;
      lseek (uf, (long)0, 0);
      read (uf, (char *) &mysuper, sizeof (mysuper));
      close(uf);
+
+     if (mysuper.unique == MTG_SUPER_UNIQUE_SWAP)
+	  swap_super(&mysuper);
 
      *updated = (mysuper.last > last);
      if (mysuper.highest < last)

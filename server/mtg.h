@@ -69,8 +69,9 @@ typedef struct {
 /* version number */
 #define MTG_SUPER_1 1
 
-/* unique number */
+/* unique number and its byte-swapped equivalent */
 #define MTG_SUPER_UNIQUE 100866
+#define MTG_SUPER_UNIQUE_SWAP 42598656
 
 
 /*
@@ -134,6 +135,8 @@ typedef struct {
 
 #define TRN_BASE_1 1
 #define TRN_BASE_UNIQUE 070476
+#define TRN_BASE_UNIQUE_SWAP 07634200000 /* byte-swapped version of
+					  * TRN_BASE_UNIQUE */
 
 /*
  *
