@@ -2,7 +2,7 @@
  *
  * List request for DISCUSS
  *
- * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.21 1989-03-27 02:18:49 srz Exp $
+ * $Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.22 1989-03-28 15:54:59 raeburn Exp $
  * $Source: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v $
  * $Locker:  $
  *
@@ -11,13 +11,13 @@
  */
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.21 1989-03-27 02:18:49 srz Exp $";
+    "$Header: /afs/dev.mit.edu/source/repository/athena/bin/discuss/client/list.c,v 1.22 1989-03-28 15:54:59 raeburn Exp $";
 #endif lint
 
 #include <stdio.h>
 #include <string.h>
 #include <sys/param.h>		/* for MIN() */
-#include "ss.h"
+#include <ss/ss.h>
 #include "config.h"
 #include <discuss/discuss.h>
 #include "globals.h"
@@ -67,7 +67,7 @@ int *codep;
 	    dsc_public.current = t_infop->current; /* current = first */
 	}
 
-	strcpy(newtime, short_time(t_infop->date_entered));
+	strcpy(newtime, short_time(&t_infop->date_entered));
 	/*
 	 * If author ends with current realm, punt the realm.
 	 */
