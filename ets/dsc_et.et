@@ -75,4 +75,7 @@
 	ec	NO_SUPPORT,
 		"Server does not support this operation"
 
+	ec	MTG_MOVED,
+		"The meeting has moved"
+
 	end
