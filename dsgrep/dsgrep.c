@@ -8,7 +8,7 @@
 
 #ifndef lint
 #ifndef SABER
-static char *RCSid = "$Id: dsgrep.c,v 1.18 2001-04-10 01:54:45 ghudson Exp $";
+static char *RCSid = "$Id: dsgrep.c,v 1.19 2002-11-11 18:25:04 ghudson Exp $";
 #endif
 #endif
 
@@ -123,7 +123,7 @@ main(argc,argv)
     }
 
   if (regexp_str) {
-    flags = REG_NOSUB | (case_insens ? REG_ICASE : 0);
+    flags = REG_NOSUB | REG_EXTENDED | (case_insens ? REG_ICASE : 0);
     if (regcomp(&search_re, regexp_str, flags) != 0) {
       fprintf(stderr,"dsgrep: Invalid regular expression %s\n",regexp_str);
       exit(1);
