@@ -67,10 +67,10 @@
 		"No such user on this system"
 
 	ec	CANT_WRITE_TEMP,
-		"Can't write temporary file"
+		"Cannot write temporary file"
 
 	ec	CANT_ATTEND,
-		"Insufficent access to attend meeting"
+		"Insufficient access to attend meeting"
 
 	ec	NO_SUPPORT,
 		"Server does not support this operation"
