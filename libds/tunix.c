@@ -7,7 +7,7 @@
  */
 /*
  *
- *	$Id: tunix.c,v 1.8 1999-02-08 14:47:13 danw Exp $
+ *	$Id: tunix.c,v 1.9 2006-03-10 07:11:38 ghudson Exp $
  *
  * tunix.c -- procedures to have tfiles work from unix files.
  *
@@ -15,7 +15,7 @@
  */
 #ifndef lint
 static char rcsid_tunix_c[] =
-    "$Id: tunix.c,v 1.8 1999-02-08 14:47:13 danw Exp $";
+    "$Id: tunix.c,v 1.9 2006-03-10 07:11:38 ghudson Exp $";
 #endif /* lint */
 
 #define min(A, B) ((A) < (B) ? (A) : (B))
@@ -24,16 +24,13 @@ static char rcsid_tunix_c[] =
 #define SUCCESS 1
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <discuss/tfile.h>
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 
 #define NL '\n'
-
-char *malloc();
-
-extern int errno;
 
 struct tunix_state {
      char last_char;

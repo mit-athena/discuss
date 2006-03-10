@@ -6,21 +6,22 @@
  *
  */
 /*
- *	$Id: list_acl.c,v 1.13 1999-02-08 14:46:49 danw Exp $
+ *	$Id: list_acl.c,v 1.14 2006-03-10 07:11:31 ghudson Exp $
  *
  */
 
 #ifndef lint
 static char rcsid_list_acl_c[] =
-    "$Id: list_acl.c,v 1.13 1999-02-08 14:46:49 danw Exp $";
+    "$Id: list_acl.c,v 1.14 2006-03-10 07:11:31 ghudson Exp $";
 #endif /* lint */
 
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <discuss/discuss.h>
 #include "globals.h"
 
-extern char *malloc(), *error_message(), *local_realm();
+extern char *local_realm();
 
 list_acl(argc, argv)
 	int argc;

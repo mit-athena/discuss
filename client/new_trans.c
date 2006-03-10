@@ -6,7 +6,7 @@
  *
  */
 /*
- *	$Id: new_trans.c,v 1.29 1999-02-08 14:46:50 danw Exp $
+ *	$Id: new_trans.c,v 1.30 2006-03-10 07:11:31 ghudson Exp $
  *
  *	New-transaction routine for DISCUSS.  (Request 'talk'.)
  *
@@ -15,7 +15,7 @@
 
 #ifndef lint
 static char rcsid_discuss_c[] =
-     "$Id: new_trans.c,v 1.29 1999-02-08 14:46:50 danw Exp $";
+     "$Id: new_trans.c,v 1.30 2006-03-10 07:11:31 ghudson Exp $";
 #endif /* lint */
 
 #include <stdio.h>
@@ -38,7 +38,6 @@ static char rcsid_discuss_c[] =
 #endif	/* lint */
 
 extern tfile	unix_tfile();
-extern char *gets(), *error_message();
 extern void flag_interrupts(), dont_flag_interrupts();
 
 new_trans(argc, argv)
@@ -87,7 +86,7 @@ new_trans(argc, argv)
 
      if (mtg) {
 	  (void) sprintf(buffer, "goto %s", mtg);
-	  ss_execute_line(sci_idx, buffer, &code);
+	  code = ss_execute_line(sci_idx, buffer);
 	  if (code != 0) {
 	       ss_perror(sci_idx, code, buffer);
 	       goto punt;

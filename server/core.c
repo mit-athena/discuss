@@ -7,7 +7,7 @@
  */
 /*
  *
- *	$Id: core.c,v 1.41 2002-04-06 15:18:55 zacheiss Exp $
+ *	$Id: core.c,v 1.42 2006-03-10 07:11:40 ghudson Exp $
  *
  *
  * core.c --    Routines that are the meat of discuss.  These provide user
@@ -16,7 +16,7 @@
  */
 #ifndef lint
 static char rcsid_core_c[] =
-    "$Id: core.c,v 1.41 2002-04-06 15:18:55 zacheiss Exp $";
+    "$Id: core.c,v 1.42 2006-03-10 07:11:40 ghudson Exp $";
 #endif /* lint */
 
 
@@ -36,6 +36,7 @@ static char rcsid_core_c[] =
 #include <sys/stat.h>
 #include <sys/param.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #if HAVE_FCNTL_H
 #include <fcntl.h>
@@ -45,9 +46,7 @@ static char rcsid_core_c[] =
 #ifndef min
 #define min(a, b) (a < b ? a : b)
 #endif
-extern char *malloc();
 extern char *new_string();
-extern long time();
 
 extern mtg_super super;
 extern char *super_chairman;

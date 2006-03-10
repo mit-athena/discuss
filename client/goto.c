@@ -6,7 +6,7 @@
  *
  */
 /*
- *	$Id: goto.c,v 1.21 1999-02-08 14:46:48 danw Exp $
+ *	$Id: goto.c,v 1.22 2006-03-10 07:11:31 ghudson Exp $
  *
  *	Code for "goto" request in discuss.
  *
@@ -14,10 +14,11 @@
 
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Id: goto.c,v 1.21 1999-02-08 14:46:48 danw Exp $";
+    "$Id: goto.c,v 1.22 2006-03-10 07:11:31 ghudson Exp $";
 #endif /* lint */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <sys/file.h>
 #include <signal.h>
 #include <string.h>
@@ -43,7 +44,6 @@ extern ss_request_table discuss_cmds;
 
 /* EXTERNAL ROUTINES */
 
-char	*malloc(), *getenv(), *gets(), *ctime(), *error_message();
 tfile	unix_tfile();
 void	leave_mtg ();
 

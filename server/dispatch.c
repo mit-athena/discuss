@@ -10,9 +10,10 @@
  * dispatch.c  -- Procedure to do the dispatching on an RPC call.
  *		  This contains the procedure table.
  *
- *	$Id: dispatch.c,v 1.12 1999-01-22 23:10:17 ghudson Exp $
+ *	$Id: dispatch.c,v 1.13 2006-03-10 07:11:40 ghudson Exp $
  */
 
+#include <stdlib.h>
 #include "rpc.h"
 #include <discuss/interface.h>
 #include <discuss/tfile.h>
@@ -21,13 +22,12 @@
 
 #ifndef lint
 static const char rcsid_dispatch_c[] =
-    "$Id: dispatch.c,v 1.12 1999-01-22 23:10:17 ghudson Exp $";
+    "$Id: dispatch.c,v 1.13 2006-03-10 07:11:40 ghudson Exp $";
 #endif
 
 extern bool recvbool();
 extern char *recvstr();
 extern tfile recvfile();
-extern char *malloc();
 extern char rpc_caller [];
 struct proc_table procs[] = {
      0, {0, 0, 0, 0, 0, 0, 0, 0},					/* unused */

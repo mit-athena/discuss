@@ -6,7 +6,7 @@
  *
  */
 /*
- *	$Id: dsname.c,v 1.28 1999-04-11 19:15:39 danw Exp $
+ *	$Id: dsname.c,v 1.29 2006-03-10 07:11:38 ghudson Exp $
  *
  */
 
@@ -16,6 +16,7 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #if HAVE_UNISTD_H
 #include <unistd.h>
@@ -31,11 +32,10 @@
 
 #ifndef lint
 static const char rcsid_dsname_c[] =
-    "$Id: dsname.c,v 1.28 1999-04-11 19:15:39 danw Exp $";
+    "$Id: dsname.c,v 1.29 2006-03-10 07:11:38 ghudson Exp $";
 #endif
 
-extern char *malloc (), *local_realm (), *getenv ();
-extern int errno;
+extern char *local_realm ();
 
 /*
  * Format of data file:
@@ -296,7 +296,6 @@ static int is_a_name(name)
 static char ** expand(list)
     char *list;
 {
-    char *calloc();
     register int num = 2;
     register char *cp;
     register char **rv, **rv1;

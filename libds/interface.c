@@ -6,18 +6,19 @@
  *
  */
 /*
- *	$Id: interface.c,v 1.30 2001-02-28 20:44:21 ghudson Exp $
+ *	$Id: interface.c,v 1.31 2006-03-10 07:11:38 ghudson Exp $
  *
  */
 
 #ifndef lint
 static char rcsid_interface_c[] =
-    "$Id: interface.c,v 1.30 2001-02-28 20:44:21 ghudson Exp $";
+    "$Id: interface.c,v 1.31 2006-03-10 07:11:38 ghudson Exp $";
 static char copyright[] =
     "Copyright (C) 1989 by the Massachusetts Institute of Technology";
 #endif /* lint */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <errno.h>
 #include <discuss/tfile.h>
@@ -40,10 +41,6 @@ typedef struct _meeting {
 	char *host, *path;
 	char *module;
 } meeting;
-
-extern char *malloc();
-extern int errno;
-extern int com_err();
 
 static int (*warning_hook)() = 0;
 

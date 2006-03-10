@@ -6,7 +6,7 @@
  *
  */
 /*
- *	$Id: reply.c,v 1.22 1999-02-08 14:46:53 danw Exp $
+ *	$Id: reply.c,v 1.23 2006-03-10 07:11:31 ghudson Exp $
  *
  *	Code for "reply" request in discuss.
  *
@@ -15,10 +15,11 @@
 
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Id: reply.c,v 1.22 1999-02-08 14:46:53 danw Exp $";
+    "$Id: reply.c,v 1.23 2006-03-10 07:11:31 ghudson Exp $";
 #endif /* lint */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <sys/file.h>
 #include <string.h>
 #include <fcntl.h>
@@ -30,7 +31,6 @@ static char rcsid_discuss_c[] =
 
 /* EXTERNAL ROUTINES */
 
-char	*malloc(), *getenv(), *gets(), *ctime(), *error_message();
 tfile	unix_tfile();
 extern void flag_interrupts(),dont_flag_interrupts();
 
@@ -94,7 +94,7 @@ repl(argc, argv)
 	}
 	if (mtg) {
 		(void) sprintf(buffer, "goto %s", mtg);
-		ss_execute_line(sci_idx, buffer, &code);
+		code = ss_execute_line(sci_idx, buffer);
 		if (code != 0) {
 			ss_perror(sci_idx, code, buffer);
 			return;

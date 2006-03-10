@@ -15,7 +15,7 @@
 
 /*
  *
- *	$Id: rpproc.c,v 1.21 2004-03-08 06:22:14 zacheiss Exp $
+ *	$Id: rpproc.c,v 1.22 2006-03-10 07:11:40 ghudson Exp $
  *
  */
 
@@ -37,6 +37,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <netinet/in.h>
 #include <sys/stat.h>
 #include <netdb.h>
@@ -65,8 +66,6 @@ static long hostaddr;
 
 extern int numprocs;
 extern struct proc_table procs [];
-extern char *malloc();
-extern int errno;
 #ifdef KERBEROS
 static char serv_name[20];
 #endif /* KERBEROS */

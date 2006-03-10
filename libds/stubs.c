@@ -7,7 +7,7 @@
  */
 /*
  *
- *	$Id: stubs.c,v 1.17 1999-02-08 14:47:12 danw Exp $
+ *	$Id: stubs.c,v 1.18 2006-03-10 07:11:38 ghudson Exp $
  *
  * stubs.c -- These are stubs that handle the calling of routines.
  *
@@ -15,11 +15,12 @@
  */
 #ifndef lint
 static char rcsid_stubs_c[] =
-    "$Id: stubs.c,v 1.17 1999-02-08 14:47:12 danw Exp $";
+    "$Id: stubs.c,v 1.18 2006-03-10 07:11:38 ghudson Exp $";
 #endif /* lint */
 
 /* Derived from CORE.PAS 06/21/86 by SRZ */
 
+#include <stdlib.h>
 #include <discuss/interface.h>
 #include "rpc.h"
 #include <discuss/tfile.h>
@@ -656,7 +657,6 @@ mtg_info *minfo;
 
 dsc_acl *recv_acl()
 {
-        char *malloc();
 	/* The following code would lose points in 6.170... */
 	register dsc_acl *result = (dsc_acl *) malloc(sizeof(dsc_acl));
 	register dsc_acl_entry *ae;

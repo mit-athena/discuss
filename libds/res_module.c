@@ -7,7 +7,7 @@
  */
 /*
  *
- *	$Id: res_module.c,v 1.16 1999-02-08 14:47:10 danw Exp $
+ *	$Id: res_module.c,v 1.17 2006-03-10 07:11:38 ghudson Exp $
  *
  * resolve_module () --
  *	Can you say "Put all the configuration into one file?"  Can you
@@ -22,7 +22,7 @@
 
 #ifndef lint
 static char rcsid_res_module_c[] =
-    "$Id: res_module.c,v 1.16 1999-02-08 14:47:10 danw Exp $";
+    "$Id: res_module.c,v 1.17 2006-03-10 07:11:38 ghudson Exp $";
 #endif /* lint */
 
 #include "rpc_et.h"
@@ -46,8 +46,6 @@ static void ExpandHost ();
 #define SNAME_SZ 30
 #define REALM_SZ 30
 #endif /* SNAME_SZ */
-
-#define NULL 0
 
 char *local_host_name ();
 const char *local_realm ();
@@ -283,7 +281,7 @@ static void ExpandHost (primary_name, krb_host, krb_realm )
 	if (isupper(*sp)) *dp=tolower(*sp);
 	else *dp = *sp;
     } while (dp++,*sp && (*sp++ != '.'));
-    *(--dp) = NULL;
+    *(--dp) = 0;
 
     /* heuristics */
 

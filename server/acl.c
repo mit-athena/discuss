@@ -6,7 +6,7 @@
  *
  */
 /*
- *	$Id: acl.c,v 1.17 2001-02-28 20:44:23 ghudson Exp $
+ *	$Id: acl.c,v 1.18 2006-03-10 07:11:39 ghudson Exp $
  *
  * 	Routines for the manipulation of access control lists in core,
  *	along with routines to move them to and from files.
@@ -19,16 +19,16 @@
 
 #ifndef lint
 static const char rcsid_acl_c[] =
-    "$Id: acl.c,v 1.17 2001-02-28 20:44:23 ghudson Exp $";
+    "$Id: acl.c,v 1.18 2006-03-10 07:11:39 ghudson Exp $";
 #endif /* lint */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 #include <discuss/discuss.h>
 #include "internal.h"
 
-char *malloc(), *realloc();
 char *acl_union(), *acl_intersection(), *acl_subtract();
 static void panic ();
 

@@ -15,6 +15,7 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #if HAVE_FCNTL_H
 #include <fcntl.h>
@@ -44,7 +45,6 @@ static char *temp_dir = "/tmp";
 static int daemon_flag = FALSE;
 
 tfile unix_tfile ();
-char *malloc();
 
 static lower(), strip_addr(), extract_full_name();
 static char *get_header();

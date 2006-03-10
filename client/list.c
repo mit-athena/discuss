@@ -9,15 +9,16 @@
  *
  * List request for DISCUSS
  *
- * $Id: list.c,v 1.35 1999-02-08 14:46:49 danw Exp $
+ * $Id: list.c,v 1.36 2006-03-10 07:11:31 ghudson Exp $
  *
  */
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Id: list.c,v 1.35 1999-02-08 14:46:49 danw Exp $";
+    "$Id: list.c,v 1.36 2006-03-10 07:11:31 ghudson Exp $";
 #endif /* lint */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <sys/param.h>		/* for MIN() */
 #include <ss/ss.h>
@@ -27,7 +28,7 @@ static char rcsid_discuss_c[] =
 #include <discuss/discuss.h>
 #include "globals.h"
 
-char *ctime(), *malloc(), *local_realm(), *error_message(), *short_time();
+char *local_realm(), *short_time();
 static trn_info3 t_info;
 static list_it(),delete_it(),retrieve_it();
 static int performed;		/* true if trn was acted upon */

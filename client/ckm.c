@@ -6,21 +6,20 @@
  *
  */
 /*
- *	$Id: ckm.c,v 1.25 1999-02-08 14:46:46 danw Exp $
+ *	$Id: ckm.c,v 1.26 2006-03-10 07:11:30 ghudson Exp $
  *
  */
      
 #ifndef lint
 static char rcsid_ckm_c[] =
-    "$Id: ckm.c,v 1.25 1999-02-08 14:46:46 danw Exp $";
+    "$Id: ckm.c,v 1.26 2006-03-10 07:11:30 ghudson Exp $";
 #endif /* lint */
 
 #include <string.h>
+#include <stdlib.h>
 #include <stdio.h>
 #include <discuss/discuss.h>
 #include "globals.h"
-
-extern char *malloc(),*ctime(), *error_message(), *calloc();
 
 extern int print_header;
 static int display;

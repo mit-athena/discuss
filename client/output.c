@@ -6,7 +6,7 @@
  *
  */
 /*
- *	$Id: output.c,v 1.16 1999-02-08 14:46:51 danw Exp $
+ *	$Id: output.c,v 1.17 2006-03-10 07:11:31 ghudson Exp $
  *
  *	Utility routines.
  *
@@ -14,7 +14,7 @@
 
 #ifndef lint
 static char rcsid_discuss_utils_c[] =
-    "$Id: output.c,v 1.16 1999-02-08 14:46:51 danw Exp $";
+    "$Id: output.c,v 1.17 2006-03-10 07:11:31 ghudson Exp $";
 #endif /* lint */
 
 #include <stdio.h>
@@ -29,7 +29,7 @@ static char rcsid_discuss_utils_c[] =
 extern ss_request_table discuss_cmds;
 extern char *temp_file;
 extern char *pgm;
-extern char *malloc(), *getenv(), *short_time();
+extern char *short_time();
 
 output_trans(tinfop, tf, code)
 	trn_info3 *tinfop;

@@ -13,10 +13,11 @@
 
 
 #ifndef lint
-static char *rcsid_discuss_c = "$Id: edsc.c,v 1.14 1999-02-08 14:47:05 danw Exp $";
+static char *rcsid_discuss_c = "$Id: edsc.c,v 1.15 2006-03-10 07:11:37 ghudson Exp $";
 #endif /* lint */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <sys/file.h>
 #include <sys/time.h>
 #include <sys/resource.h>
@@ -30,7 +31,6 @@ static char *rcsid_discuss_c = "$Id: edsc.c,v 1.14 1999-02-08 14:47:05 danw Exp 
 #include "edsc.h"
 #define INPUT_BUFF_SIZE 10240
 
-char *malloc();
 char *local_realm();
 int log_warn();
 tfile unix_tfile();

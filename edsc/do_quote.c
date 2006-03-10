@@ -8,14 +8,15 @@
 /* 
  * 
  * Created by: Mark W. Eichin <eichin@athena.mit.edu>
- * $Id: do_quote.c,v 1.3 1999-02-08 14:47:04 danw Exp $
+ * $Id: do_quote.c,v 1.4 2006-03-10 07:11:37 ghudson Exp $
  *
  */
 #ifndef lint
-static char rcsid_do_quote_c[] = "$Id: do_quote.c,v 1.3 1999-02-08 14:47:04 danw Exp $";
+static char rcsid_do_quote_c[] = "$Id: do_quote.c,v 1.4 2006-03-10 07:11:37 ghudson Exp $";
 #endif /* lint */
 
-char *malloc();
+#include <stdlib.h>
+
 /*
  *
  * do_quote ()  -- requote a string so that Lisp won't barf on it.

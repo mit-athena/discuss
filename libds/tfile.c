@@ -7,7 +7,7 @@
  */
 /*
  *
- *	$Id: tfile.c,v 1.7 1999-02-08 14:47:12 danw Exp $
+ *	$Id: tfile.c,v 1.8 2006-03-10 07:11:38 ghudson Exp $
  *
  * tfile.c -- a new implementation of tfile's.
  *
@@ -15,10 +15,11 @@
  */
 #ifndef lint
 static char rcsid_tfile_c[] =
-    "$Id: tfile.c,v 1.7 1999-02-08 14:47:12 danw Exp $";
+    "$Id: tfile.c,v 1.8 2006-03-10 07:11:38 ghudson Exp $";
 #endif /* lint */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <errno.h>
 #include <discuss/tfile.h>
 #include <sys/types.h>
@@ -27,9 +28,6 @@ static char rcsid_tfile_c[] =
 #define min(A, B) ((A) < (B) ? (A) : (B))
 #define NIL 0
 #define SUCCESS 1
-
-extern char *malloc ();
-extern int errno;
 
 tfile tcreate (tfs, infop, info, proc)
 int tfs;

@@ -7,22 +7,21 @@
  */
 /*
  *
- * $Id: trn_select.c,v 1.17 1999-02-08 14:46:55 danw Exp $
+ * $Id: trn_select.c,v 1.18 2006-03-10 07:11:31 ghudson Exp $
  *
  */
 
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Id: trn_select.c,v 1.17 1999-02-08 14:46:55 danw Exp $";
+    "$Id: trn_select.c,v 1.18 2006-03-10 07:11:31 ghudson Exp $";
 #endif /* lint */
 
 #define	MIN(a,b)	((a)<(b)?(a):(b))
 #define	MAX(a,b)	((a)>(b)?(a):(b))
 #include <stdio.h>
+#include <stdlib.h>
 #include <discuss/discuss.h>
 #include "globals.h"
-
-extern char *malloc();
 
 selection_list *
 sl_insert_range(low, high, flags, old_list, code_ptr)

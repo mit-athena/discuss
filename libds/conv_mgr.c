@@ -7,7 +7,7 @@
  */
 /*
  *
- *	$Id: conv_mgr.c,v 1.13 1999-02-08 14:47:09 danw Exp $
+ *	$Id: conv_mgr.c,v 1.14 2006-03-10 07:11:38 ghudson Exp $
  *
  * conv_mgr () -- File that contains procedure to handle conversations.  This
  *		  allows multiplexing of RPC stream, setting up the correct
@@ -21,15 +21,13 @@
 
 #ifndef lint
 static const char rcsid_conv_mgr_c[] =
-    "$Id: conv_mgr.c,v 1.13 1999-02-08 14:47:09 danw Exp $";
+    "$Id: conv_mgr.c,v 1.14 2006-03-10 07:11:38 ghudson Exp $";
 #endif /* lint */
 
 #include <errno.h>
 #include <string.h>
+#include <stdlib.h>
 #include "rpc.h"
-#define NULL 0
-
-char *malloc (), *realloc();
 
 
 /* conversation structure */

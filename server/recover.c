@@ -15,6 +15,7 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
 #include <sys/file.h>
@@ -29,7 +30,6 @@
 #include <discuss/interface.h>
 #include "mtg.h"
 
-#define NULL 0
 #define min(a, b) (a < b ? a : b)
 
 static trn_base tb;
@@ -46,7 +46,6 @@ static int do_byteswap;
 static char *temp_dir = "/tmp";
 
 tfile unix_tfile ();
-char *malloc();
 static fsize(),read_trn_hdr(),read_last_trn(),save_trn();
 
 extern char rpc_caller[];

@@ -11,18 +11,19 @@
  *	  	protocol over a TCP connection.
  *		This file handles the caller's side of the connection.
  *
- *	$Id: rpcall.c,v 1.23 2000-08-01 18:51:40 ghudson Exp $
+ *	$Id: rpcall.c,v 1.24 2006-03-10 07:11:38 ghudson Exp $
  *
  */
 #ifndef lint
 static char rcsid_rpcall_c[] =
-    "$Id: rpcall.c,v 1.23 2000-08-01 18:51:40 ghudson Exp $";
+    "$Id: rpcall.c,v 1.24 2006-03-10 07:11:38 ghudson Exp $";
 #endif /* lint */
 
 /* INCLUDES */
 
 #include <sys/types.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
 #include <fcntl.h>
@@ -45,9 +46,6 @@ static char rcsid_rpcall_c[] =
 #define ERROR   -1
 
 /* EXTERNAL ROUTINES */
-
-char *malloc();
-extern int errno;
 
 int rpc_err;
 

@@ -10,8 +10,7 @@ typedef unsigned short Boolean;
 typedef char Byte;
 
 #include <errno.h>
-
-char    *calloc();
+#include <stdlib.h>
 
 #define TRUE (Boolean) 1
 #define FALSE (Boolean) 0

@@ -8,14 +8,14 @@
 /*
  *	Print-related requests for DISCUSS.
  *
- *	$Id: print.c,v 1.27 1999-02-08 14:46:52 danw Exp $
+ *	$Id: print.c,v 1.28 2006-03-10 07:11:31 ghudson Exp $
  *
  */
 
 
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Id: print.c,v 1.27 1999-02-08 14:46:52 danw Exp $";
+    "$Id: print.c,v 1.28 2006-03-10 07:11:31 ghudson Exp $";
 #endif /* lint */
 
 #include <stdio.h>
@@ -49,7 +49,6 @@ static trn_info	t_info;
 static tfile	tf;
 
 extern void sl_free();
-extern char *error_message();
 
 static int
 display_trans(t_infop, codep)

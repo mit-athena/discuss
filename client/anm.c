@@ -6,13 +6,13 @@
  *
  */
 /*
- *	$Id: anm.c,v 1.11 1999-02-08 14:46:46 danw Exp $
+ *	$Id: anm.c,v 1.12 2006-03-10 07:11:30 ghudson Exp $
  *
  */
 
 #ifndef lint
 static char rcsid_anm_c[] =
-    "$Id: anm.c,v 1.11 1999-02-08 14:46:46 danw Exp $";
+    "$Id: anm.c,v 1.12 2006-03-10 07:11:30 ghudson Exp $";
 #endif /* lint */
 
 #include <stdio.h>
@@ -25,7 +25,6 @@ static char rcsid_anm_c[] =
 #include "config.h"
 #include "globals.h"
 
-extern char *error_message();
 extern tfile unix_tfile();
 
 announce_mtg (argc, argv)

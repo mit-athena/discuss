@@ -6,23 +6,23 @@
  *
  */
 /*
- *	$Id: lsm.c,v 1.26 1999-02-08 14:46:50 danw Exp $
+ *	$Id: lsm.c,v 1.27 2006-03-10 07:11:31 ghudson Exp $
  *
  */
 
 #ifndef lint
 static char rcsid_lsm_c[] =
-    "$Id: lsm.c,v 1.26 1999-02-08 14:46:50 danw Exp $";
+    "$Id: lsm.c,v 1.27 2006-03-10 07:11:31 ghudson Exp $";
 #endif /* lint */
 
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <discuss/discuss.h>
 #include "globals.h"
 #include <errno.h>
 #include <ss/ss.h>
 
-extern char *malloc(), *calloc(), *ctime(), *error_message();
 extern void flag_interrupts(), dont_flag_interrupts();
 
 

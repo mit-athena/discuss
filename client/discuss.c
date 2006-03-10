@@ -6,7 +6,7 @@
  *
  */
 /*
- *	$Id: discuss.c,v 1.58 1999-02-08 14:46:47 danw Exp $
+ *	$Id: discuss.c,v 1.59 2006-03-10 07:11:31 ghudson Exp $
  *
  *	A simple shell-type user interface to discuss; uses Ken Raeburn's
  *	ss library for the command interpreter.
@@ -16,10 +16,11 @@
 
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Id: discuss.c,v 1.58 1999-02-08 14:46:47 danw Exp $";
+    "$Id: discuss.c,v 1.59 2006-03-10 07:11:31 ghudson Exp $";
 #endif /* lint */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <sys/file.h>
 #include <signal.h>
 #include <string.h>
@@ -48,7 +49,6 @@ extern char *temp_file, *pgm, *user_id;
 
 /* EXTERNAL ROUTINES */
 
-char	*malloc(), *getenv(), *gets(), *ctime();
 tfile	unix_tfile();
 char	*local_realm();
 static char	buf[BUFSIZ];
@@ -190,17 +190,17 @@ command from the shell.\n\n");
 
 	if (initial_meeting != (char *)NULL) {
 		(void) sprintf(buffer, "goto %s", initial_meeting);
-		ss_execute_line(sci_idx, buffer, &code);
+		code = ss_execute_line(sci_idx, buffer);
 		if (code != 0)
 			ss_perror(sci_idx, code, initial_meeting);
 	}
 	if (initial_request != (char *)NULL) {
-		(void) ss_execute_line(sci_idx, initial_request, &code);
+		code = ss_execute_line(sci_idx, initial_request);
 		if (code != 0)
 			ss_perror(sci_idx, code, initial_request);
 	}
 	if (!quit || code)
-		(void) ss_listen (sci_idx, &code);
+		code = ss_listen (sci_idx);
 	leave_mtg();				/* clean up after ourselves */
 	return 0;
 }

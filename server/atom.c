@@ -34,7 +34,6 @@
 #if HAVE_FCNTL_H
 #include <fcntl.h>
 #endif
-#define NULL 0
 #define max(a, b) (a > b ? a : b)
 #define min(a, b) (a < b ? a : b)
 
@@ -53,7 +52,6 @@ struct dir_blk {
 };
 
 
-char *malloc(),*calloc();
 char *find_block();
 
 static int maxdirty = 0;				/* meter: maximum dirty blks */

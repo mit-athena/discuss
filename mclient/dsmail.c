@@ -9,11 +9,12 @@
  *
  * dsmail.c - Modifies/parses mail to discuss
  *
- *        $Id: dsmail.c,v 1.10 1999-01-22 23:10:09 ghudson Exp $
+ *        $Id: dsmail.c,v 1.11 2006-03-10 07:11:39 ghudson Exp $
  *
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 #include <sys/types.h>
@@ -38,15 +39,8 @@
 
 #ifndef	lint
 static char rcsid[] =
-    "$Id: dsmail.c,v 1.10 1999-01-22 23:10:09 ghudson Exp $";
+    "$Id: dsmail.c,v 1.11 2006-03-10 07:11:39 ghudson Exp $";
 #endif
-
-char *malloc(), *realloc ();
-char *mktemp();
-FILE *popen();
-FILE *fopen();
-FILE *fdopen();
-int getopt();
 
 extern char *optarg;                /* External variables for getopt */
 extern int optind;
@@ -84,8 +78,6 @@ void SendToMeeting();
 int parse_reply_to();
 int have_trn_num();
 int subject_compare();
-
-extern char *malloc(),*realloc();
 
 main(argc,argv)
 	int argc;

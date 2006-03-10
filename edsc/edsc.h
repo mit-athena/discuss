@@ -12,6 +12,7 @@
 
 #include <discuss/discuss.h>
 #include <errno.h>
+#include <stdlib.h>
 
 extern char *user_id;
 extern tfile stdout_tf;
@@ -20,8 +21,6 @@ extern char *do_quote();
 tfile unix_tfile();
 extern int cache_activated, cache_working;
 extern int use_vectors;
-
-extern char *malloc();
 
 extern int	do_quit(), do_gmi(), do_gti(), do_gcm(), do_gml(), do_gt();
 extern int	do_gtf(), do_grt(), do_grtn(), do_ss(), do_at(), do_nut();

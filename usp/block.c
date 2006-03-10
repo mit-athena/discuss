@@ -11,7 +11,6 @@
 #include "usp.h"
 #include <netinet/in.h>
 
-char *error_message();
 /* USP block operations */
 
 int usp_internal_errno = 0;
@@ -226,6 +225,6 @@ int errnum;
 	return(usp_internal_string);
     }
     else {
-	return(error_message(errnum));
+	return((char *)error_message(errnum));
     }
 }
