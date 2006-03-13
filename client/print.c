@@ -8,14 +8,14 @@
 /*
  *	Print-related requests for DISCUSS.
  *
- *	$Id: print.c,v 1.28 2006-03-10 07:11:31 ghudson Exp $
+ *	$Id: print.c,v 1.29 2006-03-13 21:39:56 amb Exp $
  *
  */
 
 
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Id: print.c,v 1.28 2006-03-10 07:11:31 ghudson Exp $";
+    "$Id: print.c,v 1.29 2006-03-13 21:39:56 amb Exp $";
 #endif /* lint */
 
 #include <stdio.h>
@@ -93,6 +93,7 @@ prt_trans(argc, argv)
 
 	if (argc != 1) {
 		if (strcmp(argv[0], "print") &&
+		    strcmp(argv[0], "show") &&
 		    strcmp(argv[0], "pr") &&
 		    strcmp(argv[0], "p")) {
 		     	fprintf(stderr, "Usage: %s\n", argv[0]);
@@ -126,6 +127,7 @@ prt_trans(argc, argv)
 	if (argc == 1) {
 		char *ref;
 		if (!strcmp(argv[0], "print") ||
+		    !strcmp(argv[0], "show") ||
 		    !strcmp(argv[0], "pr") ||
 		    !strcmp(argv[0], "p")) {
 		        ref = "current";

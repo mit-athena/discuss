@@ -4,7 +4,7 @@
 			talk, enter, send, t;
 
 	request		prt_trans, "Print a transaction.",
-			print, pr, p;
+			print, pr, p, show;
 
 	request		prt_trans, "Print next transaction.",
 			next;
