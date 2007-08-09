@@ -7,7 +7,7 @@
  */
 /*
  *
- *	$Id: res_module.c,v 1.17 2006-03-10 07:11:38 ghudson Exp $
+ *	$Id: res_module.c,v 1.18 2007-08-09 20:41:32 amb Exp $
  *
  * resolve_module () --
  *	Can you say "Put all the configuration into one file?"  Can you
@@ -22,7 +22,7 @@
 
 #ifndef lint
 static char rcsid_res_module_c[] =
-    "$Id: res_module.c,v 1.17 2006-03-10 07:11:38 ghudson Exp $";
+    "$Id: res_module.c,v 1.18 2007-08-09 20:41:32 amb Exp $";
 #endif /* lint */
 
 #include "rpc_et.h"
@@ -41,6 +41,10 @@ static char rcsid_res_module_c[] =
 #endif
 static void ExpandHost ();
 #endif /* KERBEROS */
+
+#ifdef KERBEROS5
+#include "krb5.h"
+#endif /* KERBEROS5 */
 
 #ifndef SNAME_SZ
 #define SNAME_SZ 30
@@ -233,6 +237,7 @@ void resolve_module (modname, port, hostp, servp, result)
     strcpy (service_id, "discuss@");
     strcpy (&service_id[8], REALM);
 #else
+#ifndef KERBEROS5
     strcpy (service_id, "discuss.");
     ExpandHost (myhnamep, &service_id[8], realm);
     strcat(service_id, "@");
@@ -240,6 +245,15 @@ void resolve_module (modname, port, hostp, servp, result)
 	strcat (service_id, realmp);
     else
 	strcat (service_id, realm);
+#else
+    strcpy (service_id, "discuss/");
+    ExpandHost (myhnamep, &service_id[8], realm);
+    strcat(service_id, "@");
+    if (realmp)
+        strcat (service_id, realmp);
+    else
+        strcat (service_id, realm);
+#endif /* KERBEROS5 */
 #endif /* KERBEROS */
     *hostp = myhnamep;
     *servp = service_id;
@@ -280,7 +294,11 @@ static void ExpandHost (primary_name, krb_host, krb_realm )
     do {
 	if (isupper(*sp)) *dp=tolower(*sp);
 	else *dp = *sp;
+#ifdef KERBEROS5
+    } while (dp++,*sp++);
+#else
     } while (dp++,*sp && (*sp++ != '.'));
+#endif /* KERBEROS5 */
     *(--dp) = 0;
 
     /* heuristics */

@@ -60,6 +60,7 @@ struct proc_table {
 #define SERVER_0 0
 #define SERVER_1 1
 #define SERVER_2 2
+#define SERVER_3 3
 
 extern int rpc_err;
 

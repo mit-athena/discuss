@@ -7,21 +7,25 @@
  */
 /*
  *
- *	$Id: auth_krb.c,v 1.12 2004-03-06 18:02:22 zacheiss Exp $
+ *	$Id: auth_krb.c,v 1.13 2007-08-09 20:41:32 amb Exp $
  *
- * auth_krb () -- Authentication procedure for kerberos.  This contains the
- *		  standard authentication for kerberos.
+ * auth_krb () -- Authentication procedure for kerberos v5.  This contains the
+ *		  standard authentication for kerberos v5, and fallback code
+ *                for kerberos v4.
  *
  */
 #ifndef lint
 static char *rcsid_auth_krb_c =
-    "$Id: auth_krb.c,v 1.12 2004-03-06 18:02:22 zacheiss Exp $";
+    "$Id: auth_krb.c,v 1.13 2007-08-09 20:41:32 amb Exp $";
 #endif /* lint */
 
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
 #include "krb.h"
+#ifdef KERBEROS5
+#include "krb5.h"
+#endif /* KERBEROS5 */
 
 char *local_host_name ();
 
@@ -41,11 +45,34 @@ char **authp;
 int *authl;
 int *result;
 {
-     char *realmp,*instancep;
-     char serv [SNAME_SZ+INST_SZ];
-     int rem;
+#ifdef KERBEROS5
+     get_authenticator_krb5(service_id, checksum, authp, authl, result);
+#else
+     get_authenticator_krb4(service_id, checksum, authp, authl, result);
+#endif /* KERBEROS5 */
+}
 
-     static KTEXT_ST ticket;
+#ifdef KERBEROS5
+get_authenticator_krb5 (service_id, checksum, authp, authl, result)
+char *service_id;
+int checksum;
+char **authp;
+int *authl;
+int *result;
+{
+     char *realmp,*instancep;
+     char serv [80];
+     int rem;
+     krb5_data packet, inbuf;
+     krb5_ccache ccdef;
+     krb5_context context;
+     krb5_auth_context auth_context = NULL;
+
+     rem = krb5_init_context(&context);
+     if (rem) {
+         com_err("get_authenticator_krb5", rem, "while initializing krb5");
+	 exit(1);
+     }
 
      init_krb_err_tbl();
 
@@ -60,22 +87,79 @@ int *result;
      }
 
      /* look for service instance */
-     instancep = strchr (serv, '.');
+     instancep = strchr (serv, '/');
      if (instancep == NULL) {
 	  instancep = "";
      } else {
 	  *instancep++ = '\0';
      }
 
-     rem = krb_mk_req (&ticket, serv, instancep, realmp, checksum);
-     if (rem == KSUCCESS) {
-	  *authl = ticket.length;
-	  *authp = (char *) ticket.dat;
-	  *result = 0;
+     inbuf.data = instancep;
+     inbuf.length = strlen(instancep);
+
+     rem = krb5_cc_default(context, &ccdef);
+     if (rem) {
+         com_err("get_authenticator_krb5", rem, "while getting default ccache");
+	 exit(1);
+     }
+
+     rem = krb5_mk_req (context, &auth_context, 0, serv, instancep, &inbuf,
+                        ccdef, &packet);
+     if (rem) {
+         com_err("get_authenticator_krb5", rem, "while preparing AP_REQ");
+         *authl = 0;
+         *authp = NULL;
+         *result = rem;
      } else {
-	  *authl = 0;
-	  *authp = NULL;
-	  *result = rem + krb_err_base;
+         *authl = packet.length;
+         *authp = (char *)packet.data;
+         *result = 0;
      }
 }
-	  
+#endif /* KERBEROS5 */
+
+get_authenticator_krb4 (service_id, checksum, authp, authl, result)
+char *service_id;
+int checksum;
+char **authp;
+int *authl;
+int *result;
+{
+     char *realmp,*instancep;
+     char serv [SNAME_SZ+INST_SZ];
+     int rem;
+
+     static KTEXT_ST ticket;
+
+     init_krb_err_tbl();
+
+     realmp = strchr (service_id, '@');
+     if (realmp == NULL || realmp - service_id >= sizeof (serv)) {
+          realmp = "";
+          strncpy (serv, service_id, sizeof (serv));
+     } else {
+         memcpy (serv, service_id, realmp - service_id); /* copy to serv */
+         serv [realmp - service_id] = '\0';
+         realmp++;
+     }
+
+     /* look for service instance */
+     instancep = strchr (serv, '.');
+     if (instancep == NULL) {
+          instancep = "";
+     } else {
+          *instancep++ = '\0';
+     }
+
+     rem = krb_mk_req (&ticket, serv, instancep, realmp, checksum);
+     if (rem == KSUCCESS) {
+	 *authl = ticket.length;
+	 *authp = (char *) ticket.dat;
+	 *result = 0;
+     } else {
+	 *authl = 0;
+	 *authp = NULL;
+	 *result = rem + krb_err_base;
+     }
+}
+

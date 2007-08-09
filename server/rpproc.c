@@ -15,7 +15,7 @@
 
 /*
  *
- *	$Id: rpproc.c,v 1.22 2006-03-10 07:11:40 ghudson Exp $
+ *	$Id: rpproc.c,v 1.23 2007-08-09 20:41:33 amb Exp $
  *
  */
 
@@ -46,6 +46,9 @@
 #include <string.h>
 #ifdef KERBEROS
 #include <krb.h>
+#endif
+#ifdef KERBEROS5
+#include <krb5.h>
 #endif
 #include <discuss/tfile.h>
 #include "rpc.h"
@@ -240,9 +243,18 @@ long haddr;
     char hostname[50];
     char filename[50];
     char instance[INST_SZ];
-    char *envvar;
     AUTH_DAT kdata;
     KTEXT_ST ticket;
+
+#ifdef KERBEROS5
+    char *envvar;
+    krb5_context context;
+    krb5_auth_context auth_context = NULL;
+    krb5_data packet;
+    krb5_principal sprinc;
+    krb5_keytab keytab = NULL;
+    krb5_ticket *processed_ticket = NULL;
+#endif /* KERBEROS5 */
 
     strcpy (rpc_caller, "???@");		/* safety drop */
     strcat (rpc_caller, REALM);
@@ -256,33 +268,69 @@ long haddr;
     for (i=0; i<ticket.length; i++) {
 	ticket.dat[i] = recvshort();
     }
+#ifdef KERBEROS5
+    packet.length = ticket.length;
+    packet.data = (krb5_pointer) ticket.dat;
     
     envvar = malloc(strlen(service) + 50);
     if (envvar) {
 	sprintf(envvar, "KRB5_KTNAME=/var/spool/%s/krb5.keytab", service);
 	putenv(envvar);
     }
-
+#endif /* KERBEROS5 */
     /* make filename from service */
     strcpy (filename, "/var/spool/");
     strcat (filename, service);
     strcat (filename, "/srvtab");
-    
-    strcpy(instance,"*");
-    result = krb_rd_req (&ticket, service, instance, haddr, &kdata, filename);
-    if (result == 0) {
-	strcpy(rpc_caller, kdata.pname);
-	if (kdata.pinst[0] != '\0') {
-	    strcat(rpc_caller, ".");
-	    strcat(rpc_caller, kdata.pinst);
-	}
-	strcat(rpc_caller, "@");
-	strcat(rpc_caller, kdata.prealm);
-    }
-    else {
-	result += krb_err_base;
+
+    strcpy(instance, "*");
+
+#ifdef KERBEROS5
+    result = krb5_init_context(&context);
+    if (result) {
+        com_err(service, result, "while initializing krb5");
 	goto punt_kerberos;
     }
+    result = krb5_sname_to_principal(context, NULL, service, KRB5_NT_SRV_HST,
+                                     &sprinc);
+    if (result) {
+        com_err(service, result, "while generating srv name %s", service);
+	goto punt_kerberos;
+    }
+    result = krb5_rd_req(context, &auth_context, &packet, sprinc, keytab,
+                         NULL, &processed_ticket);
+    if (result == 0) {  /* It's a valid krb5 request */
+        result = krb5_524_conv_principal(context,
+	                                 processed_ticket->enc_part2->client,
+					 kdata.pname, kdata.pinst,
+					 kdata.prealm);
+	if (result) {
+	    com_err(service, result, "while converting principal to krb4");
+	    goto punt_kerberos;
+	}
+    }
+    else {  /* Let's try krb4 */
+	/* First, log the krb5 error. */
+	com_err(service, result, "while reading request");
+#endif /* KERBEROS5 */
+        result = krb_rd_req (&ticket, service, instance, haddr, &kdata,
+	                     filename);
+	if (result) {
+	    result += krb_err_base;
+	    goto punt_kerberos;
+	}
+#ifdef KERBEROS5
+    }
+#endif /* KERBEROS5 */
+
+    strcpy(rpc_caller, kdata.pname);
+    if (kdata.pinst[0] != '\0') {
+        strcat(rpc_caller, ".");
+	strcat(rpc_caller, kdata.pinst);
+    }
+    strcat(rpc_caller, "@");
+    strcat(rpc_caller, kdata.prealm);
+
 punt_kerberos:
     USP_flush_block(us);
     if (bt == KRB_TICKET2) {

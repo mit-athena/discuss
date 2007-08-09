@@ -6,7 +6,7 @@
  *
  */
 /*
- *	$Id: discuss.c,v 1.59 2006-03-10 07:11:31 ghudson Exp $
+ *	$Id: discuss.c,v 1.60 2007-08-09 20:41:31 amb Exp $
  *
  *	A simple shell-type user interface to discuss; uses Ken Raeburn's
  *	ss library for the command interpreter.
@@ -16,7 +16,7 @@
 
 #ifndef lint
 static char rcsid_discuss_c[] =
-    "$Id: discuss.c,v 1.59 2006-03-10 07:11:31 ghudson Exp $";
+    "$Id: discuss.c,v 1.60 2007-08-09 20:41:31 amb Exp $";
 #endif /* lint */
 
 #include <stdio.h>
@@ -42,7 +42,7 @@ static char rcsid_discuss_c[] =
 
 extern ss_request_table discuss_cmds;
 
-char	dsc_version[] = "1.6";
+char	dsc_version[] = "1.7";
 int	sci_idx;
 
 extern char *temp_file, *pgm, *user_id;

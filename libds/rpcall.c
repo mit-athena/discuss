@@ -11,12 +11,12 @@
  *	  	protocol over a TCP connection.
  *		This file handles the caller's side of the connection.
  *
- *	$Id: rpcall.c,v 1.24 2006-03-10 07:11:38 ghudson Exp $
+ *	$Id: rpcall.c,v 1.25 2007-08-09 20:41:32 amb Exp $
  *
  */
 #ifndef lint
 static char rcsid_rpcall_c[] =
-    "$Id: rpcall.c,v 1.24 2006-03-10 07:11:38 ghudson Exp $";
+    "$Id: rpcall.c,v 1.25 2007-08-09 20:41:32 amb Exp $";
 #endif /* lint */
 
 /* INCLUDES */
@@ -38,6 +38,9 @@ static char rcsid_rpcall_c[] =
 #include <discuss/tfile.h>
 #include "rpc.h"
 #include "config.h"
+#ifdef KERBEROS5
+#include "krb5.h"
+#endif /* KERBEROS5 */
 
 /* DEFINES */
 
@@ -377,6 +380,50 @@ rpc_conversation open_rpc (host, port_num, service_id, code)
 	    sendshort(*authp++);
 	}
 	USP_end_block(us);
+#ifdef KERBEROS5
+	/* Prior to server version 3, Kerberos 5 wasn't an available
+	 * authentication method, so we need to send a Kerberos 4 ticket.
+	 * Unfortunately, there's no way to query the server version sooner. */
+        krb5_error_code kcode;
+        krb5_principal princ;
+        char name[30];
+        char inst[100];
+        char realm[30];
+        krb5_context context;
+	if (get_server_version() < SERVER_3) {
+	    kcode = krb5_init_context(&context);
+	    if (kcode) {
+	        com_err("discuss", kcode, "while initializing krb5");
+		return(conv);
+	    }
+	    kcode = krb5_parse_name(context, service_id, &princ);
+	    if (kcode) {
+	        com_err("discuss", kcode, "while parsing krb5 name");
+		return(conv);
+	    }
+	    kcode = krb5_524_conv_principal(context, princ, name, inst, realm);
+	    if (kcode) {
+	        com_err("discuss", kcode, "while converting k5 princ to k4");
+		return(conv);
+	    }
+            strcpy(service_id, name);
+	    if (*inst) {
+	        strcat(service_id, ".");
+		strcat(service_id, inst);
+	    }
+	    strcat(service_id, "@");
+	    strcat(service_id, realm);
+	    get_authenticator_krb4(service_id, 0, &authp, &authl, code);
+	    if (! *code) {
+	        USP_begin_block(us,KRB_TICKET);
+		sendshort(authl);
+		for (i = 0; i < authl; i++) {
+		    sendshort(*authp++);
+		}
+		USP_end_block(us);
+	    }
+	}
+#endif /* KERBEROS5 */
     } else {
 	USP_begin_block(us,KRB_TICKET);	/* send blank ticket */
 	sendshort(0);

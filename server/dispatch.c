@@ -10,7 +10,7 @@
  * dispatch.c  -- Procedure to do the dispatching on an RPC call.
  *		  This contains the procedure table.
  *
- *	$Id: dispatch.c,v 1.13 2006-03-10 07:11:40 ghudson Exp $
+ *	$Id: dispatch.c,v 1.14 2007-08-09 20:41:33 amb Exp $
  */
 
 #include <stdlib.h>
@@ -22,7 +22,7 @@
 
 #ifndef lint
 static const char rcsid_dispatch_c[] =
-    "$Id: dispatch.c,v 1.13 2006-03-10 07:11:40 ghudson Exp $";
+    "$Id: dispatch.c,v 1.14 2007-08-09 20:41:33 amb Exp $";
 #endif
 
 extern bool recvbool();
@@ -283,7 +283,7 @@ int procno;
      /* get_server_version (version_number, result) */	  
      case GET_SERVER_VERSION:
 	  startreply();
-	  sendint(SERVER_2);			/* Includes get_trn_info3 */
+	  sendint(SERVER_3);			/* Includes get_trn_info3 */
 	  sendint(0);				/* Success */
 	  sendreply();
 	  break;
