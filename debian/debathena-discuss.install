@@ -1,0 +1,12 @@
+usr/bin/crmtgs
+usr/bin/discuss
+usr/bin/dsc_setup
+usr/bin/dsgrep
+usr/bin/dsmail
+usr/bin/dspipe
+usr/bin/mkds
+usr/bin/pmtg
+usr/bin/rmds
+usr/lib/debathena-discuss/edsc
+usr/share/discuss
+usr/share/man/man1/*.1

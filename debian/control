@@ -1,0 +1,59 @@
+Source: debathena-discuss
+Section: debathena/net
+Priority: extra
+Maintainer: Debian-Athena Project <debathena@mit.edu>
+Build-Depends: cdbs (>= 0.4.23-1.1), autotools-dev, debhelper (>= 4.2.0), autoconf, quilt, patchutils (>= 0.2.25), cdbs (>= 0.4.27-1), comerr-dev, ss-dev, libkrb5-dev, libzephyr-dev, libzephyr3-krb, bison
+Standards-Version: 3.7.2
+
+Package: debathena-discuss
+Architecture: any
+Provides: discuss
+Depends: ${shlibs:Depends}, ${misc:Depends}, tcsh | c-shell, netbase
+Description: A conferencing and mail archiving system
+ Discuss is a user-interface front end to a networked conferencing 
+ system.
+
+Package: debathena-discuss-emacs
+Architecture: all
+Provides: discuss-emacs
+Depends: ${shlibs:Depends}, ${misc:Depends}, debathena-discuss (= ${Source-Version}), debathena-machtype, emacs22 | emacs21 | emacsen
+Description: Emacs interface to discuss
+ Discuss is a user-interface front end to a networked conferencing 
+ system.
+ .
+ This package contains an Emacs interface to discuss.
+
+Package: debathena-discuss-server
+Architecture: any
+Provides: discuss-server
+Pre-Depends: adduser
+Depends: ${shlibs:Depends}, ${misc:Depends}, debathena-discuss (= ${Source-Version}), netbase
+Description: A conferencing and mail archiving system
+ Discuss is a user-interface front end to a networked conferencing 
+ system.
+ .
+ This package contains the discuss server.
+
+Package: debathena-libdsk-dev
+Section: debathena/libdevel
+Architecture: any
+Provides: libdsk-dev
+Depends: ${shlibs:Depends}, ${misc:Depends}, debathena-libusp-dev (= ${Source-Version}), comerr-dev, libkrb5-dev
+Description: Development files for discuss library
+ Discuss is a user-interface front end to a networked conferencing 
+ system.
+ .
+ This package contains libdsk headers and static libraries for 
+ development.
+
+Package: debathena-libusp-dev
+Section: debathena/libdevel
+Architecture: any
+Provides: libusp-dev
+Depends: ${shlibs:Depends}, ${misc:Depends}, comerr-dev
+Description: Development files for UNIX Unified Stream Protocol library
+ Discuss is a user-interface front end to a networked conferencing 
+ system.
+ .
+ This package contains libusp headers and static libraries for 
+ development.

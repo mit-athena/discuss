@@ -1,0 +1,69 @@
+Index: debathena-discuss-9.4.30/edsc/Makefile.in
+===================================================================
+--- debathena-discuss-9.4.30.orig/edsc/Makefile.in	2007-01-31 04:46:25.000000000 -0500
++++ debathena-discuss-9.4.30/edsc/Makefile.in	2007-01-31 04:52:35.000000000 -0500
+@@ -42,10 +42,9 @@
+ depend:
+ 
+ install:
+-	${top_srcdir}/mkinstalldirs ${DESTDIR}${sbindir}
+ 	${top_srcdir}/mkinstalldirs ${DESTDIR}${libexecdir}
+ 	${top_srcdir}/mkinstalldirs ${DESTDIR}${lispdir}
+-	${INSTALL_PROGRAM} edsc ${DESTDIR}${sbindir}
++	${INSTALL_PROGRAM} edsc ${DESTDIR}${libexecdir}
+ 	${INSTALL} -m 444 ${srcdir}/discuss-acl.el ${DESTDIR}${lispdir}
+ 	${INSTALL} -m 444 ${srcdir}/discuss-enter.el ${DESTDIR}${lispdir}
+ 	${INSTALL} -m 444 ${srcdir}/discuss-ls.el ${DESTDIR}${lispdir}
+Index: debathena-discuss-9.4.30/edsc/discuss.el
+===================================================================
+--- debathena-discuss-9.4.30.orig/edsc/discuss.el	2007-01-31 04:46:25.000000000 -0500
++++ debathena-discuss-9.4.30/edsc/discuss.el	2007-01-31 04:52:35.000000000 -0500
+@@ -30,7 +30,7 @@
+     (save-excursion
+       (set-buffer buf)
+       (erase-buffer)
+-      (call-process-region (point) (point) "/bin/athena/machtype" nil t nil)
++      (call-process-region (point) (point) "/bin/machtype" nil t nil)
+       (goto-char (point-max))
+       (delete-backward-char 1)
+       (setq foo (buffer-string))
+@@ -39,7 +39,7 @@
+ 	  (error "Can't determine machine type.")
+ 	foo)
+       )))
+-(defvar discuss-pathname "/usr/athena/etc/edsc"
++(defvar discuss-pathname "/usr/lib/debathena-discuss/edsc"
+   "*Name of program to run as slave process for discuss.")
+ 
+ (defvar discuss-DWIM nil
+Index: debathena-discuss-9.4.30/include/config.h.sed
+===================================================================
+--- debathena-discuss-9.4.30.orig/include/config.h.sed	2007-01-31 04:46:25.000000000 -0500
++++ debathena-discuss-9.4.30/include/config.h.sed	2007-01-31 04:52:35.000000000 -0500
+@@ -53,7 +53,7 @@
+ 
+ /* Server to exec (assumed to be in SERVERDIR) */
+ #ifndef SERVER
+-#define SERVER "/usr/athena/etc/disserve"
++#define SERVER "/usr/sbin/disserve"
+ #endif
+ #ifndef SERVER_LOCAL
+ /* this one is path-searched if it doesn't begin with slash... */
+@@ -65,7 +65,7 @@
+ 
+ /* Info directory */
+ #ifndef INFO_DIR
+-#define INFO_DIR "/usr/athena/share/discuss/info"
++#define INFO_DIR "/usr/share/discuss/info"
+ #endif
+ 
+ /* Name server / Kerberos realm */
+@@ -80,7 +80,7 @@
+ 
+ /* Place where dsmail can find dspipe */
+ #ifndef DSPIPE
+-#define DSPIPE "/usr/athena/bin/dspipe"
++#define DSPIPE "/usr/bin/dspipe"
+ #endif
+ 
+ /* dsc_setup command */

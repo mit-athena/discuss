@@ -1,0 +1,13 @@
+Index: debathena-discuss-9.4.30/server/Makefile.in
+===================================================================
+--- debathena-discuss-9.4.30.orig/server/Makefile.in	2007-01-30 23:54:16.000000000 -0500
++++ debathena-discuss-9.4.30/server/Makefile.in	2007-01-30 23:54:30.000000000 -0500
+@@ -41,7 +41,7 @@
+ install:
+ 	${top_srcdir}/mkinstalldirs ${DESTDIR}${sbindir}
+ 	${INSTALL_PROGRAM} discussd ${DESTDIR}${sbindir}
+-	${INSTALL} -o discuss -m 4755 disserve ${DESTDIR}${sbindir}
++	${INSTALL_PROGRAM} disserve ${DESTDIR}${sbindir}
+ 
+ discussd: $(DISCUSSD_OBJS)
+ 	${CC} ${LDFLAGS} -o $@ $(DISCUSSD_OBJS) ${LIBS}

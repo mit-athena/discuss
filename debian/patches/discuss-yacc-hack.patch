@@ -1,0 +1,22 @@
+Index: debathena-discuss-9.4.30/client/trn_expr.y
+===================================================================
+--- debathena-discuss-9.4.30.orig/client/trn_expr.y	2007-01-31 04:40:04.000000000 -0500
++++ debathena-discuss-9.4.30/client/trn_expr.y	2007-01-31 04:52:35.000000000 -0500
+@@ -69,7 +69,7 @@
+  *
+  */
+ 
+-static yyerror(msg)
++yyerror(msg)
+ 	char *msg;
+ {
+ #ifdef	lint
+@@ -97,7 +97,7 @@
+ 	return(1);
+ }
+ 
+-static yylex()
++yylex()
+ {
+ 	if (!*cp) return -1;
+ 	if(isdigit(*cp)) {

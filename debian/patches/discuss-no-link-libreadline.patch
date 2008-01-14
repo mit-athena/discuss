@@ -1,0 +1,13 @@
+Index: debathena-discuss-9.4.41/client/Makefile.in
+===================================================================
+--- debathena-discuss-9.4.41.orig/client/Makefile.in	2007-08-23 14:33:29.000000000 -0400
++++ debathena-discuss-9.4.41/client/Makefile.in	2007-08-23 14:38:21.000000000 -0400
+@@ -19,7 +19,7 @@
+ CPPFLAGS=@CPPFLAGS@
+ CFLAGS=@CFLAGS@
+ LDFLAGS=@LDFLAGS@
+-LIBS=../server/acl.o ../libds/libdsk.a ../usp/libusp.a @KRB4_LIBS@ @KRB5_LIBS@ -lss -lreadline -lhistory -lcurses @LIBS@
++LIBS=../server/acl.o ../libds/libdsk.a ../usp/libusp.a @KRB4_LIBS@ @KRB5_LIBS@ -lss @LIBS@
+ ALL_CFLAGS=-I../include ${CPPFLAGS} ${CFLAGS} ${DEFS}
+ 
+ OBJS=	discuss.o edit.o output.o trn_expr.o list.o trn_select.o \
