@@ -221,12 +221,7 @@ void resolve_module (modname, port, hostp, servp, result)
     /* otherwise, we have to generate the port number */
     if (service_port == 0) {
 	sp = getservbyname (SERVICE_NAME, "tcp");
-	if (!sp) {
-	    *result = RPC_SERV_UNKNOWN;
-	    return;
-	}
-
-	service_port = sp -> s_port;
+	service_port = (sp) ? sp->s_port : htons(DISCUSS_FALLBACK_PORT);
     }
 
     *port = service_port;

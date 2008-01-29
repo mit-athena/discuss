@@ -164,12 +164,10 @@ init_rpc (service,code)
     pe = getprotobyname("tcp");
     setservent(0);			    /* get service information */
     
-    if((se = getservbyname("discuss", "tcp")) == NULL) {
-	*code = RPC_SERV_UNKNOWN;
-	return;
-    }
+    se = getservbyname(SERVICE_NAME, "tcp");
     sai.sin_addr.s_addr = INADDR_ANY;
-    sai.sin_port = se->s_port;		    /* set up socket */
+    sai.sin_port = (se) ? se->s_port : htons(DISCUSS_FALLBACK_PORT);
+					    /* set up socket */
     if((s = socket(AF_INET, SOCK_STREAM, pe->p_proto)) < 0) {
 	*code = errno;
 	return;

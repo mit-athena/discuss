@@ -78,6 +78,11 @@ server, in seconds. */
 #define SERVICE_NAME "discuss"
 #endif
 
+/* Service fallback port */
+#ifndef DISCUSS_FALLBACK_PORT
+#define DISCUSS_FALLBACK_PORT 2100
+#endif
+
 /* Place where dsmail can find dspipe */
 #ifndef DSPIPE
 #define DSPIPE "/usr/athena/bin/dspipe"
