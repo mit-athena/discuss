@@ -69,7 +69,7 @@ expr	: trn_no '-' trn_no
  *
  */
 
-static yyerror(msg)
+yyerror(msg)
 	char *msg;
 {
 #ifdef	lint
@@ -97,7 +97,7 @@ static match(s1, s2)
 	return(1);
 }
 
-static yylex()
+yylex()
 {
 	if (!*cp) return -1;
 	if(isdigit(*cp)) {

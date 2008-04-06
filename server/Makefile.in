@@ -41,7 +41,7 @@ depend:
 install:
 	${top_srcdir}/mkinstalldirs ${DESTDIR}${sbindir}
 	${INSTALL_PROGRAM} discussd ${DESTDIR}${sbindir}
-	${INSTALL} -o discuss -m 4755 disserve ${DESTDIR}${sbindir}
+	${INSTALL_PROGRAM} disserve ${DESTDIR}${sbindir}
 
 discussd: $(DISCUSSD_OBJS)
 	${CC} ${LDFLAGS} -o $@ $(DISCUSSD_OBJS) ${LIBS}

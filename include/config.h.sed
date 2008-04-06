@@ -53,7 +53,7 @@ server, in seconds. */
 
 /* Server to exec (assumed to be in SERVERDIR) */
 #ifndef SERVER
-#define SERVER "/usr/athena/etc/disserve"
+#define SERVER "/usr/sbin/disserve"
 #endif
 #ifndef SERVER_LOCAL
 /* this one is path-searched if it doesn't begin with slash... */
@@ -65,7 +65,7 @@ server, in seconds. */
 
 /* Info directory */
 #ifndef INFO_DIR
-#define INFO_DIR "/usr/athena/share/discuss/info"
+#define INFO_DIR "/usr/share/discuss/info"
 #endif
 
 /* Name server / Kerberos realm */
@@ -85,7 +85,7 @@ server, in seconds. */
 
 /* Place where dsmail can find dspipe */
 #ifndef DSPIPE
-#define DSPIPE "/usr/athena/bin/dspipe"
+#define DSPIPE "/usr/bin/dspipe"
 #endif
 
 /* dsc_setup command */

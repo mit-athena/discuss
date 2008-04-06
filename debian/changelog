@@ -1,3 +1,9 @@
+debathena-discuss (10.0.0-1) unstable; urgency=low
+
+  * Merged quilt patches into mainline Athena tree
+
+ -- Shreevatsa R <vatsa@mit.edu>  Sun,  6 Apr 2008 15:54:22 -0400
+
 debathena-discuss (9.4.41-0debathena2) unstable; urgency=low
 
   * Add emacs22 as a default alternative to emacs21 | emacsen.

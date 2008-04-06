@@ -42,10 +42,9 @@ clean:
 depend:
 
 install:
-	${top_srcdir}/mkinstalldirs ${DESTDIR}${sbindir}
 	${top_srcdir}/mkinstalldirs ${DESTDIR}${libexecdir}
 	${top_srcdir}/mkinstalldirs ${DESTDIR}${lispdir}
-	${INSTALL_PROGRAM} edsc ${DESTDIR}${sbindir}
+	${INSTALL_PROGRAM} edsc ${DESTDIR}${libexecdir}
 	${INSTALL} -m 444 ${srcdir}/discuss-acl.el ${DESTDIR}${lispdir}
 	${INSTALL} -m 444 ${srcdir}/discuss-enter.el ${DESTDIR}${lispdir}
 	${INSTALL} -m 444 ${srcdir}/discuss-ls.el ${DESTDIR}${lispdir}

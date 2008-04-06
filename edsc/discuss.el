@@ -30,7 +30,7 @@ will cause load-path to be used.")
     (save-excursion
       (set-buffer buf)
       (erase-buffer)
-      (call-process-region (point) (point) "/bin/athena/machtype" nil t nil)
+      (call-process-region (point) (point) "/bin/machtype" nil t nil)
       (goto-char (point-max))
       (delete-backward-char 1)
       (setq foo (buffer-string))
@@ -39,7 +39,7 @@ will cause load-path to be used.")
 	  (error "Can't determine machine type.")
 	foo)
       )))
-(defvar discuss-pathname "/usr/athena/etc/edsc"
+(defvar discuss-pathname "/usr/lib/debathena-discuss/edsc"
   "*Name of program to run as slave process for discuss.")
 
 (defvar discuss-DWIM nil
