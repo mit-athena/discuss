@@ -1,3 +1,10 @@
+debathena-discuss (10.0.0-0debathena2) unstable; urgency=low
+
+  * Actually use SERVERDIR, BINDIR, and INFODIR in config.h.sed.  (The
+    Makefile already interpolates these variables.)
+
+ -- Anders Kaseorg <andersk@mit.edu>  Sun, 06 Apr 2008 17:28:52 -0400
+
 debathena-discuss (10.0.0-0debathena1) unstable; urgency=low
 
   * Merged quilt patches into mainline Athena tree
