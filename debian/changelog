@@ -1,3 +1,10 @@
+debathena-discuss (10.0.1-0debathena1) unstable; urgency=low
+
+  * Fix obsolete names for Kerberos library functions, which no longer
+    worked on Mac OS X.  Patch from broder.
+
+ -- Anders Kaseorg <andersk@mit.edu>  Sun, 06 Apr 2008 19:25:13 -0400
+
 debathena-discuss (10.0.0-0debathena2) unstable; urgency=low
 
   * Actually use SERVERDIR, BINDIR, and INFODIR in config.h.sed.  (The

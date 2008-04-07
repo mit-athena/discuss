@@ -51,7 +51,7 @@ int *result;
      startsend(ADD_TRN);
      if (rpc_err) { *result = rpc_err; return; }
      sendstr(mtg_name);
-     sendfile(source_file);
+     rpc_sendfile(source_file);
      sendstr(subject);
      sendint(reply_trn);
      sendit(discuss);
@@ -85,7 +85,7 @@ int *result;
      startsend(ADD_TRN2);
      if (rpc_err) { *result = rpc_err; return; }
      sendstr(mtg_name);
-     sendfile(source_file);
+     rpc_sendfile(source_file);
      sendstr(subject);
      sendstr(signature);
      sendint(reply_trn);
@@ -342,7 +342,7 @@ int *result;
      if (rpc_err) { *result = rpc_err; return; }
      sendstr(mtg_name);
      sendint(trn);
-     sendfile(dest_file);
+     rpc_sendfile(dest_file);
      sendit(discuss);
      if (rpc_err) { *result = rpc_err; return; }
      recvdata(dest_file);

@@ -89,7 +89,7 @@ main(argc,argv)
      int i,ok_prev=0,iscont = 0, have_signature = 0, len, d;
      char filename[60], signature[35], field_name[100];
      
-     init_dsc_err_tbl();
+     initialize_dsc_error_table();
 
      PRS(argc,argv);				/* Parse args */
 

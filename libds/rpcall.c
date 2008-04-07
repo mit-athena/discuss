@@ -146,10 +146,10 @@ void sendbool(b)
 
 /*
  *
- * sendfile(tf)  -- Send a file in an RPC call.
+ * rpc_sendfile(tf)  -- Send a file in an RPC call.
  *
  */
-void sendfile(tf)
+void rpc_sendfile(tf)
     tfile tf;
 {
     int tfs;
@@ -181,8 +181,8 @@ void sendit(dest)
  */
 void init_rpc ()
 {
-    init_rpc_err_tbl();
-    init_usp_err_tbl();
+    initialize_rpc_error_table();
+    initialize_usp_error_table();
 }
 
 /*

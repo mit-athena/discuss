@@ -35,7 +35,7 @@ int main (argc,argv)
 	tfile tfstdout;
 	char machine [50],mtg_name[100];
 
-	init_dsc_err_tbl();
+	initialize_dsc_error_table();
 	argc--; argv++;
 	if (argc != 1)
 		goto lusage;

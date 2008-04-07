@@ -44,7 +44,7 @@ char **argv;
 	tfile tf;
 	int i,nread,d,exit_code;
 
-	init_dsc_err_tbl();
+	initialize_dsc_error_table();
 	for (i = 1; i < argc; i++) {
 		if (*argv[i] == '-')
 			switch (argv[i][1]) {

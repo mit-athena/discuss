@@ -116,7 +116,7 @@ init_rpc (service,code)
     USPCardinal bt;
 #endif	  
 
-    init_rpc_err_tbl();
+    initialize_rpc_error_table();
 
 #ifdef INETD
     d = open ("/dev/null", 2);
@@ -314,7 +314,7 @@ long haddr;
         result = krb_rd_req (&ticket, service, instance, haddr, &kdata,
 	                     filename);
 	if (result) {
-	    result += krb_err_base;
+	    result += ERROR_TABLE_BASE_krb;
 	    goto punt_kerberos;
 	}
 #ifdef KERBEROS5
@@ -483,7 +483,7 @@ sendint(i)
     int i;
 {
     if (USP_put_long_integer(us, i) != SUCCESS) {
-	rpc_err = errno + rpc_err_base;
+	rpc_err = errno + ERROR_TABLE_BASE_rpc;
     }
 }
 
@@ -498,7 +498,7 @@ sendstr(str)
     if (str == NULL)
       str = "";
     if (USP_put_string(us, str) != SUCCESS) {
-	rpc_err = rpc_err_base + errno;
+	rpc_err = ERROR_TABLE_BASE_rpc + errno;
 	return;
     }
 }
@@ -512,7 +512,7 @@ sendbool(b)
     bool b;
 {
     if (USP_put_boolean(us, (USPBoolean)b) != SUCCESS) {
-	rpc_err = rpc_err_base + errno;
+	rpc_err = ERROR_TABLE_BASE_rpc + errno;
 	return;
     }
 }
@@ -525,7 +525,7 @@ sendbool(b)
 sendreply()
 {
     if (USP_end_block(us) != SUCCESS) {
-	rpc_err = rpc_err_base + errno;
+	rpc_err = ERROR_TABLE_BASE_rpc + errno;
 	return;
     }
     return;
@@ -540,7 +540,7 @@ senddunno()
 {
     USP_begin_block(us,UNKNOWN_CALL);
     if (USP_end_block(us) != SUCCESS) {
-	rpc_err = rpc_err_base + errno;
+	rpc_err = ERROR_TABLE_BASE_rpc + errno;
 	return;
     }
     return;

@@ -74,7 +74,7 @@ int *result;
 	 exit(1);
      }
 
-     init_krb_err_tbl();
+     initialize_krb_error_table();
 
      realmp = strchr (service_id, '@');
      if (realmp == NULL || realmp - service_id >= sizeof (serv)) {
@@ -131,7 +131,7 @@ int *result;
 
      static KTEXT_ST ticket;
 
-     init_krb_err_tbl();
+     initialize_krb_error_table();
 
      realmp = strchr (service_id, '@');
      if (realmp == NULL || realmp - service_id >= sizeof (serv)) {
@@ -159,7 +159,7 @@ int *result;
      } else {
 	 *authl = 0;
 	 *authp = NULL;
-	 *result = rem + krb_err_base;
+	 *result = rem + ERROR_TABLE_BASE_krb;
      }
 }
 

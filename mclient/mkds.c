@@ -63,7 +63,7 @@ char *argv[];
 	tfile tf;
 	char hostname[256];
 
-	init_dsc_err_tbl();
+	initialize_dsc_error_table();
 
 	nbsrc.user_id = malloc(132);
 

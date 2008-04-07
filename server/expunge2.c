@@ -55,7 +55,7 @@ char **argv;
      char control_name[256];
      int control_fd;
      
-     init_dsc_err_tbl();
+     initialize_dsc_error_table();
 
      for (i = 1; i < argc; i++) {
 	  if (*argv[i] == '-') switch (argv[i][1]) {

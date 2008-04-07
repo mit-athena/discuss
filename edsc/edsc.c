@@ -122,7 +122,7 @@ main(argc, argv)
      char *cp,*op,delim,*args;
      struct rlimit limit;
 
-     init_dsc_err_tbl();
+     initialize_dsc_error_table();
 
      temp_file = malloc(64);
      pgm = malloc(64);

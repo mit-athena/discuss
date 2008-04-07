@@ -37,7 +37,7 @@ main(argc, argv)
 	char **aliasv;
 	int naliases;
 	
-	init_dsc_err_tbl();
+	initialize_dsc_error_table();
 
 	dsc_expand_mtg_set(NULL, "*", &set, &n_matches, &code);
 

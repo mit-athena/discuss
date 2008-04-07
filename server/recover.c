@@ -101,7 +101,7 @@ char **argv;
      has_privs = TRUE;
      use_zephyr = 0;
 
-     init_dsc_err_tbl();
+     initialize_dsc_error_table();
 
      for (i = 1; i < argc; i++) {
 	  if (*argv[i] == '-') switch (argv[i][1]) {

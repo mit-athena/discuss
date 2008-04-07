@@ -154,8 +154,8 @@ int main (argc, argv)
 		ss_perror(sci_idx, code, INFO_DIR);
 	}
 
-	init_disc_err_tbl();
-	init_dsc_err_tbl();
+	initialize_disc_error_table();
+	initialize_dsc_error_table();
 
 	temp_file = malloc(64);
 	pgm = malloc(64);
