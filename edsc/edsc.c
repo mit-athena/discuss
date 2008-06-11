@@ -86,7 +86,7 @@ RETSIGTYPE crash_handler(sig)
 	 * If the fork() fails or if this is the child, do a cache shutdown
 	 */
 	if (pid <= 0) {
-		printf("; Edsc crash (code dump in /usr/tmp) --- signal %d\n",
+		printf("; Edsc crash (code dump in /tmp) --- signal %d\n",
 		       sig);
 #ifdef EDSC_CACHE
 		if (!shutting_down_cache) {
@@ -96,11 +96,11 @@ RETSIGTYPE crash_handler(sig)
 #endif
 	}
 	/*
-	 * If the fork fails or if this is the parent, cd to /usr/tmp
+	 * If the fork fails or if this is the parent, cd to /tmp
 	 * and perform a crash dump
 	 */
 	if (pid != 0) {
-		(void) chdir("/usr/tmp");
+		(void) chdir("/tmp");
 		signal(SIGILL, SIG_DFL);
 		abort();
 	}
