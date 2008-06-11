@@ -56,8 +56,8 @@
 typedef unsigned short USPBoolean;
 typedef short USPInteger;           
 typedef unsigned short USPCardinal; 
-typedef long USPLong_integer;       
-typedef unsigned long USPLong_cardinal;
+typedef int USPLong_integer;       
+typedef unsigned int USPLong_cardinal;
 typedef char *USPString;
 
 typedef struct {
