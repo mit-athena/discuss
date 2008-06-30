@@ -1,3 +1,10 @@
+debathena-discuss (10.0.4-0debathena1) unstable; urgency=low
+
+  * Fix a crash bug in edsc on 64-bit platforms.
+  * Fix date display in discuss on 64-bit platforms.
+
+ -- Greg Hudson <ghudson@mit.edu>  Mon, 30 Jun 2008 12:50:56 -0400
+
 debathena-discuss (10.0.3-0debathena1) unstable; urgency=low
 
   * Fix a crash bug in edsc (int/long mismatch in short_time).

@@ -18,6 +18,7 @@ static char rcsid_tmem_c[] =
 #endif /* lint */
 
 #include <errno.h>
+#include <stdlib.h>
 #include <sys/types.h>
 #include <sys/uio.h>
 #include <discuss/tfile.h>
@@ -75,8 +76,8 @@ static int tmem(op, infop, info, argp, argn, result)
 		return iovmove (SCATTER, (struct iovec **)infop,
 				argp, argn);
 	case TFDESTROY:
-		if (*(char **)info)
-			free (*(char **)info);
+		if (*info)
+			free (*infop);
 		return 0;
 	default:
 		*result = EINVAL;
@@ -93,7 +94,7 @@ tfile mem_tfile (buffer, length)
 	ts[0].iov_base = buffer;
 	ts[0].iov_len = length;
 	ts[1].iov_len = 0;
-	return tcreate (length, (char *) ts, (int)ts, tmem);
+	return tcreate (length, (char *) ts, 1, tmem);
 }
 
 tfile memv_tfile (vec)

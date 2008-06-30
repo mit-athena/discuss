@@ -19,14 +19,16 @@ static char time_buf[15] = "xx/xx/xx xx:xx";
 
 #include <stdio.h>
 #include <time.h>
+#include <discuss/types.h>
 
 char *
 short_time(time)
-     long *time;
+     date_times *time;
 {
      register struct tm *now;
+     time_t tval = *time;
 
-     now = localtime(time);
+     now = localtime(&tval);
      time_buf[2] = '/';
      time_buf[5] = '/';
      time_buf[8] = ' ';
