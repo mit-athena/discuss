@@ -151,7 +151,7 @@ char	*service;
 	     USP_shutdown(us);
 	     return(NULL);
 	 }	 
-	 if(gethostname(me, &melen) == ERROR) {
+	 if(gethostname(me, melen) == ERROR) {
 	     USP_shutdown(us);
 	     return(NULL);
 	 }	 

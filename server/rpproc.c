@@ -351,7 +351,7 @@ recvit (code)
     int procno;
 
     if (USP_rcv_blk(us, &bt) != SUCCESS) {
-	if (errno = ECONNRESET) {		/* he went away, so do we */
+	if (errno == ECONNRESET) {		/* he went away, so do we */
 	    *code = errno;
 	}
 	*code = errno;
