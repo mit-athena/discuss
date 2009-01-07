@@ -37,7 +37,11 @@ main(argc, argv)
 	char **aliasv;
 	int naliases;
 	
+#if defined(__APPLE__) && defined(__MACH__)
+	add_error_table(&et_dsc_error_table);
+#else
 	initialize_dsc_error_table();
+#endif
 
 	dsc_expand_mtg_set(NULL, "*", &set, &n_matches, &code);
 

@@ -89,7 +89,11 @@ main(argc,argv)
      int i,ok_prev=0,iscont = 0, have_signature = 0, len, d;
      char filename[60], signature[35], field_name[100];
      
+#if defined(__APPLE__) && defined(__MACH__)
+     add_error_table(&et_dsc_error_table);
+#else
      initialize_dsc_error_table();
+#endif
 
      PRS(argc,argv);				/* Parse args */
 

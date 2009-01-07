@@ -154,8 +154,13 @@ int main (argc, argv)
 		ss_perror(sci_idx, code, INFO_DIR);
 	}
 
+#if defined(__APPLE__) && defined(__MACH__)
+	add_error_table(&et_disc_error_table);
+	add_error_table(&et_dsc_error_table);
+#else
 	initialize_disc_error_table();
 	initialize_dsc_error_table();
+#endif
 
 	temp_file = malloc(64);
 	pgm = malloc(64);

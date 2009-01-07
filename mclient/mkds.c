@@ -63,7 +63,11 @@ char *argv[];
 	tfile tf;
 	char hostname[256];
 
+#if defined(__APPLE__) && defined(__MACH__)
+	add_error_table(&et_dsc_error_table);
+#else
 	initialize_dsc_error_table();
+#endif
 
 	nbsrc.user_id = malloc(132);
 

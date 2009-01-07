@@ -55,7 +55,11 @@ char **argv;
      char control_name[256];
      int control_fd;
      
+#if defined(__APPLE__) && defined(__MACH__)
+     add_error_table(&et_dsc_error_table);
+#else
      initialize_dsc_error_table();
+#endif
 
      for (i = 1; i < argc; i++) {
 	  if (*argv[i] == '-') switch (argv[i][1]) {

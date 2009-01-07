@@ -60,7 +60,11 @@ main(argc,argv)
   int using_dflt_mtgs = 0;
   struct stat statb;
   
+#if defined(__APPLE__) && defined(__MACH__)
+  add_error_table(&et_dsc_error_table);
+#else
   initialize_dsc_error_table();
+#endif
 
   n_to_look = 50;
   print_trans = 0;

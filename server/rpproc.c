@@ -116,7 +116,11 @@ init_rpc (service,code)
     USPCardinal bt;
 #endif	  
 
+#if defined(__APPLE__) && defined(__MACH__)
+    add_error_table(&et_rpc_error_table);
+#else
     initialize_rpc_error_table();
+#endif
 
 #ifdef INETD
     d = open ("/dev/null", 2);

@@ -122,7 +122,11 @@ main(argc, argv)
      char *cp,*op,delim,*args;
      struct rlimit limit;
 
+#if defined(__APPLE__) && defined(__MACH__)
+     add_error_table(&et_dsc_error_table);
+#else
      initialize_dsc_error_table();
+#endif
 
      temp_file = malloc(64);
      pgm = malloc(64);

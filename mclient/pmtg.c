@@ -35,7 +35,11 @@ int main (argc,argv)
 	tfile tfstdout;
 	char machine [50],mtg_name[100];
 
+#if defined(__APPLE__) && defined(__MACH__)
+	add_error_table(&et_dsc_error_table);
+#else
 	initialize_dsc_error_table();
+#endif
 	argc--; argv++;
 	if (argc != 1)
 		goto lusage;

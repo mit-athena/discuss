@@ -181,8 +181,13 @@ void sendit(dest)
  */
 void init_rpc ()
 {
+#if defined(__APPLE__) && defined(__MACH__)
+    add_error_table(&et_rpc_error_table);
+    add_error_table(&et_usp_error_table);
+#else
     initialize_rpc_error_table();
     initialize_usp_error_table();
+#endif
 }
 
 /*
