@@ -1,3 +1,14 @@
+debathena-discuss (10.0.6-0debathena1) unstable; urgency=low
+
+  [ Evan Broder ]
+  * Add com_err support for delete and discuss on OS X.
+
+  [ Anders Kaseorg ]
+  * Depend emacs | emacsen instead of emacs22 | emacs21 | emacsen, so that
+    the emacs metapackage is pulled in by default.
+
+ -- Anders Kaseorg <andersk@mit.edu>  Thu, 08 Jan 2009 16:35:04 -0500
+
 debathena-discuss (10.0.5-0debathena1) unstable; urgency=low
 
   * Fix some trivial typos.
