@@ -34,14 +34,14 @@ SRCS	= edsc.c parse.c time.c do_quote.c do_trn.c do_mtg.c do_misc.c\
 .c.o:
 	${CC} -c ${ALL_CFLAGS} $<
 
-all: edsc
+all: edsc discuss.el
 
 clean:
 	rm -f edsc *.o version.h discuss.el
 
 depend:
 
-install:
+install: all
 	${top_srcdir}/mkinstalldirs ${DESTDIR}${libexecdir}
 	${top_srcdir}/mkinstalldirs ${DESTDIR}${lispdir}
 	${INSTALL_PROGRAM} edsc ${DESTDIR}${libexecdir}
