@@ -74,11 +74,7 @@ int *result;
 	 exit(1);
      }
 
-#if defined(__APPLE__) && defined(__MACH__)
-     add_error_table(&et_krb_error_table);
-#else
      initialize_krb_error_table();
-#endif
 
      realmp = strchr (service_id, '@');
      if (realmp == NULL || realmp - service_id >= sizeof (serv)) {
@@ -135,11 +131,7 @@ int *result;
 
      static KTEXT_ST ticket;
 
-#if defined(__APPLE__) && defined(__MACH__)
-     add_error_table(&et_krb_error_table);
-#else
      initialize_krb_error_table();
-#endif
 
      realmp = strchr (service_id, '@');
      if (realmp == NULL || realmp - service_id >= sizeof (serv)) {

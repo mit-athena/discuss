@@ -1,3 +1,10 @@
+debathena-discuss (10.0.7-0debathena1) unstable; urgency=low
+
+  * Revert a small part of the OS X com_err patch from 10.0.6 in favor of
+    changes to aclocal.m4
+
+ -- Evan Broder <broder@mit.edu>  Fri, 09 Jan 2009 19:23:15 -0500
+
 debathena-discuss (10.0.6-0debathena1) unstable; urgency=low
 
   [ Evan Broder ]
