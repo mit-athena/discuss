@@ -21,25 +21,7 @@ the trailing `/'.  It must end with `/', since it will be directly
 concatenated to other file names.  Setting this to nil or an empty string
 will cause load-path to be used.")
 
-; Pathname for subprocess.  Pretty gross Athena-specific hacks here.
-
-(defvar edsc-machine-type
-  (let ((foo nil)
-	(process-connection-type nil)
-	(buf (get-buffer-create " *edsc-xyzzy*")))
-    (save-excursion
-      (set-buffer buf)
-      (erase-buffer)
-      (call-process-region (point) (point) "/bin/machtype" nil t nil)
-      (goto-char (point-max))
-      (delete-backward-char 1)
-      (setq foo (buffer-string))
-      (kill-buffer buf)
-      (if (eq foo "")
-	  (error "Can't determine machine type.")
-	foo)
-      )))
-(defvar discuss-pathname "/usr/lib/debathena-discuss/edsc"
+(defvar discuss-pathname "#libexecdir#/edsc"
   "*Name of program to run as slave process for discuss.")
 
 (defvar discuss-DWIM nil

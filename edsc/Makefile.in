@@ -37,7 +37,7 @@ SRCS	= edsc.c parse.c time.c do_quote.c do_trn.c do_mtg.c do_misc.c\
 all: edsc
 
 clean:
-	rm -f edsc *.o version.h
+	rm -f edsc *.o version.h discuss.el
 
 depend:
 
@@ -53,6 +53,9 @@ install:
 
 version.h: ${SRCS} newvers.sh
 	sh newvers.sh
+
+discuss.el: discuss.el.in Makefile
+	sed -e 's|#libexecdir#|${libexecdir}|' $< > $@
 
 edsc: $(OBJS)
 	${CC} ${LDFLAGS} -o edsc ${OBJS} ${LIBS}
