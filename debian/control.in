@@ -1,7 +1,7 @@
 Source: debathena-discuss
 Section: debathena/net
 Priority: extra
-Maintainer: Debian-Athena Project <debathena@mit.edu>
+Maintainer: Debathena Project <debathena@mit.edu>
 Build-Depends: @cdbs@, comerr-dev, ss-dev, libkrb5-dev, libzephyr-dev, libzephyr3-krb, bison
 Standards-Version: 3.7.2
 

@@ -1,7 +1,11 @@
-The Athena source code was obtained from the Athena CVS repository at
-/afs/dev.mit.edu/source, and is licensed as follows:
+This package was debianized as part of the Debathena Project
+<http://debathena.mit.edu/> of the MIT Student Information Processing
+Board.
 
-  Copyright 1996 by the Massachusetts Institute of Technology.
+The Athena source code was obtained from the Athena SVN repository at
+<svn://debathena.mit.edu/athena/trunk>, and is licensed as follows:
+
+  Copyright © 1996 by the Massachusetts Institute of Technology.
 
   Permission to use, copy, modify, and distribute this
   software and its documentation for any purpose and without
@@ -15,6 +19,5 @@ The Athena source code was obtained from the Athena CVS repository at
   this software for any purpose.  It is provided "as is"
   without express or implied warranty.
 
-This Debian package was created as part of the Debian-Athena Project
-<http://web.mit.edu/debathena/www/> of the MIT Student Information
-Processing Board, and is released to the public domain.
+The Debian packaging is Copyright © 2007-2008 Tim Abbott and Anders
+Kaseorg, and has the same license as the original software.
