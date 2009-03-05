@@ -23,6 +23,10 @@ case "$1" in
 	if ! grep -q '^discuss[[:space:]]' /etc/services; then
 	    echo "Discuss		2100/tcp			# Networked conferencing." >>/etc/services
 	fi
+        if [ -z "$2" ]; then
+            update-inetd --add \
+                'discuss\tstream\ttcp\tnowait\tdiscuss\t/usr/sbin/discussd'
+        fi
 	if ! getent passwd discuss >/dev/null; then
 	    adduser --system --no-create-home --disabled-password --home /var/spool/discuss --gecos "Discuss server" --group discuss
 	fi
