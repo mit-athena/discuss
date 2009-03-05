@@ -26,7 +26,12 @@ case "$1" in
 	fi
     ;;
 
-    remove|upgrade|failed-upgrade|abort-install|abort-upgrade|disappear)
+    remove)
+        if hash update-inetd 2>/dev/null; then
+            update-inetd --remove "(#<off># )?discuss"
+        ;;
+
+    upgrade|failed-upgrade|abort-install|abort-upgrade|disappear)
     ;;
 
     *)

@@ -18,11 +18,14 @@ set -e
 
 
 case "$1" in
-    remove|deconfigure)
-        update-inetd --remove 'discuss.*/usr/sbin/discussd'
+    remove)
+        update-inetd --disable discuss
     ;;
 
-    upgrade|failed-upgrade)
+    upgrade|deconfigure)
+        ;;
+
+    |failed-upgrade)
     ;;
 
     *)
