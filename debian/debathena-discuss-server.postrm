@@ -29,7 +29,8 @@ case "$1" in
     remove)
         if hash update-inetd 2>/dev/null; then
             update-inetd --remove "(#<off># )?discuss"
-        ;;
+        fi
+    ;;
 
     upgrade|failed-upgrade|abort-install|abort-upgrade|disappear)
     ;;
