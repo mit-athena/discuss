@@ -27,7 +27,7 @@ Package: debathena-discuss-server
 Architecture: any
 Provides: discuss-server
 Pre-Depends: adduser
-Depends: ${shlibs:Depends}, ${misc:Depends}, debathena-discuss (= ${Source-Version}), netbase
+Depends: ${shlibs:Depends}, ${misc:Depends}, debathena-discuss (= ${Source-Version}), netbase, openbsd-inetd | inet-superserver
 Description: A conferencing and mail archiving system
  Discuss is a user-interface front end to a networked conferencing 
  system.
