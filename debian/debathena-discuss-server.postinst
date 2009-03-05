@@ -23,7 +23,7 @@ case "$1" in
 	if ! grep -q '^discuss[[:space:]]' /etc/services; then
 	    echo "Discuss		2100/tcp			# Networked conferencing." >>/etc/services
 	fi
-        if [ -z "$2" ]; then
+        if dpkg --compare-version "$2" lt 10.0.7-0debathena3; then
             update-inetd --add \
                 'discuss\tstream\ttcp\tnowait\tdiscuss\t/usr/sbin/discussd'
         fi
