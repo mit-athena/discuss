@@ -16,7 +16,7 @@ Description: A conferencing and mail archiving system
 Package: debathena-discuss-emacs
 Architecture: all
 Provides: discuss-emacs
-Depends: ${shlibs:Depends}, ${misc:Depends}, debathena-discuss (= ${source:Version}), emacs | emacsen
+Depends: ${shlibs:Depends}, ${misc:Depends}, debathena-discuss (>= ${source:Version}), emacs | emacsen
 Description: Emacs interface to discuss
  Discuss is a user-interface front end to a networked conferencing 
  system.
