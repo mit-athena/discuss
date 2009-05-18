@@ -16,7 +16,7 @@ Description: A conferencing and mail archiving system
 Package: debathena-discuss-emacs
 Architecture: all
 Provides: discuss-emacs
-Depends: ${shlibs:Depends}, ${misc:Depends}, debathena-discuss (= ${Source-Version}), emacs | emacsen
+Depends: ${shlibs:Depends}, ${misc:Depends}, debathena-discuss (= ${source:Version}), emacs | emacsen
 Description: Emacs interface to discuss
  Discuss is a user-interface front end to a networked conferencing 
  system.
@@ -27,7 +27,7 @@ Package: debathena-discuss-server
 Architecture: any
 Provides: discuss-server
 Pre-Depends: adduser
-Depends: ${shlibs:Depends}, ${misc:Depends}, debathena-discuss (= ${Source-Version}), netbase, openbsd-inetd | inet-superserver
+Depends: ${shlibs:Depends}, ${misc:Depends}, debathena-discuss (= ${binary:Version}), netbase, openbsd-inetd | inet-superserver
 Description: A conferencing and mail archiving system
  Discuss is a user-interface front end to a networked conferencing 
  system.
@@ -38,7 +38,7 @@ Package: debathena-libdsk-dev
 Section: debathena/libdevel
 Architecture: any
 Provides: libdsk-dev
-Depends: ${shlibs:Depends}, ${misc:Depends}, debathena-libusp-dev (= ${Source-Version}), comerr-dev, libkrb5-dev
+Depends: ${shlibs:Depends}, ${misc:Depends}, debathena-libusp-dev (= ${binary:Version}), comerr-dev, libkrb5-dev
 Description: Development files for discuss library
  Discuss is a user-interface front end to a networked conferencing 
  system.
