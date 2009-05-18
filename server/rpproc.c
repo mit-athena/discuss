@@ -44,10 +44,10 @@
 #include <errno.h>
 #include <pwd.h>
 #include <string.h>
-#ifdef KERBEROS
+#ifdef HAVE_KRB4
 #include <krb.h>
 #endif
-#ifdef KERBEROS5
+#ifdef HAVE_KRB5
 #include <krb5.h>
 #endif
 #include <discuss/tfile.h>
@@ -60,7 +60,7 @@
 #define min(a, b) (a < b ? a : b)
 
 /* global */
-#ifdef KERBEROS
+#ifdef HAVE_KRB4
 char rpc_caller[MAX_K_NAME_SZ + 1];
 #else
 char rpc_caller[50];
@@ -69,9 +69,9 @@ static long hostaddr;
 
 extern int numprocs;
 extern struct proc_table procs [];
-#ifdef KERBEROS
+#ifdef HAVE_KRB4
 static char serv_name[20];
-#endif /* KERBEROS */
+#endif /* HAVE_KRB4 */
 short recvshort();
 int rpc_err;
 extern tfile net_tfile ();
@@ -108,7 +108,7 @@ init_rpc (service,code)
     int s;
 #endif
     
-#ifdef KERBEROS
+#ifdef HAVE_KRB4
     int fromlen,i;
     struct sockaddr_in from;
     char hostname[50];
@@ -206,7 +206,7 @@ init_rpc (service,code)
     strcat (rpc_caller, "@");
     strcat (rpc_caller, REALM);
     
-#ifdef KERBEROS
+#ifdef HAVE_KRB4
 
     strcpy(serv_name, service);
     fromlen = sizeof (from);
@@ -235,7 +235,7 @@ init_rpc (service,code)
     return;
 }
 
-#ifdef KERBEROS
+#ifdef HAVE_KRB4
 handle_kerberos(bt,service,haddr)
 USPCardinal bt;
 char *service;
@@ -248,7 +248,7 @@ long haddr;
     AUTH_DAT kdata;
     KTEXT_ST ticket;
 
-#ifdef KERBEROS5
+#ifdef HAVE_KRB5
     char *envvar;
     krb5_context context;
     krb5_auth_context auth_context = NULL;
@@ -256,7 +256,7 @@ long haddr;
     krb5_principal sprinc;
     krb5_keytab keytab = NULL;
     krb5_ticket *processed_ticket = NULL;
-#endif /* KERBEROS5 */
+#endif /* HAVE_KRB5 */
 
     strcpy (rpc_caller, "???@");		/* safety drop */
     strcat (rpc_caller, REALM);
@@ -270,7 +270,7 @@ long haddr;
     for (i=0; i<ticket.length; i++) {
 	ticket.dat[i] = recvshort();
     }
-#ifdef KERBEROS5
+#ifdef HAVE_KRB5
     packet.length = ticket.length;
     packet.data = (krb5_pointer) ticket.dat;
     
@@ -279,7 +279,7 @@ long haddr;
 	sprintf(envvar, "KRB5_KTNAME=/var/spool/%s/krb5.keytab", service);
 	putenv(envvar);
     }
-#endif /* KERBEROS5 */
+#endif /* HAVE_KRB5 */
     /* make filename from service */
     strcpy (filename, "/var/spool/");
     strcat (filename, service);
@@ -287,7 +287,7 @@ long haddr;
 
     strcpy(instance, "*");
 
-#ifdef KERBEROS5
+#ifdef HAVE_KRB5
     result = krb5_init_context(&context);
     if (result) {
         com_err(service, result, "while initializing krb5");
@@ -314,16 +314,16 @@ long haddr;
     else {  /* Let's try krb4 */
 	/* First, log the krb5 error. */
 	com_err(service, result, "while reading request");
-#endif /* KERBEROS5 */
+#endif /* HAVE_KRB5 */
         result = krb_rd_req (&ticket, service, instance, haddr, &kdata,
 	                     filename);
 	if (result) {
 	    result += ERROR_TABLE_BASE_krb;
 	    goto punt_kerberos;
 	}
-#ifdef KERBEROS5
+#ifdef HAVE_KRB5
     }
-#endif /* KERBEROS5 */
+#endif /* HAVE_KRB5 */
 
     strcpy(rpc_caller, kdata.pname);
     if (kdata.pinst[0] != '\0') {
@@ -341,7 +341,7 @@ punt_kerberos:
 	 USP_end_block(us);
     }
 }
-#endif /* KERBEROS */
+#endif /* HAVE_KRB4 */
 
 /*
  *
@@ -362,13 +362,13 @@ recvit (code)
 	return;
     }
 
-#ifdef KERBEROS
+#ifdef HAVE_KRB4
     if (bt == KRB_TICKET || bt == KRB_TICKET2) {
 	 handle_kerberos(bt, serv_name, hostaddr);
 	 *code = 0;
 	 return;
     }
-#endif /* KERBEROS */
+#endif /* HAVE_KRB4 */
 
     procno = bt - PROC_BASE;
 

@@ -33,18 +33,18 @@ static char rcsid_res_module_c[] =
 #include <string.h>
 #include <ctype.h>
 
-#ifdef KERBEROS
+#ifdef HAVE_KRB4
 #include "krb.h"
 #ifndef MAX_K_NAME_SZ
 /* @#$%^$ last minute changes by jtkohl */
 #define krb_get_lrealm get_krbrlm
 #endif
 static void ExpandHost ();
-#endif /* KERBEROS */
+#endif /* HAVE_KRB4 */
 
-#ifdef KERBEROS5
+#ifdef HAVE_KRB5
 #include "krb5.h"
-#endif /* KERBEROS5 */
+#endif /* HAVE_KRB5 */
 
 #ifndef SNAME_SZ
 #define SNAME_SZ 30
@@ -228,11 +228,11 @@ void resolve_module (modname, port, hostp, servp, result)
 
     /* generate the service name, but concatenating "discuss.instance@realm"
      * desired realm. */
-#ifndef KERBEROS
+#ifndef HAVE_KRB4
     strcpy (service_id, "discuss@");
     strcpy (&service_id[8], REALM);
 #else
-#ifndef KERBEROS5
+#ifndef HAVE_KRB5
     strcpy (service_id, "discuss.");
     ExpandHost (myhnamep, &service_id[8], realm);
     strcat(service_id, "@");
@@ -248,14 +248,14 @@ void resolve_module (modname, port, hostp, servp, result)
         strcat (service_id, realmp);
     else
         strcat (service_id, realm);
-#endif /* KERBEROS5 */
-#endif /* KERBEROS */
+#endif /* HAVE_KRB5 */
+#endif /* HAVE_KRB4 */
     *hostp = myhnamep;
     *servp = service_id;
     *result = 0;
 }
 
-#ifdef KERBEROS
+#ifdef HAVE_KRB4
 /*
  *
  * ExpandHost -- takes a user string alias for a host, and converts it
@@ -289,11 +289,11 @@ static void ExpandHost (primary_name, krb_host, krb_realm )
     do {
 	if (isupper(*sp)) *dp=tolower(*sp);
 	else *dp = *sp;
-#ifdef KERBEROS5
+#ifdef HAVE_KRB5
     } while (dp++,*sp++);
 #else
     } while (dp++,*sp && (*sp++ != '.'));
-#endif /* KERBEROS5 */
+#endif /* HAVE_KRB5 */
     *(--dp) = 0;
 
     /* heuristics */
@@ -310,14 +310,14 @@ static void ExpandHost (primary_name, krb_host, krb_realm )
 
 const char *local_realm ()
 {
-#ifdef KERBEROS
+#ifdef HAVE_KRB4
     static char realm [REALM_SZ] = "";
 
     if (realm [0] == '\0')
 	krb_get_lrealm (realm, 1);
 
     return (realm);
-#else /* KERBEROS */
+#else /* HAVE_KRB4 */
     return (REALM);
-#endif /* KERBEROS */
+#endif /* HAVE_KRB4 */
 }

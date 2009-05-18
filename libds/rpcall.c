@@ -38,9 +38,9 @@ static char rcsid_rpcall_c[] =
 #include <discuss/tfile.h>
 #include "rpc.h"
 #include "config.h"
-#ifdef KERBEROS5
+#ifdef HAVE_KRB5
 #include "krb5.h"
-#endif /* KERBEROS5 */
+#endif /* HAVE_KRB5 */
 
 /* DEFINES */
 
@@ -385,7 +385,7 @@ rpc_conversation open_rpc (host, port_num, service_id, code)
 	    sendshort(*authp++);
 	}
 	USP_end_block(us);
-#ifdef KERBEROS5
+#ifdef HAVE_KRB5
 	/* Prior to server version 3, Kerberos 5 wasn't an available
 	 * authentication method, so we need to send a Kerberos 4 ticket.
 	 * Unfortunately, there's no way to query the server version sooner. */
@@ -428,7 +428,7 @@ rpc_conversation open_rpc (host, port_num, service_id, code)
 		USP_end_block(us);
 	    }
 	}
-#endif /* KERBEROS5 */
+#endif /* HAVE_KRB5 */
     } else {
 	USP_begin_block(us,KRB_TICKET);	/* send blank ticket */
 	sendshort(0);

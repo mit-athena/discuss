@@ -74,7 +74,7 @@ disdebug: $(OBJS) rpproc.debug.o core.o coreutil.o
 		$(LIBS) $(LDLIBS)
 
 rpproc.k.o: rpproc.c
-	${CC} ${ALL_CFLAGS} -DINETD -DKERBEROS5 -DKERBEROS -c rpproc.c
+	${CC} ${ALL_CFLAGS} -DINETD -c rpproc.c
 	mv rpproc.o rpproc.k.o
 
 rpproc.nk.o: rpproc.c
@@ -82,11 +82,11 @@ rpproc.nk.o: rpproc.c
 	mv rpproc.o rpproc.nk.o
 
 rpproc.debug.o: rpproc.c
-	${CC} ${ALL_CFLAGS} -DKERBEROS5 -DKERBEROS -c rpproc.c
+	${CC} ${ALL_CFLAGS} -c rpproc.c
 	mv rpproc.o rpproc.debug.o
 
 core.o: core.c
-	${CC} ${ALL_CFLAGS} -DKERBEROS5 -DKERBEROS -c core.c
+	${CC} ${ALL_CFLAGS} -c core.c
 
 coreutil.o: coreutil.c
-	${CC} ${ALL_CFLAGS} -DKERBEROS5 -DKERBEROS -c coreutil.c
+	${CC} ${ALL_CFLAGS} -c coreutil.c

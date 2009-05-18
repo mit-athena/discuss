@@ -56,7 +56,7 @@ libdsk.a: $(OBJS) $(KOBJS) $(ETS) $(KRBET)
 	${RANLIB} libdsk.a
 
 res_module.k.o: res_module.c
-	${CC} ${ALL_CFLAGS} -DKERBEROS5 -DKERBEROS -c res_module.c
+	${CC} ${ALL_CFLAGS} -c res_module.c
 	mv res_module.o res_module.k.o
 
 res_module.nk.o: res_module.c
@@ -64,10 +64,10 @@ res_module.nk.o: res_module.c
 	mv res_module.o res_module.nk.o
 
 auth_krb.o:
-	${CC} ${ALL_CFLAGS} -DKERBEROS5 -DKERBEROS -c auth_krb.c
+	${CC} ${ALL_CFLAGS} -c auth_krb.c
 
 rpcall.k.o:
-	${CC} ${ALL_CFLAGS} -DKERBEROS5 -DKERBEROS -c rpcall.c
+	${CC} ${ALL_CFLAGS} -c rpcall.c
 	mv rpcall.o rpcall.k.o
 
 rpcall.nk.o:

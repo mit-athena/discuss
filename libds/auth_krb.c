@@ -23,9 +23,9 @@ static char *rcsid_auth_krb_c =
 #include <string.h>
 #include <ctype.h>
 #include "krb.h"
-#ifdef KERBEROS5
+#ifdef HAVE_KRB5
 #include "krb5.h"
-#endif /* KERBEROS5 */
+#endif /* HAVE_KRB5 */
 
 char *local_host_name ();
 
@@ -45,14 +45,14 @@ char **authp;
 int *authl;
 int *result;
 {
-#ifdef KERBEROS5
+#ifdef HAVE_KRB5
      get_authenticator_krb5(service_id, checksum, authp, authl, result);
 #else
      get_authenticator_krb4(service_id, checksum, authp, authl, result);
-#endif /* KERBEROS5 */
+#endif /* HAVE_KRB5 */
 }
 
-#ifdef KERBEROS5
+#ifdef HAVE_KRB5
 get_authenticator_krb5 (service_id, checksum, authp, authl, result)
 char *service_id;
 int checksum;
@@ -116,7 +116,7 @@ int *result;
          *result = 0;
      }
 }
-#endif /* KERBEROS5 */
+#endif /* HAVE_KRB5 */
 
 get_authenticator_krb4 (service_id, checksum, authp, authl, result)
 char *service_id;
