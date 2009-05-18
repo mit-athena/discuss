@@ -7,10 +7,10 @@
 			print, pr, p, show;
 
 	request		prt_trans, "Print next transaction.",
-			next;
+			next, n;
 
 	request		prt_trans, "Print previous transation.",
-			prev;
+			prev, back, b;
 
 	request		prt_trans, "Print next reference.",
 			nref;

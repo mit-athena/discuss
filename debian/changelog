@@ -1,3 +1,9 @@
+debathena-discuss (10.0.8-0debathena1) unstable; urgency=low
+
+  * Add one-character aliases to discuss. Patch by Ben Kaduk. (Trac: #238)
+
+ -- Evan Broder <broder@mit.edu>  Mon, 18 May 2009 18:09:10 -0400
+
 debathena-discuss (10.0.7-0debathena3) unstable; urgency=low
 
   * Configure the discuss inetd service.

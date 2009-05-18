@@ -129,8 +129,20 @@ yylex()
 		cp += 4;
 		yylval=trnexpr_curtrn->next;
 		return(NEXT);
+	} else if (match(cp, "n")) {
+		cp += 1;
+		yylval=trnexpr_curtrn->next;
+		return(NEXT);
 	} else if (match(cp, "prev")) {
 		cp += 4;
+		yylval=trnexpr_curtrn->prev;
+		return(PREV);
+	} else if (match(cp, "back")) {
+		cp += 4;
+		yylval=trnexpr_curtrn->prev;
+		return(PREV);
+	} else if (match(cp, "b")) {
+		cp += 1;
 		yylval=trnexpr_curtrn->prev;
 		return(PREV);
  	} else if (match(cp, "nref")) {
