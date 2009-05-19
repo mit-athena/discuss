@@ -4,8 +4,10 @@ debathena-discuss (10.0.8-0debathena1) unstable; urgency=low
   * Squash some lintian warnings by switching from ${Source-Version} to
     ${source:Version} and ${binary:Version}
   * Use HAVE_KRB4 and HAVE_KRB5 instead of KERBEROS and KERBEROS5.
+  * Assorted changes to make discuss work with any combination of krb4 and
+    krb5 (including neither).
 
- -- Evan Broder <broder@mit.edu>  Mon, 18 May 2009 18:48:39 -0400
+ -- Evan Broder <broder@mit.edu>  Mon, 18 May 2009 23:50:01 -0400
 
 debathena-discuss (10.0.7-0debathena3) unstable; urgency=low
 

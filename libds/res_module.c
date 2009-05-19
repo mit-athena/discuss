@@ -34,17 +34,20 @@ static char rcsid_res_module_c[] =
 #include <ctype.h>
 
 #ifdef HAVE_KRB4
-#include "krb.h"
+#include <krb.h>
 #ifndef MAX_K_NAME_SZ
 /* @#$%^$ last minute changes by jtkohl */
 #define krb_get_lrealm get_krbrlm
 #endif
-static void ExpandHost ();
 #endif /* HAVE_KRB4 */
 
 #ifdef HAVE_KRB5
-#include "krb5.h"
+#include <krb5.h>
 #endif /* HAVE_KRB5 */
+
+#if defined(HAVE_KRB5) || defined(HAVE_KRB4)
+static void ExpandHost ();
+#endif /* HAVE_KRB5 || HAVE_KRB4 */
 
 #ifndef SNAME_SZ
 #define SNAME_SZ 30
@@ -228,34 +231,29 @@ void resolve_module (modname, port, hostp, servp, result)
 
     /* generate the service name, but concatenating "discuss.instance@realm"
      * desired realm. */
-#ifndef HAVE_KRB4
-    strcpy (service_id, "discuss@");
-    strcpy (&service_id[8], REALM);
+    strcpy (service_id, "discuss");
+#if defined(HAVE_KRB5) || defined(HAVE_KRB4)
+#ifdef HAVE_KRB5
+    strcat (service_id, "/");
 #else
-#ifndef HAVE_KRB5
-    strcpy (service_id, "discuss.");
-    ExpandHost (myhnamep, &service_id[8], realm);
-    strcat(service_id, "@");
-    if (realmp)
-	strcat (service_id, realmp);
-    else
-	strcat (service_id, realm);
-#else
-    strcpy (service_id, "discuss/");
+    strcat (service_id, ".");
+#endif
     ExpandHost (myhnamep, &service_id[8], realm);
     strcat(service_id, "@");
     if (realmp)
         strcat (service_id, realmp);
     else
         strcat (service_id, realm);
-#endif /* HAVE_KRB5 */
-#endif /* HAVE_KRB4 */
+#else /* HAVE_KRB5 || HAVE_KRB4 */
+    strcat (service_id, "@");
+    strcpy (&service_id[8], REALM);
+#endif /* HAVE_KRB5 || HAVE_KRB4 */
     *hostp = myhnamep;
     *servp = service_id;
     *result = 0;
 }
 
-#ifdef HAVE_KRB4
+#if defined(HAVE_KRB4) || defined(HAVE_KRB5)
 /*
  *
  * ExpandHost -- takes a user string alias for a host, and converts it
@@ -284,7 +282,26 @@ static void ExpandHost (primary_name, krb_host, krb_realm )
      * could give the command "menel echo foo" and we will resolve
      * it to "menelaus".
      */
+#ifdef HAVE_KRB5
+    krb5_context context;
+    char **hrealms = 0;
+    krb5_error_code retval;
+
+    retval = krb5_init_context(&context);
+    if (!retval)
+      krb5_get_host_realm(context, primary_name, &hrealms);
+    if (!retval && !hrealms[0])
+      strcpy(krb_realm, hrealms[0]);
+    if (retval)
+      strcpy(krb_realm, local_realm());
+
+    if (hrealms)
+      krb5_free_host_realm(context, hrealms);
+    if (context)
+      krb5_free_context(context);
+#else /* HAVE_KRB5 */
     (void) strcpy(krb_realm, (char *)krb_realmofhost(primary_name));
+#endif
     /* lower case Kerberos host name */
     do {
 	if (isupper(*sp)) *dp=tolower(*sp);
@@ -306,7 +323,7 @@ static void ExpandHost (primary_name, krb_host, krb_realm )
 #endif
     return;
 }
-#endif
+#endif /* HAVE_KRB4 || HAVE_KRB5 */
 
 const char *local_realm ()
 {
@@ -317,6 +334,17 @@ const char *local_realm ()
 	krb_get_lrealm (realm, 1);
 
     return (realm);
+#elif defined(HAVE_KRB5)
+    krb5_context context;
+    static char *realm = NULL;
+
+    if (!realm) {
+      krb5_init_context(&context);
+      krb5_get_default_realm(context, &realm);
+      krb5_free_context(context);
+    }
+
+    return realm;
 #else /* HAVE_KRB4 */
     return (REALM);
 #endif /* HAVE_KRB4 */

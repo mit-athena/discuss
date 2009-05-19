@@ -32,7 +32,7 @@
 	ec	DISC_ACTION_NOT_PERFORMED,
 		"Action not performed"
 
-	ec	DISC_NO_KRB
+	ec	DISC_NO_KRB,
 		"No Kerberos support built in"
 
 	end

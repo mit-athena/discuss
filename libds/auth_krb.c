@@ -28,6 +28,7 @@ static char *rcsid_auth_krb_c =
 #ifdef HAVE_KRB5
 #include "krb5.h"
 #endif /* HAVE_KRB5 */
+#include "discuss_err.h"
 
 char *local_host_name ();
 
@@ -52,8 +53,9 @@ int *result;
 #elif HAVE_KRB4
      get_authenticator_krb4(service_id, checksum, authp, authl, result);
 #else /* No Kerberos */
-     printf("get_authenticator", DISC_NO_KRB, "while initializing authentication");
-     exit(1);
+     *authl = 0;
+     *authp = NULL;
+     *result = DISC_NO_KRB;
 #endif
 }
 
