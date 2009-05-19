@@ -22,7 +22,9 @@ static char *rcsid_auth_krb_c =
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+#ifdef HAVE_KRB4
 #include "krb.h"
+#endif /* HAVE_KRB4 */
 #ifdef HAVE_KRB5
 #include "krb5.h"
 #endif /* HAVE_KRB5 */
@@ -47,9 +49,12 @@ int *result;
 {
 #ifdef HAVE_KRB5
      get_authenticator_krb5(service_id, checksum, authp, authl, result);
-#else
+#elif HAVE_KRB4
      get_authenticator_krb4(service_id, checksum, authp, authl, result);
-#endif /* HAVE_KRB5 */
+#else /* No Kerberos */
+     printf("get_authenticator", DISC_NO_KRB, "while initializing authentication");
+     exit(1);
+#endif
 }
 
 #ifdef HAVE_KRB5
@@ -74,7 +79,7 @@ int *result;
 	 exit(1);
      }
 
-     initialize_krb_error_table();
+     initialize_krb5_error_table();
 
      realmp = strchr (service_id, '@');
      if (realmp == NULL || realmp - service_id >= sizeof (serv)) {
@@ -118,6 +123,7 @@ int *result;
 }
 #endif /* HAVE_KRB5 */
 
+#ifdef HAVE_KRB4
 get_authenticator_krb4 (service_id, checksum, authp, authl, result)
 char *service_id;
 int checksum;
@@ -162,4 +168,4 @@ int *result;
 	 *result = rem + ERROR_TABLE_BASE_krb;
      }
 }
-
+#endif /* HAVE_KRB4 */

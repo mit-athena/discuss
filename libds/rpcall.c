@@ -41,6 +41,7 @@ static char rcsid_rpcall_c[] =
 #ifdef HAVE_KRB5
 #include "krb5.h"
 #endif /* HAVE_KRB5 */
+#include "rpc_et.h"
 
 /* DEFINES */
 
@@ -385,7 +386,6 @@ rpc_conversation open_rpc (host, port_num, service_id, code)
 	    sendshort(*authp++);
 	}
 	USP_end_block(us);
-#ifdef HAVE_KRB5
 	/* Prior to server version 3, Kerberos 5 wasn't an available
 	 * authentication method, so we need to send a Kerberos 4 ticket.
 	 * Unfortunately, there's no way to query the server version sooner. */
@@ -396,6 +396,7 @@ rpc_conversation open_rpc (host, port_num, service_id, code)
         char realm[30];
         krb5_context context;
 	if (get_server_version() < SERVER_3) {
+#if defined(HAVE_KRB5) && defined(HAVE_KRB4)
 	    kcode = krb5_init_context(&context);
 	    if (kcode) {
 	        com_err("discuss", kcode, "while initializing krb5");
@@ -427,8 +428,10 @@ rpc_conversation open_rpc (host, port_num, service_id, code)
 		}
 		USP_end_block(us);
 	    }
+#else /* HAVE_KRB5 && HAVE_KRB4 */
+            com_err("discuss", RPC_SERVER_TOO_OLD, "while authenticating to discuss server");
+#endif /* HAVE_KRB5 && HAVE_KRB4 */
 	}
-#endif /* HAVE_KRB5 */
     } else {
 	USP_begin_block(us,KRB_TICKET);	/* send blank ticket */
 	sendshort(0);

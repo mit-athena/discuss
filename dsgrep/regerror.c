@@ -13,6 +13,7 @@ static char *RCSid = "$Id: regerror.c,v 1.2 1999-01-22 23:09:40 ghudson Exp $";
 #endif
 
 #include <stdio.h>
+#include <stdlib.h>
 void regerror(msg)
      char *msg;
 {

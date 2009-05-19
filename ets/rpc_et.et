@@ -36,4 +36,7 @@
 	ec	RPC_NO_ADDR,
 		"Host has no network address"
 
+	ec	RPC_SERVER_TOO_OLD,
+		"RPC server too old"
+
 	end
