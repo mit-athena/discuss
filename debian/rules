@@ -4,7 +4,7 @@ DEB_AUTO_UPDATE_AUTOCONF = 2.50
 include /usr/share/cdbs/1/rules/debhelper.mk
 include /usr/share/cdbs/1/class/autotools.mk
 
-DEB_CONFIGURE_EXTRA_FLAGS += --with-krb4=$(shell krb5-config --prefix krb4) --with-krb5 --with-zephyr
+DEB_CONFIGURE_EXTRA_FLAGS += --without-krb4 --with-krb5 --with-zephyr
 DEB_MAKE_CLEAN_TARGET = clean
 DEB_DH_INSTALL_SOURCEDIR = $(DEB_DESTDIR)
 
