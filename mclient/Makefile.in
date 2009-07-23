@@ -61,7 +61,7 @@ pmtg: pmtg.o ../ets/dsc_et.o
 	${CC} ${LDFLAGS} -o pmtg pmtg.o ../ets/dsc_et.o ${KLIBS}
 
 dsmail: dsmail.o ../ets/dsc_et.o
-	${CC} ${LDFLAGS} -o dsmail dsmail.o ../ets/dsc_et.o ${KLIBS}
+	${CC} ${LDFLAGS} -o dsmail dsmail.o ../ets/dsc_et.o ${NKLIBS}
 
 dspipe: dspipe.o ../ets/dsc_et.o
 	${CC} ${LDFLAGS} -o dspipe dspipe.o ../ets/dsc_et.o ${KLIBS}

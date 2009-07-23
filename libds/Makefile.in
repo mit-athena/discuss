@@ -60,7 +60,7 @@ res_module.k.o: res_module.c
 	mv res_module.o res_module.k.o
 
 res_module.nk.o: res_module.c
-	${CC} ${ALL_CFLAGS} -c res_module.c
+	${CC} ${ALL_CFLAGS} -DNOKERBEROS -c res_module.c
 	mv res_module.o res_module.nk.o
 
 auth_krb.o:
@@ -71,6 +71,6 @@ rpcall.k.o:
 	mv rpcall.o rpcall.k.o
 
 rpcall.nk.o:
-	${CC} ${ALL_CFLAGS} -c rpcall.c
+	${CC} ${ALL_CFLAGS} -DNOKERBEROS -c rpcall.c
 	mv rpcall.o rpcall.nk.o
 

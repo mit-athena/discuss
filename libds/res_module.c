@@ -33,6 +33,11 @@ static char rcsid_res_module_c[] =
 #include <string.h>
 #include <ctype.h>
 
+#ifdef NOKERBEROS
+#undef HAVE_KRB4
+#undef HAVE_KRB5
+#endif /* NOKERBEROS */
+
 #ifdef HAVE_KRB4
 #include <krb.h>
 #ifndef MAX_K_NAME_SZ
@@ -289,10 +294,10 @@ static void ExpandHost (primary_name, krb_host, krb_realm )
 
     retval = krb5_init_context(&context);
     if (!retval)
-      krb5_get_host_realm(context, primary_name, &hrealms);
-    if (!retval && !hrealms[0])
+      retval = krb5_get_host_realm(context, primary_name, &hrealms);
+    if (!retval && hrealms && hrealms[0] && *(hrealms[0]))
       strcpy(krb_realm, hrealms[0]);
-    if (retval)
+    else
       strcpy(krb_realm, local_realm());
 
     if (hrealms)

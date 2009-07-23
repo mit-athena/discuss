@@ -38,6 +38,12 @@ static char rcsid_rpcall_c[] =
 #include <discuss/tfile.h>
 #include "rpc.h"
 #include "config.h"
+
+#ifdef NOKERBEROS
+#undef HAVE_KRB4
+#undef HAVE_KRB5
+#endif /* NOKERBEROS */
+
 #ifdef HAVE_KRB5
 #include "krb5.h"
 #endif /* HAVE_KRB5 */

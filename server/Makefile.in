@@ -78,7 +78,7 @@ rpproc.k.o: rpproc.c
 	mv rpproc.o rpproc.k.o
 
 rpproc.nk.o: rpproc.c
-	${CC} ${ALL_CFLAGS} -DSUBPROC -c rpproc.c
+	${CC} ${ALL_CFLAGS} -DSUBPROC -DNOKERBEROS -c rpproc.c
 	mv rpproc.o rpproc.nk.o
 
 rpproc.debug.o: rpproc.c

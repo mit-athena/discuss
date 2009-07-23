@@ -20,6 +20,11 @@
  */
 
 
+#ifdef NOKERBEROS
+#undef HAVE_KRB4
+#undef HAVE_KRB5
+#endif /* NOKERBEROS */
+
 #ifdef INETD
 #define ASSOC 1
 #endif
