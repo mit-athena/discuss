@@ -1,3 +1,9 @@
+debathena-discuss (10.0.10-0debathena1) unstable; urgency=low
+
+  * Patch discuss server to work without krb4. Patch by Mitch Berger.
+
+ -- Evan Broder <broder@mit.edu>  Thu, 23 Jul 2009 21:00:55 -0400
+
 debathena-discuss (10.0.9-0debathena1) unstable; urgency=low
 
   * Fix local/dumb authentication needed for mail delivery and local

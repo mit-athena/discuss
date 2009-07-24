@@ -64,19 +64,44 @@
 #define ERROR   -1
 #define min(a, b) (a < b ? a : b)
 
+/* When both krb4 and krb5 are available, the server will try to
+ * authenticate clients with krb5 and then fall back to krb4.  To
+ * avoid writing entirely separate code for the case where krb4 is
+ * not available, we fake some of the constants and data structures.
+ */
+#ifndef HAVE_KRB4
+#define ANAME_SZ      40
+#define REALM_SZ      40
+#define INST_SZ       40
+#define MAX_KTXT_LEN  1250
+#define MAX_K_NAME_SZ (ANAME_SZ + INST_SZ + REALM_SZ + 2)
+struct ktext {
+    int length;
+    unsigned char dat[MAX_KTXT_LEN];
+    unsigned long mbz;
+};
+typedef struct ktext KTEXT_ST;
+struct partial_auth_dat { /* Just enough of the struct for our purposes */
+    char pname[ANAME_SZ];
+    char pinst[INST_SZ];
+    char prealm[REALM_SZ];
+};
+typedef struct partial_auth_dat AUTH_DAT;
+#endif /* HAVE_KRB4 */
+
 /* global */
-#ifdef HAVE_KRB4
+#if defined(HAVE_KRB4) || defined(HAVE_KRB5)
 char rpc_caller[MAX_K_NAME_SZ + 1];
 #else
 char rpc_caller[50];
-#endif
+#endif /* HAVE_KRB4 || HAVE_KRB5 */
 static long hostaddr;
 
 extern int numprocs;
 extern struct proc_table procs [];
-#ifdef HAVE_KRB4
+#if defined(HAVE_KRB4) || defined(HAVE_KRB5)
 static char serv_name[20];
-#endif /* HAVE_KRB4 */
+#endif /* HAVE_KRB4 || HAVE_KRB5 */
 short recvshort();
 int rpc_err;
 extern tfile net_tfile ();
@@ -113,13 +138,13 @@ init_rpc (service,code)
     int s;
 #endif
     
-#ifdef HAVE_KRB4
+#if defined(HAVE_KRB4) || defined(HAVE_KRB5)
     int fromlen,i;
     struct sockaddr_in from;
     char hostname[50];
     struct hostent *hp;
     USPCardinal bt;
-#endif	  
+#endif /* HAVE_KRB4 || HAVE_KRB5 */
 
 #if defined(__APPLE__) && defined(__MACH__)
     add_error_table(&et_rpc_error_table);
@@ -211,7 +236,7 @@ init_rpc (service,code)
     strcat (rpc_caller, "@");
     strcat (rpc_caller, REALM);
     
-#ifdef HAVE_KRB4
+#if defined(HAVE_KRB4) || defined(HAVE_KRB5)
 
     strcpy(serv_name, service);
     fromlen = sizeof (from);
@@ -235,12 +260,12 @@ init_rpc (service,code)
     }
     
     handle_kerberos(bt,serv_name,hostaddr);
-#endif
+#endif /* HAVE_KRB4 || HAVE_KRB5 */
     *code = 0;
     return;
 }
 
-#ifdef HAVE_KRB4
+#if defined(HAVE_KRB4) || defined(HAVE_KRB5)
 handle_kerberos(bt,service,haddr)
 USPCardinal bt;
 char *service;
@@ -320,12 +345,14 @@ long haddr;
 	/* First, log the krb5 error. */
 	com_err(service, result, "while reading request");
 #endif /* HAVE_KRB5 */
+#ifdef HAVE_KRB4
         result = krb_rd_req (&ticket, service, instance, haddr, &kdata,
 	                     filename);
 	if (result) {
 	    result += ERROR_TABLE_BASE_krb;
 	    goto punt_kerberos;
 	}
+#endif /* HAVE_KRB4 */
 #ifdef HAVE_KRB5
     }
 #endif /* HAVE_KRB5 */
@@ -346,7 +373,7 @@ punt_kerberos:
 	 USP_end_block(us);
     }
 }
-#endif /* HAVE_KRB4 */
+#endif /* HAVE_KRB4 || HAVE_KRB5 */
 
 /*
  *
@@ -367,13 +394,13 @@ recvit (code)
 	return;
     }
 
-#ifdef HAVE_KRB4
+#if defined(HAVE_KRB4) || defined(HAVE_KRB5)
     if (bt == KRB_TICKET || bt == KRB_TICKET2) {
 	 handle_kerberos(bt, serv_name, hostaddr);
 	 *code = 0;
 	 return;
     }
-#endif /* HAVE_KRB4 */
+#endif /* HAVE_KRB4 || HAVE_KRB5 */
 
     procno = bt - PROC_BASE;
 
