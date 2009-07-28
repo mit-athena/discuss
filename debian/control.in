@@ -2,7 +2,7 @@ Source: debathena-discuss
 Section: debathena/net
 Priority: extra
 Maintainer: Debathena Project <debathena@mit.edu>
-Build-Depends: @cdbs@, comerr-dev, ss-dev, libkrb5-dev, libzephyr-dev, libzephyr3-krb, bison
+Build-Depends: @cdbs@, comerr-dev, ss-dev, libkrb5-dev, libzephyr-dev, bison
 Standards-Version: 3.7.2
 
 Package: debathena-discuss
@@ -27,7 +27,7 @@ Package: debathena-discuss-server
 Architecture: any
 Provides: discuss-server
 Pre-Depends: adduser
-Depends: ${shlibs:Depends}, ${misc:Depends}, debathena-discuss (= ${binary:Version}), netbase, openbsd-inetd | inet-superserver
+Depends: ${shlibs:Depends}, ${misc:Depends}, debathena-discuss (= ${binary:Version}), libzephyr4-krb5 | libzephyr3-krb, netbase, openbsd-inetd | inet-superserver
 Description: A conferencing and mail archiving system
  Discuss is a user-interface front end to a networked conferencing 
  system.

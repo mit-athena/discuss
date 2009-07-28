@@ -1,3 +1,9 @@
+debathena-discuss (10.0.10-0debathena2) unstable; urgency=low
+
+  * Depend on Kerberos-enabled zephyr instead of build-depending.
+
+ -- Evan Broder <broder@mit.edu>  Mon, 27 Jul 2009 14:38:10 -0400
+
 debathena-discuss (10.0.10-0debathena1) unstable; urgency=low
 
   * Patch discuss server to work without krb4. Patch by Mitch Berger.
