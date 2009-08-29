@@ -1,3 +1,11 @@
+debathena-discuss (10.0.11-0debathena1) unstable; urgency=low
+
+  * Move the single-letter checks in trn_expr.y:yylex to the bottom of the
+    function so that they get caught after commands that start with those
+    letters. (Trac: #346)
+
+ -- Evan Broder <broder@mit.edu>  Sat, 29 Aug 2009 17:20:43 -0400
+
 debathena-discuss (10.0.10-0debathena2) unstable; urgency=low
 
   * Depend on Kerberos-enabled zephyr instead of build-depending.
