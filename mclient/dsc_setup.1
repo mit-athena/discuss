@@ -1,0 +1,42 @@
+.\"
+.\"
+.\"
+.\"
+.\"
+.\"
+.TH DSC_SETUP 1 "16 October 2009" "MIT SIPB"
+.SH NAME
+dsc_setup \- Create an initial ~/.meetings file
+.SH SYNOPSIS
+.B dsc_setup
+.SH DESCRIPTION
+.I dsc_setup
+should be run before a user uses
+.I discuss
+for the first time.  
+.I dsc_setup 
+creates an initial ~/.meetings file which includes the two public meetings "New_meetings" and "Everybody".  If a user runs
+.I discuss
+and does not have a ~/.meetings file, they will be prompted to run 
+.I dsc_setup.  
+
+Users who wish to use discuss but do not wish to run this program may instead create an empty ~/.meetings file.
+
+.I dsc_setup
+accepts no arguments.
+
+.SH FILES
+~/.meetings	Data file listing meetings that you attend.
+
+.SH AUTHORS
+Ken Raeburn, MIT Student Information Processing Board
+
+.SH "SEE ALSO"
+.PP
+discuss(1)
+
+
+
+
+
+

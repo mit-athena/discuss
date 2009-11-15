@@ -1,0 +1,47 @@
+.\"
+.\"
+.\"
+.\"
+.\"
+.\"
+.TH MKDS 8 "16 October 2009" "MIT SIPB"
+.SH NAME
+mkds \- Create a discuss meeting
+.SH SYNOPSIS
+.B mkds
+.SH DESCRIPTION
+.I mkds
+creates a discuss meeting on a specified discuss server, provided the user has permission to do so.
+
+.I mkds 
+will prompt for the server name, a directory where the meeting should
+be stored, the long and short names of the meeting, and whether or not
+the meeting should be public.  If the meeting can be successfully
+created, mkds will then prompt for a list of users who should have
+permission to create new transactions in the meeting, and will require
+the creator to enter the initial meeting transaction.  Finally, mkds
+will ask whether or not the meeting should be announced.
+
+.I mkds
+accepts no arguments.
+
+.SH FILES
+.ta \w'/var/spool/discuss/cacl  'u
+.br
+~/.meetings	Data file listing meetings that you attend.
+.br
+/var/spool/discuss/cacl	The list of users (Kerberos principals) who 
+	can create meetings on the server
+
+.SH AUTHORS
+Robert French and Ken Raeburn, MIT Student Information Processing Board
+
+.SH "SEE ALSO"
+.PP
+discuss(1)
+
+
+
+
+
+

@@ -1,0 +1,40 @@
+.\"
+.\"
+.\"
+.\"
+.\"
+.\"
+.TH DSPIPE 8 "16 October 2009" "MIT SIPB"
+.SH NAME
+dspipe \- Pipe STDIN into a discuss meeting
+.SH SYNOPSIS
+.B dspipe
+.I meeting_name
+[ \-t
+.I topic
+]
+[ \-s
+.I signature
+]
+.SH DESCRIPTION
+.I dspipe
+is designed to be used on discuss servers to pipe STDIN into a
+specified discuss meeting.  A topic (subject) for the transaction may
+be specified, as well as a signature.  The user running dspipe must
+have "answer", "status", and "write" permissions on the meeting in
+question.
+
+.SH FILES
+~/.meetings	Data file listing meetings that you attend.
+
+.SH AUTHORS
+Stan Zanarotti, MIT Student Information Processing Board
+
+.SH "SEE ALSO"
+.PP
+discuss(1)
+
+
+
+
+
