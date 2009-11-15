@@ -49,7 +49,7 @@ install:
 	${INSTALL} -m 755 dsc_setup.sh ${DESTDIR}${bindir}/dsc_setup
 	${INSTALL} -m 444 crmtgs.1 ${DESTDIR}${mandir}/man1
 	${INSTALL} -m 444 mkds.8 ${DESTDIR}${mandir}/man8
-	${INSTALL} -m 444 pmtg.1 ${DESTDIR}${mandir}/man8
+	${INSTALL} -m 444 pmtg.1 ${DESTDIR}${mandir}/man1
 	${INSTALL} -m 444 dsmail.1 ${DESTDIR}${mandir}/man1
 	${INSTALL} -m 444 dspipe.8 ${DESTDIR}${mandir}/man8
 	${INSTALL} -m 444 dsc_setup.1 ${DESTDIR}${mandir}/man1
