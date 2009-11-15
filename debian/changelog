@@ -1,3 +1,9 @@
+debathena-discuss (10.0.12-0debathena1) unstable; urgency=low
+
+  * Stop using the obsolete AC_TYPE_SIGNAL. (Trac: #347)
+
+ -- Evan Broder <broder@mit.edu>  Sun, 15 Nov 2009 16:00:34 -0500
+
 debathena-discuss (10.0.11-0debathena1) unstable; urgency=low
 
   * Move the single-letter checks in trn_expr.y:yylex to the bottom of the

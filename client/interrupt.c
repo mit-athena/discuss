@@ -21,7 +21,7 @@ struct sigaction act, oact;
 
 int interrupt = 0;
 #if !HAVE_SIGACTION
-static RETSIGTYPE (*old_interrupt_handler)() = SIG_DFL;
+static void (*old_interrupt_handler)() = SIG_DFL;
 #endif
 static void
 interrupt_handler(dummy)

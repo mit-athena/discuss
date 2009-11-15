@@ -34,7 +34,7 @@ static char *rcsid_discuss_c = "$Id: edsc.c,v 1.15 2006-03-10 07:11:37 ghudson E
 char *local_realm();
 int log_warn();
 tfile unix_tfile();
-RETSIGTYPE sig_do_quit();
+void sig_do_quit();
 
 static struct edsc_req {
      char *name;				/* Name of request */
@@ -75,7 +75,7 @@ static struct edsc_req {
 /*
  * This is we can cleanup when we have problems
  */
-RETSIGTYPE crash_handler(sig)
+void crash_handler(sig)
 	int	sig;
 {
 	static int	shutting_down_cache = 0;
@@ -253,7 +253,7 @@ do_quit(args)
 	exit(0);
 }
 
-RETSIGTYPE sig_do_quit()
+void sig_do_quit()
 {
 	do_quit(NULL);
 }
