@@ -10,3 +10,4 @@ usr/bin/rmds
 usr/lib/debathena-discuss/edsc
 usr/share/discuss
 usr/share/man/man1/*.1
+usr/share/man/man8/*.8
