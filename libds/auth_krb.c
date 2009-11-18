@@ -81,7 +81,9 @@ int *result;
 	 exit(1);
      }
 
+#if !defined(__APPLE__) || !defined(__MACH__)
      initialize_krb5_error_table();
+#endif
 
      realmp = strchr (service_id, '@');
      if (realmp == NULL || realmp - service_id >= sizeof (serv)) {
