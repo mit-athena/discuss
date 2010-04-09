@@ -167,26 +167,20 @@ int main (argc, argv)
 	(void) sprintf(temp_file, "/tmp/mtg%d.%d", (int)getuid(), getpid());
 
 	if (code = find_rc_filename()) {
-	     register char *prompt;
-	     ss_perror(sci_idx, code, "");
-	     fprintf(stderr, "\n\
-If you are using discuss for the first time, you need to run the 'dsc_setup'\n\
-command from the shell.\n\n");
-	     fflush(stderr);
-	     prompt = "Run dsc_setup now? (y or n) ";
-	     while (getyn(prompt, 'y')) {
-		  printf("\nRunning dsc_setup...\n");
-		  system("dsc_setup");
-		  if (code = find_rc_filename()) {
-		       ss_perror(sci_idx, code, "");
-		       prompt =
-			    "\nThat didn't seem to work; try again? (y or n)";
-		  } else break;
-	     }
-	     if (code)
-		 exit (1);
+	  if (code != EACCES) {
+	    fprintf(stderr, "Creating new ~/.meetings file...\n");
+	    fflush(stderr);
+	    char buf[100];
+	    sprintf(buf, "%s -q", DSC_SETUP);
+	    system(buf);
+	    code = find_rc_filename();	
+	  }
+	  if (code) {
+	    ss_perror(sci_idx, code, "while reading meetings file.");
+	    exit (1);
+	  }
 	}
-	else if (!quit) {
+        if (!quit) {
 	     printf("Discuss version %s.  Type '?' for a list of commands.\n",
 		    dsc_version);
 	     if (!initial_meeting)

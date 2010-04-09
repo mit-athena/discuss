@@ -1,3 +1,9 @@
+debathena-discuss (10.0.12-0debathena2) unstable; urgency=low
+
+  * Run dsc_setup on behalf of the user, like edsc does. (Trac #426)
+
+ -- Jonathan Reed <jdreed@mit.edu>  Thu, 08 Apr 2010 20:06:29 -0400
+
 debathena-discuss (10.0.12-0debathena1) unstable; urgency=low
 
   * Stop using the obsolete AC_TYPE_SIGNAL. (Trac: #347)
