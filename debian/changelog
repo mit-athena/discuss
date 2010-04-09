@@ -1,8 +1,9 @@
 debathena-discuss (10.0.12-0debathena2) unstable; urgency=low
 
   * Run dsc_setup on behalf of the user, like edsc does. (Trac #426)
+  * Rewrite dsc_setup in bash, because all the cool kids use it.
 
- -- Jonathan Reed <jdreed@mit.edu>  Thu, 08 Apr 2010 20:06:29 -0400
+ -- Jonathan Reed <jdreed@mit.edu>  Thu, 08 Apr 2010 21:03:07 -0400
 
 debathena-discuss (10.0.12-0debathena1) unstable; urgency=low
 
