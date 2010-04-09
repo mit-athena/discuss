@@ -170,9 +170,11 @@ int main (argc, argv)
 	  if (code != EACCES) {
 	    fprintf(stderr, "Creating new ~/.meetings file...\n");
 	    fflush(stderr);
-	    char buf[100];
-	    sprintf(buf, "%s -q", DSC_SETUP);
-	    system(buf);
+	    char * cmd = malloc(strlen(DSC_SETUP) + strlen(" -q") + 1);
+
+	    sprintf(cmd, "%s -q", DSC_SETUP);
+	    system(cmd);
+	    free(cmd);
 	    code = find_rc_filename();	
 	  }
 	  if (code) {
