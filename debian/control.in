@@ -8,7 +8,7 @@ Standards-Version: 3.7.2
 Package: debathena-discuss
 Architecture: any
 Provides: discuss
-Depends: ${shlibs:Depends}, ${misc:Depends}, tcsh | c-shell, netbase
+Depends: ${shlibs:Depends}, ${misc:Depends}, netbase
 Description: A conferencing and mail archiving system
  Discuss is a user-interface front end to a networked conferencing 
  system.
