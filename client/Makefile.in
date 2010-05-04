@@ -15,7 +15,7 @@ exec_prefix=@exec_prefix@
 bindir=@bindir@
 datarootdir=@datarootdir@
 datadir=@datadir@
-infodir=@infodir@/discuss
+infodir=${datadir}/discuss/info
 
 CC=@CC@
 DEFS=@DEFS@

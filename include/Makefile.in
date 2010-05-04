@@ -18,7 +18,7 @@ includedir=@includedir@
 
 datarootdir=@datarootdir@
 datadir=@datadir@
-infodir=@infodir@/discuss
+infodir=${datadir}/discuss/info
 
 LINKS=	usp/usp.h usp/usp_et.h rpc_et.h discuss/dsc_et.h usp.h usp_et.h \
 	discuss_err.h
