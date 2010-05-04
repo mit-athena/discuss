@@ -86,7 +86,7 @@ all: discuss
 
 clean:
 	rm -f *.o *~ \#* *.bak
-	rm -f discuss trn_expr.c y.tab.c TAGS info.tar
+	rm -f discuss cmds.c trn_expr.c y.tab.c TAGS info.tar
 
 distclean: clean
 	rm -f Makefile
