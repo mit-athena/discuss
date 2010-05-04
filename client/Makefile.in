@@ -15,7 +15,7 @@ exec_prefix=@exec_prefix@
 bindir=@bindir@
 datarootdir=@datarootdir@
 datadir=@datadir@
-infodir=${datadir}/discuss/info
+ssinfodir=${datadir}/discuss/info
 
 CC=@CC@
 DEFS=@DEFS@
@@ -94,40 +94,40 @@ distclean: clean
 depend:
 
 install:
-	${MKDIR_P} ${DESTDIR}${infodir}
+	${MKDIR_P} ${DESTDIR}${ssinfodir}
 	${MKDIR_P} ${DESTDIR}${bindir}
-	${INSTALL_DATA} ${srcdir}/info/access.info ${DESTDIR}${infodir}
-	${INSTALL_DATA} ${srcdir}/info/add_meeting.info ${DESTDIR}${infodir}
-	${INSTALL_DATA} ${srcdir}/info/announce_meeting.info ${DESTDIR}${infodir}
-	${INSTALL_DATA} ${srcdir}/info/check_meetings.info ${DESTDIR}${infodir}
-	${INSTALL_DATA} ${srcdir}/info/del_mtg.info ${DESTDIR}${infodir}
-	${INSTALL_DATA} ${srcdir}/info/delete.info ${DESTDIR}${infodir}
-	${INSTALL_DATA} ${srcdir}/info/delete_acl.info ${DESTDIR}${infodir}
-	${INSTALL_DATA} ${srcdir}/info/goto.info ${DESTDIR}${infodir}
-	${INSTALL_DATA} ${srcdir}/info/help.info ${DESTDIR}${infodir}
-	${INSTALL_DATA} ${srcdir}/info/list.info ${DESTDIR}${infodir}
-	${INSTALL_DATA} ${srcdir}/info/list_acl.info ${DESTDIR}${infodir}
-	${INSTALL_DATA} ${srcdir}/info/list_meetings.info ${DESTDIR}${infodir}
-	${INSTALL_DATA} ${srcdir}/info/next_meeting.info ${DESTDIR}${infodir}
-	${INSTALL_DATA} ${srcdir}/info/print.info ${DESTDIR}${infodir}
-	${INSTALL_DATA} ${srcdir}/info/quit.info ${DESTDIR}${infodir}
-	${INSTALL_DATA} ${srcdir}/info/reply.info ${DESTDIR}${infodir}
-	${INSTALL_DATA} ${srcdir}/info/retrieve.info ${DESTDIR}${infodir}
-	${INSTALL_DATA} ${srcdir}/info/rn.info ${DESTDIR}${infodir}
-	${INSTALL_DATA} ${srcdir}/info/set.info ${DESTDIR}${infodir}
-	${INSTALL_DATA} ${srcdir}/info/set_acl.info ${DESTDIR}${infodir}
-	${INSTALL_DATA} ${srcdir}/info/status.info ${DESTDIR}${infodir}
-	${INSTALL_DATA} ${srcdir}/info/switch_off.info ${DESTDIR}${infodir}
-	${INSTALL_DATA} ${srcdir}/info/switch_on.info ${DESTDIR}${infodir}
-	${INSTALL_DATA} ${srcdir}/info/talk.info ${DESTDIR}${infodir}
-	${INSTALL_DATA} ${srcdir}/info/transaction_specifiers.info ${DESTDIR}${infodir}
-	${INSTALL_DATA} ${srcdir}/info/write.info ${DESTDIR}${infodir}
+	${INSTALL_DATA} ${srcdir}/info/access.info ${DESTDIR}${ssinfodir}
+	${INSTALL_DATA} ${srcdir}/info/add_meeting.info ${DESTDIR}${ssinfodir}
+	${INSTALL_DATA} ${srcdir}/info/announce_meeting.info ${DESTDIR}${ssinfodir}
+	${INSTALL_DATA} ${srcdir}/info/check_meetings.info ${DESTDIR}${ssinfodir}
+	${INSTALL_DATA} ${srcdir}/info/del_mtg.info ${DESTDIR}${ssinfodir}
+	${INSTALL_DATA} ${srcdir}/info/delete.info ${DESTDIR}${ssinfodir}
+	${INSTALL_DATA} ${srcdir}/info/delete_acl.info ${DESTDIR}${ssinfodir}
+	${INSTALL_DATA} ${srcdir}/info/goto.info ${DESTDIR}${ssinfodir}
+	${INSTALL_DATA} ${srcdir}/info/help.info ${DESTDIR}${ssinfodir}
+	${INSTALL_DATA} ${srcdir}/info/list.info ${DESTDIR}${ssinfodir}
+	${INSTALL_DATA} ${srcdir}/info/list_acl.info ${DESTDIR}${ssinfodir}
+	${INSTALL_DATA} ${srcdir}/info/list_meetings.info ${DESTDIR}${ssinfodir}
+	${INSTALL_DATA} ${srcdir}/info/next_meeting.info ${DESTDIR}${ssinfodir}
+	${INSTALL_DATA} ${srcdir}/info/print.info ${DESTDIR}${ssinfodir}
+	${INSTALL_DATA} ${srcdir}/info/quit.info ${DESTDIR}${ssinfodir}
+	${INSTALL_DATA} ${srcdir}/info/reply.info ${DESTDIR}${ssinfodir}
+	${INSTALL_DATA} ${srcdir}/info/retrieve.info ${DESTDIR}${ssinfodir}
+	${INSTALL_DATA} ${srcdir}/info/rn.info ${DESTDIR}${ssinfodir}
+	${INSTALL_DATA} ${srcdir}/info/set.info ${DESTDIR}${ssinfodir}
+	${INSTALL_DATA} ${srcdir}/info/set_acl.info ${DESTDIR}${ssinfodir}
+	${INSTALL_DATA} ${srcdir}/info/status.info ${DESTDIR}${ssinfodir}
+	${INSTALL_DATA} ${srcdir}/info/switch_off.info ${DESTDIR}${ssinfodir}
+	${INSTALL_DATA} ${srcdir}/info/switch_on.info ${DESTDIR}${ssinfodir}
+	${INSTALL_DATA} ${srcdir}/info/talk.info ${DESTDIR}${ssinfodir}
+	${INSTALL_DATA} ${srcdir}/info/transaction_specifiers.info ${DESTDIR}${ssinfodir}
+	${INSTALL_DATA} ${srcdir}/info/write.info ${DESTDIR}${ssinfodir}
 	${INSTALL_PROGRAM} discuss ${DESTDIR}${bindir}
 	@set $(INFOLINKS); \
 	while [ $$# -ge 2 ]; do \
-		rm -f ${DESTDIR}${infodir}/$$1; \
-		echo ln -s $$2 ${DESTDIR}${infodir}/$$1; \
-		ln -s $$2 ${DESTDIR}${infodir}/$$1; \
+		rm -f ${DESTDIR}${ssinfodir}/$$1; \
+		echo ln -s $$2 ${DESTDIR}${ssinfodir}/$$1; \
+		ln -s $$2 ${DESTDIR}${ssinfodir}/$$1; \
 		shift 2; \
 	done
 

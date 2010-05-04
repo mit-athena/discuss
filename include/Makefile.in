@@ -18,7 +18,7 @@ includedir=@includedir@
 
 datarootdir=@datarootdir@
 datadir=@datadir@
-infodir=${datadir}/discuss/info
+ssinfodir=${datadir}/discuss/info
 
 LINKS=	usp/usp.h usp/usp_et.h rpc_et.h discuss/dsc_et.h usp.h usp_et.h \
 	discuss_err.h
@@ -47,7 +47,7 @@ install:
 config.h: config.h.sed
 	rm -f config.h
 	sed     -e s:SERVERDIR:${sbindir}: \
-		-e s:INFODIR:${infodir}: \
+		-e s:INFODIR:${ssinfodir}: \
 		-e s:BINDIR:${bindir}: < config.h.sed > config.h
 
 usp:
