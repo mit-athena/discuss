@@ -6,15 +6,18 @@ SHELL=/bin/sh
 VPATH=@srcdir@
 INSTALL=@INSTALL@
 INSTALL_PROGRAM=@INSTALL_PROGRAM@
+INSTALL_DATA=@INSTALL_DATA@
+MKDIR_P=@MKDIR_P@
 srcdir=@srcdir@
 top_srcdir=@top_srcdir@
 prefix=@prefix@
 exec_prefix=@exec_prefix@
 bindir=@bindir@
 sbindir=@sbindir@
+datarootdir=@datarootdir@
 datadir=@datadir@
 # XXX
-lispdir=${prefix}/share/emacs/site-lisp
+lispdir=@lispdir@
 libexecdir=@libexecdir@
 
 CC=@CC@
@@ -42,14 +45,14 @@ clean:
 depend:
 
 install: all
-	${top_srcdir}/mkinstalldirs ${DESTDIR}${libexecdir}
-	${top_srcdir}/mkinstalldirs ${DESTDIR}${lispdir}
+	${MKDIR_P} ${DESTDIR}${libexecdir}
+	${MKDIR_P} ${DESTDIR}${lispdir}
 	${INSTALL_PROGRAM} edsc ${DESTDIR}${libexecdir}
-	${INSTALL} -m 444 ${srcdir}/discuss-acl.el ${DESTDIR}${lispdir}
-	${INSTALL} -m 444 ${srcdir}/discuss-enter.el ${DESTDIR}${lispdir}
-	${INSTALL} -m 444 ${srcdir}/discuss-ls.el ${DESTDIR}${lispdir}
-	${INSTALL} -m 444 ${srcdir}/discuss-misc.el ${DESTDIR}${lispdir}
-	${INSTALL} -m 444 ${srcdir}/discuss.el ${DESTDIR}${lispdir}
+	${INSTALL_DATA} ${srcdir}/discuss-acl.el ${DESTDIR}${lispdir}
+	${INSTALL_DATA} ${srcdir}/discuss-enter.el ${DESTDIR}${lispdir}
+	${INSTALL_DATA} ${srcdir}/discuss-ls.el ${DESTDIR}${lispdir}
+	${INSTALL_DATA} ${srcdir}/discuss-misc.el ${DESTDIR}${lispdir}
+	${INSTALL_DATA} ${srcdir}/discuss.el ${DESTDIR}${lispdir}
 
 version.h: ${SRCS} newvers.sh
 	sh newvers.sh

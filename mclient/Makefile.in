@@ -6,11 +6,14 @@ SHELL=/bin/sh
 VPATH=@srcdir@
 INSTALL=@INSTALL@
 INSTALL_PROGRAM=@INSTALL_PROGRAM@
+INSTALL_DATA=@INSTALL_DATA@
+MKDIR_P=@MKDIR_P@
 srcdir=@srcdir@
 top_srcdir=@top_srcdir@
 prefix=@prefix@
 exec_prefix=@exec_prefix@
 bindir=@bindir@
+datarootdir=@datarootdir@
 mandir=@mandir@
 
 CC=@CC@
@@ -35,9 +38,9 @@ clean:
 depend:
 
 install:
-	${top_srcdir}/mkinstalldirs ${DESTDIR}${bindir}
-	${top_srcdir}/mkinstalldirs ${DESTDIR}${mandir}/man1
-	${top_srcdir}/mkinstalldirs ${DESTDIR}${mandir}/man8
+	${MKDIR_P} ${DESTDIR}${bindir}
+	${MKDIR_P} ${DESTDIR}${mandir}/man1
+	${MKDIR_P} ${DESTDIR}${mandir}/man8
 	${INSTALL_PROGRAM} create_mtg_dir ${DESTDIR}${bindir}
 	${INSTALL_PROGRAM} crmtgs ${DESTDIR}${bindir}
 	${INSTALL_PROGRAM} mkds ${DESTDIR}${bindir}
@@ -47,13 +50,13 @@ install:
 	-rm -f $(DESTDIR)${bindir}/rmds
 	-ln -s mkds $(DESTDIR)$(bindir)/rmds
 	${INSTALL} -m 755 dsc_setup.sh ${DESTDIR}${bindir}/dsc_setup
-	${INSTALL} -m 444 crmtgs.1 ${DESTDIR}${mandir}/man1
-	${INSTALL} -m 444 mkds.8 ${DESTDIR}${mandir}/man8
-	${INSTALL} -m 444 pmtg.1 ${DESTDIR}${mandir}/man1
-	${INSTALL} -m 444 dsmail.1 ${DESTDIR}${mandir}/man1
-	${INSTALL} -m 444 dspipe.8 ${DESTDIR}${mandir}/man8
-	${INSTALL} -m 444 dsc_setup.1 ${DESTDIR}${mandir}/man1
-	${INSTALL} -m 444 rmds.8 ${DESTDIR}${mandir}/man8
+	${INSTALL_DATA} crmtgs.1 ${DESTDIR}${mandir}/man1
+	${INSTALL_DATA} mkds.8 ${DESTDIR}${mandir}/man8
+	${INSTALL_DATA} pmtg.1 ${DESTDIR}${mandir}/man1
+	${INSTALL_DATA} dsmail.1 ${DESTDIR}${mandir}/man1
+	${INSTALL_DATA} dspipe.8 ${DESTDIR}${mandir}/man8
+	${INSTALL_DATA} dsc_setup.1 ${DESTDIR}${mandir}/man1
+	${INSTALL_DATA} rmds.8 ${DESTDIR}${mandir}/man8
 
 create_mtg_dir: create_mtg_dir.o
 	${CC} ${LDFLAGS} -o create_mtg_dir create_mtg_dir.o

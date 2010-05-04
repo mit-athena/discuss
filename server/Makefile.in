@@ -6,6 +6,7 @@ SHELL=/bin/sh
 VPATH=@srcdir@
 INSTALL=@INSTALL@
 INSTALL_PROGRAM=@INSTALL_PROGRAM@
+MKDIR_P=@MKDIR_P@
 srcdir=@srcdir@
 top_srcdir=@top_srcdir@
 prefix=@prefix@
@@ -39,7 +40,7 @@ clean:
 depend:
 
 install:
-	${top_srcdir}/mkinstalldirs ${DESTDIR}${sbindir}
+	${MKDIR_P} ${DESTDIR}${sbindir}
 	${INSTALL_PROGRAM} discussd ${DESTDIR}${sbindir}
 	${INSTALL_PROGRAM} disserve ${DESTDIR}${sbindir}
 

@@ -6,6 +6,7 @@ SHELL=/bin/sh
 VPATH=@srcdir@
 INSTALL=@INSTALL@
 INSTALL_PROGRAM=@INSTALL_PROGRAM@
+MKDIR_P=@MKDIR_P@
 srcdir=@srcdir@
 top_srcdir=@top_srcdir@
 prefix=@prefix@
@@ -33,7 +34,7 @@ clean:
 depend:
 
 install:
-	${top_srcdir}/mkinstalldirs ${DESTDIR}${libdir}
+	${MKDIR_P} ${DESTDIR}${libdir}
 	${INSTALL_PROGRAM} libusp.a ${DESTDIR}${libdir}
 
 libusp.a: $(OBJS) $(USPET)

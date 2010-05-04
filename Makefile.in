@@ -5,9 +5,12 @@
 SHELL=/bin/sh
 VPATH=@srcdir@
 INSTALL=@INSTALL@
+INSTALL_DATA=@INSTALL_DATA@
+MKDIR_P=@MKDIR_P@
 srcdir=@srcdir@
 top_srcdir=@top_srcdir@
 prefix=@prefix@
+datarootdir=@datarootdir@
 mandir=@mandir@
 
 SUBDIRS=ets include usp libds server client mclient edsc dsgrep
@@ -19,6 +22,6 @@ all clean depend install::
 	done
 
 install::
-	${top_srcdir}/mkinstalldirs ${DESTDIR}${mandir}/man1
-	${INSTALL} -m 444 ${srcdir}/discuss.1 ${DESTDIR}${mandir}/man1
+	${MKDIR_P} ${DESTDIR}${mandir}/man1
+	${INSTALL_DATA} ${srcdir}/discuss.1 ${DESTDIR}${mandir}/man1
 

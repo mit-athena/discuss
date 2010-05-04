@@ -6,14 +6,17 @@ SHELL=/bin/sh
 VPATH=@srcdir@
 INSTALL=@INSTALL@
 INSTALL_PROGRAM=@INSTALL_PROGRAM@
+INSTALL_DATA=@INSTALL_DATA@
+MKDIR_P=@MKDIR_P@
 srcdir=@srcdir@
 top_srcdir=@top_srcdir@
 prefix=@prefix@
 exec_prefix=@exec_prefix@
 bindir=@bindir@
 sbindir=@sbindir@
-includedir=${prefix}/include
+includedir=@includedir@
 
+datarootdir=@datarootdir@
 datadir=@datadir@
 infodir=${datadir}/discuss/info
 
@@ -32,10 +35,10 @@ clean:
 depend: $(LINKS) config.h
 
 install:
-	${top_srcdir}/mkinstalldirs ${DESTDIR}${includedir}/discuss
-	${top_srcdir}/mkinstalldirs ${DESTDIR}${includedir}/usp
+	${MKDIR_P} ${DESTDIR}${includedir}/discuss
+	${MKDIR_P} ${DESTDIR}${includedir}/usp
 	-for i in discuss/?*.h usp/?*.h; do \
-		$(INSTALL) -m 0444 ${srcdir}/$$i ${DESTDIR}${includedir}/$$i; \
+		${INSTALL_DATA} ${srcdir}/$$i ${DESTDIR}${includedir}/$$i; \
 	done
 
 config.h: config.h.sed

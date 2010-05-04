@@ -1,8 +1,13 @@
-AC_INIT(client/discuss.c)
+AC_INIT
+AC_CONFIG_SRCDIR([client/discuss.c])
 
 AC_PROG_CC
 AC_PROG_INSTALL
 AC_PROG_RANLIB
+AC_PROG_MKDIR_P
+
+lispdir='${datarootdir}/emacs/site-lisp'
+AC_SUBST(lispdir)
 
 dnl Checks for libraries.
 ATHENA_KRB4
@@ -12,17 +17,18 @@ ATHENA_UTIL_COM_ERR
 ATHENA_UTIL_SS
 ATHENA_ZEPHYR
 
-AC_SEARCH_LIBS(gethostbyname, nsl)
-AC_SEARCH_LIBS(socket, socket)
+AC_SEARCH_LIBS([gethostbyname], [nsl])
+AC_SEARCH_LIBS([socket], [socket])
 
 dnl Checks for header files.
 AC_HEADER_STDC
 AC_HEADER_SYS_WAIT
-AC_CHECK_HEADERS(fcntl.h unistd.h termios.h)
+AC_CHECK_HEADERS([fcntl.h unistd.h termios.h])
 
 dnl Checks for library functions.
-AC_CHECK_FUNCS(srand48 sigaction)
+AC_CHECK_FUNCS([srand48 sigaction])
 
-AC_OUTPUT(Makefile client/Makefile dsgrep/Makefile edsc/Makefile ets/Makefile
-          include/Makefile libds/Makefile mclient/Makefile server/Makefile
-          usp/Makefile)
+AC_CONFIG_FILES([Makefile client/Makefile dsgrep/Makefile edsc/Makefile ets/Makefile
+                 include/Makefile libds/Makefile mclient/Makefile server/Makefile
+                 usp/Makefile])
+AC_OUTPUT
