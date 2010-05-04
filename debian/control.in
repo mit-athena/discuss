@@ -2,7 +2,7 @@ Source: debathena-discuss
 Section: debathena/net
 Priority: extra
 Maintainer: Debathena Project <debathena@mit.edu>
-Build-Depends: @cdbs@, autotools-dev, automake1.9, debathena-aclocal, comerr-dev, ss-dev, libkrb5-dev, libzephyr-dev, bison
+Build-Depends: @cdbs@, autotools-dev, automake1.9, debathena-aclocal, pkg-config, comerr-dev, ss-dev, libkrb5-dev, libzephyr-dev, bison
 Standards-Version: 3.7.2
 
 Package: debathena-discuss
