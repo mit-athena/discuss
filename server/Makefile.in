@@ -37,6 +37,9 @@ all: debug recover expunge discussd disserve
 clean:
 	rm -f *.o *~ \#* disserve recover expunge discussd disdebug
 
+distclean: clean
+	rm -f Makefile
+
 depend:
 
 install:

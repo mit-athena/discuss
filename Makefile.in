@@ -15,7 +15,7 @@ mandir=@mandir@
 
 SUBDIRS=ets include usp libds server client mclient edsc dsgrep
 
-all clean depend install::
+all clean depend install distclean::
 	for i in ${SUBDIRS}; \
 		do echo making $@ in $$i; \
 		(cd $$i; ${MAKE} $@) || exit 1; \
@@ -25,3 +25,7 @@ install::
 	${MKDIR_P} ${DESTDIR}${mandir}/man1
 	${INSTALL_DATA} ${srcdir}/discuss.1 ${DESTDIR}${mandir}/man1
 
+# Doesn't depend on clean because that would run clean target in
+# subdirectories more than once
+distclean::
+	rm -rf config.cache config.log config.status Makefile

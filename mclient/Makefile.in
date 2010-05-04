@@ -35,6 +35,9 @@ all: create_mtg_dir crmtgs mkds pmtg dsmail dspipe
 clean:
 	rm -f create_mtg_dir crmtgs mkds pmtg dsmail dspipe *.o
 
+distclean: clean
+	rm -f Makefile
+
 depend:
 
 install:

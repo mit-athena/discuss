@@ -31,6 +31,9 @@ all: libusp.a
 clean:
 	rm -f libusp.a $(OBJS)
 
+distclean: clean
+	rm -f Makefile
+
 depend:
 
 install:

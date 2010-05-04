@@ -33,6 +33,9 @@ all: $(OBJS)
 clean:
 	rm -f ${OBJS} ${EXTRA_CLEAN}
 
+distclean: clean
+	rm -f Makefile
+
 depend:
 
 install:

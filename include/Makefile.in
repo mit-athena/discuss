@@ -32,6 +32,9 @@ all: $(LINKS) config.h
 clean:
 	rm -rf ss usp $(LINKS) *~ discuss/?*~ config.h
 
+distclean: clean
+	rm -f Makefile
+
 depend: $(LINKS) config.h
 
 install:

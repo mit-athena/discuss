@@ -42,6 +42,9 @@ all: edsc discuss.el
 clean:
 	rm -f edsc *.o version.h discuss.el
 
+distclean: clean
+	rm -f Makefile
+
 depend:
 
 install: all

@@ -42,6 +42,9 @@ all:	$(LIBS)
 clean:
 	rm -f $(LIBS) $(OBJS) $(KOBJS) $(NKOBJS)
 
+distclean: clean
+	rm -f Makefile
+
 depend:
 
 install:
