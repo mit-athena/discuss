@@ -4,10 +4,16 @@ DEB_AUTO_UPDATE_AUTOCONF = 2.50
 include /usr/share/cdbs/1/rules/debhelper.mk
 include /usr/share/cdbs/1/class/autotools.mk
 
+debian/stamp-autotools-files: aclocal.m4 config.guess config.sub install-sh missing
+aclocal.m4:
+	aclocal-1.9
+config.guess config.sub:
+	cp /usr/share/misc/$@ $@
+install-sh missing:
+	-automake-1.9 --foreign --add-missing
+
 DEB_CONFIGURE_EXTRA_FLAGS += --without-krb4 --with-krb5 --with-zephyr
-DEB_MAKE_CLEAN_TARGET = clean
 DEB_DH_INSTALL_SOURCEDIR = $(DEB_DESTDIR)
 
 clean::
-	find . -name Makefile -exec rm -f {} \;
-	rm -f client/cmds.c config.status config.log configure
+	rm -f configure config.guess config.sub aclocal.m4 install-sh missing
