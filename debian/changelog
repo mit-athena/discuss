@@ -3,10 +3,8 @@ debathena-discuss (10.0.13-0debathena1) unstable; urgency=low
   * Update our autogoo for the 21st century.
   * Add a working distclean target.
   * Update packaging to not require daconfiscate.
-  * Use pkg-config instead of our home-grown macros for finding ss and
-    com_err.
 
- -- Evan Broder <broder@mit.edu>  Tue, 04 May 2010 19:36:02 -0400
+ -- Evan Broder <broder@mit.edu>  Tue, 04 May 2010 19:27:37 -0400
 
 debathena-discuss (10.0.12-0debathena3) unstable; urgency=low
 

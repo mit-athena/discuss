@@ -19,13 +19,13 @@ mandir=@mandir@
 CC=@CC@
 DEFS=@DEFS@
 CPPFLAGS=@CPPFLAGS@
-CFLAGS=@CFLAGS@ @COM_ERR_CFLAGS@
+CFLAGS=@CFLAGS@
 LDFLAGS=@LDFLAGS@
 LIBS=@LIBS@
 ALL_CFLAGS=-I../include ${CPPFLAGS} ${CFLAGS} ${DEFS}
 
 KLIBS=	../libds/libdsk.a ../usp/libusp.a @KRB4_LIBS@ @KRB5_LIBS@ ${LIBS}
-NKLIBS=	../libds/libds.a ../usp/libusp.a @COM_ERR_LIBS@ ${LIBS}
+NKLIBS=	../libds/libds.a ../usp/libusp.a -lcom_err ${LIBS}
 
 .c.o:
 	${CC} -c ${ALL_CFLAGS} $<

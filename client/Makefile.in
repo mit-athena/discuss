@@ -20,9 +20,9 @@ ssinfodir=${datadir}/discuss/info
 CC=@CC@
 DEFS=@DEFS@
 CPPFLAGS=@CPPFLAGS@
-CFLAGS=@CFLAGS@ @SS_CFLAGS@
+CFLAGS=@CFLAGS@
 LDFLAGS=@LDFLAGS@
-LIBS=../server/acl.o ../libds/libdsk.a ../usp/libusp.a @KRB4_LIBS@ @KRB5_LIBS@ @SS_LIBS@ @LIBS@
+LIBS=../server/acl.o ../libds/libdsk.a ../usp/libusp.a @KRB4_LIBS@ @KRB5_LIBS@ -lss @LIBS@
 ALL_CFLAGS=-I../include ${CPPFLAGS} ${CFLAGS} ${DEFS}
 
 OBJS=	discuss.o edit.o output.o trn_expr.o list.o trn_select.o \
