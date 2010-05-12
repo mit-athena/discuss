@@ -3,8 +3,9 @@ debathena-discuss (10.0.13-0debathena1) unstable; urgency=low
   * Update our autogoo for the 21st century.
   * Add a working distclean target.
   * Update packaging to not require daconfiscate.
+  * Eliminate libds, as its only use could be replaced by libdsk.
 
- -- Evan Broder <broder@mit.edu>  Tue, 04 May 2010 19:27:37 -0400
+ -- Evan Broder <broder@mit.edu>  Wed, 12 May 2010 08:50:34 -0400
 
 debathena-discuss (10.0.12-0debathena3) unstable; urgency=low
 

@@ -28,11 +28,10 @@ ETS=	$(RPCET) $(USPET) $(DSCET)
 KRBET=	../ets/krb_et.o
 
 OBJS=	tfile.o tunix.o tnet.o stubs.o dsname.o interface.o \
-	conv_mgr.o host.o announce.o dsc_enter.o tmem.o
-KOBJS=	res_module.k.o rpcall.k.o auth_krb.o
-NKOBJS=	res_module.nk.o rpcall.nk.o auth_dum.o
+	conv_mgr.o host.o announce.o dsc_enter.o tmem.o \
+	res_module.o rpcall.o auth_krb.o
 
-LIBS=	libds.a libdsk.a
+LIBS=	libdsk.a
 
 .c.o:
 	${CC} -c ${ALL_CFLAGS} $<
@@ -40,7 +39,7 @@ LIBS=	libds.a libdsk.a
 all:	$(LIBS)
 
 clean:
-	rm -f $(LIBS) $(OBJS) $(KOBJS) $(NKOBJS)
+	rm -f $(LIBS) $(OBJS)
 
 distclean: clean
 	rm -f Makefile
@@ -51,30 +50,6 @@ install:
 	${MKDIR_P} ${DESTDIR}${libdir}
 	${INSTALL_PROGRAM} libdsk.a ${DESTDIR}${libdir}
 
-libds.a: $(OBJS) $(NKOBJS) $(ETS)
-	ar cru libds.a $(OBJS) $(NKOBJS) $(ETS)
-	${RANLIB} libds.a
-
 libdsk.a: $(OBJS) $(KOBJS) $(ETS) $(KRBET)
 	ar cru libdsk.a $(OBJS) $(KOBJS) $(ETS) $(KRBET)
 	${RANLIB} libdsk.a
-
-res_module.k.o: res_module.c
-	${CC} ${ALL_CFLAGS} -c res_module.c
-	mv res_module.o res_module.k.o
-
-res_module.nk.o: res_module.c
-	${CC} ${ALL_CFLAGS} -DNOKERBEROS -c res_module.c
-	mv res_module.o res_module.nk.o
-
-auth_krb.o:
-	${CC} ${ALL_CFLAGS} -c auth_krb.c
-
-rpcall.k.o:
-	${CC} ${ALL_CFLAGS} -c rpcall.c
-	mv rpcall.o rpcall.k.o
-
-rpcall.nk.o:
-	${CC} ${ALL_CFLAGS} -DNOKERBEROS -c rpcall.c
-	mv rpcall.o rpcall.nk.o
-

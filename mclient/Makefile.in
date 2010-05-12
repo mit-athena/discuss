@@ -25,7 +25,6 @@ LIBS=@LIBS@
 ALL_CFLAGS=-I../include ${CPPFLAGS} ${CFLAGS} ${DEFS}
 
 KLIBS=	../libds/libdsk.a ../usp/libusp.a @KRB4_LIBS@ @KRB5_LIBS@ ${LIBS}
-NKLIBS=	../libds/libds.a ../usp/libusp.a -lcom_err ${LIBS}
 
 .c.o:
 	${CC} -c ${ALL_CFLAGS} $<
@@ -74,7 +73,7 @@ pmtg: pmtg.o ../ets/dsc_et.o
 	${CC} ${LDFLAGS} -o pmtg pmtg.o ../ets/dsc_et.o ${KLIBS}
 
 dsmail: dsmail.o ../ets/dsc_et.o
-	${CC} ${LDFLAGS} -o dsmail dsmail.o ../ets/dsc_et.o ${NKLIBS}
+	${CC} ${LDFLAGS} -o dsmail dsmail.o ../ets/dsc_et.o ${KLIBS}
 
 dspipe: dspipe.o ../ets/dsc_et.o
 	${CC} ${LDFLAGS} -o dspipe dspipe.o ../ets/dsc_et.o ${KLIBS}
