@@ -1,5 +1,5 @@
 /*
- * Pager: Routines to create a "more" running out of a particular file
+ * Pager: Routines to create a pager running out of a particular file
  * descriptor.
  */
 #ifndef lint
@@ -12,6 +12,10 @@ int pager_create()
 {
 	int filedes[2];
 	int i;
+	const char *pager;
+	if (!(pager = getenv("PAGER")))
+		pager = PAGER;
+
 	if(pipe(filedes) != 0) return(-1);
 
 	switch(fork()) {
@@ -24,7 +28,7 @@ int pager_create()
 		(void) dup2(filedes[0], 0);
 		for (i=3; i<32; i++)
 			(void) close(i);
-		(void) execlp("more", "more", (char *) NULL);
+		(void) execlp("/bin/sh", "/bin/sh", "-c", pager, (char *) NULL);
 		exit(1);
 	default:
 		/*

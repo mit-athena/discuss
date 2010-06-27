@@ -17,6 +17,13 @@ ATHENA_UTIL_COM_ERR
 ATHENA_UTIL_SS
 ATHENA_ZEPHYR
 
+AC_ARG_WITH(
+  [pager],
+  [AS_HELP_STRING([--with-pager=PAGER], [specify the default pager (default is more)])],
+  [],
+  [AC_PATH_PROG([with_pager], [more])])
+AC_DEFINE_UNQUOTED([PAGER], ["$with_pager"])
+
 AC_SEARCH_LIBS([gethostbyname], [nsl])
 AC_SEARCH_LIBS([socket], [socket])
 

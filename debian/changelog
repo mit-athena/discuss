@@ -4,8 +4,10 @@ debathena-discuss (10.0.13-0debathena1) unstable; urgency=low
   * Add a working distclean target.
   * Update packaging to not require daconfiscate.
   * Eliminate libds, as its only use could be replaced by libdsk.
+  * Check $PAGER for a pager before falling back on a compiled-in default
+    ("more" by default, but "pager" under our packaging). (Trac: #629)
 
- -- Evan Broder <broder@mit.edu>  Wed, 12 May 2010 08:50:34 -0400
+ -- Evan Broder <broder@mit.edu>  Sun, 27 Jun 2010 13:02:34 -0400
 
 debathena-discuss (10.0.12-0debathena3) unstable; urgency=low
 

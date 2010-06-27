@@ -12,7 +12,7 @@ config.guess config.sub:
 install-sh missing:
 	-automake-1.9 --foreign --add-missing
 
-DEB_CONFIGURE_EXTRA_FLAGS += --without-krb4 --with-krb5 --with-zephyr
+DEB_CONFIGURE_EXTRA_FLAGS += --without-krb4 --with-krb5 --with-zephyr --with-pager=/usr/bin/pager
 DEB_DH_INSTALL_SOURCEDIR = $(DEB_DESTDIR)
 
 clean::
