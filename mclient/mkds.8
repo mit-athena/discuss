@@ -11,19 +11,53 @@ mkds \- Create a discuss meeting
 .B mkds
 .SH DESCRIPTION
 .I mkds
-creates a discuss meeting on a specified discuss server, provided the user has permission to do so.
+creates a discuss meeting on a specified discuss server,
+provided the user has permission to do so.
 
 .I mkds 
 will prompt for the server name, a directory where the meeting should
 be stored, the long and short names of the meeting, and whether or not
-the meeting should be public.  If the meeting can be successfully
-created, mkds will then prompt for a list of users who should have
-permission to create new transactions in the meeting, and will require
-the creator to enter the initial meeting transaction.  Finally, mkds
-will ask whether or not the meeting should be announced.
+the meeting should be public.
+At this point, it attempts to contact the discuss daemon running on the
+discuss server, and an access checked is performed for meeting creation
+(the ``cacl'' file on the server lists authorized users).
+If the meeting can be successfully created and is not a public meeting,
+.I mkds
+will then prompt for a list of users who should have
+permission to create new transactions in the meeting.
+(The user who created the meeting will automatically be given
+chairman permissions.)
+.I mkds
+will then open an editor for
+the creator to enter the initial meeting transaction.  Finally,
+.I mkds
+will ask whether or not the meeting should be announced
+(in the new_meetings meeting).
 
 .I mkds
 accepts no arguments.
+
+The meeting created by
+.I mkds
+is a pure discuss meeting in its original form.  If it is intended
+to be used as a mail archive, a server maintainer will need to perform
+additional configuration to accept mail for the meeting's alias and
+run
+.I dsmail
+as appropriate.
+
+A meeting created with
+.I mkds
+can be removed with
+\fIrmds\fR.
+
+The cacl file has a similar format to that of a discuss meeting acl;
+the first line contains a number which is the number of entries on the
+acl.
+The subsequent lines contain a list of access bits, a colon,
+and the user they correspond to.
+However, unlike meeting acls, only the 'a' bit is relevant for
+meeting creation.
 
 .SH FILES
 .ta \w'/var/spool/discuss/cacl  'u
@@ -31,14 +65,13 @@ accepts no arguments.
 ~/.meetings	Data file listing meetings that you attend.
 .br
 /var/spool/discuss/cacl	The list of users (Kerberos principals) who 
-	can create meetings on the server
+	can create meetings on the server.
 
 .SH AUTHORS
 Robert French and Ken Raeburn, MIT Student Information Processing Board
 
 .SH "SEE ALSO"
-.PP
-discuss(1)
+discuss(1), dsmail(1), rmds(8)
 
 
 

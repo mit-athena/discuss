@@ -1,3 +1,9 @@
+debathena-discuss (10.0.13-0debathena2) unstable; urgency=low
+
+  * Flesh out mkds.8 and rmds.8 some more.
+
+ -- Benjamin Kaduk <kaduk@mit.edu>  Sun, 03 Jul 2011 18:31:43 -0400
+
 debathena-discuss (10.0.13-0debathena1) unstable; urgency=low
 
   * Update our autogoo for the 21st century.

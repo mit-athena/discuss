@@ -4,7 +4,7 @@
 .\"
 .\"
 .\"
-.TH RMDS 8 "16 October 2009" "MIT SIPB"
+.TH RMDS 8 "03 July 2011" "MIT SIPB"
 .SH NAME
 rmds \- Delete a discuss meeting
 .SH SYNOPSIS
@@ -14,27 +14,24 @@ rmds \- Delete a discuss meeting
 deletes a discuss meeting on a specified discuss server, provided the user has permission to do so.
 
 .I rmds 
-will prompt for the server name, a directory where the meeting should
-be stored and the short name of the meeting.  The meeting will then be
-deleted, if the user has permission to do so.
+will prompt for the server name, a directory where the meeting
+is found, and the short name of the meeting.  The meeting will then be
+deleted, if the user has permission to do so (by virtue of being
+a chairman of the meeting).
 
 .I rmds
 accepts no arguments.
 
 .SH FILES
-.ta \w'/var/spool/discuss/cacl  'u
+.ta \w'~/.meetings  'u
 .br
 ~/.meetings	Data file listing meetings that you attend.
-.br
-/var/spool/discuss/cacl	The list of users (Kerberos principals) who 
-	can delete meetings on the server
 
 .SH AUTHORS
 Robert French and Ken Raeburn, MIT Student Information Processing Board
 
 .SH "SEE ALSO"
-.PP
-discuss(1)
+discuss(1), mkds(8)
 
 
 
