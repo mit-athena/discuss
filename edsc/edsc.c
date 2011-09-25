@@ -135,7 +135,7 @@ main(argc, argv)
 #endif
 
      /* Use our com_err so the library doesn't spew and confuse emacs */
-     set_com_err_hook(our_com_err);
+     (void) set_com_err_hook(our_com_err);
 
      temp_file = malloc(64);
      pgm = malloc(64);
