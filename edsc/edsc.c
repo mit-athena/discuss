@@ -72,6 +72,12 @@ static struct edsc_req {
 
 #define NUM_EDSC_REQUESTS (sizeof (edscr) / sizeof (struct edsc_req))
 
+void our_com_err(const char *who, long code, const char *fmt, va_list args)
+{
+  /* A simple com_err that keeps library errors from confusing emacs */
+  fprintf(stderr, ";%s: %s\n", who, error_message(code));
+}
+
 /*
  * This is we can cleanup when we have problems
  */
@@ -127,6 +133,9 @@ main(argc, argv)
 #else
      initialize_dsc_error_table();
 #endif
+
+     /* Use our com_err so the library doesn't spew and confuse emacs */
+     set_com_err_hook(our_com_err);
 
      temp_file = malloc(64);
      pgm = malloc(64);

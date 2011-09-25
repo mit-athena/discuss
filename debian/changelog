@@ -1,3 +1,10 @@
+debathena-discuss (10.0.14-0debathena1) unstable; urgency=low
+
+  * edsc now defines and sets its own com_err hook to avoid libdsk
+    confusing emacs (Trac: 603)
+
+ -- Jonathan Reed <jdreed@mit.edu>  Sun, 25 Sep 2011 17:07:38 -0400
+
 debathena-discuss (10.0.13-0debathena2) unstable; urgency=low
 
   * Flesh out mkds.8 and rmds.8 some more.
