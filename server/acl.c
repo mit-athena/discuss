@@ -455,7 +455,7 @@ main()
 static void panic(s)
 	char *s;
 {
-	printf(s);
+	printf("%s\n", s);
 	fflush(stdout);
 	abort();
 }

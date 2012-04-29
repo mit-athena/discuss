@@ -1,3 +1,9 @@
+debathena-discuss (10.0.15-0debathena1) unstable; urgency=low
+
+  * Fix FTBFS with -Werror=format-security.
+
+ -- Geoffrey Thomas <geofft@mit.edu>  Sat, 28 Apr 2012 20:36:38 -0700
+
 debathena-discuss (10.0.14-0debathena1) unstable; urgency=low
 
   * edsc now defines and sets its own com_err hook to avoid libdsk
