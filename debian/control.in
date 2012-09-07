@@ -3,13 +3,13 @@ Section: debathena/net
 Priority: extra
 Maintainer: Debathena Project <debathena@mit.edu>
 Build-Depends: @cdbs@, autotools-dev, automake1.9, debathena-aclocal, comerr-dev, ss-dev, libkrb5-dev, libzephyr-dev, bison
-Standards-Version: 3.7.2
+Standards-Version: 3.9.1
 
 Package: debathena-discuss
 Architecture: any
 Provides: discuss
 Depends: ${shlibs:Depends}, ${misc:Depends}, netbase
-Description: A conferencing and mail archiving system
+Description: Conferencing and mail archiving system
  Discuss is a user-interface front end to a networked conferencing 
  system.
 
@@ -28,11 +28,13 @@ Architecture: any
 Provides: discuss-server
 Pre-Depends: adduser
 Depends: ${shlibs:Depends}, ${misc:Depends}, debathena-discuss (= ${binary:Version}), libzephyr4-krb5 | libzephyr3-krb, netbase, openbsd-inetd | inet-superserver
-Description: A conferencing and mail archiving system
+Description: Conferencing and mail archiving system (server)
  Discuss is a user-interface front end to a networked conferencing 
  system.
  .
- This package contains the discuss server.
+ This package contains the discuss server and associated utilities.
+ Note that the 'byteswap' utility is no longer needed and is not
+ included, as modern discuss servers do this automatically.
 
 Package: debathena-libdsk-dev
 Section: debathena/libdevel

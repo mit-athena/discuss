@@ -13,6 +13,7 @@ prefix=@prefix@
 exec_prefix=@exec_prefix@
 bindir=@bindir@
 sbindir=@sbindir@
+libexecdir=@libexecdir@
 
 CC=@CC@
 DEFS=@DEFS@
@@ -44,8 +45,12 @@ depend:
 
 install:
 	${MKDIR_P} ${DESTDIR}${sbindir}
+	${MKDIR_P} ${DESTDIR}${libexecdir}
 	${INSTALL_PROGRAM} discussd ${DESTDIR}${sbindir}
 	${INSTALL_PROGRAM} disserve ${DESTDIR}${sbindir}
+	${INSTALL_PROGRAM} recover ${DESTDIR}${libexecdir}
+	${INSTALL_PROGRAM} expunge ${DESTDIR}${libexecdir}
+	${INSTALL_PROGRAM} disdebug ${DESTDIR}${libexecdir}
 
 discussd: $(DISCUSSD_OBJS)
 	${CC} ${LDFLAGS} -o $@ $(DISCUSSD_OBJS) ${LIBS}

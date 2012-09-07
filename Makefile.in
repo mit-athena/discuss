@@ -23,7 +23,11 @@ all clean depend install distclean::
 
 install::
 	${MKDIR_P} ${DESTDIR}${mandir}/man1
+	${MKDIR_P} ${DESTDIR}${mandir}/man8
 	${INSTALL_DATA} ${srcdir}/discuss.1 ${DESTDIR}${mandir}/man1
+	${INSTALL_DATA} ${srcdir}/create_mtg_dir.1 ${DESTDIR}${mandir}/man1
+	${INSTALL_DATA} ${srcdir}/discussd.8 ${DESTDIR}${mandir}/man8
+	${INSTALL_DATA} ${srcdir}/disserve.8 ${DESTDIR}${mandir}/man8
 
 # Doesn't depend on clean because that would run clean target in
 # subdirectories more than once
