@@ -2,8 +2,11 @@ debathena-discuss (10.0.15-0debathena2) unstable; urgency=low
 
   * Bump debian/compat to 6
   * Package discuss server utilities (Trac: #881)
+  * Cleanup man pages so they don't generate errors
+  * Add missing man pages to satisfy Lintian
+  * Comply with Lintian's feelings on grammar
 
- -- Jonathan Reed <jdreed@mit.edu>  Fri, 07 Sep 2012 15:47:43 -0400
+ -- Jonathan Reed <jdreed@mit.edu>  Fri, 07 Sep 2012 15:53:02 -0400
 
 debathena-discuss (10.0.15-0debathena1) unstable; urgency=low
 
