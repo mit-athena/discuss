@@ -368,7 +368,8 @@ add_the_mtg(new_nbp,code)
 	int *code;
 {
 	name_blk *nbp,temp_nb;
-	char question[100];
+	const char *prompt = "Meeting %s already exists.\nDo you wish to delete the old one and add the new one? ";
+	char *question = NULL;
 	int j;
 
 	/* see if we're already attending... */
@@ -382,14 +383,20 @@ add_the_mtg(new_nbp,code)
 	for (j = 0; new_nbp->aliases[j] != NULL; j++) {
 	     dsc_get_mtg (user_id, new_nbp->aliases[j], &temp_nb, code);
 	     if (*code == 0) {				/* already exists */
-		  sprintf (question, "Meeting %s already exists.\nDo you wish to delete the old one and add the new one? ",new_nbp -> aliases[j]);
+	          question = malloc(strlen(prompt) - 2 + strlen(new_nbp -> aliases[j]) + 1);
+		       if (! question) {
+			    fprintf(stderr, "Couldn't malloc.  Too bad...");
+			    return;
+		       }
+		  sprintf (question, prompt, new_nbp -> aliases[j]);
 		  if (!command_query (question)) {
 		       printf ("Meeting not added.\n");
 		       dsc_destroy_name_blk (&temp_nb);
 		       *code = DISC_ACTION_NOT_PERFORMED;
+		       free(question);
 		       return;
 		  }
-
+		  free(question);
 		  del_the_mtg (&temp_nb, code);
 		  if (*code != 0) {
 		       dsc_destroy_name_blk (&temp_nb);
