@@ -501,7 +501,10 @@ char *recvstr ()
 
     if (USP_get_string(us, &str) != SUCCESS) {
 	rpc_err = errno;
-	return("");
+    /* the invoking code will call free()
+     * on values returned from this function */
+    str = malloc(1);
+    str[0] = '\0';
     }
 
     return (str);
