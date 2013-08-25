@@ -5,7 +5,6 @@ usr/bin/dsgrep
 usr/bin/dsmail
 usr/bin/dspipe
 usr/bin/mkds
-usr/bin/pmtg
 usr/bin/rmds
 usr/lib/debathena-discuss/edsc
 usr/share/discuss

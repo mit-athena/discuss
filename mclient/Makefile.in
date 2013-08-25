@@ -29,10 +29,10 @@ KLIBS=	../libds/libdsk.a ../usp/libusp.a @KRB4_LIBS@ @KRB5_LIBS@ ${LIBS}
 .c.o:
 	${CC} -c ${ALL_CFLAGS} $<
 
-all: create_mtg_dir crmtgs mkds pmtg dsmail dspipe
+all: create_mtg_dir crmtgs mkds dsmail dspipe
 
 clean:
-	rm -f create_mtg_dir crmtgs mkds pmtg dsmail dspipe *.o
+	rm -f create_mtg_dir crmtgs mkds dsmail dspipe *.o
 
 distclean: clean
 	rm -f Makefile
@@ -46,7 +46,6 @@ install:
 	${INSTALL_PROGRAM} create_mtg_dir ${DESTDIR}${bindir}
 	${INSTALL_PROGRAM} crmtgs ${DESTDIR}${bindir}
 	${INSTALL_PROGRAM} mkds ${DESTDIR}${bindir}
-	${INSTALL_PROGRAM} pmtg ${DESTDIR}${bindir}
 	${INSTALL_PROGRAM} dsmail ${DESTDIR}${bindir}
 	${INSTALL_PROGRAM} dspipe ${DESTDIR}${bindir}
 	-rm -f $(DESTDIR)${bindir}/rmds
@@ -54,7 +53,6 @@ install:
 	${INSTALL} -m 755 dsc_setup.sh ${DESTDIR}${bindir}/dsc_setup
 	${INSTALL_DATA} crmtgs.1 ${DESTDIR}${mandir}/man1
 	${INSTALL_DATA} mkds.8 ${DESTDIR}${mandir}/man8
-	${INSTALL_DATA} pmtg.1 ${DESTDIR}${mandir}/man1
 	${INSTALL_DATA} dsmail.1 ${DESTDIR}${mandir}/man1
 	${INSTALL_DATA} dspipe.8 ${DESTDIR}${mandir}/man8
 	${INSTALL_DATA} dsc_setup.1 ${DESTDIR}${mandir}/man1
@@ -68,9 +66,6 @@ crmtgs: crmtgs.o ../ets/dsc_et.o
 
 mkds: mkds.o ../ets/dsc_et.o ../client/edit.o
 	${CC} ${LDFLAGS} -o mkds mkds.o ../ets/dsc_et.o ../client/edit.o ${KLIBS}
-
-pmtg: pmtg.o ../ets/dsc_et.o
-	${CC} ${LDFLAGS} -o pmtg pmtg.o ../ets/dsc_et.o ${KLIBS}
 
 dsmail: dsmail.o ../ets/dsc_et.o
 	${CC} ${LDFLAGS} -o dsmail dsmail.o ../ets/dsc_et.o ${KLIBS}

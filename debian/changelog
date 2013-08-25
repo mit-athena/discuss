@@ -7,7 +7,9 @@ debathena-discuss (10.0.16-0debathena1) UNRELEASED; urgency=low
 
   [ Victor Vasiliev ]
   * Fix segmentation fault caused by interrupting listing of the transactions
-    in the meeting.
+    in the meeting
+  * Remove pmtg, which was broken and unmaintained for sufficiently long
+    amount of time
 
  -- Jonathan Reed <jdreed@mit.edu>  Wed, 03 Apr 2013 13:59:39 -0400
 
