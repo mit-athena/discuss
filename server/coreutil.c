@@ -139,6 +139,7 @@ char *mtg_name;
 	  (void) close (u_control_f);
 	  current_mtg [0] = '\0';
 	  acl_destroy(mtg_acl);
+	  mtg_acl = NULL;
      }
 
      u_trn_f = u_control_f = u_acl_f = 0;
