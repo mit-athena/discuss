@@ -1,8 +1,8 @@
 .\" This is an -*- nroff -*- source file.
 .\"
-.TH DISSERVE 8 "9 September 2012" "Discuss" "deabthena-discuss-server"
+.TH DISSERVE 8 "9 September 2012" "Discuss" "debathena-discuss-server"
 .SH NAME
-disserve \- Component of discuss server
+disserve \- local access component of discuss server
 .SH SYNOPSIS
 .B disserve
 .SH DESCRIPTION
@@ -10,5 +10,8 @@ The
 .B disserve
 program is a component of the discuss server.  Is it not intended to be
 run by hand.
+
+\fBdisserve\fR is typically installed setuid and run (by \fBdiscuss\fR(1) or \fImkds\fR(8), for example) to handle local access to discuss meetings.
+
 .SH SEE ALSO
 .BR discuss (1)
