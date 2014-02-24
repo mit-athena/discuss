@@ -1,8 +1,8 @@
 .\" This is an -*- nroff -*- source file.
 .\"
-.TH DISCUSSD 8 "9 September 2012" "Discuss" "deabthena-discuss-server"
+.TH DISCUSSD 8 "9 September 2012" "Discuss" "debathena-discuss-server"
 .SH NAME
-discussd \- Component of discuss server
+discussd \- remote access component of discuss server
 .SH SYNOPSIS
 .B discussd
 .SH DESCRIPTION
@@ -10,5 +10,8 @@ The
 .B discussd
 program is a component of the discuss server.  Is it not intended to be
 run by hand.
+
+\fBdiscussd\fR is typically run by \fIinetd\fR(8) to handle remote access to discuss meetings.
+
 .SH SEE ALSO
 .BR discuss (1)
