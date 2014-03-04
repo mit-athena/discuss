@@ -47,10 +47,10 @@ unnecessary cruft.  If no options are specified, all of the mail
 headers are stripped.  By using the options detailed below, you can
 have fine control over which headers should be retained:
 .TP
-.B \-d
+.B \-x
 will cause
 .B dsmail
-to retain the ``default'' fields.  These are the to, from, cc, and
+to NOT retain the ``default'' fields.  These are the to, from, cc, and
 date fields, the Message-Id field, the MIME-related fields, and any
 other fields ending in ``-to'' (except for fields beginning with
 ``d'', such as Delivered-To) or ``-from''.
@@ -81,6 +81,19 @@ entered into the discuss meeting.  Instead, it is sent to standard
 output so that the formatting of the mail messages can be checked
 easily.   This option should only be used interactively.
 
+.SH "NOTE"
+Early versions of dsmail treated the
+.B \-A
+,
+.B \-d
+and
+.B \-D
+options as toggles.  (That is, specifying an option twice would
+essentially be a no-op.)  This was deemed to be confusing and
+this feature was removed in 2013.  You may still specify options as many
+times as you like, but they will have the same effect as if the option
+was specified once.
+
 .SH "IN-REPLY-TO"
 dsmail parses the ``In-reply-to'' field in the mail header for
 transaction numbers of the form ``[nnnn] in meeting name''.  If one is
@@ -93,4 +106,4 @@ chained to that transaction number.
 .SH "SEE ALSO"
 discuss(1), aliases(5)
 .SH BUGS
-Hopefully few.
+Probably lots.
