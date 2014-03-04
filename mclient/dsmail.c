@@ -65,7 +65,8 @@ char *fromlist[] = {
 char *progname;
 char *save[LISTLEN],*reject[LISTLEN];
 char *usr_mtg = "";
-int dodefs, allfields, debug, have_host, subject_match=0;
+int dodefs=1;
+int allfields, debug, have_host, subject_match=0;
 char *optarg;
 int optind;
 extern tfile unix_tfile();
@@ -409,10 +410,14 @@ void PRS(argc,argv)
 	progname=argv[0];
 	sp=rp=0;
 	optind=1;		/* Initialize for getopt */
-	while ((c = getopt(argc,argv,"AZDs:da:r:h")) != EOF)
+	while ((c = getopt(argc,argv,"AZDs:dxa:r:h")) != EOF)
 		switch(c) {
 		case 'd':
-			dodefs=!dodefs;
+			/* no-op */
+			break;
+
+		case 'x':
+			dodefs=0;
 			break;
 
 		case 's':
@@ -420,11 +425,11 @@ void PRS(argc,argv)
 			break;
 
 		case 'D':
-			debug=!debug;
+			debug=1;
 			break;
 
 		case 'A':
-			allfields=!allfields;
+			allfields=1;
 			break;
 
 		case 'a':
