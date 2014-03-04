@@ -1,3 +1,11 @@
+debathena-discuss (10.0.17-0debathena1) unstable; urgency=low
+
+  * Correct typos and add clarifications in in discussd and disserve man
+    pages (patch from Alex Dehnert)
+  * Make dsmail default to -d (Trac: #1114)
+
+ -- Jonathan Reed <jdreed@mit.edu>  Tue, 04 Mar 2014 13:33:18 -0500
+
 debathena-discuss (10.0.16-0debathena1) unstable; urgency=low
 
   [ Jonathan Reed ]
