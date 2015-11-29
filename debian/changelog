@@ -1,3 +1,9 @@
+debathena-discuss (10.0.17-0debathena2) unstable; urgency=medium
+
+  * Raise automake version to 1.11.
+
+ -- Victor Vasiliev <vasilvv@mit.edu>  Sat, 28 Nov 2015 23:08:23 -0500
+
 debathena-discuss (10.0.17-0debathena1) unstable; urgency=low
 
   * Correct typos and add clarifications in in discussd and disserve man
