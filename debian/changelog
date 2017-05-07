@@ -1,3 +1,12 @@
+debathena-discuss (10.0.17-0debathena3) unstable; urgency=medium
+
+  * debathena-discuss-emacs: Modify debathena-discuss
+    (>= ${source:Version}) dependency to debathena-discuss
+    (>= ${binary:Version}), because sbuild now provides a
+    ${source:Version} without our appended ~distro tags.
+
+ -- Anders Kaseorg <andersk@mit.edu>  Sun, 07 May 2017 01:31:39 -0400
+
 debathena-discuss (10.0.17-0debathena2) unstable; urgency=medium
 
   * Raise automake version to 1.11.
