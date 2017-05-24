@@ -533,7 +533,7 @@ char *args;
      }
 
      /* Read the subject */
-     if (gets(subject) == NULL) {
+     if (fgets(subject, sizeof(subject), stdin) == NULL) {
 	  printf(";End of file\n");
 	  exit(1);
      }

@@ -102,7 +102,7 @@ char *argv[];
 		strcpy(default_host, h);
 	}
 	printf("Meeting host: [default %s]: ", default_host);
-	if (!gets(mtg_host))
+	if (!fgets(mtg_host, sizeof(mtg_host), stdin))
 		exit(1);
 	strcpy(mtg_host, strtrim(mtg_host));
 	if (mtg_host[0] == '\0')
@@ -119,14 +119,14 @@ char *argv[];
 		strcpy(mtg_host, hp->h_name);
 	}
 	printf("\nMeeting location [default %s]: ", default_dir);
-	if (!gets(mtg_path))
+	if (!fgets(mtg_path, sizeof(mtg_path), stdin))
 	        exit(1);
 	strcpy(mtg_path, strtrim(mtg_path));
 	if (!mtg_path[0])
 		strcpy(mtg_path, default_dir);
 	if (!remove) {
 		printf("\nLong meeting name: ");
-		if (!gets(long_name))
+		if (!fgets(long_name, sizeof(long_name), stdin))
 		        exit(1);
 		strcpy(long_name, strtrim(long_name));
 		if (long_name[0] == '\0') {
@@ -135,7 +135,7 @@ char *argv[];
 		}
 	}
 	printf("\nShort meeting name: ");
-	if (!gets(short_name))
+	if (!fgets(short_name, sizeof(short_name), stdin))
 	        exit(1);
 	strcpy(short_name, strtrim(short_name));
 	if(short_name[0] == '\0') {
@@ -186,7 +186,7 @@ End with . on a line by itself\n\n");
 		for (;;) {
 			printf("User name: ");
 			fflush(stdout);
-			if (!gets(username)) break;
+			if (!fgets(username, sizeof(username), stdin)) break;
 			strcpy(username, strtrim(username));
 			if (strcmp(username, ".") == 0) break;
 			if (strcmp(username,"*") != 0 &&
@@ -260,7 +260,7 @@ End with . on a line by itself\n\n");
 		printf("\n");
 		for (;;) {
 			printf("Announce in what meeting? ");
-			if (!gets(ann_mtg))
+			if (!fgets(ann_mtg, sizeof(ann_mtg), stdin))
 				exit(1);
 			dsc_get_mtg(nbsrc.user_id,strtrim(ann_mtg),
 				    &nbdest,&result);
@@ -316,7 +316,7 @@ char *prompt,def;
 
 	for (;;) {
 		(void) printf("%s ",prompt);
-		if (!gets(yn_inp))
+		if (!fgets(yn_inp, sizeof(yn_inp), stdin))
 		        exit(1);
 		if (yn_inp[0] == '\0')
 			yn_inp[0] = def;

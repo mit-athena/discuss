@@ -16,6 +16,7 @@
 #include <discuss/dsc_et.h>
 #include <rpc.h>
 #include <sys/file.h>
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <fcntl.h>

@@ -34,6 +34,7 @@ static char rcsid_rpcall_c[] =
 #include <netdb.h>
 #if HAVE_FCNTL_H
 #include <fcntl.h>
+#include <unistd.h>
 #endif
 #include <discuss/tfile.h>
 #include "rpc.h"
