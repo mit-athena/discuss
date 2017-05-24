@@ -16,6 +16,7 @@ static char rcsid_do_quote_c[] = "$Id: do_quote.c,v 1.4 2006-03-10 07:11:37 ghud
 #endif /* lint */
 
 #include <stdlib.h>
+#include <string.h>
 
 /*
  *

@@ -17,7 +17,9 @@ static char rcsid_update_c[] =
 
 #include <discuss/discuss.h>
 #include "globals.h"
+#include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <sys/types.h>
 #include <sys/file.h>
 #include <sys/ioctl.h>
