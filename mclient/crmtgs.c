@@ -20,6 +20,7 @@ static char rcsid_crmtgs_c[] =
     "$Id: crmtgs.c,v 1.7 1999-04-12 16:47:06 ghudson Exp $";
 #endif /* lint */
 
+#include <stdlib.h>
 #include <stdio.h>
 #include <discuss/discuss.h>
 

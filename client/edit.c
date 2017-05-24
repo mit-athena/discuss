@@ -18,10 +18,12 @@ static char rcsid_discuss_utils_c[] =
     "$Id: edit.c,v 1.16 1999-02-02 20:39:46 kcr Exp $";
 #endif /* lint */
 
+#include <stdlib.h>
 #include <stdio.h>
 #include <sys/file.h>
 #include <string.h>
 #include <signal.h>
+#include <unistd.h>
 #include <ss/ss.h>
 #include <discuss/discuss.h>
 #include "globals.h"
@@ -98,7 +100,7 @@ edit(fn, edit_path)
 		fchmod(fileno(the_file), 0700);
 		printf("Enter transaction; end with ^D or '.' on a line by itself.\n");
 		for (;;) {
-			if ((gets(buffer) == NULL) || interrupt || !strcmp(buffer, ".")) break;
+			if ((fgets(buffer, sizeof(buffer), stdin) == NULL) || interrupt || !strcmp(buffer, ".")) break;
 			else if (!strcmp(buffer,"\\f")) {
 				editor_path_2 = editor_path_e;
 				break;

@@ -10,6 +10,7 @@
  * However, it is secure..
  */
 
+#include <stdlib.h>
 #include <stdio.h>
 #include <sys/file.h>
 #include <sys/param.h>

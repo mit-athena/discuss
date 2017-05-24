@@ -12,6 +12,7 @@
  * $Id: disserve.c,v 1.5 1999-01-22 23:10:17 ghudson Exp $
  */
 
+#include <stdlib.h>
 #include <stdio.h>
 #include <syslog.h>
 extern char *error_message();

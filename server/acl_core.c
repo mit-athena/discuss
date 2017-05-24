@@ -19,6 +19,7 @@
 #include "internal.h"
 #include <sys/file.h>
 #include <errno.h>
+#include <stdlib.h>
 #include <stdio.h>
 #include <sys/param.h>
 #include <string.h>

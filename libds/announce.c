@@ -15,6 +15,7 @@ static char rcsid_announce_c[] =
     "$Id: announce.c,v 1.10 1999-02-08 14:47:07 danw Exp $";
 #endif /* lint */
 
+#include <stdlib.h>
 #include <stdio.h>
 #include <sys/file.h>
 #if HAVE_FCNTL_H

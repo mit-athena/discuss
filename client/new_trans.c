@@ -18,6 +18,7 @@ static char rcsid_discuss_c[] =
      "$Id: new_trans.c,v 1.30 2006-03-10 07:11:31 ghudson Exp $";
 #endif /* lint */
 
+#include <stdlib.h>
 #include <stdio.h>
 #include <sys/file.h>
 #include <signal.h>

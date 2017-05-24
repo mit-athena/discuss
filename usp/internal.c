@@ -7,6 +7,7 @@
 #include <sys/types.h>
 #include <errno.h>
 #include <stdio.h>
+#include <string.h>
 #include "gen.h"
 #include "usp.h"
 #include <netinet/in.h>
